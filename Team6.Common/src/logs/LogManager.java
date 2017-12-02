@@ -1,5 +1,5 @@
 
-package Logs;
+package logs;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -100,7 +100,7 @@ public class LogManager
 
 			logger.setLevel(Level.ALL);
 
-			logger.config("Log create succesfuly on 'All' Level. Log path: " + f.getAbsolutePath());
+			logger.config("Log created successfully on 'All' Level. Log path: " + f.getAbsolutePath());
 
 			return logger;
 		}
