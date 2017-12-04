@@ -20,30 +20,30 @@ import utilities.XmlUtilities;
 public class EntryPoint {
 
 	private static Logger s_logger = null;
-	
+
 	/**
 	 * Server application entry point
 	 *
-	 * @param args application arguments
+	 * @param args
+	 *            application arguments
 	 */
 	public static void main(String[] args) {
 		s_logger = LogManager.getLogger();
 
 		try {
 			initializeConfiguration();
+			
 		} catch (Exception ex) {
 
 		}
 	}
 
 	private static void initializeConfiguration() {
-		InputStream inputStream = EntryPoint.class.getResourceAsStream("/Configuration/configuration.xml"); 
+		InputStream inputStream = EntryPoint.class.getResourceAsStream("/Configuration/configuration.xml");
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-		ServerConfiguration serverConfiguration = XmlUtilities.parseXmlToObject(bufferedReader,ServerConfiguration.class);
-		if (s_logger == null) {
-			return;
-		}
-		
+		ServerConfiguration serverConfiguration = XmlUtilities.parseXmlToObject(bufferedReader,
+				ServerConfiguration.class);
+
 		if (serverConfiguration != null) {
 			s_logger.config("Server configuration loaded seccesfuly! " + serverConfiguration.toString());
 

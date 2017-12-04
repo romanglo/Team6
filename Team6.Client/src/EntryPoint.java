@@ -40,9 +40,7 @@ public class EntryPoint {
 		InputStream inputStream = EntryPoint.class.getResourceAsStream("/Configuration/configuration.xml"); 
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 		ClientConfiguration serverConfiguration = XmlUtilities.parseXmlToObject(bufferedReader,ClientConfiguration.class);
-		if (s_logger == null) {
-			return;
-		}
+
 		
 		if (serverConfiguration != null) {
 			s_logger.config("Server configuration loaded seccesfuly! " + serverConfiguration.toString());
