@@ -34,6 +34,7 @@ public class EntryPoint {
 		} catch (Exception ex) {
 
 		}
+		s_logger.info("Server closing..");
 	}
 
 	private static void initializeConfiguration() {
