@@ -1,4 +1,4 @@
-package configuration;
+package configurations;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  */
 @XmlRootElement(name = "configuration")
-public class ServerConfiguration {
+public class ClientConfiguration {
 
 	@XmlElement(name = "ip")
 	private String m_ip;
@@ -35,7 +35,7 @@ public class ServerConfiguration {
 
 	@Override
 	public String toString() {
-		return "ServerConfiguration [ip=" + m_ip + ", port=" + m_port + "]";
+		return "ClientConfiguration [ip=" + m_ip + ", port=" + m_port + "]";
 	}
 
 	

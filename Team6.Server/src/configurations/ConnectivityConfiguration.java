@@ -1,17 +1,16 @@
-package configuration;
+package configurations;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-
 /**
  * 
  *
- * ServerConfiguration: POJO to server application.
+ * ServerConfiguration: POJO to connectivity configuration.
  *
  */
-@XmlRootElement(name = "configuration")
-public class ClientConfiguration {
+@XmlRootElement(name = "connectivity")
+public class ConnectivityConfiguration {
 
 	@XmlElement(name = "ip")
 	private String m_ip;
@@ -35,8 +34,6 @@ public class ClientConfiguration {
 
 	@Override
 	public String toString() {
-		return "ClientConfiguration [ip=" + m_ip + ", port=" + m_port + "]";
+		return "ServerConfiguration [ip=" + m_ip + ", port=" + m_port + "]";
 	}
-
-	
 }

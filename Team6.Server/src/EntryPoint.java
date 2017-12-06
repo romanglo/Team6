@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import configuration.ServerConfiguration;
+import configurations.ServerConfiguration;
 import logs.LogManager;
 import utilities.XmlUtilities;
 
@@ -21,6 +21,7 @@ import utilities.XmlUtilities;
 public class EntryPoint {
 
 	private static Logger s_logger = null;
+	private static ServerConfiguration s_serverConfiguration;
 
 	/**
 	 * Server application entry point
@@ -42,25 +43,25 @@ public class EntryPoint {
 	}
 
 	private static void testDbController() {
-		DbController controller =new DbController(false, s_logger);
+		DbController controller =new DbController(s_serverConfiguration.getDbConfiguration());
 		controller.Start();
 		controller.printAllProducts();
 		controller.Stop();
 	}
 
 	private static void initializeConfiguration() {
-		String configurationPath = "configuration\\configuration.xml";
+		String configurationPath = "configuration.xml";
 		InputStream inputStream = EntryPoint.class.getResourceAsStream(configurationPath);
 		if (inputStream == null) {
-			s_logger.severe("Configuration file was not found, path: " + configurationPath);
+			s_logger.severe("Configuration XML file was not found, path: " + configurationPath);
 			return;
 		}
 		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-		ServerConfiguration serverConfiguration = XmlUtilities.parseXmlToObject(bufferedReader,
+		s_serverConfiguration = XmlUtilities.parseXmlToObject(bufferedReader,
 				ServerConfiguration.class);
 
-		if (serverConfiguration != null) {
-			s_logger.config("Server configuration loaded seccesfuly! " + serverConfiguration.toString());
+		if (s_serverConfiguration != null) {
+			s_logger.config("Server configuration loaded seccesfuly! " + s_serverConfiguration.toString());
 
 		} else {
 			s_logger.severe("Failed on try to load configuration xml file.");

@@ -3,50 +3,65 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.sun.istack.internal.NotNull;
+
 import java.sql.Connection;
 
+import common.IStartable;
 import common.NotRunningException;
 import common.Startable;
 import common.StartableState;
+import configurations.DbConfiguration;
+import logs.LogManager;
 
 /**
  *
  * DbController:
- * TODO Roman: Auto-generated type stub - Change with type description
+ * A class which communicates with the database
  * 
+ * @see IStartable
  */
 public class DbController extends Startable {
 	
 	// region Fields
 
-	
 	private Connection m_connection = null;
+	
+	private DbConfiguration m_dbConfiguration;
 
 	// end region -> Fields
 
 	// region Constructors
 
-	protected DbController(boolean throwable, Logger logger) {
-		super(throwable, logger);
-		// TODO Auto-generated constructor stub
+	/**
+	 * 
+	 *  Create a instance which communicates with the database, you must {@link IStartable#Start()} the class before using it.
+	 *
+	 * @param dbConfiguration The configuration of the database.
+	 */
+	public DbController(@NotNull DbConfiguration dbConfiguration) {
+		super(false, LogManager.getLogger());
+		m_dbConfiguration = dbConfiguration;
+		
 	}
 	
 	// end region -> Constructors
 
-	// region Public Methods
-
-	
-
-	// end region -> Public Methods
 
 	// region Startable Implementation
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void initialStart() throws SQLException 
 	{
+		String connectionString = "jdbc:mysql://"+m_dbConfiguration.getIp()+'/'+m_dbConfiguration.getSchema();
 		try {
-			m_connection = DriverManager.getConnection("jdbc:mysql://localhost/zer-li","root","123456");
+			//			m_connection = DriverManager.getConnection("jdbc:mysql://localhost/zer-li","root","123456");
+
+			m_connection = DriverManager.getConnection(connectionString,m_dbConfiguration.getUsername(),m_dbConfiguration.getPassword());
 		} catch (SQLException e) {
 			m_connection=null;			
 			String errormessage = "Failed to open connection with MySql server!";
@@ -56,6 +71,9 @@ public class DbController extends Startable {
 		
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void initialStop() throws SQLException
 	{
@@ -82,7 +100,7 @@ public class DbController extends Startable {
 	
 	/**
 	 * 
-	 * TODO Roman: Auto-generated comment stub - Change it!
+	 * The method prints all the rows in product table.
 	 *
 	 * @throws NotRunningException if the method called when the class not in {@link StartableState#Running}
 	 */
@@ -110,10 +128,5 @@ public class DbController extends Startable {
 	
 	//end region -> Public Methods
 	
-	
-	// region Nested Classes
-
-
-	// end region -> Nested Classes
 }
 
