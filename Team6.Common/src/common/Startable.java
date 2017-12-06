@@ -135,12 +135,12 @@ public abstract class Startable implements IStartable
 	/**
 	 * The method contain the real login in stop operation.
 	 */
-	protected abstract void initialStop();
+	protected abstract void initialStop() throws Exception;
 
 	/**
 	 * The method contain the real login in start operation.
 	 */
-	protected abstract void initialStart();
+	protected abstract void initialStart() throws Exception;
 
 	// end region -> Abstract Methods
 }
