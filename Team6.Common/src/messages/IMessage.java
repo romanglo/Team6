@@ -13,7 +13,7 @@ public interface IMessage
 {
 
 	/**
-	 * @return The ID of the the message.
+	 * @return The ID of the message.
 	 */
 	String getMessageId();
 

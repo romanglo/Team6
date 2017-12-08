@@ -1,12 +1,8 @@
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import configurations.ClientConfiguration;
 import logs.LogManager;
-import utilities.XmlUtilities;
 
 /**
  * Package Name: Created: 13-11-2017
@@ -21,6 +17,7 @@ public class EntryPoint
 {
 
 	private static Logger s_logger = null;
+	private static ClientConfiguration s_clientConfiguration;
 
 	/**
 	 * Server application entry point
@@ -41,23 +38,14 @@ public class EntryPoint
 
 	}
 
-	private static void initializeConfiguration() throws Exception 
-	{
-		String configurationPath = "configuration.xml";
-		InputStream inputStream = EntryPoint.class.getResourceAsStream(configurationPath);
-		if (inputStream == null) {
-			s_logger.severe("Configuration XML file was not found, path: " + configurationPath);
-			return;
+	private static void initializeConfiguration() {
+		s_clientConfiguration = ClientConfiguration.getInstance();
+		if (s_clientConfiguration.isDefaultConfiguration()) {
+			s_logger.warning("Failed on try to read configuration from \"" + 
+					ClientConfiguration.CONFIGURATION_PATH
+					+ "\". Created default configuration.");
+
 		}
-
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-		ClientConfiguration clientConfiguration = XmlUtilities.parseXmlToObject(bufferedReader,ClientConfiguration.class);
-
-		if (clientConfiguration != null) {
-			s_logger.config("Server configuration loaded seccesfuly! " + clientConfiguration.toString());
-
-		} else {
-			s_logger.severe("Failed on try to load configuration xml file.");
-		}
+		s_logger.config("Client configuration loaded:" + s_clientConfiguration.toString());
 	}
 }
