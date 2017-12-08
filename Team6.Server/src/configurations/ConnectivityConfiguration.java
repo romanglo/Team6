@@ -12,28 +12,39 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "connectivity")
 public class ConnectivityConfiguration {
 
-	@XmlElement(name = "ip")
-	private String m_ip;
+	// region Constants
+
+	/**
+	 * Default connection port.
+	 */
+	public final static int DEFAULT_PORT = 1234;
+
+	// end region -> Constants
+
+	// region Fields
 
 	@XmlElement(name = "port")
-	private String m_port;
+	private int m_port;
+
+	// end region -> Fields
+
+	// region Getters
 
 	/**
 	 * @return the application port.
 	 */
-	public String getPort() {
+	public int getPort() {
 		return m_port;
 	}
-	
-	/**
-	 * @return the application IP.
-	 */
-	public String getIp() {
-		return m_ip;
-	}
+
+	// end region -> Getters
+
+	// region Object Methods Overrides
 
 	@Override
 	public String toString() {
-		return "ServerConfiguration [ip=" + m_ip + ", port=" + m_port + "]";
+		return "ServerConfiguration [port=" + m_port + "]";
 	}
+
+	// end region -> Object Methods Overrides
 }

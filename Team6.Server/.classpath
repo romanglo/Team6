@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="libs"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Team6.Common"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry exported="true" kind="lib" path="../3rd Parties/mysql-connector-java-5.1.19-bin.jar"/>
+	<classpathentry kind="lib" path="libs/mysql-connector-java-5.1.19-bin.jar"/>
+	<classpathentry kind="lib" path="libs/ObjectClientServerFramework.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

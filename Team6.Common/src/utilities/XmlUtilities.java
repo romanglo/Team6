@@ -4,13 +4,9 @@ package utilities;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-
-import logs.LogManager;
 
 /**
  *
@@ -19,8 +15,6 @@ import logs.LogManager;
  */
 public class XmlUtilities
 {
-
-	private static Logger s_logger = null;
 
 	/**
 	 * The method parsing a XML file to specific object.
@@ -32,44 +26,31 @@ public class XmlUtilities
 	 * @param type
 	 *            A class object of the type that XML file describes.
 	 * @return An instance of <TData> if the parsing succeed, and null if did not.
+	 * @throws Exception
+	 *             If the parsing process failed.
 	 * @throws NullPointerException
 	 *             if one of the parameters is null.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <TData> TData parseXmlToObject(BufferedReader bufferedReader, Class<TData> type)
-			throws NullPointerException
+	public static <TData> TData parseXmlToObject(BufferedReader bufferedReader, Class<TData> type) throws Exception
 	{
-		// lazy loading to logger
-		if (s_logger == null) {
-			s_logger = LogManager.getLogger();
-		}
-
 		if (bufferedReader == null) {
-			String errMsg = "BufferedReader parameter is null!";
-			s_logger.log(Level.SEVERE, errMsg);
-			throw new NullPointerException(errMsg);
+			throw new NullPointerException("BufferedReader parameter is null!");
 		}
 
 		if (type == null) {
-			String errMsg = "Class<TData> parameter is null!";
-			s_logger.log(Level.SEVERE, errMsg);
-			throw new NullPointerException(errMsg);
+			throw new NullPointerException("Class<TData> parameter is null!");
 		}
 
 		TData data = null;
-		try {
 
-			String xmlString = generateStringFromBufferedReader(bufferedReader);
-			JAXBContext jaxbContext = JAXBContext.newInstance(type);
-			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+		String xmlString = generateStringFromBufferedReader(bufferedReader);
+		JAXBContext jaxbContext = JAXBContext.newInstance(type);
+		Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-			StringReader reader = new StringReader(xmlString);
-			data = (TData) unmarshaller.unmarshal(reader);
-		}
-		catch (Exception ex) {
-			s_logger.log(Level.WARNING, "Failed to parse XML file to object", ex);
-			data = null;
-		}
+		StringReader reader = new StringReader(xmlString);
+		data = (TData) unmarshaller.unmarshal(reader);
+
 		return data;
 	}
 
@@ -102,7 +83,7 @@ public class XmlUtilities
 				bufferedReader.close();
 			}
 			catch (IOException e) {
-				s_logger.log(Level.WARNING, "Failed on try to close the XML file.", e);
+				throw e;
 			}
 		}
 		return sb.toString();

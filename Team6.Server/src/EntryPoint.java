@@ -1,12 +1,12 @@
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import configurations.ServerConfiguration;
+import connectivity.Server;
+import db.DbController;
 import logs.LogManager;
-import utilities.XmlUtilities;
 
 /**
  * Package Name: 
@@ -22,6 +22,8 @@ public class EntryPoint {
 
 	private static Logger s_logger = null;
 	private static ServerConfiguration s_serverConfiguration;
+	private static DbController s_dbController;
+	private static Server s_server;
 
 	/**
 	 * Server application entry point
@@ -29,48 +31,64 @@ public class EntryPoint {
 	 * @param args
 	 *            application arguments
 	 */
+	@SuppressWarnings("resource")
 	public static void main(String[] args) {
 		s_logger = LogManager.getLogger();
 
-        
 		try {
 			initializeConfiguration();
-			initializeMySqlDriver();
-			testDbController();
+			intializeServer();
+			initializeDbController();
 		} catch (Exception ex) {
-			s_logger.log(Level.SEVERE, "initialization failed!", ex);
+			s_logger.log(Level.SEVERE, "Initialization failed!", ex);
+		}
+
+		System.out.println("Press enter to continue..");
+		new Scanner(System.in).next();
+
+		try {
+			disposeDbController();
+			disposeServer();
+		} catch (Exception ex) {
+			s_logger.log(Level.SEVERE, "Disposing failed!", ex);
 		}
 	}
 
-	private static void testDbController() {
-		DbController controller =new DbController(s_serverConfiguration.getDbConfiguration());
-		controller.Start();
-		controller.printAllProducts();
-		controller.Stop();
+	private static void intializeServer() throws IOException {
+		s_server = new Server(s_logger, s_serverConfiguration.getConnectivityConfiguration());
+		s_server.listen();
+		s_logger.info("Server initialized successfully.");
+	}
+
+	private static void disposeServer() throws IOException {
+		if (s_server != null) {
+			s_server.close();
+			s_logger.info("Server disposed successfully.");
+		}
+	}
+
+	private static void initializeDbController() {
+		s_dbController = new DbController(s_logger, s_serverConfiguration.getDbConfiguration());
+		s_dbController.Start();
+		s_logger.info("Database controller initialized successfully.");
+	}
+
+	private static void disposeDbController() {
+		if (s_dbController != null) {
+			s_dbController.printAllProducts();
+			s_dbController.Stop();
+			s_logger.info("Database controller disposed successfully.");
+		}
 	}
 
 	private static void initializeConfiguration() {
-		String configurationPath = "configuration.xml";
-		InputStream inputStream = EntryPoint.class.getResourceAsStream(configurationPath);
-		if (inputStream == null) {
-			s_logger.severe("Configuration XML file was not found, path: " + configurationPath);
-			return;
-		}
-		BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-		s_serverConfiguration = XmlUtilities.parseXmlToObject(bufferedReader,
-				ServerConfiguration.class);
+		s_serverConfiguration = ServerConfiguration.getInstance();
+		if (s_serverConfiguration.isDefaultConfiguration()) {
+			s_logger.warning("Failed on try to read configuration from \"" + ServerConfiguration.CONFIGURATION_PATH
+					+ "\". Created default configuration");
 
-		if (s_serverConfiguration != null) {
-			s_logger.config("Server configuration loaded seccesfuly! " + s_serverConfiguration.toString());
-
-		} else {
-			s_logger.severe("Failed on try to load configuration xml file.");
 		}
+		s_logger.config("Server configuration loaded:" + s_serverConfiguration.toString());
 	}
-	
-	private static void initializeMySqlDriver() throws Exception{
-		String mySqlDriverName = "com.mysql.jdbc.Driver";
-        Class.forName(mySqlDriverName).newInstance();
-        s_logger.config("Successfully created MySQL driver , driver name: " + mySqlDriverName);	
-	}
+
 }

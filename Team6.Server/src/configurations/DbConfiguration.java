@@ -12,6 +12,32 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "db")
 public class DbConfiguration {
 
+	// region Constants
+
+	/**
+	 * Default database IP.
+	 */
+	public final static String DEFAULT_IP = "localhost";
+	
+	/**
+	 * Default database schema name.
+	 */
+	public final static String DEFAULT_SCHEMA = "zer-li";
+
+	/**
+	 * Default database user name.
+	 */
+	public final static String DEFAULT_USERNAME = "root";
+	
+	/**
+	 * Default database password.
+	 */
+	public final static String DEFAULT_PASSWORD = "123456";
+
+	// end region -> Constants
+
+	// region Fields
+
 	@XmlElement(name = "ip")
 	private String m_ip;
 
@@ -20,10 +46,25 @@ public class DbConfiguration {
 
 	@XmlElement(name = "username")
 	private String m_username;
-	
+
 	@XmlElement(name = "password")
 	private String m_password;
-	
+
+	// end region -> Fields
+
+	// region Constructors
+
+	DbConfiguration() {
+		m_ip = DEFAULT_IP;
+		m_schema = DEFAULT_SCHEMA;
+		m_username = DEFAULT_USERNAME;
+		m_password = DEFAULT_PASSWORD;
+	}
+
+	// end region -> Constructors
+
+	// region Getters
+
 	/**
 	 * @return the database user password.
 	 */
@@ -44,7 +85,7 @@ public class DbConfiguration {
 	public String getSchema() {
 		return m_schema;
 	}
-	
+
 	/**
 	 * @return the database IP.
 	 */
@@ -52,9 +93,15 @@ public class DbConfiguration {
 		return m_ip;
 	}
 
+	// end region -> Getters
+
+	// region Object Methods Overrides
+
 	@Override
 	public String toString() {
-		return "DbConfiguration [ip=" + m_ip + ", schema=" + m_schema + ", username=" + m_username
-				+ ", password=" + m_password + "]";
+		return "DbConfiguration [ip=" + m_ip + ", schema=" + m_schema + ", username=" + m_username + ", password="
+				+ m_password + "]";
 	}
+
+	// end region -> Object Methods Overrides
 }

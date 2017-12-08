@@ -41,7 +41,7 @@ public class EntryPoint
 
 	}
 
-	private static void initializeConfiguration()
+	private static void initializeConfiguration() throws Exception 
 	{
 		String configurationPath = "configuration.xml";
 		InputStream inputStream = EntryPoint.class.getResourceAsStream(configurationPath);
