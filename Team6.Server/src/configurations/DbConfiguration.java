@@ -2,6 +2,7 @@ package configurations;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * 
@@ -18,7 +19,7 @@ public class DbConfiguration {
 	 * Default database IP.
 	 */
 	public final static String DEFAULT_IP = "localhost";
-	
+
 	/**
 	 * Default database schema name.
 	 */
@@ -28,7 +29,7 @@ public class DbConfiguration {
 	 * Default database user name.
 	 */
 	public final static String DEFAULT_USERNAME = "root";
-	
+
 	/**
 	 * Default database password.
 	 */
@@ -38,22 +39,25 @@ public class DbConfiguration {
 
 	// region Fields
 
-	@XmlElement(name = "ip")
+    @XmlTransient
 	private String m_ip;
 
-	@XmlElement(name = "schema")
+    @XmlTransient
 	private String m_schema;
 
-	@XmlElement(name = "username")
+    @XmlTransient
 	private String m_username;
 
-	@XmlElement(name = "password")
+    @XmlTransient
 	private String m_password;
 
 	// end region -> Fields
 
 	// region Constructors
 
+	/**
+	 * Package internal constructor which set default values to all fields.
+	 */
 	DbConfiguration() {
 		m_ip = DEFAULT_IP;
 		m_schema = DEFAULT_SCHEMA;
@@ -68,6 +72,7 @@ public class DbConfiguration {
 	/**
 	 * @return the database user password.
 	 */
+	@XmlElement(name = "password")
 	public String getPassword() {
 		return m_password;
 	}
@@ -75,6 +80,7 @@ public class DbConfiguration {
 	/**
 	 * @return the database user name.
 	 */
+	@XmlElement(name = "username")
 	public String getUsername() {
 		return m_username;
 	}
@@ -82,6 +88,7 @@ public class DbConfiguration {
 	/**
 	 * @return the database schema name.
 	 */
+	@XmlElement(name = "schema")
 	public String getSchema() {
 		return m_schema;
 	}
@@ -89,8 +96,45 @@ public class DbConfiguration {
 	/**
 	 * @return the database IP.
 	 */
+	@XmlElement(name = "ip")
 	public String getIp() {
 		return m_ip;
+	}
+
+	// end region -> Getters
+
+	// region Setters
+
+	/**
+	 * @param ip
+	 *            Database IP.
+	 */
+	public void setIp(String ip) {
+		m_ip = ip;
+	}
+
+	/**
+	 * @param schema
+	 *            Database schema name.
+	 */
+	public void setSchema(String schema) {
+		m_schema = schema;
+	}
+
+	/**
+	 * @param username
+	 *            Database user name.
+	 */
+	public void setUsername(String username) {
+		m_username = username;
+	}
+
+	/**
+	 * @param password
+	 *            Database password.
+	 */
+	public void setPassword(String password) {
+		m_password = password;
 	}
 
 	// end region -> Getters
