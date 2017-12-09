@@ -37,7 +37,7 @@ public class ProductEntity implements IEntity
 	}
 
 	/**
-	 * @return A enumerator which describes the product type.  
+	 * @return A enumerator which describes the product type.
 	 */
 	public ProductType getProductType()
 	{
@@ -86,11 +86,14 @@ public class ProductEntity implements IEntity
 	// region Constructors
 
 	/**
-	 * Create instance of {@link ProductType}.
-	 *
-	 * @param id An unique ID of the product.
-	 * @param name The name of the product.
-	 * @param productType A enumerator which describes the product type.
+	 * Create instance of {@link ProductType}. Dedicated for add or update messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the product.
+	 * @param name
+	 *            The name of the product.
+	 * @param productType
+	 *            A enumerator which describes the product type.
 	 */
 	public ProductEntity(int id, String name, ProductType productType)
 	{
@@ -99,12 +102,50 @@ public class ProductEntity implements IEntity
 		m_productType = productType;
 	}
 
-	// end region -> Constructors
-	
+	/**
+	 * Create instance of {@link ProductType}, with <code>null</code> name.
+	 * Dedicated for update messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the product.
+	 * @param productType
+	 *            A enumerator which describes the product type.
+	 */
+	public ProductEntity(int id, ProductType productType)
+	{
+		this(id, null, productType);
+	}
 
-	//region Override Object Methods
-	
-	/* 
+	/**
+	 * Create instance of {@link ProductType}, with <code>null</code> product type.
+	 * Dedicated for update messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the product.
+	 * @param name
+	 *            The name of the product.
+	 */
+	public ProductEntity(int id, String name)
+	{
+		this(id, name, null);
+	}
+
+	/**
+	 * Create instance of {@link ProductType} only with id. Dedicated for get or
+	 * remove messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the product.
+	 */
+	public ProductEntity(int id)
+	{
+		this(id, null, null);
+	}
+	// end region -> Constructors
+
+	// region Override Object Methods
+
+	/*
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -116,7 +157,7 @@ public class ProductEntity implements IEntity
 		return result;
 	}
 
-	/* 
+	/*
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -130,7 +171,7 @@ public class ProductEntity implements IEntity
 		return true;
 	}
 
-	/* 
+	/*
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -139,5 +180,5 @@ public class ProductEntity implements IEntity
 		return "ProductEntity [ID=" + m_id + ", Name=" + m_name + ", Product Type=" + m_productType + "]";
 	}
 
-	//end region -> Override Object Methods
+	// end region -> Override Object Methods
 }

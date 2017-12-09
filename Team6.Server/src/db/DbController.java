@@ -149,6 +149,30 @@ public class DbController extends Startable {
 		}
 	}
 
+	/**
+	 * 
+	 * The method execute update query in the DB.
+	 *
+	 * @param query the query to execute.
+	 */
+	public void executeUpdate(String query) {
+		if (m_State != StartableState.Running) {
+			throw new NotRunningException(this);
+		}
+
+		Statement stmt;
+		try {
+			stmt = m_connection.createStatement();
+			int result = stmt.executeUpdate(query);
+			if (result == 1) {
+				m_Logger.info("A query executed seccessfully! The query: " + query);
+			} else {
+				m_Logger.warning("Failed on try to execute the query: " + query);
+			}
+		} catch (SQLException ex) {
+			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + query, ex);
+		}
+	}
 	// end region -> Public Methods
 
 }

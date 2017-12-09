@@ -1,11 +1,14 @@
 import java.io.IOException;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import configurations.ServerConfiguration;
 import connectivity.Server;
 import db.DbController;
+import db.QueryFactory;
+import entities.IEntity;
+import entities.ProductEntity;
+import entities.ProductType;
 import logs.LogManager;
 
 /**
@@ -31,7 +34,6 @@ public class EntryPoint {
 	 * @param args
 	 *            application arguments
 	 */
-	@SuppressWarnings("resource")
 	public static void main(String[] args) {
 		s_logger = LogManager.getLogger();
 
@@ -43,8 +45,12 @@ public class EntryPoint {
 			s_logger.log(Level.SEVERE, "Initialization failed!", ex);
 		}
 
-		System.out.println("Press enter to continue..");
-		new Scanner(System.in).next();
+		IEntity debugProduct = new ProductEntity(99, "DEBUG", ProductType.BridalBouquet);
+		String updateEntityQuery = QueryFactory.generateUpdateEntityQuery(debugProduct);
+		if (updateEntityQuery != null) {
+			s_dbController.executeUpdate(updateEntityQuery);
+			s_dbController.printAllProducts();
+		}
 
 		try {
 			disposeDbController();
@@ -75,7 +81,6 @@ public class EntryPoint {
 
 	private static void disposeDbController() {
 		if (s_dbController != null) {
-			s_dbController.printAllProducts();
 			s_dbController.Stop();
 			s_logger.info("Database controller disposed successfully.");
 		}

@@ -30,11 +30,11 @@ public class Server extends AbstractServer {
 		/**
 		 * 
 		 * Method called when {@link IMessage} type message received, there is option to
-		 * answer to all clients.
+		 * answer to the client.
 		 *
 		 * @param msg
 		 *            The message from the client.
-		 * @return Answer to the all clients, null if there is not one.
+		 * @return Answer to the client, null to do nothing.
 		 */
 		IMessage onMessageReceived(IMessage msg);
 	}
@@ -173,7 +173,12 @@ public class Server extends AbstractServer {
 		IMessage answerMsg = m_messagesHandler.onMessageReceived(receivedMsg);
 
 		if (answerMsg != null) {
-			this.sendToAllClients(answerMsg);
+			try {
+				client.sendToClient(answerMsg);
+			} catch (IOException e) {
+				m_logger.log(Level.SEVERE,"Answering to the client failed, the client: " + client.toString(), e);
+			}
+			
 		}
 
 	}
