@@ -55,10 +55,13 @@ public class ApplicationEntryPoint extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			 Parent root = FXMLLoader.load(getClass().getResource("ServerXML.fxml"));
-			 Scene scene = new Scene(root,450,250);
+			 Scene scene = new Scene(root,450,300);
 			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());			 
 			 primaryStage.setScene(scene);
 			 primaryStage.show();
+			 primaryStage.setMinWidth(410);
+			 primaryStage.setMinHeight(310);
+			 primaryStage.setTitle("Server Control");
 		} catch (Exception ex) {
 			m_logger.log(Level.SEVERE, "UI start failed!", ex);
 		}
