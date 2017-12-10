@@ -11,7 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-
+import logs.LogManager;
 import common.UncaughetExceptions;
 
 /**
@@ -20,8 +20,11 @@ import common.UncaughetExceptions;
  */
 public class ApplicationEntryPoint extends Application {
 
-	private Logger m_logger = null;
+	private Logger m_logger;
+	
 	private ServerConfiguration m_serverConfiguration;
+	
+	
 	
 	/**
 	 * Application Database Controller.
@@ -51,12 +54,13 @@ public class ApplicationEntryPoint extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			 Parent root = FXMLLoader.load(getClass().getResource("ServerUI.fxml"));
-			 Scene scene = new Scene(root);
+			 Parent root = FXMLLoader.load(getClass().getResource("ServerXML.fxml"));
+			 Scene scene = new Scene(root,450,250);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());			 
 			 primaryStage.setScene(scene);
 			 primaryStage.show();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+			m_logger.log(Level.SEVERE, "UI start failed!", ex);
 		}
 	}
 
@@ -66,6 +70,7 @@ public class ApplicationEntryPoint extends Application {
 	@Override
 	public void init() throws Exception {
 		try {
+			m_logger=LogManager.getLogger();
 			initializeUncughtExceptionHandler();
 			initializeConfiguration();
 			initializeDbController();
