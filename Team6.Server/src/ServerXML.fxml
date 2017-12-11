@@ -79,7 +79,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TextArea editable="false" layoutX="21.0" layoutY="27.0" scrollLeft="1.0" AnchorPane.bottomAnchor="11.0" AnchorPane.leftAnchor="21.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="20.0">
+                        <TextArea fx:id="log" editable="false" layoutX="21.0" layoutY="27.0" scrollLeft="1.0" AnchorPane.bottomAnchor="11.0" AnchorPane.leftAnchor="21.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="20.0">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
@@ -91,10 +91,10 @@
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <TableView fx:id="setting_table" accessibleRole="TREE_VIEW" layoutX="20.0" layoutY="18.0" nodeOrientation="LEFT_TO_RIGHT" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <TableView fx:id="setting_table" editable="true" layoutX="20.0" layoutY="18.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <columns>
-                            <TableColumn editable="false" maxWidth="1.7976931348623157E308" minWidth="225.0" prefWidth="-1.0" resizable="false" sortable="false" text="Setting" />
-                            <TableColumn maxWidth="-1.0" minWidth="225.0" prefWidth="-1.0" resizable="false" sortable="false" text="Value" />
+                            <TableColumn fx:id="setting_column" editable="false" minWidth="225.0" prefWidth="-1.0" sortable="false" text="Setting" />
+                            <TableColumn fx:id="value_column" minWidth="225.0" prefWidth="-1.0" sortable="false" text="Value" />
                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
