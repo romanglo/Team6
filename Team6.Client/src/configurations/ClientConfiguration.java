@@ -52,7 +52,7 @@ public class ClientConfiguration {
 
 					} catch (Exception ex) {
 						/*
-						 * if the Server configuration failed due to some reason, 
+						 * if the Server configuration failed for some reason, 
 						 * default configuration will be created.
 						 */
 						s_instance = new ClientConfiguration();
@@ -80,14 +80,14 @@ public class ClientConfiguration {
 	 * @return the application port.
 	 */
 	public String getPort() {
-		return m_port;
+		return m_port.trim();
 	}
 	
 	/**
 	 * @return the application IP.
 	 */
 	public String getIp() {
-		return m_ip;
+		return m_ip.trim();
 	}
 	
 	/**
