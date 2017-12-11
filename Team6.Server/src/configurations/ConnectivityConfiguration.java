@@ -2,6 +2,7 @@ package configurations;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * 
@@ -15,7 +16,7 @@ public class ConnectivityConfiguration {
 	// region Constants
 
 	/**
-	 * Default connection port.
+	 * Default listening port.
 	 */
 	public final static int DEFAULT_PORT = 1234;
 
@@ -23,7 +24,7 @@ public class ConnectivityConfiguration {
 
 	// region Fields
 
-	@XmlElement(name = "port")
+    @XmlTransient
 	private int m_port;
 
 	// end region -> Fields
@@ -31,13 +32,37 @@ public class ConnectivityConfiguration {
 	// region Getters
 
 	/**
-	 * @return the application port.
+	 * @return The Server listening port.
 	 */
+	@XmlElement(name = "port")
 	public int getPort() {
 		return m_port;
 	}
 
 	// end region -> Getters
+
+	// region Setters
+
+	/**
+	 * @param port
+	 *            Server listening port.
+	 */
+	public void setPort(int port) {
+		m_port = port;
+	}
+
+	// end region -> Setters
+
+	// region Constructors
+
+	/**
+	 * Package internal constructor which set default values to all fields.
+	 */
+	ConnectivityConfiguration() {
+		m_port = DEFAULT_PORT;
+	}
+
+	// end region -> Constructors
 
 	// region Object Methods Overrides
 

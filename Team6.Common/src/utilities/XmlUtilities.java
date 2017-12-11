@@ -2,10 +2,12 @@
 package utilities;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
 /**
@@ -88,4 +90,37 @@ public class XmlUtilities
 		}
 		return sb.toString();
 	}
+
+	/**
+	 * The method parsing a object to file.
+	 *
+	 * @param <TData>
+	 *            The type that XML file describes.
+	 * @param file
+	 *            The XML file which the object will be saved to it.
+	 * @param object
+	 *            The object that will be saved to XML file.
+	 * 
+	 * @throws Exception
+	 *             If the parsing process failed.
+	 * @throws NullPointerException
+	 *             if one of the parameters is null.
+	 */
+	public static <TData> void parseObjectToXml(File file, TData object) throws Exception
+	{
+		if (file == null) {
+			throw new NullPointerException("File parameter is null!");
+		}
+
+		if (object == null) {
+			throw new NullPointerException("TData object parameter is null!");
+		}
+
+		JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
+		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+		jaxbMarshaller.marshal(object, file);
+	}
+
 }

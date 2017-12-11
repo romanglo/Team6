@@ -47,6 +47,12 @@ public class EntryPoint {
 
 		IEntity debugProduct = new ProductEntity(99, "DEBUG", ProductType.BridalBouquet);
 		String updateEntityQuery = QueryFactory.generateUpdateEntityQuery(debugProduct);
+		s_serverConfiguration.getConnectivityConfiguration().setPort(6666);
+		if(s_serverConfiguration.updateResourceFile()) {
+			s_logger.info("Configuration resource file updated successfully. " +s_serverConfiguration.toString());
+		} else {
+			s_logger.warning("Configuration resource file update failed!");
+		}
 		if (updateEntityQuery != null) {
 			s_dbController.executeUpdate(updateEntityQuery);
 			s_dbController.printAllProducts();
