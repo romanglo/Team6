@@ -17,26 +17,26 @@ import javafx.scene.shape.Circle;
 
 public class ServerController implements Initializable 
 {
-	/*Database start-stop button definition*/
+	/*Database start-stop button declaration*/
 	@FXML private Button btn_db_start;
 	@FXML private Button btn_db_stop;
 	
-	/*Database status definition*/
+	/*Database status declaration*/
 	@FXML private Circle circle_db_on;	
 	@FXML private Circle circle_db_off;
 	
-	/*Connectivity start-stop button definition*/
+	/*Connectivity start-stop button declaration*/
 	@FXML private Button btn_connectivity_start;
 	@FXML private Button btn_connectivity_stop;
 	
-	/*Connectivity status definition*/
+	/*Connectivity status declaration*/
 	@FXML private Circle circle_connectivity_on;
 	@FXML private Circle circle_connectivity_off;
 	
-	/*Log text view definition*/
+	/*Log text view declaration*/
 	@FXML private TextArea log;
 	
-	/*Setting table and columns definition*/
+	/*Setting table and columns declaration*/
 	@FXML private TableView<SettingsRow> setting_table;
 	@FXML private TableColumn<SettingsRow, String> setting_column;
 	@FXML private TableColumn<SettingsRow, String>  value_column;
@@ -67,7 +67,6 @@ public class ServerController implements Initializable
 		btn_connectivity_stop.setDisable(false);
 		circle_connectivity_on.setFill(Paint.valueOf("green"));
 		circle_connectivity_off.setFill(Paint.valueOf("grey"));
-		setting_table.getItems().add(new SettingsRow("IPIPIP","PPPP"));
 	}
 	
 	@FXML
@@ -105,7 +104,6 @@ public class ServerController implements Initializable
 		setting_table.setItems(getSettings());
 		setting_table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		log.setText(" hi\n yo\n hi\n hi\n yo\n yo\n hi\n yo\n hi\n yo\n hi\n yo\n hi");
-		
 		
 	}
 	

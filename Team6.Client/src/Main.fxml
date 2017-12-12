@@ -48,20 +48,17 @@
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="290.0" prefWidth="358.0">
                      <children>
-                        <TableView fx:id="m_itemInformation" accessibleRole="LIST_VIEW" cache="true" focusTraversable="false" layoutX="94.0" layoutY="128.0" pickOnBounds="false" prefHeight="226.0" prefWidth="234.0" scaleShape="false" snapToPixel="false">
-                          <columns>
-                            <TableColumn fx:id="itemProperty" editable="false" minWidth="0.0" prefWidth="116.00000762939453" resizable="false" sortable="false" text="Property" />
-                            <TableColumn fx:id="itemValue" editable="false" prefWidth="115.20001220703125" resizable="false" sortable="false" text="Value" />
-                          </columns>
-                           <columnResizePolicy>
-                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                           </columnResizePolicy>
-                        </TableView>
                         <Label layoutX="94.0" layoutY="85.0" prefHeight="26.0" prefWidth="195.0" text="The Selected item info:" textAlignment="CENTER">
                            <font>
                               <Font name="MingLiU-ExtB" size="15.0" />
                            </font>
                         </Label>
+                        <TableView fx:id="m_productDisplayTable" layoutX="94.0" layoutY="118.0" AnchorPane.bottomAnchor="153.0" AnchorPane.leftAnchor="94.0" AnchorPane.rightAnchor="120.0" AnchorPane.topAnchor="118.0">
+                          <columns>
+                            <TableColumn fx:id="m_propertyColumn" editable="false" minWidth="108.0" prefWidth="-1.0" sortable="false" text="Property" />
+                            <TableColumn fx:id="m_valueColumn" minWidth="108.0" prefWidth="-1.0" sortable="false" text="Value" />
+                          </columns>
+                        </TableView>
                      </children>
                   </AnchorPane>
                </content>
