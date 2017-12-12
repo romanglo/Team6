@@ -7,14 +7,14 @@ import java.util.logging.Logger;
 import com.sun.istack.internal.Nullable;
 
 import configurations.ConnectivityConfiguration;
-import messages.IMessage;
+import messages.Message;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 
 /**
  *
  * Server: Implementation of {@link AbstractServer} that can receive
- * {@link IMessage} type message.
+ * {@link Message} type message.
  * 
  */
 public class Server extends AbstractServer {
@@ -23,20 +23,22 @@ public class Server extends AbstractServer {
 
 	/**
 	 *
-	 * MessagesHandler: Describes handlers of {@link IMessage} messages.
+	 * MessagesHandler: Describes handlers of {@link Message} messages.
 	 * 
 	 */
 	public interface MessagesHandler {
 		/**
 		 * 
-		 * Method called when {@link IMessage} type message received, there is option to
+		 * Method called when {@link Message} type message received, there is option to
 		 * answer to the client.
 		 *
 		 * @param msg
 		 *            The message from the client.
+		 * @param clientDetails
+		 *            String that describes the sender of the message.
 		 * @return Answer to the client, null to do nothing.
 		 */
-		IMessage onMessageReceived(IMessage msg);
+		Message onMessageReceived(Message msg, String clientDetails);
 	}
 
 	/**
@@ -57,12 +59,6 @@ public class Server extends AbstractServer {
 		 * Method called when the server stops accepting connections.
 		 */
 		void onServerStopped();
-
-		/**
-		 * method called when the server is closed, this method always called after
-		 * {@link ServerStatusHandler#onServerStopped()}.
-		 */
-		void onServerClosed();
 
 	}
 
@@ -116,7 +112,7 @@ public class Server extends AbstractServer {
 	public int getNumberOfConnectedClients() {
 		return m_numOfConnectedClients;
 	}
-	
+
 	/**
 	 * @return The configuration of the server.
 	 */
@@ -156,10 +152,9 @@ public class Server extends AbstractServer {
 			m_logger.info("A null message has been received from client: " + client.toString());
 			return;
 		}
-
-		if (!(msg instanceof IMessage)) {
+		if (!(msg instanceof Message)) {
 			m_logger.info(
-					"A message has been received from client, but the message type is not dirived from IMessage. The Client: "
+					"A message has been received from client, but the message type is not dirived from Message. The Client: "
 							+ client.toString());
 			return;
 		}
@@ -169,18 +164,17 @@ public class Server extends AbstractServer {
 					+ client.toString() + " , Message: " + msg.toString());
 			return;
 		}
-		IMessage receivedMsg = (IMessage) msg;
-		IMessage answerMsg = m_messagesHandler.onMessageReceived(receivedMsg);
+		Message receivedMsg = (Message) msg;
+		String clientDetails = client.getName()+';'+client.getId()+';'+client.getInetAddress().toString();
+		Message answerMsg = m_messagesHandler.onMessageReceived(receivedMsg,clientDetails);
 
 		if (answerMsg != null) {
 			try {
 				client.sendToClient(answerMsg);
 			} catch (IOException e) {
-				m_logger.log(Level.SEVERE,"Answering to the client failed, the client: " + client.toString(), e);
+				m_logger.log(Level.SEVERE, "Answering to the client failed, the client: " + client.toString(), e);
 			}
-			
 		}
-
 	}
 
 	/*
@@ -189,9 +183,9 @@ public class Server extends AbstractServer {
 	@Override
 	protected void serverStarted() {
 		if (m_serverStatusHandler != null) {
-			m_logger.info("Server Started");
 			m_serverStatusHandler.onServerStarted();
 		}
+		m_logger.info("The server Started");
 	}
 
 	/*
@@ -200,9 +194,9 @@ public class Server extends AbstractServer {
 	@Override
 	protected void serverStopped() {
 		if (m_serverStatusHandler != null) {
-			m_logger.info("Server Stopped");
 			m_serverStatusHandler.onServerStopped();
 		}
+		m_logger.info("The server Stopped");
 	}
 
 	/*
@@ -210,10 +204,7 @@ public class Server extends AbstractServer {
 	 */
 	@Override
 	protected void serverClosed() {
-		if (m_serverStatusHandler != null) {
-			m_logger.info("Server Closed");
-			m_serverStatusHandler.onServerClosed();
-		}
+		m_logger.info("The server Closed");
 	}
 
 	/*

@@ -15,6 +15,7 @@ import common.NotRunningException;
 import common.Startable;
 import common.StartableState;
 import configurations.DbConfiguration;
+import entities.IEntity;
 
 /**
  *
@@ -149,30 +150,52 @@ public class DbController extends Startable {
 		}
 	}
 
-	/**
-	 * 
-	 * The method execute update query in the DB.
-	 *
-	 * @param query the query to execute.
-	 */
-	public void executeUpdate(String query) {
+	public IEntity executeGetEntity(IEntity entity) {
+//		if (m_State != StartableState.Running) {
+//			throw new NotRunningException(this);
+//		}
+//
+//		String updateQuery = QueryFactory.generateUpdateEntityQuery(entity);
+//		Statement stmt;
+//		try {
+//			stmt = m_connection.createStatement();
+//			boolean result = stmt.executeUpdate(updateQuery) ==1 ;
+//			if (result) {
+//				m_Logger.info("A query executed seccessfully! The query: " + updateQuery);
+//			} else {
+//				m_Logger.warning("Failed on try to execute the query: " + updateQuery);
+//			}
+//			return result;
+//		} catch (SQLException ex) {
+//			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + updateQuery, ex);
+//			return false;
+//		}
+		return null;
+	}
+	
+
+	public boolean executeUpdateEntity(IEntity entity) {
 		if (m_State != StartableState.Running) {
 			throw new NotRunningException(this);
 		}
 
+		String updateQuery = QueryFactory.generateUpdateEntityQuery(entity);
 		Statement stmt;
 		try {
 			stmt = m_connection.createStatement();
-			int result = stmt.executeUpdate(query);
-			if (result == 1) {
-				m_Logger.info("A query executed seccessfully! The query: " + query);
+			boolean result = stmt.executeUpdate(updateQuery) ==1 ;
+			if (result) {
+				m_Logger.info("A query executed seccessfully! The query: " + updateQuery);
 			} else {
-				m_Logger.warning("Failed on try to execute the query: " + query);
+				m_Logger.warning("Failed on try to execute the query: " + updateQuery);
 			}
+			return result;
 		} catch (SQLException ex) {
-			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + query, ex);
+			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + updateQuery, ex);
+			return false;
 		}
 	}
+	
 	// end region -> Public Methods
 
 }

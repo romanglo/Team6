@@ -12,6 +12,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import logs.LogManager;
+import common.StartableState;
 import common.UncaughetExceptions;
 
 /**
@@ -21,16 +22,14 @@ import common.UncaughetExceptions;
 public class ApplicationEntryPoint extends Application {
 
 	private Logger m_logger;
-	
+
 	private ServerConfiguration m_serverConfiguration;
-	
-	
-	
+
 	/**
 	 * Application Database Controller.
 	 */
 	public static DbController DbContoller;
-	
+
 	/**
 	 * Application Server Controller.
 	 */
@@ -40,28 +39,29 @@ public class ApplicationEntryPoint extends Application {
 	 * 
 	 * The main method of the application.
 	 *
-	 * @param args Application arguments.
+	 * @param args
+	 *            Application arguments.
 	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
 
-	//region Application Method Overrides
-	
+	// region Application Method Overrides
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			 Parent root = FXMLLoader.load(getClass().getResource("ServerXML.fxml"));
-			 Scene scene = new Scene(root,450,300);
-			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());			 
-			 primaryStage.setScene(scene);
-			 primaryStage.show();
-			 primaryStage.setMinWidth(410);
-			 primaryStage.setMinHeight(310);
-			 primaryStage.setTitle("Server Control");
+			Parent root = FXMLLoader.load(getClass().getResource("ServerXML.fxml"));
+			Scene scene = new Scene(root, 450, 300);
+			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+			primaryStage.setMinWidth(410);
+			primaryStage.setMinHeight(310);
+			primaryStage.setTitle("Zer-Li Server");
 		} catch (Exception ex) {
 			m_logger.log(Level.SEVERE, "UI start failed!", ex);
 		}
@@ -73,7 +73,7 @@ public class ApplicationEntryPoint extends Application {
 	@Override
 	public void init() throws Exception {
 		try {
-			m_logger=LogManager.getLogger();
+			m_logger = LogManager.getLogger();
 			initializeUncughtExceptionHandler();
 			initializeConfiguration();
 			initializeDbController();
@@ -96,6 +96,9 @@ public class ApplicationEntryPoint extends Application {
 		} catch (Exception ex) {
 			m_logger.log(Level.SEVERE, "Disposing failed!", ex);
 		}
+		m_logger=null;
+		m_serverConfiguration=null;
+		
 		super.stop();
 	}
 
@@ -108,11 +111,11 @@ public class ApplicationEntryPoint extends Application {
 		}
 		m_logger.config("Server configuration loaded:" + m_serverConfiguration.toString());
 	}
-	
-	// end region ->  Application Method Overrides
-	
+
+	// end region -> Application Method Overrides
+
 	// region Private Initialize Methods
-	
+
 	private void initializeUncughtExceptionHandler() {
 		UncaughetExceptions.UncaughtExceptionsHandler uncaughtExceptionsHandler = new UncaughetExceptions.UncaughtExceptionsHandler() {
 			@Override
@@ -129,33 +132,33 @@ public class ApplicationEntryPoint extends Application {
 
 	private void intializeServer() throws IOException {
 		Server = new Server(m_logger, m_serverConfiguration.getConnectivityConfiguration());
-		Server.listen();
-		m_logger.info("Server initialized successfully.");
+		m_logger.info("Server instance created successfully.");
 	}
-	
+
 	private void initializeDbController() {
 		DbContoller = new DbController(m_logger, m_serverConfiguration.getDbConfiguration());
-		DbContoller.Start();
-		m_logger.info("Database controller initialized successfully.");
+		m_logger.info("Database instance created successfully.");
 	}
-	
-	//end region -> Private Initialize Methods
-	
-	//region -> Private Dispose Methods
-	
+
+	// end region -> Private Initialize Methods
+
+	// region -> Private Dispose Methods
+
 	private void disposeServer() throws IOException {
 		if (Server != null) {
 			Server.close();
-			m_logger.info("Server disposed successfully.");
 		}
+		m_logger.info("Server disposed successfully.");
+		Server=null;
 	}
 
 	private void disposeDbController() {
-		if (DbContoller != null) {
+		if (DbContoller != null && DbContoller.getState() == StartableState.Running) {
 			DbContoller.Stop();
-			m_logger.info("Database controller disposed successfully.");
 		}
+		m_logger.info("Database controller disposed successfully.");
+		DbContoller=null;
 	}
 
-	//end region.
+	// end region.
 }

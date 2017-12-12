@@ -1,5 +1,7 @@
 package db;
 
+import java.sql.ResultSet;
+
 import entities.IEntity;
 import entities.ProductEntity;
 import entities.ProductType;
@@ -75,4 +77,5 @@ public class QueryFactory {
 		}
 		return "SELECT * FROM product WHERE pId = " + id + ';';
 	}
+	
 }
