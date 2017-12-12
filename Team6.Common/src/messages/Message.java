@@ -8,10 +8,11 @@ import com.sun.istack.internal.NotNull;
 
 /**
  *
- * Message: Generic implementation to {@link IMessage} interface.
- * 
+ * Message: Define messages that are described by ID, creation time and
+ * {@link Object} data.
+ * This class instance created by {@link MessagesFactory}.
  */
-public class Message implements IMessage
+public class Message
 {
 
 	// region Fields
@@ -27,27 +28,24 @@ public class Message implements IMessage
 	// region Getters
 
 	/**
-	 * {@inheritDoc}
+	 * @return The ID of the message.
 	 */
-	@Override
 	public String getMessageId()
 	{
 		return m_id;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @return The creation time of the message.
 	 */
-	@Override
 	public Date getCreationTime()
 	{
 		return m_creationTime;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @return The actual data of the message
 	 */
-	@Override
 	public MessageData getMessageData()
 	{
 		return m_messageData;
@@ -69,7 +67,7 @@ public class Message implements IMessage
 	 *             If received null pointer.
 	 * 
 	 */
-	public Message(@NotNull MessageData messageData) throws NullPointerException
+	Message(@NotNull MessageData messageData) throws NullPointerException
 	{
 		if (messageData == null) {
 			throw new NullPointerException("Message constructor received null poitner as MessageData parameter.");

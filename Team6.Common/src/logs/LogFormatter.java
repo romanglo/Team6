@@ -5,7 +5,13 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-class LogFormatter extends Formatter
+/**
+ *
+ * LogFormatter:
+ * Decorate message style.
+ * 
+ */
+public class LogFormatter extends Formatter
 {
 
 	private final SimpleDateFormat m_localDateFormat = new SimpleDateFormat("HH:mm:ss");

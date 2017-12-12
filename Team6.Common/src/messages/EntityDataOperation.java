@@ -28,5 +28,10 @@ public enum EntityDataOperation {
 	/**
 	 * Get specific {@link IEntity} operation.
 	 */
-	Get
+	Get,
+	
+	/**
+	 * Without specific {@link IEntity} operation.
+	 */
+	None
 }
