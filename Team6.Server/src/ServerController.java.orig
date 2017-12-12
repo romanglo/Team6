@@ -30,12 +30,6 @@ import messages.Message;
 import messages.MessageData;
 import messages.MessagesFactory;
 
-/**
- *
- * ServerController:
- * Server GUI controller.
- * 
- */
 public class ServerController implements Initializable, Server.ServerStatusHandler, Server.MessagesHandler {
 	// region UI Elements
 
