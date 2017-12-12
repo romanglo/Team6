@@ -58,6 +58,9 @@
                             <TableColumn fx:id="m_propertyColumn" editable="false" minWidth="108.0" prefWidth="-1.0" sortable="false" text="Property" />
                             <TableColumn fx:id="m_valueColumn" minWidth="108.0" prefWidth="-1.0" sortable="false" text="Value" />
                           </columns>
+                          <columnResizePolicy>
+                              <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
                         </TableView>
                      </children>
                   </AnchorPane>
