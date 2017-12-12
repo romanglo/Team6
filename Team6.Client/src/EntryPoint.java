@@ -13,13 +13,18 @@ import javafx.stage.Stage;
 
 /**
  *
- * EntryPoint: The class that have the main function.
+ * EntryPoint: 
+ * The entry point of the application.
  * 
  */
 public class EntryPoint extends Application {
 
 	private static Logger s_logger = null;
-	private static ClientConfiguration s_clientConfiguration;
+	
+	/**
+	 * Client connection configuration.
+	 */
+	public static ClientConfiguration s_clientConfiguration;
 	
 	/**
 	 * Client connection management instance.

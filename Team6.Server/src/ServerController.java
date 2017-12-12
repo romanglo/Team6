@@ -15,6 +15,12 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
+/**
+ *
+ * ServerController:
+ * Server GUI controller.
+ * 
+ */
 public class ServerController implements Initializable 
 {
 	/*Database start-stop button declaration*/

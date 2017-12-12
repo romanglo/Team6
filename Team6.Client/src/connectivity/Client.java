@@ -3,6 +3,9 @@ package connectivity;
 import java.io.IOException;
 import java.util.logging.Logger;
 
+import entities.IEntity;
+import messages.EntityData;
+import messages.Message;
 import ocsf.client.AbstractClient;
 
 /**
@@ -64,7 +67,9 @@ public class Client extends AbstractClient {
 	
 	@Override
 	public void handleMessageFromServer(Object msg) {
-		// TODO Create handle
+		IEntity entity = ((EntityData)((Message)msg).getMessageData()).getEntity();
+		
+		System.out.println(entity);
 	}
 	
 	/**
