@@ -1,9 +1,11 @@
+package declarations;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import entities.IEntity;
 import entities.ProductEntity;
 import entities.ProductType;
 import javafx.collections.FXCollections;
@@ -56,12 +58,11 @@ public class MainController implements Initializable
 
 	/* Split pane attribute. */
 	@FXML SplitPane m_getItemPane;
-
-	@FXML Label m_itemIdLbl;
-
-	@FXML Label m_itemNameLbl;
-
-	@FXML Label m_itemTypeLbl;
+	
+	/* Item display labels. */
+	@FXML static Label m_itemIdLbl;
+	@FXML static Label m_itemNameLbl;
+	@FXML static Label m_itemTypeLbl;
 
 	@SuppressWarnings("unused") private static Logger s_logger = null;
 
@@ -113,6 +114,19 @@ public class MainController implements Initializable
 		Message msg = MessagesFactory.createUpdateEntityMessage(
 				new ProductEntity(Integer.parseInt(m_enterItemId.getText()), "Roman", ProductType.Flower));
 		EntryPoint.clientController.handleMessageFromClientUI(msg);
+	}
+
+	/**
+	 * After response from the server, insert the details into the UI.
+	 *
+	 * @param entity
+	 *            - details of the entity.
+	 */
+	public static void setItemDetails(IEntity entity)
+	{
+		m_itemIdLbl.setText(String.valueOf(((ProductEntity) entity).getId()));
+		m_itemNameLbl.setText(((ProductEntity) entity).getName());
+		m_itemTypeLbl.setText(((ProductEntity) entity).getProductType().toString());
 	}
 
 	ObservableList<SettingsRow> getSettings()
