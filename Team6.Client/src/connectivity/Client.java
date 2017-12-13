@@ -63,39 +63,11 @@ public class Client extends AbstractClient
 
 	private Logger m_logger;
 
-	private String m_host;
-
-	private int m_port;
-
 	private ClientStatusHandler m_clientStatusHandler;
 
 	private MessageReceiveHandler m_messageReceiveHandler;
 
 	// end region -> Fields
-
-	// region Getters
-
-	/**
-	 * Return server port.
-	 *
-	 * @return server port.
-	 */
-	public int getServerPort()
-	{
-		return m_port;
-	}
-
-	/**
-	 * Return server host.
-	 *
-	 * @return server host.
-	 */
-	public String getServerHost()
-	{
-		return m_host;
-	}
-
-	// end region -> Getters
 
 	// region Setters
 
@@ -108,28 +80,6 @@ public class Client extends AbstractClient
 	public void setClientStatusHandler(@Nullable ClientStatusHandler clientStatusHandler)
 	{
 		m_clientStatusHandler = clientStatusHandler;
-	}
-
-	/**
-	 * Update server host.
-	 *
-	 * @param host
-	 *            - Server host for connection.
-	 */
-	public void setServerHost(String host)
-	{
-		this.m_host = host;
-	}
-
-	/**
-	 * Update server port.
-	 *
-	 * @param port
-	 *            - Server port for connection.
-	 */
-	public void setServerPort(int port)
-	{
-		this.m_port = port;
 	}
 
 	/**
@@ -167,8 +117,6 @@ public class Client extends AbstractClient
 		}
 
 		m_logger = logger;
-		m_host = host;
-		m_port = port;
 		m_clientStatusHandler = null;
 		m_messageReceiveHandler = null;
 	}
@@ -176,12 +124,13 @@ public class Client extends AbstractClient
 	// end region -> Constructors
 
 	// region Public Methods
-	
+
 	/**
 	 * Open connection with the server.
 	 *
 	 */
-	public void createConnectionWithServer() {
+	public void createConnectionWithServer()
+	{
 		try {
 			openConnection();
 		}

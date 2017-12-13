@@ -1,12 +1,14 @@
 
-package declarations;
+package client;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import configurations.ClientConfiguration;
 import connectivity.Client;
 import entities.IEntity;
 import entities.ProductEntity;
@@ -16,11 +18,15 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -52,12 +58,14 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 
 	@FXML Button m_getItemFromServer;
 
-	/* Table elements. */
-	@FXML TableView<SettingsRow> m_settingsDisplayTable;
+	/* Setting table declaration */
+	@FXML private TableView<SettingsRow> setting_table;
 
-	@FXML TableColumn<SettingsRow, String> m_settingColumn;
+	@FXML private TableColumn<SettingsRow, String> tablecolumn_setting;
 
-	@FXML TableColumn<SettingsRow, String> m_valueColumn;
+	@FXML private TableColumn<SettingsRow, String> tablecolumn_value;
+
+	@FXML private Button btn_update_settings;
 
 	/* Split pane attribute. */
 	@FXML SplitPane m_getItemPane;
@@ -90,9 +98,9 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 	private void ServerConnection(ActionEvent connectionEvent) throws IOException
 	{
 		if (connectionEvent.getSource().equals(m_connectToServer)) {
-			EntryPoint.clientController.createConnectionWithServer();
+			ApplicationEntryPoint.clientController.createConnectionWithServer();
 		} else {
-			EntryPoint.disposeConnection();
+			ApplicationEntryPoint.disposeConnection();
 		}
 		m_enterItemId.setText("");
 		clearFields();
@@ -110,7 +118,7 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 		try {
 			Message msg = MessagesFactory
 					.createGetEntityMessage(new ProductEntity(Integer.parseInt(m_enterItemId.getText())));
-			EntryPoint.clientController.handleMessageFromClientUI(msg);
+			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
 		catch (Exception ex) {
 			s_logger.log(Level.WARNING, "Error when sending get request. Exception: ", ex);
@@ -130,7 +138,7 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 			Message msg = MessagesFactory
 					.createUpdateEntityMessage(new ProductEntity(Integer.parseInt(m_itemIdUpdate.getText()),
 							m_itemNameUpdate.getText(), getItemType(m_itemTypeUpdate.getText())));
-			EntryPoint.clientController.handleMessageFromClientUI(msg);
+			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
 		catch (Exception ex) {
 			s_logger.log(Level.WARNING, "Error when sending data for update. Exception: ", ex);
@@ -158,36 +166,91 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 		m_itemTypeUpdate.setText("");
 	}
 
-	ObservableList<SettingsRow> getSettings()
-	{
-		ObservableList<SettingsRow> settings = FXCollections.observableArrayList();
-		settings.add(new SettingsRow("IP", EntryPoint.s_clientConfiguration.getIp()));
-		settings.add(new SettingsRow("PORT", EntryPoint.s_clientConfiguration.getPort()));
-		return settings;
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb)
 	{
-		initializeSettings();
+		initializeConfigurationTable();
 		initializeClientHandler();
 	}
 
-	private void initializeSettings()
+	private void initializeConfigurationTable()
 	{
-		m_settingColumn.setCellValueFactory(new PropertyValueFactory<>("setting"));
-		m_valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
-		m_settingsDisplayTable.setItems(getSettings());
-		m_settingsDisplayTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		setting_table.setRowFactory(param -> {
+			TableRow<SettingsRow> tableRow = new TableRow<>();
+			tableRow.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
+					SettingsRow rowData = tableRow.getItem();
+
+					TextInputDialog dialog = new TextInputDialog();
+					dialog.setTitle("Update Settings Value");
+					dialog.setHeaderText("Do you want to update the value of " + rowData.getSetting() + " ?");
+					dialog.setContentText("Please enter the new value:");
+					// Traditional way to get the response value.
+					Optional<String> result = dialog.showAndWait();
+					if (!result.isPresent()) {
+						return;
+					}
+					String resultString = result.get();
+					if (!(resultString != null && !resultString.equals(rowData.getValue()))) {
+						return;
+					}
+
+					Client clientController = ApplicationEntryPoint.clientController;
+					ClientConfiguration clientConfiguration = ApplicationEntryPoint.s_clientConfiguration;
+					switch (rowData.getSetting()) {
+						case ClientConfiguration.PROPERTY_NAME_IP:
+
+							clientController.setHost(resultString);
+							clientConfiguration.setIp(resultString);
+						break;
+						case ClientConfiguration.PROPERTY_NAME_PORT:
+							try {
+								int port = Integer.parseInt(resultString);
+								clientController.setPort(port);
+								clientConfiguration.setPort(port);
+							}
+							catch (Exception e) {
+								return;
+							}
+						break;
+						default:
+						break;
+					}
+					rowData.setValue(resultString);
+					drawContantToTable();
+					btn_update_settings.setDisable(false);
+					if (clientController.isConnected()) {
+						showInformationMessage("Attention: You must reconnect for the changes to take effect!");
+					}
+				}
+			});
+			return tableRow;
+		});
+		tablecolumn_setting.setCellValueFactory(new PropertyValueFactory<>("setting"));
+		tablecolumn_value.setCellValueFactory(new PropertyValueFactory<>("value"));
+
+		drawContantToTable();
+
+		btn_update_settings.setDisable(true);
 	}
 
 	private void initializeClientHandler()
 	{
-		EntryPoint.clientController.setMessagesHandler(this);
-		EntryPoint.clientController.setClientStatusHandler(this);
+		ApplicationEntryPoint.clientController.setMessagesHandler(this);
+		ApplicationEntryPoint.clientController.setClientStatusHandler(this);
+	}
+
+	private void drawContantToTable()
+	{
+		ClientConfiguration dbConfiguration = ApplicationEntryPoint.s_clientConfiguration;
+		ObservableList<SettingsRow> settings = FXCollections.observableArrayList();
+
+		settings.add(new SettingsRow(ClientConfiguration.PROPERTY_NAME_IP, dbConfiguration.getIp()));
+		settings.add(new SettingsRow("PORT", Integer.toString(ApplicationEntryPoint.s_clientConfiguration.getPort())));
+		setting_table.setItems(settings);
 	}
 
 	/**
@@ -229,4 +292,25 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 		m_disconnectedLight.setFill(Color.RED);
 		m_getItemPane.setDisable(true);
 	}
+
+	@FXML
+	private void updateSettingsFile(ActionEvent event)
+	{
+		ApplicationEntryPoint.s_clientConfiguration.updateResourceFile();
+		btn_update_settings.setDisable(true);
+	}
+
+	private void showInformationMessage(String message)
+	{
+		if (message == null || message.isEmpty()) {
+			return;
+		}
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Information Dialog");
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+
+		alert.showAndWait();
+	}
+
 }

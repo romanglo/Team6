@@ -1,62 +1,95 @@
+
 package configurations;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import logs.LogManager;
 import utilities.XmlUtilities;
-
 
 /**
  *
  * ClientConfiguration: POJO to client application configuration.
  *
  */
-@XmlRootElement(name = "configuration")
-public class ClientConfiguration {
-	
+@XmlRootElement(name = "configuration") public class ClientConfiguration
+{
+
 	/* Constants region */
-	
+
 	/**
-	 * The path of the configuration XML file.
+	 * The name of 'IP' property.
+	 */
+	public static final String PROPERTY_NAME_IP = "IP";
+
+	/**
+	 * The name of 'Port' property.
+	 */
+	public static final String PROPERTY_NAME_PORT = "Port";
+
+	/**
+	 * Default connection IP.
+	 */
+	public final static String DEFAULT_IP = "localhost";
+
+	/**
+	 * Default connection port.
+	 */
+	public final static int DEFAULT_PORT = 1234;
+
+	/**
+	 * The path of the configuration XML resource, relative to current class path.
 	 */
 	public final static String CONFIGURATION_PATH = "configuration.xml";
-	
-	/* End of --> Constants region */
-	
-	/* Singleton region */
-	
+
+	/**
+	 * A possible path of external configuration XML file.
+	 */
+	private final static File file = new File(
+			ClientConfiguration.class.getProtectionDomain().getCodeSource().getLocation().getPath() + '\\'
+					+ CONFIGURATION_PATH);
+	// end region -> Constants
+
+	// region Singleton Pattern
+
 	private static ClientConfiguration s_instance;
 
 	/**
-	 * If it is the first call of this method, it will try read the configuration
-	 * from the XML file (if the reading fails, it will be created with default configuration).
-	 * Otherwise the method will return an existing configuration.
+	 * If it is the first call to the method, the method will try read configuration
+	 * from XML file (if the reading failed, will be created default configuration),
+	 * try first to load XML file from execution folder and then from resources.
+	 * Else the method will return an existing configuration.
 	 *
-	 * @return The configuration of the application.
+	 * @return The application configuration.
 	 */
-	public static ClientConfiguration getInstance() {
-		/* Check if this is the first call */
-		if (s_instance == null) { 
-			synchronized (LogManager.class) {
-				/* Make sure that this is the first call */
-				if (s_instance == null) {
+	public static ClientConfiguration getInstance()
+	{
+		if (s_instance == null) { // Single Checked
+			synchronized (ClientConfiguration.class) {
+				if (s_instance == null) { // Double checked
 					try {
-						InputStream inputStream = ClientConfiguration.class.getResourceAsStream(CONFIGURATION_PATH);
+						InputStream inputStream;
+						if (file.exists()) {
+							inputStream = new FileInputStream(file);
+						} else {
+							inputStream = ClientConfiguration.class.getResourceAsStream(CONFIGURATION_PATH);
+						}
 						BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 						s_instance = XmlUtilities.parseXmlToObject(bufferedReader, ClientConfiguration.class);
 
-					} catch (Exception ex) {
+					}
+					catch (Exception ex) {
 						/*
-						 * if the Server configuration failed for some reason, 
-						 * default configuration will be created.
+						 * if the Server configuration failed due to some reason, default configuration
+						 * will created.
 						 */
 						s_instance = new ClientConfiguration();
-						s_instance.m_isDefaultConfiguration = true;
+						s_instance.m_defaultConfiguration = true;
 					}
 				}
 			}
@@ -64,50 +97,113 @@ public class ClientConfiguration {
 		return s_instance;
 	}
 
-	/* End of --> Singleton region */
-	
+	// end region -> Singleton Pattern
+
 	/* Fields region */
-	
-	private boolean m_isDefaultConfiguration = false;
-	
-	@XmlElement(name = "ip")
-	private String m_ip;
 
-	@XmlElement(name = "port")
-	private String m_port;
+	private boolean m_defaultConfiguration = false;
+
+	@XmlElement(name = "ip") private String m_ip;
+
+	@XmlElement(name = "port") private int m_port;
+
+	/* End of --> Fields region */
+
+	/* region Constructors */
+
+	private ClientConfiguration()
+	{
+		m_ip = DEFAULT_IP;
+		m_port = DEFAULT_PORT;
+	}
+
+	/* End of --> Constructors */
+
+	/* region Getters */
 
 	/**
-	 * @return the application port.
+	 * @return the connectivity port.
 	 */
-	public String getPort() {
-		return m_port.trim();
+	public int getPort()
+	{
+		return m_port;
 	}
-	
+
 	/**
-	 * @return the application IP.
+	 * @return the connectivity IP.
 	 */
-	public String getIp() {
-		return m_ip.trim();
+	public String getIp()
+	{
+		return m_ip;
 	}
-	
+
 	/**
 	 * Identifies whether or not the configuration is default.
 	 * 
 	 * @return <code>true</code> if the loaded default configuration,
 	 *         <code>false</code> if does not.
 	 */
-	public boolean isDefaultConfiguration() {
-		return m_isDefaultConfiguration;
+	public boolean isDefaultConfiguration()
+	{
+		return m_defaultConfiguration;
 	}
-	
-	/* End of --> Fields region */
-	
+	/* End of --> Getters */
+
+	/* region Setters */
+
+	/**
+	 * @param ip
+	 *            the connectivity IP.
+	 */
+	public void setIp(String ip)
+	{
+		m_ip = ip.trim();
+	}
+
+	/**
+	 * @param port
+	 *            the connectivity port.
+	 */
+	public void setPort(int port)
+	{
+		m_port = port;
+	}
+
+	/* End of --> Setters */
+
+	/* region Public Methods */
+
+	/**
+	 * If exist XML configuration file in execution folder the Method will update
+	 * it, if does not will create one.
+	 *
+	 * @return <code>true</code> if the updating succeed and <code>false</code> if
+	 *         updating failed.
+	 */
+	public boolean updateResourceFile()
+	{
+		boolean result = true;
+		try {
+			XmlUtilities.parseObjectToXml(file, this);
+		}
+		catch (Exception ex) {
+			result = false;
+		}
+
+		return result;
+	}
+	/* end region -> Public Methods */
+
 	/* Override region */
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public String toString() {
+	public String toString()
+	{
 		return "ClientConfiguration [ip=" + m_ip + ", port=" + m_port + "]";
 	}
-	
+
 	/* End of --> Override region */
 }

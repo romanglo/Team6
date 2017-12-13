@@ -1,5 +1,14 @@
-package declarations;
+package client;
 
+import javafx.scene.control.TableView;
+
+/**
+*
+* SettingsRow: POJO class for binding between {@link ClientConfiguration} to
+* {@link TableView}.
+* 
+*/
+@SuppressWarnings("javadoc")
 public class SettingsRow {
 	
 	private String setting;
