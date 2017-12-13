@@ -1,3 +1,4 @@
+package server;
 import configurations.ServerConfiguration;
 import javafx.scene.control.TableView;
 
