@@ -52,12 +52,13 @@ public class EntityData implements MessageData
 	 * @throws NullPointerException
 	 *             If the constructor received null.
 	 */
-	EntityData(@NotNull EntityDataOperation entityDataOperation, @NotNull IEntity entity) throws NullPointerException
+	public EntityData(@NotNull EntityDataOperation entityDataOperation, @NotNull IEntity entity) throws NullPointerException
 	{
 		if (entityDataOperation == null || entity == null) {
 			throw new NullPointerException("The constructor of 'AddEntityData' can not get null parameters.");
 		}
 		m_entity = entity;
+		m_operation = entityDataOperation;
 	}
 
 	// end region -> Constructors

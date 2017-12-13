@@ -1,7 +1,5 @@
 package db;
 
-import java.sql.ResultSet;
-
 import entities.IEntity;
 import entities.ProductEntity;
 import entities.ProductType;

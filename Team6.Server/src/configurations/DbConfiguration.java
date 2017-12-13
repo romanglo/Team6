@@ -16,6 +16,30 @@ public class DbConfiguration {
 	// region Constants
 
 	/**
+	 * The configuration type name.
+	 */
+
+	public final static String CONFIGURATION_TYPE_NAME = "Database";
+
+	/**
+	 * The name of 'IP' property.
+	 */
+	public final static String PROPERTY_NAME_IP = "IP";
+
+	/**
+	 * The name of 'Schema' property.
+	 */
+	public final static String PROPERTY_NAME_SCHEMA = "Schema";
+	/**
+	 * The name of 'Username' property.
+	 */
+	public final static String PROPERTY_NAME_USERNAME = "Username";
+	/**
+	 * The name of 'Password' property.
+	 */
+	public final static String PROPERTY_NAME_PASSWORD = "Password";
+
+	/**
 	 * Default database IP.
 	 */
 	public final static String DEFAULT_IP = "localhost";
@@ -39,16 +63,16 @@ public class DbConfiguration {
 
 	// region Fields
 
-    @XmlTransient
+	@XmlTransient
 	private String m_ip;
 
-    @XmlTransient
+	@XmlTransient
 	private String m_schema;
 
-    @XmlTransient
+	@XmlTransient
 	private String m_username;
 
-    @XmlTransient
+	@XmlTransient
 	private String m_password;
 
 	// end region -> Fields
@@ -138,6 +162,48 @@ public class DbConfiguration {
 	}
 
 	// end region -> Getters
+
+	// region Public Methods
+
+	/**
+	 * 
+	 * The method update an property by his name.
+	 *
+	 * @param name
+	 *            Property name.
+	 * @param value
+	 *            the new value;
+	 * @return true if the update succeed and false if does not.
+	 */
+	public boolean updateValueByName(String name, Object value) {
+		if (name == null || name.isEmpty() || value == null) {
+			return false;
+		}
+		boolean succeed = false;
+		try {
+			switch (name) {
+			case PROPERTY_NAME_IP:
+				m_ip = (String) value;
+				break;
+			case PROPERTY_NAME_SCHEMA:
+				m_schema = (String) value;
+				break;
+			case PROPERTY_NAME_USERNAME:
+				m_username = (String) value;
+				break;
+			case PROPERTY_NAME_PASSWORD:
+				m_password = (String) value;
+				break;
+			default:
+				break;
+			}
+		} catch (Exception ignored) {
+
+		}
+		return succeed;
+	}
+
+	// end region -> Public Methods
 
 	// region Object Methods Overrides
 

@@ -15,7 +15,6 @@ import common.NotRunningException;
 import common.Startable;
 import common.StartableState;
 import configurations.DbConfiguration;
-import entities.IEntity;
 
 /**
  *
@@ -150,52 +149,63 @@ public class DbController extends Startable {
 		}
 	}
 
-	public IEntity executeGetEntity(IEntity entity) {
-//		if (m_State != StartableState.Running) {
-//			throw new NotRunningException(this);
-//		}
-//
-//		String updateQuery = QueryFactory.generateUpdateEntityQuery(entity);
-//		Statement stmt;
-//		try {
-//			stmt = m_connection.createStatement();
-//			boolean result = stmt.executeUpdate(updateQuery) ==1 ;
-//			if (result) {
-//				m_Logger.info("A query executed seccessfully! The query: " + updateQuery);
-//			} else {
-//				m_Logger.warning("Failed on try to execute the query: " + updateQuery);
-//			}
-//			return result;
-//		} catch (SQLException ex) {
-//			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + updateQuery, ex);
-//			return false;
-//		}
-		return null;
-	}
-	
-
-	public boolean executeUpdateEntity(IEntity entity) {
+	/**
+	 * 
+	 * The method execute select query.
+	 *
+	 * @param query The query to execute.
+	 * @return A {@link ResultSet} with the query result.
+	 * @throws NotRunningException if the method called when the state is not {@link StartableState#Running}
+	 */
+	public ResultSet executeSelectQuery(String query) throws NotRunningException{
 		if (m_State != StartableState.Running) {
 			throw new NotRunningException(this);
 		}
-
-		String updateQuery = QueryFactory.generateUpdateEntityQuery(entity);
+		if (query == null || query.isEmpty()) {
+			return null;
+		}
 		Statement stmt;
 		try {
 			stmt = m_connection.createStatement();
-			boolean result = stmt.executeUpdate(updateQuery) ==1 ;
+			ResultSet queryReuslt = stmt.executeQuery(query);
+			return queryReuslt;
+		} catch (SQLException ex) {
+			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + query, ex);
+			return null;
+		}
+	}
+
+	/**
+	 * 
+	 * The method execute update query.
+	 *
+	 * @param query The query to execute.
+	 * @return true if the update succeed and false if does not.
+	 * @throws NotRunningException if the method called when the state is not {@link StartableState#Running}
+	 */
+	public boolean executeUpdateQuery(String query) throws NotRunningException{
+		if (m_State != StartableState.Running) {
+			throw new NotRunningException(this);
+		}
+		if (query == null || query.isEmpty()) {
+			return false;
+		}
+		Statement stmt;
+		try {
+			stmt = m_connection.createStatement();
+			boolean result = stmt.executeUpdate(query) == 1;
 			if (result) {
-				m_Logger.info("A query executed seccessfully! The query: " + updateQuery);
+				m_Logger.info("A query executed seccessfully! The query: " + query);
 			} else {
-				m_Logger.warning("Failed on try to execute the query: " + updateQuery);
+				m_Logger.warning("Failed on try to execute the query: " + query);
 			}
 			return result;
 		} catch (SQLException ex) {
-			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + updateQuery, ex);
+			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + query, ex);
 			return false;
 		}
 	}
-	
+
 	// end region -> Public Methods
 
 }

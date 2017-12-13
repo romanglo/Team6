@@ -9,8 +9,7 @@ import com.sun.istack.internal.NotNull;
 /**
  *
  * Message: Define messages that are described by ID, creation time and
- * {@link Object} data.
- * This class instance created by {@link MessagesFactory}.
+ * {@link Object} data. This class instance created by {@link MessagesFactory}.
  */
 public class Message
 {
@@ -53,6 +52,18 @@ public class Message
 
 	// end region -> Getters
 
+	// region Setters
+
+	/**
+	 * @param message
+	 *            set actual data of the message
+	 */
+	public void setMessageData(MessageData message)
+	{
+		m_messageData = message;
+	}
+	// end region -> Setters
+
 	// region Constructors
 
 	/**
@@ -77,5 +88,18 @@ public class Message
 		m_creationTime = new Date();
 	}
 
+	/**
+	 * 
+	 * Create instance of class that implements {@link IMessage}. Auto generation of
+	 * message ID based on {@link UUID}, and time in UTC format. The message have
+	 * null {@link MessageData}.
+	 * 
+	 */
+	Message()
+	{
+		m_messageData = null;
+		m_id = UUID.randomUUID().toString();
+		m_creationTime = new Date();
+	}
 	// end region -> Constructors
 }

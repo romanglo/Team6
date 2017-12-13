@@ -16,6 +16,17 @@ public class ConnectivityConfiguration {
 	// region Constants
 
 	/**
+	 * The configuration type name.
+	 */
+
+	public final static String CONFIGURATION_TYPE_NAME = "Connectivity";
+
+	/**
+	 * The name of 'Port' property.
+	 */
+	public final static String PROPERTY_NAME_PORT = "Port";
+
+	/**
 	 * Default listening port.
 	 */
 	public final static int DEFAULT_PORT = 1234;
@@ -24,7 +35,7 @@ public class ConnectivityConfiguration {
 
 	// region Fields
 
-    @XmlTransient
+	@XmlTransient
 	private int m_port;
 
 	// end region -> Fields
@@ -63,6 +74,38 @@ public class ConnectivityConfiguration {
 	}
 
 	// end region -> Constructors
+
+	// region Public Methods
+
+	/**
+	 * 
+	 * The method update an property by his name.
+	 *
+	 * @param name
+	 *            Property name.
+	 * @param value
+	 *            the new value;
+	 * @return true if the update succeed and false if does not.
+	 */
+	public boolean updateValueByName(String name, Object value) {
+		if (name == null || name.isEmpty() || value == null) {
+			return false;
+		}
+		boolean succeed = false;
+		try {
+			switch (name) {
+			case PROPERTY_NAME_PORT:
+				m_port = (int) value;
+				break;
+			default:
+				break;
+			}
+		} catch (Exception ignored) {
+
+		}
+		return succeed;
+	}
+	// end region -> Public Methods
 
 	// region Object Methods Overrides
 

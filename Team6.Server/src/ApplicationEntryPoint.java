@@ -56,7 +56,7 @@ public class ApplicationEntryPoint extends Application {
 		try {
 			Parent root = FXMLLoader.load(getClass().getResource("ServerXML.fxml"));
 			Scene scene = new Scene(root, 450, 300);
-			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.show();
 			primaryStage.setMinWidth(410);
@@ -96,9 +96,9 @@ public class ApplicationEntryPoint extends Application {
 		} catch (Exception ex) {
 			m_logger.log(Level.SEVERE, "Disposing failed!", ex);
 		}
-		m_logger=null;
-		m_serverConfiguration=null;
-		
+		m_logger = null;
+		m_serverConfiguration = null;
+
 		super.stop();
 	}
 
@@ -149,7 +149,7 @@ public class ApplicationEntryPoint extends Application {
 			Server.close();
 		}
 		m_logger.info("Server disposed successfully.");
-		Server=null;
+		Server = null;
 	}
 
 	private void disposeDbController() {
@@ -157,7 +157,7 @@ public class ApplicationEntryPoint extends Application {
 			DbContoller.Stop();
 		}
 		m_logger.info("Database controller disposed successfully.");
-		DbContoller=null;
+		DbContoller = null;
 	}
 
 	// end region.
