@@ -49,9 +49,10 @@ import messages.IMessageData;
  */
 public class ServerController implements Initializable, Server.ServerStatusHandler, Server.MessagesHandler {
 	// region UI Elements
-
-	@FXML
-	private TabPane tabpane;
+	
+	
+	@FXML private TabPane tabpane;
+	
 	/* Database start-stop button declaration */
 	@FXML
 	private Button btn_db_start;
@@ -400,5 +401,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			}
 		}
 	}
+	
 	// end region -> Nested Classes
 }
