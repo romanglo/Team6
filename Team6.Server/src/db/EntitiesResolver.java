@@ -25,9 +25,10 @@ public class EntitiesResolver {
 	 *            An object of the kind supposed to return.
 	 * @return An instance of expected type if the resolving succeed,
 	 *         <code>null</code> if does not.
-	 * @throws NullPointerException if one of the received parameters is null.
+	 * @throws NullPointerException
+	 *             if one of the received parameters is null.
 	 */
-	public static IEntity resolveResultSet(ResultSet resultSet, IEntity expectedType) throws NullPointerException{
+	public static IEntity resolveResultSet(ResultSet resultSet, IEntity expectedType) throws NullPointerException {
 		if (resultSet == null) {
 			throw new NullPointerException("ResultSet is null!");
 		}
@@ -43,18 +44,20 @@ public class EntitiesResolver {
 	}
 
 	private static IEntity ResultSetToProduct(ResultSet resultSet) {
-		int id;
-		String name;
-		ProductType productType;
 		try {
-			id = resultSet.getInt(1);
-			name = resultSet.getString(2);
-			String productTypeString = resultSet.getString(3);
-			productType = Enum.valueOf(ProductType.class, productTypeString);
-		} catch (Exception e) {
-			return null;
-		}
+			int id;
+			String name;
+			ProductType productType;
+			if (resultSet.next()) {
+				id = resultSet.getInt(1);
+				name = resultSet.getString(2);
+				String productTypeString = resultSet.getString(3);
+				productType = Enum.valueOf(ProductType.class, productTypeString);
+				return new ProductEntity(id, name, productType);
+			}
+		} catch (Exception ignored) {
 
-		return new ProductEntity(id, name, productType);
+		}
+		return null;
 	}
 }

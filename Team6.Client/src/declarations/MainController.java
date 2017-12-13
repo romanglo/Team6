@@ -1,3 +1,4 @@
+
 package declarations;
 
 import java.io.IOException;
@@ -58,11 +59,11 @@ public class MainController implements Initializable
 
 	/* Split pane attribute. */
 	@FXML SplitPane m_getItemPane;
-	
+
 	/* Item display labels. */
-	@FXML static Label m_itemIdLbl;
-	@FXML static Label m_itemNameLbl;
-	@FXML static Label m_itemTypeLbl;
+	@FXML static TextField	m_itemIdLbl;
+	@FXML static TextField	m_itemNameLbl;
+	@FXML static TextField	m_itemTypeLbl;
 
 	@SuppressWarnings("unused") private static Logger s_logger = null;
 
@@ -81,7 +82,6 @@ public class MainController implements Initializable
 	 * @param connectionEvent
 	 *            - Button event.
 	 */
-	@SuppressWarnings("unused")
 	@FXML
 	private void ServerConnection(ActionEvent connectionEvent)
 	{
@@ -107,13 +107,34 @@ public class MainController implements Initializable
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@FXML
 	private void getItemFromServer(ActionEvent getItemEvent)
 	{
-		Message msg = MessagesFactory.createUpdateEntityMessage(
-				new ProductEntity(Integer.parseInt(m_enterItemId.getText()), "Roman", ProductType.Flower));
+		Message msg = MessagesFactory.createGetEntityMessage(
+				new ProductEntity(Integer.parseInt(m_enterItemId.getText())));
 		EntryPoint.clientController.handleMessageFromClientUI(msg);
+	}
+
+	@FXML
+	private void updateItemInServer(ActionEvent updateItem)
+	{
+		Message msg = MessagesFactory.createUpdateEntityMessage(
+				new ProductEntity(Integer.parseInt(m_enterItemId.getText()),
+						m_itemNameLbl.getText(), getItemType(m_itemTypeLbl.getText())));
+		EntryPoint.clientController.handleMessageFromClientUI(msg);
+	}
+	
+	private ProductType getItemType(String type) {
+		switch (type) {
+			case "Flower":
+				return ProductType.Flower;
+			case "FlowerPot":
+				return ProductType.FlowerPot;
+			case "BridalBouquet":
+				return ProductType.BridalBouquet;
+			default: 
+				return null;
+		}
 	}
 
 	/**

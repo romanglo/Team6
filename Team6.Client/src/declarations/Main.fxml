@@ -50,7 +50,6 @@
                            </effect>
                         </Circle>
                         <Separator layoutX="-1.0" layoutY="94.0" prefHeight="10.0" prefWidth="458.0" />
-                        <Separator layoutX="-4.0" layoutY="166.0" prefHeight="5.0" prefWidth="458.0" />
                         <SplitPane fx:id="m_getItemPane" dividerPositions="0.34698996655518394" layoutX="-3.0" layoutY="97.0" orientation="VERTICAL" prefHeight="241.0" prefWidth="401.0">
                           <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -66,14 +65,17 @@
                               </AnchorPane>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="156.0" prefWidth="399.0">
                                  <children>
-                                    <Label layoutX="123.0" layoutY="22.0" text="ID" />
-                                    <Label layoutX="123.0" layoutY="50.0" text="Name" />
-                                    <Label layoutX="123.0" layoutY="74.0" text="Type" />
-                                    <Label fx:id="m_itemIdLbl" layoutX="218.0" layoutY="22.0" text="15616" />
-                                    <Label fx:id="m_itemNameLbl" layoutX="218.0" layoutY="50.0" text="Narkis" />
-                                    <Label fx:id="m_itemTypeLbl" layoutX="218.0" layoutY="75.0" text="Base" />
-                                    <Separator layoutX="95.0" layoutY="46.0" prefHeight="4.0" prefWidth="179.0" />
-                                    <Separator layoutX="95.0" layoutY="71.0" prefHeight="3.0" prefWidth="178.0" />
+                                    <Label layoutX="14.0" layoutY="15.0" text="ID" />
+                                    <Label layoutX="11.0" layoutY="50.0" text="Name" />
+                                    <Label layoutX="13.0" layoutY="84.0" text="Type" />
+                                    <TextField id="tf_displayItemId" fx:id="m_itemIdLbl" layoutX="104.0" layoutY="11.0" prefHeight="25.0" prefWidth="164.0" stylesheets="@application.css" />
+                                    <TextField id="tf_displayItemName" fx:id="m_itemNameLbl" layoutX="104.0" layoutY="46.0" prefHeight="25.0" prefWidth="164.0" stylesheets="@application.css" />
+                                    <TextField id="tf_displayItemNameType" fx:id="m_itemTypeLbl" layoutX="104.0" layoutY="80.0" prefHeight="25.0" prefWidth="164.0" stylesheets="@application.css" />
+                                    <Button layoutX="285.0" layoutY="40.0" mnemonicParsing="false" onAction="#updateItemInServer" prefHeight="37.0" prefWidth="76.0" text="Update">
+                                       <font>
+                                          <Font size="16.0" />
+                                       </font>
+                                    </Button>
                                  </children>
                               </AnchorPane>
                           </items>

@@ -68,5 +68,23 @@ public class EntityData implements IMessageData
 		m_operation = entityDataOperation;
 	}
 
+	
+
 	// end region -> Constructors
+	
+
+	// region Object Methods Override
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString()
+	{
+		return "EntityData [Operation=" + m_operation + ", Entity=" + m_entity + "]";
+	}
+	
+	
+	// end region -> Object Methods Override
+
 }

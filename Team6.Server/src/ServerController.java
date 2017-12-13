@@ -40,6 +40,7 @@ import logs.LogManager;
 import messages.EntityData;
 import messages.EntityDataOperation;
 import messages.Message;
+import messages.MessagesFactory;
 import messages.IMessageData;
 
 /**
@@ -328,8 +329,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			}
 			if (returnEntity != null) {
 				IMessageData returnedMessageData = new EntityData(EntityDataOperation.None, returnEntity);
-				msg.setMessageData(returnedMessageData);
-				return msg;
+				
+//				msg.setMessageData(returnedMessageData);
+//				return msg;
+				return MessagesFactory.createEntityMessage(returnEntity);
 			}
 		}
 		return null;
