@@ -131,7 +131,7 @@ public class ApplicationEntryPoint extends Application {
 	}
 
 	private void intializeServer() throws IOException {
-		Server = new Server(m_logger, m_serverConfiguration.getConnectivityConfiguration());
+		Server = new Server(m_logger, m_serverConfiguration.getConnectivityConfiguration().getPort());
 		m_logger.info("Server instance created successfully.");
 	}
 

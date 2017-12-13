@@ -45,4 +45,12 @@ public class SettingsRow {
 		this.type = parent;
 	}
 
+	/*
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "Type=" + type + ", Setting=" + setting + ", Value=" + value + "]";
+	}
+
 }

@@ -24,6 +24,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -31,6 +32,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
@@ -145,20 +147,31 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 						return;
 					}
 					if (rowData.getType().equals(ConnectivityConfiguration.CONFIGURATION_TYPE_NAME)) {
-						int parseInt;
+						int port;
 						try {
-							parseInt = Integer.parseInt(resultString);
+							port = Integer.parseInt(resultString);
+							m_configuration.getConnectivityConfiguration().setPort(port);
+							m_server.setPort(port);
+							if (m_server.isListening()) {
+								showInformationMessage(
+										"Attention: You must reopen the application for the changes to take effect!");
+							}
 						} catch (NumberFormatException e) {
 							return;
 						}
-						m_configuration.getConnectivityConfiguration().updateValueByName(rowData.getSetting(),
-								parseInt);
 					} else {
 						m_configuration.getDbConfiguration().updateValueByName(rowData.getSetting(), resultString);
+						if (m_dbContoller.getState() == StartableState.Running) {
+							showInformationMessage(
+									"Attention: You must reopen database connection for the changes to take effect!");
+						}
 					}
 					rowData.setValue(resultString);
 					drawContantToTable();
 					btn_update_settings.setDisable(false);
+					
+					m_logger.info("The Configuration " + rowData.getType() + '-' + rowData.getSetting()
+							+ " value changed to " + rowData.getValue());
 				}
 			});
 			return tableRow;
@@ -274,11 +287,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private IEntity onEntityDataReceived(IMessageData messageData) throws Exception {
 		EntityData entityData = (EntityData) messageData;
 		IEntity receivedEntity = entityData.getEntity();
-		
-		if(receivedEntity == null) {
+
+		if (receivedEntity == null) {
 			return null;
 		}
-		
+
 		IEntity returningEntity = null;
 
 		ResultSet queryResult = null;
@@ -286,7 +299,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			switch (entityData.getOperation()) {
 			case Update:
 				String generatedUpdateQuery = QueryFactory.generateUpdateEntityQuery(receivedEntity);
-				if(generatedUpdateQuery == null || generatedUpdateQuery.isEmpty()) {
+				if (generatedUpdateQuery == null || generatedUpdateQuery.isEmpty()) {
 					break;
 				}
 				m_dbContoller.executeUpdateQuery(generatedUpdateQuery);
@@ -294,11 +307,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 			case Get:
 				String generatedGetQuery2 = QueryFactory.generateGetEntityQuery(receivedEntity);
-				if(generatedGetQuery2 == null || generatedGetQuery2.isEmpty()) {
+				if (generatedGetQuery2 == null || generatedGetQuery2.isEmpty()) {
 					break;
 				}
 				queryResult = m_dbContoller.executeSelectQuery(generatedGetQuery2);
-				if(queryResult ==null) {
+				if (queryResult == null) {
 					break;
 				}
 				returningEntity = EntitiesResolver.resolveResultSet(queryResult, receivedEntity);
@@ -321,6 +334,17 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		return returningEntity;
 	}
 
+	private void showInformationMessage(String message) {
+		if (message == null || message.isEmpty()) {
+			return;
+		}
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Information Dialog");
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+
+		alert.showAndWait();
+	}
 	// end region -> Private Methods
 
 	// region Server Handlers Implementation

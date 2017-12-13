@@ -93,6 +93,7 @@ public class DbController extends Startable {
 			m_Logger.log(Level.SEVERE, errormessage, e);
 			throw e;
 		}
+		m_Logger.info("Connection with MySQL database created! connection string: " +connectionString);
 	}
 
 	/**
@@ -114,6 +115,7 @@ public class DbController extends Startable {
 
 			throw e;
 		}
+		m_Logger.info("Connection with MySQL database closed!");
 
 	}
 

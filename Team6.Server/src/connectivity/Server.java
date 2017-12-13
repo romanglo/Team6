@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 
-import configurations.ConnectivityConfiguration;
 import messages.Message;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
@@ -72,8 +72,6 @@ public class Server extends AbstractServer {
 
 	private Logger m_logger;
 
-	private ConnectivityConfiguration m_configuration;
-
 	// end region -> Fields
 
 	// region Constructors
@@ -84,18 +82,17 @@ public class Server extends AbstractServer {
 	 *
 	 * @param logger
 	 *            The logger that the server will log to it.
-	 * @param configuration
-	 *            The server configuration
+	 * @param port
+	 *            - A port for the connection.
 	 * @throws NullPointerException
 	 *             If one of the received parameters is null.
 	 */
-	public Server(Logger logger, ConnectivityConfiguration configuration) throws NullPointerException {
-		super(configuration.getPort());
+	public Server(@NotNull Logger logger, int port) throws NullPointerException {
+		super(port);
 		if (logger == null) {
 			throw new NullPointerException("Logger is null!");
 		}
 		m_logger = logger;
-		m_configuration = configuration;
 		m_serverStatusHandler = null;
 		m_messagesHandler = null;
 		m_numOfConnectedClients = 0;
@@ -112,12 +109,6 @@ public class Server extends AbstractServer {
 		return m_numOfConnectedClients;
 	}
 
-	/**
-	 * @return The configuration of the server.
-	 */
-	public ConnectivityConfiguration getConfiguration() {
-		return m_configuration;
-	}
 	// end region -> Getters
 
 	// region Setters
@@ -200,7 +191,7 @@ public class Server extends AbstractServer {
 		if (m_serverStatusHandler != null) {
 			m_serverStatusHandler.onServerStarted();
 		}
-		m_logger.info("The server Started");
+		m_logger.info("The server started listen to port" + getPort());
 	}
 
 	/*
@@ -211,7 +202,7 @@ public class Server extends AbstractServer {
 		if (m_serverStatusHandler != null) {
 			m_serverStatusHandler.onServerStopped();
 		}
-		m_logger.info("The server Stopped");
+		m_logger.info("The server stopped listen");
 	}
 
 	/*
@@ -219,7 +210,7 @@ public class Server extends AbstractServer {
 	 */
 	@Override
 	protected void serverClosed() {
-		m_logger.info("The server Closed");
+		m_logger.info("The server closed");
 	}
 
 	/*

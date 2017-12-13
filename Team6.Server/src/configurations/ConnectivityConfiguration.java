@@ -75,38 +75,6 @@ public class ConnectivityConfiguration {
 
 	// end region -> Constructors
 
-	// region Public Methods
-
-	/**
-	 * 
-	 * The method update an property by his name.
-	 *
-	 * @param name
-	 *            Property name.
-	 * @param value
-	 *            the new value;
-	 * @return true if the update succeed and false if does not.
-	 */
-	public boolean updateValueByName(String name, Object value) {
-		if (name == null || name.isEmpty() || value == null) {
-			return false;
-		}
-		boolean succeed = false;
-		try {
-			switch (name) {
-			case PROPERTY_NAME_PORT:
-				m_port = (int) value;
-				break;
-			default:
-				break;
-			}
-		} catch (Exception ignored) {
-
-		}
-		return succeed;
-	}
-	// end region -> Public Methods
-
 	// region Object Methods Overrides
 
 	@Override

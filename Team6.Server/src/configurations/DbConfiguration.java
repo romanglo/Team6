@@ -169,30 +169,30 @@ public class DbConfiguration {
 	 * 
 	 * The method update an property by his name.
 	 *
-	 * @param name
+	 * @param propertyName
 	 *            Property name.
 	 * @param value
 	 *            the new value;
 	 * @return true if the update succeed and false if does not.
 	 */
-	public boolean updateValueByName(String name, Object value) {
-		if (name == null || name.isEmpty() || value == null) {
+	public boolean updateValueByName(String propertyName, String value) {
+		if (propertyName == null || propertyName.isEmpty() || value == null || value.isEmpty()) {
 			return false;
 		}
 		boolean succeed = false;
 		try {
-			switch (name) {
+			switch (propertyName) {
 			case PROPERTY_NAME_IP:
-				m_ip = (String) value;
+				m_ip = value;
 				break;
 			case PROPERTY_NAME_SCHEMA:
-				m_schema = (String) value;
+				m_schema = value;
 				break;
 			case PROPERTY_NAME_USERNAME:
-				m_username = (String) value;
+				m_username = value;
 				break;
 			case PROPERTY_NAME_PASSWORD:
-				m_password = (String) value;
+				m_password = value;
 				break;
 			default:
 				break;
