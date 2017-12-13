@@ -11,8 +11,14 @@ import javafx.scene.control.TableView;
 @SuppressWarnings("javadoc")
 public class SettingsRow {
 	
+	/* Fields region */
+	
 	private String setting;
 	private String value;
+	
+	/* End of --> Fields region */
+	
+	/* Constructors region */
 	
 	public SettingsRow(String setting, String value) {
 		super();
@@ -20,20 +26,29 @@ public class SettingsRow {
 		this.value = value;
 	}
 	
+	/* End of --> Constructors region */
+	
+	/* Getters region */
+	
 	public String getSetting() {
 		return setting;
-	}
-	
-	public void setSetting(String setting) {
-		this.setting = setting;
 	}
 	
 	public String getValue() {
 		return value;
 	}
 	
+	/* End of --> Getters region */
+	
+	/* Setters region */
+	
+	public void setSetting(String setting) {
+		this.setting = setting;
+	}
+	
 	public void setValue(String value) {
 		this.value = value;
 	}
-
+	
+	/* End of --> Setters region */
 }

@@ -22,6 +22,7 @@ import logger.LogManager;
  */
 public class ApplicationEntryPoint extends Application
 {
+	/* Fields region */
 
 	private static Logger s_logger = null;
 
@@ -35,6 +36,8 @@ public class ApplicationEntryPoint extends Application
 	 */
 	public static Client clientController;
 
+	/* End of --> Fields region */
+
 	/**
 	 * Client application entry point
 	 *
@@ -46,17 +49,7 @@ public class ApplicationEntryPoint extends Application
 		launch(args);
 	}
 
-	/**
-	 * Method closes the connection with the server.
-	 *
-	 */
-	public static void disposeConnection()
-	{
-		if (clientController != null) {
-			clientController.close();
-			s_logger.info("Client disposed successfully");
-		}
-	}
+	/* Initializing methods region */
 
 	/**
 	 * Method creates connection to the server with the configured IP and port.
@@ -142,6 +135,22 @@ public class ApplicationEntryPoint extends Application
 		super.init();
 	}
 
+	/* End of --> Initializing methods region */
+
+	/* Private disposing methods region */
+
+	/**
+	 * Method closes the connection with the server.
+	 *
+	 */
+	public static void disposeConnection()
+	{
+		if (clientController != null) {
+			clientController.close();
+			s_logger.info("Client disposed successfully");
+		}
+	}
+
 	@Override
 	public void stop() throws Exception
 	{
@@ -149,4 +158,5 @@ public class ApplicationEntryPoint extends Application
 		super.stop();
 	}
 
+	/* End of --> Private disposing methods region */
 }

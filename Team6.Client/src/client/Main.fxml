@@ -17,7 +17,7 @@
 <AnchorPane minHeight="285.0" minWidth="380.0"
 	nodeOrientation="LEFT_TO_RIGHT" prefHeight="399.0" prefWidth="400.0"
 	xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="client.MainController">
+	fx:controller="client.ClientController">
 	<children>
 		<Label layoutX="14.0" layoutY="14.0" prefHeight="34.0"
 			prefWidth="156.0" text="Zer-Li Client Control" AnchorPane.leftAnchor="14.0"

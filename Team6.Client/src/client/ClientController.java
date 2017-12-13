@@ -40,8 +40,9 @@ import messages.MessagesFactory;
  * MainController: Controls all the actions made in the UI of the client.
  * 
  */
-public class MainController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class ClientController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
+	/* Fields region */
 
 	/* Connection circles. */
 	@FXML Circle m_connectedLight;
@@ -79,14 +80,22 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 
 	private static Logger s_logger = null;
 
+	/* End of --> Fields region */
+
+	/* Constructors region */
+
 	/**
 	 * UI controller constructor.
 	 *
 	 */
-	public MainController()
+	public ClientController()
 	{
 		s_logger = LogManager.getLogger();
 	}
+
+	/* End of --> Constructors region */
+
+	/* UI events region */
 
 	/**
 	 * Method is called after pressing the connect button and creates new connection
@@ -144,27 +153,17 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 			s_logger.log(Level.WARNING, "Error when sending data for update. Exception: ", ex);
 		}
 	}
-
-	private ProductType getItemType(String type)
+	
+	@FXML
+	private void updateSettingsFile(ActionEvent event)
 	{
-		switch (type) {
-			case "Flower":
-				return ProductType.Flower;
-			case "FlowerPot":
-				return ProductType.FlowerPot;
-			case "BridalBouquet":
-				return ProductType.BridalBouquet;
-			default:
-				return null;
-		}
+		ApplicationEntryPoint.s_clientConfiguration.updateResourceFile();
+		btn_update_settings.setDisable(true);
 	}
 
-	private void clearFields()
-	{
-		m_itemIdUpdate.setText("");
-		m_itemNameUpdate.setText("");
-		m_itemTypeUpdate.setText("");
-	}
+	/* End of --> UI events region */
+	
+	/* Initializing methods region */
 
 	/**
 	 * {@inheritDoc}
@@ -242,16 +241,10 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 		ApplicationEntryPoint.clientController.setMessagesHandler(this);
 		ApplicationEntryPoint.clientController.setClientStatusHandler(this);
 	}
-
-	private void drawContantToTable()
-	{
-		ClientConfiguration dbConfiguration = ApplicationEntryPoint.s_clientConfiguration;
-		ObservableList<SettingsRow> settings = FXCollections.observableArrayList();
-
-		settings.add(new SettingsRow(ClientConfiguration.PROPERTY_NAME_IP, dbConfiguration.getIp()));
-		settings.add(new SettingsRow("PORT", Integer.toString(ApplicationEntryPoint.s_clientConfiguration.getPort())));
-		setting_table.setItems(settings);
-	}
+	
+	/* End of --> Initializing methods region */
+	
+	/* Implemented methods region */
 
 	/**
 	 * {@inheritDoc}
@@ -292,13 +285,10 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 		m_disconnectedLight.setFill(Color.RED);
 		m_getItemPane.setDisable(true);
 	}
+	
+	/* End of --> Implemented methods region */
 
-	@FXML
-	private void updateSettingsFile(ActionEvent event)
-	{
-		ApplicationEntryPoint.s_clientConfiguration.updateResourceFile();
-		btn_update_settings.setDisable(true);
-	}
+	/* Private methods region */
 
 	private void showInformationMessage(String message)
 	{
@@ -313,4 +303,36 @@ public class MainController implements Initializable, Client.ClientStatusHandler
 		alert.showAndWait();
 	}
 
+	private ProductType getItemType(String type)
+	{
+		switch (type) {
+			case "Flower":
+				return ProductType.Flower;
+			case "FlowerPot":
+				return ProductType.FlowerPot;
+			case "BridalBouquet":
+				return ProductType.BridalBouquet;
+			default:
+				return null;
+		}
+	}
+
+	private void clearFields()
+	{
+		m_itemIdUpdate.setText("");
+		m_itemNameUpdate.setText("");
+		m_itemTypeUpdate.setText("");
+	}
+
+	private void drawContantToTable()
+	{
+		ClientConfiguration dbConfiguration = ApplicationEntryPoint.s_clientConfiguration;
+		ObservableList<SettingsRow> settings = FXCollections.observableArrayList();
+
+		settings.add(new SettingsRow(ClientConfiguration.PROPERTY_NAME_IP, dbConfiguration.getIp()));
+		settings.add(new SettingsRow("PORT", Integer.toString(ApplicationEntryPoint.s_clientConfiguration.getPort())));
+		setting_table.setItems(settings);
+	}
+	
+	/* End of --> Private methods region */
 }
