@@ -3,6 +3,7 @@ package client;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -21,6 +22,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -76,7 +78,10 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 
 	@FXML TextField m_itemNameUpdate;
 
-	@FXML TextField m_itemTypeUpdate;
+	@FXML ComboBox m_itemTypeUpdate;
+	
+	ObservableList<String> m_productTypeList;
+	
 
 	private static Logger s_logger = null;
 
@@ -138,7 +143,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	private void updateItemInServer(ActionEvent updateItem)
 	{
 		if (m_itemIdUpdate.getText().equals("") || m_itemNameUpdate.getText().equals("")
-				|| m_itemTypeUpdate.getText().equals("")) {
+				|| m_itemTypeUpdate.getValue().equals("")) {
 			s_logger.info("Empty field(s). Cannot send update request.");
 			return;
 		}
@@ -146,7 +151,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		try {
 			Message msg = MessagesFactory
 					.createUpdateEntityMessage(new ProductEntity(Integer.parseInt(m_itemIdUpdate.getText()),
-							m_itemNameUpdate.getText(), getItemType(m_itemTypeUpdate.getText())));
+							m_itemNameUpdate.getText(), getItemType((String)m_itemTypeUpdate.getValue())));
 			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
 		catch (Exception ex) {
@@ -171,8 +176,19 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	@Override
 	public void initialize(URL url, ResourceBundle rb)
 	{
+		initializeProductTypeComboBox();
 		initializeConfigurationTable();
 		initializeClientHandler();
+	}
+	
+	private void initializeProductTypeComboBox()
+	{
+		ArrayList<String> productTypeList = new ArrayList<String>();
+		productTypeList.add(ProductType.BridalBouquet.name());
+		productTypeList.add(ProductType.Flower.name());
+		productTypeList.add(ProductType.FlowerPot.name());
+		m_productTypeList = FXCollections.observableArrayList(productTypeList);
+		m_itemTypeUpdate.setItems(m_productTypeList);
 	}
 
 	private void initializeConfigurationTable()
@@ -257,7 +273,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 
 		m_itemIdUpdate.setText(String.valueOf(((ProductEntity) entity).getId()));
 		m_itemNameUpdate.setText(((ProductEntity) entity).getName());
-		m_itemTypeUpdate.setText(((ProductEntity) entity).getProductType().toString());
+		m_itemTypeUpdate.setValue((String)((ProductEntity) entity).getProductType().name());
 	}
 
 	/**
@@ -321,7 +337,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	{
 		m_itemIdUpdate.setText("");
 		m_itemNameUpdate.setText("");
-		m_itemTypeUpdate.setText("");
+		m_itemTypeUpdate.setValue("");
 	}
 
 	private void drawContantToTable()
