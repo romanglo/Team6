@@ -33,7 +33,7 @@ public class QueryFactory {
 		ProductType productType = productEntity.getProductType();
 
 		// Wrong details
-		if (id <= 1 || name == null || name.isEmpty() || productType == null) {
+		if (id < 1 || name == null || name.isEmpty() || productType == null) {
 			return null;
 		}
 

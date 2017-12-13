@@ -192,6 +192,9 @@ public class Client extends AbstractClient
 	protected void connectionException(Exception exception)
 	{
 		m_logger.log(Level.WARNING, "Connection exception: ", exception);
+		if (!isConnected()) {
+			connectionClosed();
+		}
 	}
 
 	@Override

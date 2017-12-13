@@ -130,7 +130,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
 		catch (Exception ex) {
-			s_logger.log(Level.WARNING, "Error when sending get request. Exception: ", ex);
+			s_logger.warning("Error when sending get request.");
 		}
 	}
 
