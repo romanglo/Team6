@@ -45,8 +45,8 @@ public class NotRunningException extends RuntimeException
 	}
 
 	/**
-	 * Constructs a new runtime exception with the detail message that
-	 * describes the throwing instance.
+	 * Constructs a new runtime exception with the detail message that describes the
+	 * throwing instance.
 	 *
 	 * @param startable
 	 *            the instance that used without be in 'Running' state.
@@ -55,7 +55,8 @@ public class NotRunningException extends RuntimeException
 	 */
 	public NotRunningException(Startable startable)
 	{
-		super(startable.m_Id + " that implements IStartable interface used not in " + startable.m_State + " state.");
+		super(startable.m_Id + " that implements IStartable interface used not in 'Running' state. Current state: "
+				+ startable.getState());
 	}
 
 }

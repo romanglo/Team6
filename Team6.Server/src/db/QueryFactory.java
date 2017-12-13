@@ -70,7 +70,7 @@ public class QueryFactory {
 
 	private static String generateGetEntityQuery(ProductEntity productEntity) {
 		int id = productEntity.getId();
-		if (id <= 1) {
+		if (id < 1) {
 			return null;
 		}
 		return "SELECT * FROM product WHERE pId = " + id + ';';

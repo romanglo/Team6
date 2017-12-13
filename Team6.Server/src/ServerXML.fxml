@@ -98,7 +98,7 @@
 										<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
 									</columnResizePolicy>
 								</TableView>
-								<Button fx:id="btn_save_settings" mnemonicParsing="false" onAction="#saveSettings" prefHeight="24.0" prefWidth="59.0" text="Save" AnchorPane.bottomAnchor="11.0" AnchorPane.rightAnchor="14.0" />
+								<Button fx:id="btn_update_settings" mnemonicParsing="false" onAction="#updateSettingsFile" prefHeight="24.0" prefWidth="80.0" text="Update file" AnchorPane.bottomAnchor="11.0" AnchorPane.rightAnchor="14.0" />
 							</children>
 						</AnchorPane>
 					</content>

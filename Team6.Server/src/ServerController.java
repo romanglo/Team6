@@ -19,7 +19,6 @@ import db.DbController;
 import db.EntitiesResolver;
 import db.QueryFactory;
 import entities.IEntity;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -40,7 +39,6 @@ import logs.LogManager;
 import messages.EntityData;
 import messages.EntityDataOperation;
 import messages.Message;
-import messages.MessagesFactory;
 import messages.IMessageData;
 
 /**
@@ -50,10 +48,10 @@ import messages.IMessageData;
  */
 public class ServerController implements Initializable, Server.ServerStatusHandler, Server.MessagesHandler {
 	// region UI Elements
-	
-	
-	@FXML private TabPane tabpane;
-	
+
+	@FXML
+	private TabPane tabpane;
+
 	/* Database start-stop button declaration */
 	@FXML
 	private Button btn_db_start;
@@ -93,7 +91,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	@FXML
 	private TableColumn<SettingsRow, String> tablecolumn_type;
 	@FXML
-	private Button btn_save_settings;
+	private Button btn_update_settings;
 
 	// end region -> UI Elements
 
@@ -106,6 +104,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private ServerConfiguration m_configuration;
 
 	private Logger m_logger;
+
+	private Handler m_logHandler;
 
 	// end region -> Fields
 
@@ -131,7 +131,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 					SettingsRow rowData = tableRow.getItem();
 
 					TextInputDialog dialog = new TextInputDialog();
-					dialog.setTitle("Update Settings Valude");
+					dialog.setTitle("Update Settings Value");
 					dialog.setHeaderText("Do you want to update the value of " + rowData.getType() + '-'
 							+ rowData.getSetting() + " ?");
 					dialog.setContentText("Please enter the new value:");
@@ -158,7 +158,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 					}
 					rowData.setValue(resultString);
 					drawContantToTable();
-					btn_save_settings.setDisable(false);
+					btn_update_settings.setDisable(false);
 				}
 			});
 			return tableRow;
@@ -167,15 +167,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		tablecolumn_setting.setCellValueFactory(new PropertyValueFactory<>("setting"));
 		tablecolumn_value.setCellValueFactory(new PropertyValueFactory<>("value"));
 
-		tabpane.getSelectionModel().selectedIndexProperty()
-				.addListener((ChangeListener<Number>) (ov, oldValue, newValue) -> {
-					if (oldValue == newValue) {
-						return;
-					}
-					drawContantToTable();
-				});
+		drawContantToTable();
 
-		btn_save_settings.setDisable(true);
+		btn_update_settings.setDisable(true);
 	}
 
 	private void initializeServerLogic() {
@@ -184,10 +178,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	}
 
 	private void initializeLog() {
-		Handler logHandler = new LogHandler();
+		m_logHandler = new LogHandler();
 		LogFormatter formatter = new LogFormatter();
-		logHandler.setFormatter(formatter);
-		m_logger.addHandler(logHandler);
+		m_logHandler.setFormatter(formatter);
+		m_logger.addHandler(m_logHandler);
 	}
 
 	private void initializeFields() {
@@ -232,18 +226,27 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	@FXML
 	private void startConnectivity(ActionEvent event) {
+		try {
+			m_server.listen();
+			m_logger.info("Trying to start listening..");
+		} catch (Exception e) {
+			m_logger.log(Level.SEVERE, "Listening request faild.", e);
+			return;
+		}
 		onServerStarted();
 	}
 
 	@FXML
 	private void stopConnectivity(ActionEvent event) {
+		m_logger.info("Trying to stop listening..");
+		m_server.stopListening();
 		onServerStopped();
 	}
 
 	@FXML
-	private void saveSettings(ActionEvent event) {
+	private void updateSettingsFile(ActionEvent event) {
 		m_configuration.updateResourceFile();
-		btn_save_settings.setDisable(true);
+		btn_update_settings.setDisable(true);
 	}
 
 	// end region -> UI Methods
@@ -271,6 +274,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private IEntity onEntityDataReceived(IMessageData messageData) throws Exception {
 		EntityData entityData = (EntityData) messageData;
 		IEntity receivedEntity = entityData.getEntity();
+		
+		if(receivedEntity == null) {
+			return null;
+		}
+		
 		IEntity returningEntity = null;
 
 		ResultSet queryResult = null;
@@ -278,18 +286,21 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			switch (entityData.getOperation()) {
 			case Update:
 				String generatedUpdateQuery = QueryFactory.generateUpdateEntityQuery(receivedEntity);
-				boolean executeUpdateQueryResult = m_dbContoller.executeUpdateQuery(generatedUpdateQuery);
-				if (!executeUpdateQueryResult) {
+				if(generatedUpdateQuery == null || generatedUpdateQuery.isEmpty()) {
 					break;
 				}
-				String generatedGetQuery1 = QueryFactory.generateGetEntityQuery(receivedEntity);
-				queryResult = m_dbContoller.executeSelectQuery(generatedGetQuery1);
-				returningEntity = EntitiesResolver.resolveResultSet(queryResult, receivedEntity);
+				m_dbContoller.executeUpdateQuery(generatedUpdateQuery);
 				break;
 
 			case Get:
 				String generatedGetQuery2 = QueryFactory.generateGetEntityQuery(receivedEntity);
+				if(generatedGetQuery2 == null || generatedGetQuery2.isEmpty()) {
+					break;
+				}
 				queryResult = m_dbContoller.executeSelectQuery(generatedGetQuery2);
+				if(queryResult ==null) {
+					break;
+				}
 				returningEntity = EntitiesResolver.resolveResultSet(queryResult, receivedEntity);
 				break;
 
@@ -315,9 +326,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	// region Server Handlers Implementation
 
 	@Override
-	public Message onMessageReceived(Message msg, String clientDetails) {
-		m_logger.info(
-				"Received message from client. Client details: " + clientDetails + ", Message: " + msg.toString());
+	public Message onMessageReceived(Message msg) {
+
 		IMessageData messageData = msg.getMessageData();
 		if (messageData instanceof EntityData) {
 			IEntity returnEntity = null;
@@ -329,10 +339,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			}
 			if (returnEntity != null) {
 				IMessageData returnedMessageData = new EntityData(EntityDataOperation.None, returnEntity);
-				
-//				msg.setMessageData(returnedMessageData);
-//				return msg;
-				return MessagesFactory.createEntityMessage(returnEntity);
+				msg.setMessageData(returnedMessageData);
+				return msg;
 			}
 		}
 		return null;
@@ -340,12 +348,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	@Override
 	public void onServerStarted() {
-		try {
-			m_server.listen();
-		} catch (Exception e) {
-			m_logger.log(Level.SEVERE, "Listening request faild.", e);
-			return;
-		}
+
 		btn_connectivity_start.setDisable(true);
 		btn_connectivity_stop.setDisable(false);
 		circle_connectivity_on.setFill(Paint.valueOf("green"));
@@ -354,12 +357,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	@Override
 	public void onServerStopped() {
-		try {
-			m_server.stopListening();
-		} catch (Exception e) {
-			m_logger.log(Level.SEVERE, "Listening request faild.", e);
-			return;
-		}
 		btn_connectivity_start.setDisable(false);
 		btn_connectivity_stop.setDisable(true);
 		circle_connectivity_on.setFill(Paint.valueOf("grey"));
@@ -383,7 +380,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 
 		@Override
-		public void publish(LogRecord record) {
+		public synchronized void publish(LogRecord record) {
 			try {
 				if (record == null || textarea_log == null) {
 					return;
@@ -396,14 +393,16 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				} else {
 					currentText = currentText.trim() + '\n' + msgFormmated;
 				}
+
 				textarea_log.setText(currentText);
 				textarea_log.selectPositionCaret(textarea_log.getLength());
 				textarea_log.deselect();
 			} catch (Exception e) {
-				textarea_log.setText(" - Log Error! - \n Error:" + e.getMessage());
+				m_logger.removeHandler(m_logHandler);
+				m_logger.warning("Logging to log UI disabled.");
 			}
 		}
 	}
-	
+
 	// end region -> Nested Classes
 }

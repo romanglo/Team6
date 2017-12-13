@@ -168,9 +168,10 @@ public class DbController extends Startable {
 		try {
 			stmt = m_connection.createStatement();
 			ResultSet queryReuslt = stmt.executeQuery(query);
+			m_Logger.info("A select query executed seccessfully! The query: " + query);
 			return queryReuslt;
 		} catch (SQLException ex) {
-			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + query, ex);
+			m_Logger.log(Level.SEVERE, "Failed on try to execute the select query: " + query, ex);
 			return null;
 		}
 	}
@@ -195,9 +196,9 @@ public class DbController extends Startable {
 			stmt = m_connection.createStatement();
 			boolean result = stmt.executeUpdate(query) == 1;
 			if (result) {
-				m_Logger.info("A query executed seccessfully! The query: " + query);
+				m_Logger.info("A update query executed seccessfully! The query: " + query);
 			} else {
-				m_Logger.warning("Failed on try to execute the query: " + query);
+				m_Logger.warning("Failed on try to execute the update query: " + query);
 			}
 			return result;
 		} catch (SQLException ex) {

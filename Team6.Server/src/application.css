@@ -2,8 +2,8 @@
 {
 	-fx-background-color: #5490ff;
 	-fx-text-fill: white;
-	-fx-padding: 6 6 6 6;
-	-fx-border-radius: 8;
+	-fx-padding: 6.0 6.0 6.0 6.0;
+	-fx-border-radius: 8.0;
 }
 .button:hover 
 {
@@ -12,18 +12,17 @@
 
 .tab-pane .tab-header-area .tab-header-background 
 {
-    -fx-opacity: 0;
+    -fx-opacity: 0.0;
 }
 
 .tab-pane
 {
-    -fx-tab-min-width:90px;
-    /*-fx-background-color: lightgrey;*/
+    -fx-tab-min-width:90.0px;
 }
 
 .tab
 {
-    -fx-background-insets: 0 1 0 1,0,0;
+    -fx-background-insets: 0.0 1.0 0.0 1.0,0.0,0.0;
 }
 .tab-pane .tab
 {
@@ -38,18 +37,14 @@
 
 .tab-content-area 
 {
--fx-background-color: rgb(218,218,218);
-/*-fx-padding: 1px; 
--fx-border-color: white; 
--fx-border-width: 3px;*/
-/* -fx-opacity: -fx-disabled-opacity;*/
+	-fx-background-color: rgb(218.0,218.0,218.0);
 }
 
 .tab .tab-label 
 { 
-	-fx-alignment: center-right  ;
+	-fx-alignment: center-right;
     -fx-text-fill: black;
-    -fx-font-size: 12px;
+    -fx-font-size: 12.0px;
     -fx-font-weight: bold; 
 }
 
@@ -62,7 +57,7 @@
 {
     -fx-text-fill: #5490ff;
     -fx-font-weight: bold;
-    -fx-font-size: 16px;
+    -fx-font-size: 16.0px;
 }
 .root
 {

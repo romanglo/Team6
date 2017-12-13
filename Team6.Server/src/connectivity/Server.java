@@ -34,11 +34,9 @@ public class Server extends AbstractServer {
 		 *
 		 * @param msg
 		 *            The message from the client.
-		 * @param clientDetails
-		 *            String that describes the sender of the message.
 		 * @return Answer to the client, null to do nothing.
 		 */
-		Message onMessageReceived(Message msg, String clientDetails);
+		Message onMessageReceived(Message msg);
 	}
 
 	/**
@@ -99,6 +97,7 @@ public class Server extends AbstractServer {
 		m_logger = logger;
 		m_configuration = configuration;
 		m_serverStatusHandler = null;
+		m_messagesHandler = null;
 		m_numOfConnectedClients = 0;
 	}
 
@@ -159,19 +158,34 @@ public class Server extends AbstractServer {
 			return;
 		}
 
+		Message receivedMsg = (Message) msg;
+
 		if (m_serverStatusHandler == null) {
 			m_logger.info("A message has been received from client, but the handler is null. The Client: "
 					+ client.toString() + " , Message: " + msg.toString());
 			return;
+		} else {
+			m_logger.info("A message has been received from client. The Client: " + client.toString() + " , Message: "
+					+ msg.toString());
 		}
-		Message receivedMsg = (Message) msg;
-		String clientDetails = client.getName()+';'+client.getId()+';'+client.getInetAddress().toString();
-		Message answerMsg = m_messagesHandler.onMessageReceived(receivedMsg,clientDetails);
+
+		// Message entityMessage = MessagesFactory
+		// .createGetEntityMessage(new ProductEntity(99, "Hello",
+		// ProductType.FlowerPot));
+		// try {
+		// client.sendToClient((Object) entityMessage);
+		// m_logger.info(entityMessage + " message to client: " + client.toString() + "
+		// sent.");
+		// } catch (IOException e) {
+		// m_logger.log(Level.WARNING, entityMessage + " message to client: " +
+		// client.toString() + " FAILED!.", e);
+		// }
+
+		Message answerMsg = m_messagesHandler.onMessageReceived(receivedMsg);
 
 		if (answerMsg != null) {
 			try {
 				client.sendToClient(answerMsg);
-				//TODO ROMAN : Create exception.
 			} catch (IOException e) {
 				m_logger.log(Level.SEVERE, "Answering to the client failed, the client: " + client.toString(), e);
 			}
@@ -214,6 +228,8 @@ public class Server extends AbstractServer {
 	@Override
 	protected void clientConnected(ConnectionToClient client) {
 		m_numOfConnectedClients++;
+		m_logger.info("The client connected: " + client.toString() + ", number of connected clients:"
+				+ m_numOfConnectedClients);
 	}
 
 	/*
@@ -222,6 +238,8 @@ public class Server extends AbstractServer {
 	@Override
 	protected synchronized void clientDisconnected(ConnectionToClient client) {
 		m_numOfConnectedClients--;
+		m_logger.info("The client connected: " + client.toString() + ", number of connected clients:"
+				+ m_numOfConnectedClients);
 	}
 
 	/*
@@ -229,9 +247,12 @@ public class Server extends AbstractServer {
 	 */
 	@Override
 	protected synchronized void clientException(ConnectionToClient client, Throwable exception) {
-		m_logger.log(Level.WARNING, "Received exception on ConnectionToClient thread, the client: " + client.toString(),
-				exception);
-		//TODO ROMAN : Check if the server closed and notify.
+		m_logger.log(Level.WARNING, "Received exception on ConnectionToClient thread, the client: " + client.toString()
+				+ ", all the connections with clients closed", exception);
+		m_numOfConnectedClients = 0;
+		if (!isListening()) {
+			serverStopped();
+		}
 	}
 
 	/*
@@ -243,23 +264,9 @@ public class Server extends AbstractServer {
 			m_logger.log(Level.WARNING, "Received exception in listening thread, but the thread is still running.",
 					exception);
 			return;
+		} else {
+			serverStopped();
 		}
-
-		m_logger.info("Restarting the listening thread..");
-
-		try {
-			listen();
-			return;
-		} catch (IOException e) {
-			m_logger.log(Level.SEVERE, "Restarting listening thread failed! closing server..", e);
-		}
-
-		try {
-			close();
-		} catch (IOException e) {
-			m_logger.log(Level.SEVERE, "Closing server failed!", e);
-		}
-
 	}
 
 	// end region -> AbstractServer Methods Override
