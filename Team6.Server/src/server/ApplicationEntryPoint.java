@@ -128,7 +128,7 @@ public class ApplicationEntryPoint extends Application {
 				}
 			}
 		};
-		UncaughetExceptions.startHandling(uncaughtExceptionsHandler,true);
+		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, true);
 	}
 
 	private void intializeServer() throws IOException {
