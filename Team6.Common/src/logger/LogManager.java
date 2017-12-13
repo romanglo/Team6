@@ -1,5 +1,5 @@
 
-package logs;
+package logger;
 
 import java.io.File;
 import java.time.LocalDate;

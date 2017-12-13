@@ -30,7 +30,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import logs.LogManager;
+import logger.LogManager;
 import messages.EntityData;
 import messages.Message;
 import messages.MessagesFactory;

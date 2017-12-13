@@ -7,13 +7,13 @@ import java.util.logging.Logger;
 
 import common.UncaughetExceptions;
 import configurations.ClientConfiguration;
-import logs.LogManager;
 import connectivity.Client;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import logger.LogManager;
 
 /**
  *
