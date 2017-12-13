@@ -171,6 +171,7 @@ public class Server extends AbstractServer {
 		if (answerMsg != null) {
 			try {
 				client.sendToClient(answerMsg);
+				//TODO ROMAN : Create exception.
 			} catch (IOException e) {
 				m_logger.log(Level.SEVERE, "Answering to the client failed, the client: " + client.toString(), e);
 			}
@@ -230,6 +231,7 @@ public class Server extends AbstractServer {
 	protected synchronized void clientException(ConnectionToClient client, Throwable exception) {
 		m_logger.log(Level.WARNING, "Received exception on ConnectionToClient thread, the client: " + client.toString(),
 				exception);
+		//TODO ROMAN : Check if the server closed and notify.
 	}
 
 	/*

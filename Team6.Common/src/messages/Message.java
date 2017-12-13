@@ -108,4 +108,19 @@ public class Message implements Serializable
 		m_creationTime = new Date();
 	}
 	// end region -> Constructors
+
+	
+	
+	// region Object Methods Override
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString()
+	{
+		return "Message [ID=" + m_id + ", Creation Time=" + m_creationTime + ", Message Data=" + m_messageData
+				+ "]";
+	}
+	// end region -> Object Methods Override
 }
