@@ -15,7 +15,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -88,18 +87,18 @@ public class MainController implements Initializable
 		try {
 			if (connectionEvent.getSource().equals(m_connectToServer)) {
 				EntryPoint.initializeConnection();
-				m_connectToServer.setDisable(false);
-				m_disconnectFromServer.setDisable(true);
-				m_connectedLight.setFill(Color.GREEN);
-				m_disconnectedLight.setFill(Color.GREY);
-				m_getItemPane.setVisible(true);
-			} else {
-				EntryPoint.disposeConnection();
 				m_connectToServer.setDisable(true);
 				m_disconnectFromServer.setDisable(false);
+				m_connectedLight.setFill(Color.GREEN);
+				m_disconnectedLight.setFill(Color.GREY);
+				m_getItemPane.setDisable(false);
+			} else {
+				EntryPoint.disposeConnection();
+				m_connectToServer.setDisable(false);
+				m_disconnectFromServer.setDisable(true);
 				m_connectedLight.setFill(Color.GREY);
-				m_disconnectedLight.setFill(Color.GREEN);
-				m_getItemPane.setVisible(false);
+				m_disconnectedLight.setFill(Color.RED);
+				m_getItemPane.setDisable(true);
 			}
 		}
 		catch (IOException ioe) {
@@ -132,7 +131,7 @@ public class MainController implements Initializable
 				return ProductType.FlowerPot;
 			case "BridalBouquet":
 				return ProductType.BridalBouquet;
-			default: 
+			default:
 				return null;
 		}
 	}
