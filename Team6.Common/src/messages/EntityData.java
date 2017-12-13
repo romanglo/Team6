@@ -1,6 +1,8 @@
 
 package messages;
 
+import java.io.Serializable;
+
 import com.sun.istack.internal.NotNull;
 
 import entities.IEntity;
@@ -11,9 +13,14 @@ import entities.IEntity;
  * used by {@link Message}.
  * 
  */
-public class EntityData implements MessageData
+public class EntityData implements IMessageData
 {
 	// region Fields
+
+	/**
+	 * Serial version unique ID, necessary due to the class implements {@link Serializable}
+	 */
+	private static final long serialVersionUID = 4732439024965484856L;
 
 	private EntityDataOperation m_operation;
 

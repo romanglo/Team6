@@ -12,7 +12,7 @@ public class MessagesFactory
 {
 
 	/**
-	 * Create {@link Message} with a {@link MessageData} of a {@link EntityData}
+	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
 	 * with {@link EntityDataOperation#Get} operation.
 	 *
 	 * @param entity
@@ -25,7 +25,7 @@ public class MessagesFactory
 	}
 
 	/**
-	 * Create {@link Message} with a {@link MessageData} of a {@link EntityData}
+	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
 	 * with {@link EntityDataOperation#None} operation.
 	 *
 	 * @param entity
@@ -38,7 +38,7 @@ public class MessagesFactory
 	}
 
 	/**
-	 * Create {@link Message} with a {@link MessageData} of a {@link EntityData}
+	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
 	 * with {@link EntityDataOperation#Update} operation.
 	 *
 	 * @param entity
@@ -56,7 +56,7 @@ public class MessagesFactory
 		if (entity == null) {
 			return null;
 		}
-		MessageData data = new EntityData(entityDataOperation, entity);
+		IMessageData data = new EntityData(entityDataOperation, entity);
 		return new Message(data);
 	}
 

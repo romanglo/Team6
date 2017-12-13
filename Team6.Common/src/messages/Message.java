@@ -1,6 +1,7 @@
 
 package messages;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -11,16 +12,21 @@ import com.sun.istack.internal.NotNull;
  * Message: Define messages that are described by ID, creation time and
  * {@link Object} data. This class instance created by {@link MessagesFactory}.
  */
-public class Message
+public class Message implements Serializable
 {
 
 	// region Fields
+
+	/**
+	 * Serial version unique ID, necessary due to the class implements {@link Serializable}
+	 */
+	private static final long serialVersionUID = 4562040062542908564L;
 
 	private String m_id;
 
 	private Date m_creationTime;
 
-	private MessageData m_messageData;
+	private IMessageData m_messageData;
 
 	// end region -> Fields
 
@@ -45,7 +51,7 @@ public class Message
 	/**
 	 * @return The actual data of the message
 	 */
-	public MessageData getMessageData()
+	public IMessageData getMessageData()
 	{
 		return m_messageData;
 	}
@@ -58,7 +64,7 @@ public class Message
 	 * @param message
 	 *            set actual data of the message
 	 */
-	public void setMessageData(MessageData message)
+	public void setMessageData(IMessageData message)
 	{
 		m_messageData = message;
 	}
@@ -78,7 +84,7 @@ public class Message
 	 *             If received null pointer.
 	 * 
 	 */
-	Message(@NotNull MessageData messageData) throws NullPointerException
+	Message(@NotNull IMessageData messageData) throws NullPointerException
 	{
 		if (messageData == null) {
 			throw new NullPointerException("Message constructor received null poitner as MessageData parameter.");
@@ -92,7 +98,7 @@ public class Message
 	 * 
 	 * Create instance of class that implements {@link IMessage}. Auto generation of
 	 * message ID based on {@link UUID}, and time in UTC format. The message have
-	 * null {@link MessageData}.
+	 * null {@link IMessageData}.
 	 * 
 	 */
 	Message()

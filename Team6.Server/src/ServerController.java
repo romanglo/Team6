@@ -40,7 +40,7 @@ import logs.LogManager;
 import messages.EntityData;
 import messages.EntityDataOperation;
 import messages.Message;
-import messages.MessageData;
+import messages.IMessageData;
 
 /**
  *
@@ -266,7 +266,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		setting_table.setItems(settings);
 	}
 
-	private IEntity onEntityDataReceived(MessageData messageData) throws Exception {
+	private IEntity onEntityDataReceived(IMessageData messageData) throws Exception {
 		EntityData entityData = (EntityData) messageData;
 		IEntity receivedEntity = entityData.getEntity();
 		IEntity returningEntity = null;
@@ -316,7 +316,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	public Message onMessageReceived(Message msg, String clientDetails) {
 		m_logger.info(
 				"Received message from client. Client details: " + clientDetails + ", Message: " + msg.toString());
-		MessageData messageData = msg.getMessageData();
+		IMessageData messageData = msg.getMessageData();
 		if (messageData instanceof EntityData) {
 			IEntity returnEntity = null;
 			try {
@@ -325,9 +325,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			} catch (Exception e) {
 				m_logger.log(Level.WARNING, "Some failure occurred ", e);
 			}
-			MessageData returnedMessageData = new EntityData(EntityDataOperation.None, returnEntity);
-			msg.setMessageData(returnedMessageData);
-			return msg;
+			if (returnEntity != null) {
+				IMessageData returnedMessageData = new EntityData(EntityDataOperation.None, returnEntity);
+				msg.setMessageData(returnedMessageData);
+				return msg;
+			}
 		}
 		return null;
 	}

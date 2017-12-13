@@ -1,6 +1,8 @@
 
 package entities;
 
+import java.io.Serializable;
+
 /**
  *
  * ProductEntity: Describes an entity of product.
@@ -9,6 +11,11 @@ package entities;
 public class ProductEntity implements IEntity
 {
 	// region Fields
+
+	/**
+	 * Serial version unique ID, necessary due to the class implements {@link Serializable}
+	 */
+	private static final long serialVersionUID = -1575231046663959076L;
 
 	private int m_id;
 
