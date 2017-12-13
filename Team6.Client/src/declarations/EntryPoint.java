@@ -42,6 +42,7 @@ public class EntryPoint extends Application {
 
 		try {
 			initializeConfiguration();
+			initializeConnection();
 			launch(args);
 		}
 		catch (Exception ex) {
@@ -97,6 +98,9 @@ public class EntryPoint extends Application {
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
+			primaryStage.setMinWidth(440);
+			primaryStage.setMinHeight(450);
+			primaryStage.setTitle("Zer-Li Client");
 			primaryStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();

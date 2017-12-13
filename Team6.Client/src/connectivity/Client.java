@@ -2,11 +2,11 @@
 package connectivity;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import declarations.MainController;
-import entities.IEntity;
-import messages.EntityData;
+import com.sun.istack.internal.Nullable;
+
 import messages.Message;
 import ocsf.client.AbstractClient;
 
@@ -18,16 +18,130 @@ import ocsf.client.AbstractClient;
 public class Client extends AbstractClient
 {
 
+	/**
+	 *
+	 * MessageReceiveHandler: Handler interface for message from the server to
+	 * display on UI.
+	 * 
+	 */
+	public interface MessageReceiveHandler
+	{
+
+		/**
+		 * Prototype of a method that meant to process the message received from the
+		 * server and updating the UI according to the Object details.
+		 *
+		 * @param msg
+		 *            - An Object received from the server.
+		 */
+		void onMessageReceived(Object msg);
+	}
+
+	/**
+	 *
+	 * ClientStatusHandler: handler interface for updating the UI according to the
+	 * connection status of the client.
+	 * 
+	 */
+	public interface ClientStatusHandler
+	{
+
+		/**
+		 * Update the UI after the connection to the server.
+		 *
+		 */
+		void onClientConnected();
+
+		/**
+		 * Update the UI after the disconnection from the server.
+		 *
+		 */
+		void onClientDisconnected();
+	}
+
 	// region Fields
 
 	private Logger m_logger;
 
+	private String m_host;
+
+	private int m_port;
+
+	private ClientStatusHandler m_clientStatusHandler;
+
+	private MessageReceiveHandler m_messageReceiveHandler;
+
 	// end region -> Fields
 
 	// region Getters
+
+	/**
+	 * Return server port.
+	 *
+	 * @return server port.
+	 */
+	public int getServerPort()
+	{
+		return m_port;
+	}
+
+	/**
+	 * Return server host.
+	 *
+	 * @return server host.
+	 */
+	public String getServerHost()
+	{
+		return m_host;
+	}
+
 	// end region -> Getters
 
 	// region Setters
+
+	/**
+	 * @param clientStatusHandler
+	 *            Handler of changing in client status, if a handler exist the new
+	 *            one will swap him. <code>null</code> will remove the current
+	 *            handler.
+	 */
+	public void setClientStatusHandler(@Nullable ClientStatusHandler clientStatusHandler)
+	{
+		m_clientStatusHandler = clientStatusHandler;
+	}
+
+	/**
+	 * Update server host.
+	 *
+	 * @param host
+	 *            - Server host for connection.
+	 */
+	public void setServerHost(String host)
+	{
+		this.m_host = host;
+	}
+
+	/**
+	 * Update server port.
+	 *
+	 * @param port
+	 *            - Server port for connection.
+	 */
+	public void setServerPort(int port)
+	{
+		this.m_port = port;
+	}
+
+	/**
+	 * @param messagesHandler
+	 *            Handler of messages, if a handler exist the new one will swap him.
+	 *            <code>null</code> will remove the current handler.
+	 */
+	public void setMessagesHandler(@Nullable MessageReceiveHandler messagesHandler)
+	{
+		this.m_messageReceiveHandler = messagesHandler;
+	}
+
 	// end region -> Setters
 
 	// region Constructors
@@ -53,12 +167,28 @@ public class Client extends AbstractClient
 		}
 
 		m_logger = logger;
-		openConnection();
+		m_host = host;
+		m_port = port;
+		m_clientStatusHandler = null;
+		m_messageReceiveHandler = null;
 	}
 
 	// end region -> Constructors
 
 	// region Public Methods
+	
+	/**
+	 * Open connection with the server.
+	 *
+	 */
+	public void createConnectionWithServer() {
+		try {
+			openConnection();
+		}
+		catch (IOException e) {
+			m_logger.log(Level.WARNING, "Failed to open connection.", e);
+		}
+	}
 
 	/**
 	 * The method closes the connection with the server.
@@ -73,7 +203,7 @@ public class Client extends AbstractClient
 			m_logger.warning("Could not close the connection with the server.");
 		}
 	}
-	
+
 	@Override
 	public void handleMessageFromServer(Object msg)
 	{
@@ -81,18 +211,44 @@ public class Client extends AbstractClient
 			m_logger.info("A null message was received from server.");
 			return;
 		}
-		
+
+		if (msg instanceof String) {
+			System.out.println("Message received is : " + msg);
+			return;
+		}
+
 		if (!(msg instanceof Message)) {
 			m_logger.info("A message was received from the server, but the message type is not dirived from Message.");
 			return;
 		}
 
-		Message receivedMessage = ((Message) msg);
-		IEntity entity = ((EntityData) receivedMessage.getMessageData()).getEntity();
-		
-		MainController.setItemDetails(entity);
-		
-		System.out.println(entity);
+		m_logger.info("A message received from the server.");
+
+		try {
+			m_messageReceiveHandler.onMessageReceived(msg);
+			m_logger.info("Displayed data from server.");
+		}
+		catch (Exception ex) {
+			m_logger.log(Level.WARNING, "Error! Failed displaying the data received. Exception: ", ex);
+		}
+	}
+
+	@Override
+	protected void connectionClosed()
+	{
+		m_clientStatusHandler.onClientDisconnected();
+	}
+
+	@Override
+	protected void connectionException(Exception exception)
+	{
+		m_logger.log(Level.WARNING, "Connection exception: ", exception);
+	}
+
+	@Override
+	protected void connectionEstablished()
+	{
+		m_clientStatusHandler.onClientConnected();
 	}
 
 	/**

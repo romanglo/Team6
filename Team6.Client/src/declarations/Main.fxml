@@ -14,49 +14,49 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="285.0" minWidth="380.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="399.0" prefWidth="395.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="declarations.MainController">
+<AnchorPane minHeight="285.0" minWidth="380.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="399.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="declarations.MainController">
    <children>
-      <Label layoutX="14.0" layoutY="14.0" prefHeight="34.0" prefWidth="156.0" text="Zer-Li Client Control">
+      <Label layoutX="14.0" layoutY="14.0" prefHeight="34.0" prefWidth="156.0" text="Zer-Li Client Control" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0">
          <font>
             <Font name="David" size="16.0" />
          </font>
       </Label>
-      <TabPane layoutY="79.0" prefHeight="368.0" prefWidth="450.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="-1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="75.0">
+      <TabPane layoutY="79.0" prefHeight="368.0" prefWidth="450.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="75.0">
         <tabs>
           <Tab closable="false" text="Server Status">
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="372.0" prefWidth="450.0">
                      <children>
-                        <Button fx:id="m_connectToServer" layoutX="14.0" layoutY="38.0" mnemonicParsing="false" onAction="#ServerConnection" prefHeight="37.0" prefWidth="76.0" text="Start">
+                        <Button fx:id="m_connectToServer" layoutX="14.0" layoutY="38.0" mnemonicParsing="false" onAction="#ServerConnection" prefHeight="37.0" prefWidth="76.0" text="Start" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="38.0">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </Button>
-                        <Button fx:id="m_disconnectFromServer" disable="true" layoutX="103.0" layoutY="38.0" mnemonicParsing="false" onAction="#ServerConnection" prefHeight="37.0" prefWidth="76.0" text="Stop">
+                        <Button fx:id="m_disconnectFromServer" disable="true" layoutX="103.0" layoutY="38.0" mnemonicParsing="false" onAction="#ServerConnection" prefHeight="37.0" prefWidth="76.0" text="Stop" AnchorPane.leftAnchor="103.0" AnchorPane.topAnchor="38.0">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </Button>
-                        <Circle fx:id="m_connectedLight" fill="#909090e8" layoutX="294.0" layoutY="57.0" radius="17.0" stroke="BLACK" strokeType="INSIDE">
+                        <Circle fx:id="m_connectedLight" fill="#909090e8" layoutX="294.0" layoutY="57.0" radius="17.0" stroke="BLACK" strokeType="INSIDE" AnchorPane.leftAnchor="277.0" AnchorPane.topAnchor="40.0">
                            <effect>
                               <DropShadow color="#00000084" />
                            </effect>
                         </Circle>
-                        <Label layoutX="14.0" layoutY="14.0" text="Connectivity" />
-                        <Label layoutX="271.0" layoutY="14.0" text="Connectivity Status" />
-                        <Circle fx:id="m_disconnectedLight" fill="#ff1f1fe9" layoutX="348.0" layoutY="57.0" radius="17.0" stroke="BLACK" strokeType="INSIDE">
+                        <Label layoutX="14.0" layoutY="14.0" text="Connectivity" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
+                        <Label layoutX="271.0" layoutY="14.0" text="Connectivity Status" AnchorPane.leftAnchor="271.0" AnchorPane.topAnchor="14.0" />
+                        <Circle fx:id="m_disconnectedLight" fill="#ff1f1fe9" layoutX="348.0" layoutY="57.0" radius="17.0" stroke="BLACK" strokeType="INSIDE" AnchorPane.leftAnchor="331.0" AnchorPane.topAnchor="40.0">
                            <effect>
                               <DropShadow color="#00000084" />
                            </effect>
                         </Circle>
                         <Separator layoutX="-1.0" layoutY="94.0" prefHeight="10.0" prefWidth="458.0" />
-                        <SplitPane fx:id="m_getItemPane" disable="true" dividerPositions="0.34698996655518394" layoutX="-3.0" layoutY="97.0" orientation="VERTICAL" prefHeight="241.0" prefWidth="401.0">
+                        <SplitPane fx:id="m_getItemPane" disable="true" dividerPositions="0.34698996655518394" layoutX="-3.0" layoutY="97.0" orientation="VERTICAL" prefHeight="241.0" prefWidth="401.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="95.0">
                           <items>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                  <children>
-                                    <Label layoutX="14.0" layoutY="33.0" text="Enter Item ID" />
-                                    <TextField id="tf_enterItemId" fx:id="m_enterItemId" alignment="CENTER" layoutX="104.0" layoutY="29.0" prefHeight="25.0" prefWidth="163.0" stylesheets="@application.css" />
-                                    <Button fx:id="m_getItemFromServer" layoutX="286.0" layoutY="23.0" mnemonicParsing="false" onAction="#getItemFromServer" prefHeight="37.0" prefWidth="76.0" text="Get">
+                                    <Label layoutX="14.0" layoutY="25.0" text="Enter Item ID" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="25.0" />
+                                    <TextField id="tf_enterItemId" fx:id="m_enterItemId" alignment="CENTER" layoutX="130.0" layoutY="24.0" stylesheets="@application.css" AnchorPane.leftAnchor="130.0" />
+                                    <Button fx:id="m_getItemFromServer" layoutX="303.0" layoutY="18.0" mnemonicParsing="false" onAction="#getItemFromServer" prefHeight="37.0" prefWidth="76.0" text="Get">
                                        <font>
                                           <Font size="16.0" />
                                        </font>
@@ -65,13 +65,13 @@
                               </AnchorPane>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="156.0" prefWidth="399.0">
                                  <children>
-                                    <Label layoutX="14.0" layoutY="15.0" text="ID" />
-                                    <Label layoutX="11.0" layoutY="50.0" text="Name" />
-                                    <Label layoutX="13.0" layoutY="84.0" text="Type" />
-                                    <TextField id="tf_displayItemId" fx:id="m_itemIdLbl" layoutX="104.0" layoutY="11.0" prefHeight="25.0" prefWidth="164.0" stylesheets="@application.css" />
-                                    <TextField id="tf_displayItemName" fx:id="m_itemNameLbl" layoutX="104.0" layoutY="46.0" prefHeight="25.0" prefWidth="164.0" stylesheets="@application.css" />
-                                    <TextField id="tf_displayItemNameType" fx:id="m_itemTypeLbl" layoutX="104.0" layoutY="80.0" prefHeight="25.0" prefWidth="164.0" stylesheets="@application.css" />
-                                    <Button layoutX="285.0" layoutY="40.0" mnemonicParsing="false" onAction="#updateItemInServer" prefHeight="37.0" prefWidth="76.0" text="Update">
+                                    <Label layoutX="14.0" layoutY="15.0" text="ID" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="15.0" />
+                                    <Label layoutX="11.0" layoutY="50.0" text="Name" AnchorPane.leftAnchor="14.0" />
+                                    <Label layoutX="13.0" layoutY="84.0" text="Type" AnchorPane.leftAnchor="14.0" />
+                                    <TextField id="tf_displayItemId" fx:id="m_itemIdUpdate" editable="false" layoutX="130.0" layoutY="11.0" prefHeight="25.0" prefWidth="149.0" stylesheets="@application.css" AnchorPane.leftAnchor="130.0" />
+                                    <TextField id="tf_displayItemName" fx:id="m_itemNameUpdate" layoutX="130.0" layoutY="49.0" stylesheets="@application.css" AnchorPane.leftAnchor="130.0" />
+                                    <TextField id="tf_displayItemNameType" fx:id="m_itemTypeUpdate" layoutX="130.0" layoutY="83.0" stylesheets="@application.css" AnchorPane.leftAnchor="130.0" />
+                                    <Button layoutX="303.0" layoutY="41.0" mnemonicParsing="false" onAction="#updateItemInServer" prefHeight="37.0" prefWidth="76.0" text="Update">
                                        <font>
                                           <Font size="16.0" />
                                        </font>
@@ -89,8 +89,8 @@
                      <children>
                         <TableView fx:id="m_settingsDisplayTable" editable="true" layoutX="20.0" layoutY="18.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <columns>
-                            <TableColumn fx:id="m_settingColumn" editable="false" minWidth="32.40002512931824" prefWidth="189.59997248649597" sortable="false" text="Setting" />
-                            <TableColumn fx:id="m_valueColumn" minWidth="187.5999298095703" prefWidth="203.6000518798828" sortable="false" text="Value" />
+                            <TableColumn fx:id="m_settingColumn" editable="false" minWidth="197.0" prefWidth="-1.0" sortable="false" text="Setting" />
+                            <TableColumn fx:id="m_valueColumn" minWidth="197.0" prefWidth="-1.0" sortable="false" text="Value" />
                           </columns>
                            <columnResizePolicy>
                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
