@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,6 +36,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import logger.LogFormatter;
@@ -96,6 +99,12 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	@FXML
 	private Button btn_update_settings;
 
+	/* Title images */
+	@FXML
+	private ImageView imageview_gif;
+	@FXML
+	private ImageView imageview_title;
+
 	// end region -> UI Elements
 
 	// region Fields
@@ -119,6 +128,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
+		initializeImages();
+
 		initializeFields();
 
 		initializeLog();
@@ -126,7 +137,19 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		initializeServerLogic();
 
 		initializeConfigurationTable();
+	}
 
+	private void initializeImages() {
+		InputStream serverGif = getClass().getResourceAsStream("ServerGIF.gif");
+		if (serverGif != null) {
+			Image image = new Image(serverGif);
+			imageview_gif.setImage(image);
+		}
+		InputStream title = getClass().getResourceAsStream("Zerli_Headline.jpg");
+		if (title != null) {
+			Image image = new Image(title);
+			imageview_title.setImage(image);
+		}
 	}
 
 	private void initializeConfigurationTable() {
@@ -277,7 +300,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	 */
 	void shutdown() {
 		// cleanup code here...
-		if (m_logger!=null && m_logHandler != null) {
+		if (m_logger != null && m_logHandler != null) {
 			m_logger.removeHandler(m_logHandler);
 		}
 

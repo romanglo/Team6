@@ -2,6 +2,7 @@
 package client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -28,6 +29,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import logger.LogManager;
@@ -77,6 +80,11 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	@FXML TextField m_itemNameUpdate;
 
 	@FXML ComboBox<String> m_itemTypeUpdate;
+
+	/* Title images */
+	@FXML private ImageView	imageview_gif;
+
+	@FXML private ImageView	imageview_title;
 
 	private static Logger s_logger = null;
 
@@ -138,18 +146,18 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	private void updateItemInServer(ActionEvent updateItem)
 	{
 		if (m_itemIdUpdate.getText().equals("") || m_itemNameUpdate.getText().equals("")
-		 || m_itemTypeUpdate.getValue().equals("") ) {
+				|| m_itemTypeUpdate.getValue().equals("")) {
 			s_logger.info("Empty field(s). Cannot send update request.");
 			return;
 		}
 
 		try {
 			String itemStringId = m_itemIdUpdate.getText().trim();
-			int itemId= Integer.parseInt(itemStringId);
+			int itemId = Integer.parseInt(itemStringId);
 			String itemName = m_itemNameUpdate.getText().trim();
 			String itemStringType = m_itemTypeUpdate.getValue().trim();
 			ProductType productType = Enum.valueOf(ProductType.class, itemStringType);
-			ProductEntity entity = new ProductEntity(itemId,itemName,productType);
+			ProductEntity entity = new ProductEntity(itemId, itemName, productType);
 			Message msg = MessagesFactory.createUpdateEntityMessage(entity);
 			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
@@ -175,9 +183,24 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	@Override
 	public void initialize(URL url, ResourceBundle rb)
 	{
+		initializeImages();
 		initializeProductTypeComboBox();
 		initializeConfigurationTable();
 		initializeClientHandler();
+	}
+
+	private void initializeImages()
+	{
+		InputStream serverGif = getClass().getResourceAsStream("Flower.gif");
+		if (serverGif != null) {
+			Image image = new Image(serverGif);
+			imageview_gif.setImage(image);
+		}
+		InputStream title = getClass().getResourceAsStream("Zerli_Headline.jpg");
+		if (title != null) {
+			Image image = new Image(title);
+			imageview_title.setImage(image);
+		}
 	}
 
 	private void initializeProductTypeComboBox()
