@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.istack.internal.NotNull;
@@ -13,7 +12,6 @@ import com.sun.istack.internal.NotNull;
 import common.IStartable;
 import common.NotRunningException;
 import common.Startable;
-import common.StartableState;
 import configurations.DbConfiguration;
 
 /**
@@ -76,8 +74,7 @@ public class DbController extends Startable {
 			try {
 				Class.forName(MY_SQL_DRIVER_NAME).newInstance();
 			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-				String errormessage = "Failed to intialize MySQL driver!";
-				m_Logger.log(Level.SEVERE, errormessage, e);
+				m_Logger.severe("Failed to intialize MySQL driver! exception: " + e.getMessage());
 				throw e;
 			}
 		}
@@ -89,11 +86,10 @@ public class DbController extends Startable {
 					m_dbConfiguration.getPassword());
 		} catch (SQLException e) {
 			m_connection = null;
-			String errormessage = "Failed to open connection with MySql server!";
-			m_Logger.log(Level.SEVERE, errormessage, e);
+			m_Logger.severe("Failed to open connection with MySql server! exception: " + e.getMessage());
 			throw e;
 		}
-		m_Logger.info("Connection with MySQL database created! connection string: " +connectionString);
+		m_Logger.info("Connection with MySQL database created! connection string: " + connectionString);
 	}
 
 	/**
@@ -109,10 +105,7 @@ public class DbController extends Startable {
 			m_connection.close();
 		} catch (SQLException e) {
 			m_connection = null;
-
-			String errormessage = "Failed to close the connection to MySql!";
-			m_Logger.log(Level.SEVERE, errormessage, e);
-
+			m_Logger.severe("Failed to close the connection to MySql! exception: " + e.getMessage());
 			throw e;
 		}
 		m_Logger.info("Connection with MySQL database closed!");
@@ -128,11 +121,11 @@ public class DbController extends Startable {
 	 * The method prints all the rows in product table.
 	 *
 	 * @throws NotRunningException
-	 *             if the method called when the class not in
-	 *             {@link StartableState#Running}
+	 *             if the method called when the state is not Running.
+	 * 
 	 */
 	public void printAllProducts() throws NotRunningException {
-		if (m_State != StartableState.Running) {
+		if (!isRunning()) {
 			throw new NotRunningException(this);
 		}
 
@@ -155,17 +148,20 @@ public class DbController extends Startable {
 	 * 
 	 * The method execute select query.
 	 *
-	 * @param query The query to execute.
+	 * @param query
+	 *            The query to execute.
 	 * @return A {@link ResultSet} with the query result.
-	 * @throws NotRunningException if the method called when the state is not {@link StartableState#Running}
+	 * @throws NotRunningException
+	 *             if the method called when the state is not Running.
 	 */
-	public ResultSet executeSelectQuery(String query) throws NotRunningException{
-		if (m_State != StartableState.Running) {
+	public ResultSet executeSelectQuery(String query) throws NotRunningException {
+		if (!isRunning()) {
 			throw new NotRunningException(this);
 		}
 		if (query == null || query.isEmpty()) {
 			return null;
 		}
+
 		Statement stmt;
 		try {
 			stmt = m_connection.createStatement();
@@ -173,7 +169,7 @@ public class DbController extends Startable {
 			m_Logger.info("A select query executed seccessfully! The query: " + query);
 			return queryReuslt;
 		} catch (SQLException ex) {
-			m_Logger.log(Level.SEVERE, "Failed on try to execute the select query: " + query, ex);
+			m_Logger.warning("Failed on try to execute the query: " + query + " , exception: " + ex);
 			return null;
 		}
 	}
@@ -182,17 +178,20 @@ public class DbController extends Startable {
 	 * 
 	 * The method execute update query.
 	 *
-	 * @param query The query to execute.
+	 * @param query
+	 *            The query to execute.
 	 * @return true if the update succeed and false if does not.
-	 * @throws NotRunningException if the method called when the state is not {@link StartableState#Running}
+	 * @throws NotRunningException
+	 *             if the method called when the state is not Running.
 	 */
-	public boolean executeUpdateQuery(String query) throws NotRunningException{
-		if (m_State != StartableState.Running) {
+	public boolean executeUpdateQuery(String query) throws NotRunningException {
+		if (!isRunning()) {
 			throw new NotRunningException(this);
 		}
 		if (query == null || query.isEmpty()) {
 			return false;
 		}
+
 		Statement stmt;
 		try {
 			stmt = m_connection.createStatement();
@@ -204,7 +203,7 @@ public class DbController extends Startable {
 			}
 			return result;
 		} catch (SQLException ex) {
-			m_Logger.log(Level.SEVERE, "Failed on try to execute the query: " + query, ex);
+			m_Logger.warning("Failed on try to execute the query: " + query + " , exception: " + ex);
 			return false;
 		}
 	}

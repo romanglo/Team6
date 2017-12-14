@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-	<ip>192.168.14.137</ip>
-	<port> 1234 </port>
+	<ip>localhost</ip>
+	<port>1234</port>
 </configuration>

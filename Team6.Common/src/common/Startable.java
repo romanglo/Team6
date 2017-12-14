@@ -18,7 +18,7 @@ public abstract class Startable implements IStartable
 
 	protected final String m_Id;
 
-	protected StartableState m_State;
+	protected boolean m_running;
 
 	protected Logger m_Logger;
 
@@ -30,21 +30,22 @@ public abstract class Startable implements IStartable
 
 	/**
 	 * @param throwable
-	 *            if true the method {@link IStartable#Start()} and
-	 *            {@link IStartable#Stop()} will throw {@link RuntimeException} on
-	 *            error case. if false only the {@link StartableState} will changed.
+	 *            if true the method {@link IStartable#Start()} will throw
+	 *            {@link RuntimeException} on error case. if false only the
+	 *            {@link StartableState} will changed.
 	 * @param logger
 	 *            A logger to write to it.
 	 */
 	protected Startable(boolean throwable, @NotNull Logger logger)
 	{
 		m_throwable = throwable;
-		
+
 		m_Logger = logger;
 
 		m_Id = getClass().getName();
 
-		m_State = StartableState.Ready;
+		m_running = false;
+		
 	}
 
 	// end region -> Constructors
@@ -54,7 +55,7 @@ public abstract class Startable implements IStartable
 	/**
 	 *
 	 * @return true if the method will throw exception in {@link Startable#Start()}
-	 *         and {@link Startable#Stop()} if necessary.
+	 *         on error case.
 	 */
 	public boolean isThrowable()
 	{
@@ -68,32 +69,31 @@ public abstract class Startable implements IStartable
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public StartableState getState()
+	public boolean isRunning()
 	{
-		return m_State;
+		return m_running;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * {@inheritDoc} The method
 	 */
 	@Override
 	public void Start() throws RuntimeException
 	{
-		if (m_State == StartableState.Running || m_State == StartableState.Error) {
-			m_Logger.log(Level.INFO, "Start method of " + m_Id + " called when the state is: " + m_State);
+		if (m_running) {
+			m_Logger.log(Level.INFO, "Start method of " + m_Id + " called when the state is already 'Running'.");
 			return;
 		}
 
 		m_Logger.log(Level.INFO, m_Id + " starting..");
 		try {
 			initialStart();
-			m_State = StartableState.Running;
-			m_Logger.log(Level.INFO, m_Id + " started successfully, the state is: " + m_State);
+			m_running = true;
+			m_Logger.log(Level.INFO, m_Id + " started successfully");
 		}
 		catch (Exception e) {
-			m_State = StartableState.Error;
-			String errorMessage = m_Id + " starting failed, the state is: " + m_State;
+			m_running = false;
+			String errorMessage = m_Id + " failed on try to start, the state is 'Stopped'.";
 			m_Logger.log(Level.INFO, errorMessage, e);
 			if (m_throwable) {
 				throw new RuntimeException(errorMessage, e);
@@ -107,24 +107,22 @@ public abstract class Startable implements IStartable
 	@Override
 	public void Stop()
 	{
-		if (m_State != StartableState.Running) {
-			m_Logger.log(Level.INFO, "Stop method of " + m_Id + " called when the state is: " + m_State);
+		if (m_running) {
+			m_Logger.log(Level.INFO, "Start method of " + m_Id + " called when the state is already 'Stopped'.");
 			return;
 		}
 
 		m_Logger.log(Level.INFO, m_Id + " stopping..");
 		try {
 			initialStop();
-			m_State = StartableState.Stopped;
-			m_Logger.log(Level.INFO, m_Id + " stopping successfully, the state is: " + m_State);
+			m_Logger.log(Level.INFO, m_Id + " stopped successfully.");
 		}
 		catch (Exception e) {
-			m_State = StartableState.Error;
-			String errorMessage = m_Id + " starting failed, the state is: " + m_State;
+			String errorMessage = m_Id + " failed on try to stop, the state is 'Stopped'.";
 			m_Logger.log(Level.INFO, errorMessage, e);
-			if (m_throwable) {
-				throw new RuntimeException(errorMessage, e);
-			}
+		}
+		finally {
+			m_running = false;
 		}
 	}
 

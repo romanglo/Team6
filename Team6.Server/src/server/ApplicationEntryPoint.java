@@ -13,7 +13,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import logger.LogManager;
-import common.StartableState;
 import common.UncaughetExceptions;
 
 /**
@@ -56,13 +55,13 @@ public class ApplicationEntryPoint extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			Parent root = FXMLLoader.load(getClass().getResource("ServerXML.fxml"));
-			Scene scene = new Scene(root, 450, 300);
+			Scene scene = new Scene(root, 430, 310);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.show();
-			primaryStage.setMinWidth(410);
+			primaryStage.setMinWidth(450);
 			primaryStage.setMinHeight(310);
 			primaryStage.setTitle("Zer-Li Server");
+			primaryStage.show();
 		} catch (Exception ex) {
 			m_logger.log(Level.SEVERE, "UI start failed!", ex);
 		}
@@ -154,7 +153,7 @@ public class ApplicationEntryPoint extends Application {
 	}
 
 	private void disposeDbController() {
-		if (DbContoller != null && DbContoller.getState() == StartableState.Running) {
+		if (DbContoller != null && DbContoller.isRunning()) {
 			DbContoller.Stop();
 		}
 		m_logger.info("Database controller disposed successfully.");

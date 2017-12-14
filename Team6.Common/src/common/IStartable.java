@@ -12,21 +12,18 @@ public interface IStartable
 {
 
 	/**
-	 * @return the state of the {@link IStartable}, see {@link StartableState} for
-	 *         more information on the different states.
+	 * @return <code>true</code> if the {@link IStartable} started and running now,
+	 *         and <code>false</code> if in stopped state.
 	 */
-	StartableState getState();
+	boolean isRunning();
 
 	/**
-	 * 
 	 * Start the operation that the {@link IStartable} does.
-	 *
 	 */
 	void Start();
 
 	/**
 	 * Stop the operation that the {@link IStartable} does.
-	 *
 	 */
 	void Stop();
 }

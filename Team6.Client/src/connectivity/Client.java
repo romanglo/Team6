@@ -2,7 +2,6 @@
 package connectivity;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.istack.internal.Nullable;
@@ -135,7 +134,7 @@ public class Client extends AbstractClient
 			openConnection();
 		}
 		catch (IOException e) {
-			m_logger.warning("Failed to open connection. Exception:"+ e.getMessage());
+			m_logger.warning("Failed to open connection. Exception:" + e.getMessage());
 		}
 	}
 
@@ -172,7 +171,7 @@ public class Client extends AbstractClient
 			m_messageReceiveHandler.onMessageReceived(msg);
 		}
 		catch (Exception ex) {
-			m_logger.warning("Message handler failed!. Exception: "+ ex.getMessage());
+			m_logger.warning("Message handler failed!. Exception: " + ex.getMessage());
 		}
 	}
 
@@ -185,10 +184,16 @@ public class Client extends AbstractClient
 	@Override
 	protected void connectionException(Exception exception)
 	{
-		m_logger.severe("Connection exception: "+ exception.getMessage());
-		if (!isConnected()) {
-			connectionClosed();
-		}
+		m_logger.severe("Connection exception: " + exception.getMessage());
+	
+//		if (!isConnected()) {
+//			connectionClosed();
+//		}
+		
+		/* If the exception happens because a disconnection from the server, the method
+		 isConnected() still returns true due to an unknown reason.  
+		 So on condition that an error is occurred, always happened a logout from the server.*/
+		connectionClosed();
 	}
 
 	@Override

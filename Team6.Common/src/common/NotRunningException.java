@@ -1,13 +1,9 @@
-/**
- * Package Name: common Created: 05-12-2017
- */
-
 package common;
 
 /**
  *
  * NotRunningException: Unchecked exception which thrown when a
- * {@link IStartable} that is not in the {@link StartableState#Running} state is
+ * {@link IStartable} that is not in the 'Running' state is
  * used.
  * 
  * @see RuntimeException
@@ -29,7 +25,7 @@ public class NotRunningException extends RuntimeException
 	 */
 	public NotRunningException()
 	{
-		super("A instance that implements IStartable interface that is not in the 'Running' state is used.");
+		super("A instance that implements IStartable interface that is in 'Stopped' state used.");
 	}
 
 	/**
@@ -55,8 +51,7 @@ public class NotRunningException extends RuntimeException
 	 */
 	public NotRunningException(Startable startable)
 	{
-		super(startable.m_Id + " that implements IStartable interface used not in 'Running' state. Current state: "
-				+ startable.getState());
+		super(startable.m_Id + " that implements IStartable interface used in 'Stopped' state.");
 	}
 
 }

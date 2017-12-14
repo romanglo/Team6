@@ -108,7 +108,7 @@ public class ApplicationEntryPoint extends Application
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.setMinWidth(440);
+			primaryStage.setMinWidth(445);
 			primaryStage.setMinHeight(450);
 			primaryStage.setTitle("Zer-Li Client");
 			primaryStage.show();

@@ -1,5 +1,6 @@
 package server;
 
+import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import common.StartableState;
 import configurations.ConnectivityConfiguration;
 import configurations.DbConfiguration;
 import configurations.ServerConfiguration;
@@ -162,7 +162,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 						}
 					} else {
 						m_configuration.getDbConfiguration().updateValueByName(rowData.getSetting(), resultString);
-						if (m_dbContoller.getState() == StartableState.Running) {
+						if (m_dbContoller.isRunning()) {
 							showInformationMessage(
 									"Attention: You must reopen database connection for the changes to take effect!");
 						}
@@ -170,7 +170,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 					rowData.setValue(resultString);
 					drawContantToTable();
 					btn_update_settings.setDisable(false);
-					
+
 					m_logger.info("The Configuration " + rowData.getType() + '-' + rowData.getSetting()
 							+ " value changed to " + rowData.getValue());
 				}
@@ -213,15 +213,13 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private void startDb(ActionEvent event) {
 		try {
 			m_dbContoller.Start();
-		} catch (Exception e) {
-			m_logger.log(Level.SEVERE, "Failed to connect to database", event);
-			return;
-		}
-		if (m_dbContoller.getState() == StartableState.Running) {
 			btn_db_start.setDisable(true);
 			btn_db_stop.setDisable(false);
 			circle_db_on.setFill(Paint.valueOf("green"));
 			circle_db_off.setFill(Paint.valueOf("grey"));
+		} catch (Exception e) {
+			m_logger.log(Level.SEVERE, "Failed to connect to database", event);
+			return;
 		}
 	}
 
@@ -229,13 +227,13 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private void stopDb(ActionEvent event) {
 		try {
 			m_dbContoller.Stop();
+			btn_db_start.setDisable(false);
+			btn_db_stop.setDisable(true);
+			circle_db_on.setFill(Paint.valueOf("grey"));
+			circle_db_off.setFill(Paint.valueOf("red"));
 		} catch (Exception e) {
 			m_logger.log(Level.SEVERE, "Failed to disconnect from database", event);
-		}
-		btn_db_start.setDisable(false);
-		btn_db_stop.setDisable(true);
-		circle_db_on.setFill(Paint.valueOf("grey"));
-		circle_db_off.setFill(Paint.valueOf("red"));
+		}	
 	}
 
 	@FXML
@@ -253,7 +251,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	@FXML
 	private void stopConnectivity(ActionEvent event) {
 		m_logger.info("Trying to stop listening..");
-		m_server.stopListening();
+		try {
+			m_server.close();
+		} catch (IOException e) {
+			m_logger.severe("An error occurred on closing connection! exception: "+ e.getMessage());
+		}
 		onServerStopped();
 	}
 
@@ -328,7 +330,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				try {
 					queryResult.close();
 				} catch (SQLException e) {
-					m_logger.warning("Failed on try to close query result. Exception: "+ e.getMessage());
+					m_logger.warning("Failed on try to close query result. Exception: " + e.getMessage());
 				}
 			}
 		}

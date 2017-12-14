@@ -18,7 +18,6 @@ import com.sun.istack.internal.Nullable;
 
 import common.IStartable;
 import common.Startable;
-import common.StartableState;
 
 /**
  *
@@ -96,8 +95,7 @@ public abstract class ScheduledExecutor extends Startable
 
 	/**
 	 * 
-	 * Add task to the executor, if the executor is in state
-	 * {@value StartableState#Ready} or {@value StartableState#Stopped}.
+	 * Add task to the executor, if the executor is in 'Stopped' state.
 	 *
 	 * @param <TData>
 	 *            Scheduled task result type.
@@ -110,7 +108,7 @@ public abstract class ScheduledExecutor extends Startable
 	public <TData> boolean addTask(@NotNull Callable<TData> runnable,
 			@Nullable ScheduledExecutionHandle<TData> executionHandle)
 	{
-		if (m_State == StartableState.Running || m_State == StartableState.Error) {
+		if (isRunning()) {
 			return false;
 		}
 		Future<TData> submit = m_executorService.submit(runnable);
