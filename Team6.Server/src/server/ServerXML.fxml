@@ -17,7 +17,7 @@
 
 <AnchorPane minHeight="285.0" minWidth="380.0"
 	nodeOrientation="LEFT_TO_RIGHT" prefHeight="300.0" prefWidth="450.0"
-	xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
+	xmlns="http://javafx.com/javafx/8.0.1" xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="server.ServerController">
 	<children>
 		<TabPane fx:id="tabpane" layoutY="79.0" prefHeight="171.0"

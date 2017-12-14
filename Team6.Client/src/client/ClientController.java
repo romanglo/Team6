@@ -12,7 +12,6 @@ import configurations.ClientConfiguration;
 import connectivity.Client;
 import entities.IEntity;
 import entities.ProductEntity;
-import entities.ProductType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,7 +20,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -60,6 +58,10 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	/* Get item text field and button. */
 	@FXML TextField m_enterItemId;
 
+	@FXML TextField m_itemNameGet;
+
+	@FXML TextField m_itemTypeGet;
+
 	@FXML Button m_getItemFromServer;
 
 	/* Setting table declaration */
@@ -74,17 +76,15 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	/* Split pane attribute. */
 	@FXML SplitPane m_getItemPane;
 
-	/* Item display labels. */
+	/* Item update labels. */
 	@FXML TextField m_itemIdUpdate;
 
 	@FXML TextField m_itemNameUpdate;
 
-	@FXML ComboBox<String> m_itemTypeUpdate;
-
 	/* Title images */
-	@FXML private ImageView	imageview_gif;
+	@FXML private ImageView imageview_gif;
 
-	@FXML private ImageView	imageview_title;
+	@FXML private ImageView imageview_title;
 
 	private static Logger s_logger = null;
 
@@ -137,6 +137,9 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 					.createGetEntityMessage(new ProductEntity(Integer.parseInt(m_enterItemId.getText())));
 			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
+		catch (NumberFormatException e) {
+			s_logger.warning("Failed to parse string to integer. Invalid value: " + m_enterItemId.getText().trim());
+		}
 		catch (Exception ex) {
 			s_logger.warning("Error when sending get request.");
 		}
@@ -145,8 +148,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	@FXML
 	private void updateItemInServer(ActionEvent updateItem)
 	{
-		if (m_itemIdUpdate.getText().equals("") || m_itemNameUpdate.getText().equals("")
-				|| m_itemTypeUpdate.getValue().equals("")) {
+		if (m_itemIdUpdate.getText().equals("") || m_itemNameUpdate.getText().equals("")) {
 			s_logger.info("Empty field(s). Cannot send update request.");
 			return;
 		}
@@ -155,11 +157,12 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 			String itemStringId = m_itemIdUpdate.getText().trim();
 			int itemId = Integer.parseInt(itemStringId);
 			String itemName = m_itemNameUpdate.getText().trim();
-			String itemStringType = m_itemTypeUpdate.getValue().trim();
-			ProductType productType = Enum.valueOf(ProductType.class, itemStringType);
-			ProductEntity entity = new ProductEntity(itemId, itemName, productType);
+			ProductEntity entity = new ProductEntity(itemId, itemName);
 			Message msg = MessagesFactory.createUpdateEntityMessage(entity);
 			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
+		}
+		catch (NumberFormatException e) {
+			s_logger.warning("Failed to parse string to integer. Invalid value: " + m_itemIdUpdate.getText().trim());
 		}
 		catch (Exception ex) {
 			s_logger.warning("Error when sending data for update. Exception: " + ex.getMessage());
@@ -184,7 +187,6 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	public void initialize(URL url, ResourceBundle rb)
 	{
 		initializeImages();
-		initializeProductTypeComboBox();
 		initializeConfigurationTable();
 		initializeClientHandler();
 	}
@@ -201,12 +203,6 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 			Image image = new Image(title);
 			imageview_title.setImage(image);
 		}
-	}
-
-	private void initializeProductTypeComboBox()
-	{
-		m_itemTypeUpdate.getItems().addAll(ProductType.BridalBouquet.name(), ProductType.Flower.name(),
-				ProductType.FlowerPot.name());
 	}
 
 	private void initializeConfigurationTable()
@@ -290,9 +286,11 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		IEntity entity = ((EntityData) receivedMessage.getMessageData()).getEntity();
 
 		ProductEntity productEntity = (ProductEntity) entity;
+		String itemName = productEntity.getName();
+		m_itemNameGet.setText(itemName);
+		m_itemTypeGet.setText(productEntity.getProductType().name());
 		m_itemIdUpdate.setText(String.valueOf(productEntity.getId()));
-		m_itemNameUpdate.setText(productEntity.getName());
-		// m_itemTypeUpdate.getSelectionModel().select(productEntity.getProductType().name());
+		m_itemNameUpdate.setText(itemName);
 	}
 
 	/**
@@ -342,7 +340,8 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	{
 		m_itemIdUpdate.setText("");
 		m_itemNameUpdate.setText("");
-		// m_itemTypeUpdate.setValue("");
+		m_itemNameGet.setText("");
+		m_itemTypeGet.setText("");
 	}
 
 	private void drawContantToTable()
