@@ -328,7 +328,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				try {
 					queryResult.close();
 				} catch (SQLException e) {
-					m_logger.log(Level.WARNING, "Failed on try to close query result.", e);
+					m_logger.warning("Failed on try to close query result. Exception: "+ e.getMessage());
 				}
 			}
 		}
@@ -360,7 +360,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				returnEntity = onEntityDataReceived(messageData);
 
 			} catch (Exception e) {
-				m_logger.log(Level.WARNING, "Some failure occurred ", e);
+				m_logger.warning("Some failure occurred. Exception: " + e.getMessage());
 			}
 			if (returnEntity != null) {
 				IMessageData returnedMessageData = new EntityData(EntityDataOperation.None, returnEntity);

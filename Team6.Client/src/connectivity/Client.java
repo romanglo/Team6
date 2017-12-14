@@ -135,7 +135,7 @@ public class Client extends AbstractClient
 			openConnection();
 		}
 		catch (IOException e) {
-			m_logger.log(Level.WARNING, "Failed to open connection.", e);
+			m_logger.warning("Failed to open connection. Exception:"+ e.getMessage());
 		}
 	}
 
@@ -161,11 +161,6 @@ public class Client extends AbstractClient
 			return;
 		}
 
-		if (msg instanceof String) {
-			System.out.println("Message received is : " + msg);
-			return;
-		}
-
 		if (!(msg instanceof Message)) {
 			m_logger.info("A message was received from the server, but the message type is not dirived from Message.");
 			return;
@@ -175,10 +170,9 @@ public class Client extends AbstractClient
 
 		try {
 			m_messageReceiveHandler.onMessageReceived(msg);
-			m_logger.info("Displayed data from server.");
 		}
 		catch (Exception ex) {
-			m_logger.log(Level.WARNING, "Error! Failed displaying the data received. Exception: ", ex);
+			m_logger.warning("Message handler failed!. Exception: "+ ex.getMessage());
 		}
 	}
 
@@ -191,7 +185,7 @@ public class Client extends AbstractClient
 	@Override
 	protected void connectionException(Exception exception)
 	{
-		m_logger.log(Level.WARNING, "Connection exception: ", exception);
+		m_logger.severe("Connection exception: "+ exception.getMessage());
 		if (!isConnected()) {
 			connectionClosed();
 		}

@@ -3,10 +3,8 @@ package client;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import configurations.ClientConfiguration;
@@ -78,10 +76,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 
 	@FXML TextField m_itemNameUpdate;
 
-	@FXML ComboBox m_itemTypeUpdate;
-	
-	ObservableList<String> m_productTypeList;
-	
+	@FXML ComboBox<String> m_itemTypeUpdate;
 
 	private static Logger s_logger = null;
 
@@ -151,14 +146,14 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		try {
 			Message msg = MessagesFactory
 					.createUpdateEntityMessage(new ProductEntity(Integer.parseInt(m_itemIdUpdate.getText()),
-							m_itemNameUpdate.getText(), getItemType((String)m_itemTypeUpdate.getValue())));
+							m_itemNameUpdate.getText(), getItemType((String) m_itemTypeUpdate.getValue())));
 			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
 		catch (Exception ex) {
-			s_logger.log(Level.WARNING, "Error when sending data for update. Exception: ", ex);
+			s_logger.warning("Error when sending data for update. Exception: "+ ex.getMessage());
 		}
 	}
-	
+
 	@FXML
 	private void updateSettingsFile(ActionEvent event)
 	{
@@ -167,7 +162,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	}
 
 	/* End of --> UI events region */
-	
+
 	/* Initializing methods region */
 
 	/**
@@ -180,15 +175,10 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		initializeConfigurationTable();
 		initializeClientHandler();
 	}
-	
+
 	private void initializeProductTypeComboBox()
 	{
-		ArrayList<String> productTypeList = new ArrayList<String>();
-		productTypeList.add(ProductType.BridalBouquet.name());
-		productTypeList.add(ProductType.Flower.name());
-		productTypeList.add(ProductType.FlowerPot.name());
-		m_productTypeList = FXCollections.observableArrayList(productTypeList);
-		m_itemTypeUpdate.setItems(m_productTypeList);
+		m_itemTypeUpdate.getItems().addAll(ProductType.BridalBouquet.name(), ProductType.Flower.name(), ProductType.FlowerPot.name());
 	}
 
 	private void initializeConfigurationTable()
@@ -257,9 +247,9 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		ApplicationEntryPoint.clientController.setMessagesHandler(this);
 		ApplicationEntryPoint.clientController.setClientStatusHandler(this);
 	}
-	
+
 	/* End of --> Initializing methods region */
-	
+
 	/* Implemented methods region */
 
 	/**
@@ -271,9 +261,10 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		Message receivedMessage = (Message) msg;
 		IEntity entity = ((EntityData) receivedMessage.getMessageData()).getEntity();
 
-		m_itemIdUpdate.setText(String.valueOf(((ProductEntity) entity).getId()));
-		m_itemNameUpdate.setText(((ProductEntity) entity).getName());
-		m_itemTypeUpdate.setValue((String)((ProductEntity) entity).getProductType().name());
+		ProductEntity productEntity = (ProductEntity) entity;
+		m_itemIdUpdate.setText(String.valueOf(productEntity.getId()));
+		m_itemNameUpdate.setText(productEntity.getName());
+		m_itemTypeUpdate.getSelectionModel().select(productEntity.getProductType().name());
 	}
 
 	/**
@@ -301,7 +292,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		m_disconnectedLight.setFill(Color.RED);
 		m_getItemPane.setDisable(true);
 	}
-	
+
 	/* End of --> Implemented methods region */
 
 	/* Private methods region */
@@ -336,7 +327,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	private void clearFields()
 	{
 		m_itemIdUpdate.setText("");
-		m_itemNameUpdate.setText("");
+		m_itemNameUpdate.setText("");		
 		m_itemTypeUpdate.setValue("");
 	}
 
@@ -349,6 +340,6 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		settings.add(new SettingsRow("PORT", Integer.toString(ApplicationEntryPoint.s_clientConfiguration.getPort())));
 		setting_table.setItems(settings);
 	}
-	
+
 	/* End of --> Private methods region */
 }

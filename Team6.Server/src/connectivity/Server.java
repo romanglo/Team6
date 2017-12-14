@@ -1,7 +1,6 @@
 package connectivity;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.istack.internal.NotNull;
@@ -160,25 +159,14 @@ public class Server extends AbstractServer {
 					+ msg.toString());
 		}
 
-		// Message entityMessage = MessagesFactory
-		// .createGetEntityMessage(new ProductEntity(99, "Hello",
-		// ProductType.FlowerPot));
-		// try {
-		// client.sendToClient((Object) entityMessage);
-		// m_logger.info(entityMessage + " message to client: " + client.toString() + "
-		// sent.");
-		// } catch (IOException e) {
-		// m_logger.log(Level.WARNING, entityMessage + " message to client: " +
-		// client.toString() + " FAILED!.", e);
-		// }
-
 		Message answerMsg = m_messagesHandler.onMessageReceived(receivedMsg);
 
 		if (answerMsg != null) {
 			try {
 				client.sendToClient(answerMsg);
 			} catch (IOException e) {
-				m_logger.log(Level.SEVERE, "Answering to the client failed, the client: " + client.toString(), e);
+				m_logger.severe("Answering to the client failed! Client: " + client.toString() + ", exception: "
+						+ e.getMessage());
 			}
 		}
 	}
@@ -191,7 +179,7 @@ public class Server extends AbstractServer {
 		if (m_serverStatusHandler != null) {
 			m_serverStatusHandler.onServerStarted();
 		}
-		m_logger.info("The server started listen to port" + getPort());
+		m_logger.info("The server started listen to port " + getPort());
 	}
 
 	/*
@@ -238,8 +226,8 @@ public class Server extends AbstractServer {
 	 */
 	@Override
 	protected synchronized void clientException(ConnectionToClient client, Throwable exception) {
-		m_logger.log(Level.WARNING, "Received exception on ConnectionToClient thread, the client: " + client.toString()
-				+ ", all the connections with clients closed", exception);
+		m_logger.warning("Received exception on ConnectionToClient thread! Failed client: " + client.toString()
+				+ ", exception: " + exception.getMessage());
 		m_numOfConnectedClients = 0;
 		if (!isListening()) {
 			serverStopped();
@@ -252,8 +240,8 @@ public class Server extends AbstractServer {
 	@Override
 	protected void listeningException(Throwable exception) {
 		if (isListening()) {
-			m_logger.log(Level.WARNING, "Received exception in listening thread, but the thread is still running.",
-					exception);
+			m_logger.warning(
+					"Received exception in listening thread, but the thread is still running. Exception: " + exception);
 			return;
 		} else {
 			serverStopped();

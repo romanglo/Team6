@@ -50,7 +50,7 @@
 								<Separator layoutX="-1.0" layoutY="94.0" prefHeight="10.0" prefWidth="458.0" />
 								<SplitPane fx:id="m_getItemPane" disable="true" dividerPositions="0.3484848484848485" layoutX="-3.0" layoutY="97.0" orientation="VERTICAL" prefHeight="241.0" prefWidth="401.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="95.0">
 									<items>
-										<AnchorPane fx:id="m_enterIdPane" minHeight="0.0" minWidth="0.0">
+										<AnchorPane minHeight="0.0" minWidth="0.0">
 											<children>
 												<Label layoutX="13.0" layoutY="22.0" text="Enter Item ID" AnchorPane.leftAnchor="13.0" AnchorPane.topAnchor="22.0" />
 												<TextField id="tf_enterItemId" fx:id="m_enterItemId" alignment="CENTER" layoutX="129.0" layoutY="21.0" stylesheets="@application.css" AnchorPane.leftAnchor="129.0" />
