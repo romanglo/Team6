@@ -107,8 +107,8 @@ public abstract class Startable implements IStartable
 	@Override
 	public void Stop()
 	{
-		if (m_running) {
-			m_Logger.log(Level.INFO, "Start method of " + m_Id + " called when the state is already 'Stopped'.");
+		if (!m_running) {
+			m_Logger.log(Level.INFO, "Stop method of " + m_Id + " called when the state is already 'Stopped'.");
 			return;
 		}
 

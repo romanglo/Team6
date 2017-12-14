@@ -44,9 +44,12 @@ public class UncaughetExceptions
 		@Override
 		public void uncaughtException(Thread thread, Throwable throwable)
 		{
-			String msg = "Caughted unhandled exception in: " + thread.toString();
-
 			Logger logger = LogManager.getLogger();
+
+			String msg = "Caughted unhandled exception in: " + thread.toString();
+			if (throwable != null) {
+				msg += ", exception type: " + throwable.getClass().getName();
+			}
 
 			logger.log(Level.SEVERE, msg, throwable);
 
@@ -64,7 +67,8 @@ public class UncaughetExceptions
 	/**
 	 * 
 	 * The method start handling uncaught exceptions, on uncaught exception will
-	 * call the {@link UncaughtExceptionsHandler} and could shutdown the application.
+	 * call the {@link UncaughtExceptionsHandler} and could shutdown the
+	 * application.
 	 *
 	 * @param handler
 	 *            a handler that would called when occurred uncaught exception.

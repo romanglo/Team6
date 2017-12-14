@@ -13,11 +13,4 @@ public enum ProductType
 	Flower,
 	FlowerPot,
 	BridalBouquet
-	
-	
-	
-	
-	
-	
-	
 }
