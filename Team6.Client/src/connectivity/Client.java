@@ -32,8 +32,11 @@ public class Client extends AbstractClient
 		 *
 		 * @param msg
 		 *            - An Object received from the server.
+		 * @throws Exception
+		 *             The method can throw any kind of exception, this method call
+		 *             surround with try/catch.
 		 */
-		void onMessageReceived(Object msg);
+		void onMessageReceived(Object msg) throws Exception;
 	}
 
 	/**
@@ -185,14 +188,16 @@ public class Client extends AbstractClient
 	protected void connectionException(Exception exception)
 	{
 		m_logger.severe("Connection exception: " + exception.getMessage());
-	
-//		if (!isConnected()) {
-//			connectionClosed();
-//		}
-		
-		/* If the exception happens because a disconnection from the server, the method
-		 isConnected() still returns true due to an unknown reason.  
-		 So on condition that an error is occurred, always happened a logout from the server.*/
+
+		// if (!isConnected()) {
+		// connectionClosed();
+		// }
+
+		/*
+		 * If the exception happens because a disconnection from the server, the method
+		 * isConnected() still returns true due to an unknown reason. So on condition
+		 * that an error is occurred, always happened a logout from the server.
+		 */
 		connectionClosed();
 	}
 

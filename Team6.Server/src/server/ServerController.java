@@ -114,11 +114,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	// region Initializable Implementation
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
 		initializeFields();
 
-		initializeLog();
+		//initializeLog();
 
 		initializeServerLogic();
 
@@ -233,7 +236,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			circle_db_off.setFill(Paint.valueOf("red"));
 		} catch (Exception e) {
 			m_logger.log(Level.SEVERE, "Failed to disconnect from database", event);
-		}	
+		}
 	}
 
 	@FXML
@@ -241,11 +244,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		try {
 			m_server.listen();
 			m_logger.info("Trying to start listening..");
+			onServerStarted();
 		} catch (Exception e) {
 			m_logger.log(Level.SEVERE, "Listening request faild.", e);
 			return;
 		}
-		onServerStarted();
 	}
 
 	@FXML
@@ -253,10 +256,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		m_logger.info("Trying to stop listening..");
 		try {
 			m_server.close();
+			onServerStopped();
 		} catch (IOException e) {
-			m_logger.severe("An error occurred on closing connection! exception: "+ e.getMessage());
+			m_logger.severe("An error occurred on closing connection! exception: " + e.getMessage());
 		}
-		onServerStopped();
 	}
 
 	@FXML
@@ -352,18 +355,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	// region Server Handlers Implementation
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
-	public Message onMessageReceived(Message msg) {
-
+	public synchronized Message onMessageReceived(Message msg) throws Exception {
 		IMessageData messageData = msg.getMessageData();
 		if (messageData instanceof EntityData) {
-			IEntity returnEntity = null;
-			try {
-				returnEntity = onEntityDataReceived(messageData);
-
-			} catch (Exception e) {
-				m_logger.warning("Some failure occurred. Exception: " + e.getMessage());
-			}
+			IEntity returnEntity = onEntityDataReceived(messageData);
 			if (returnEntity != null) {
 				IMessageData returnedMessageData = new EntityData(EntityDataOperation.None, returnEntity);
 				msg.setMessageData(returnedMessageData);
@@ -373,6 +372,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onServerStarted() {
 
@@ -382,6 +384,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		circle_connectivity_off.setFill(Paint.valueOf("grey"));
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onServerStopped() {
 		btn_connectivity_start.setDisable(false);
@@ -394,6 +399,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	// region Nested Classes
 
+	/**
+	 * LogHandler: A class that connect application {@link Logger} with the server
+	 * log view.
+	 */
 	private class LogHandler extends Handler {
 
 		@Override

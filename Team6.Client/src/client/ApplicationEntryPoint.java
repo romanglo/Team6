@@ -94,7 +94,7 @@ public class ApplicationEntryPoint extends Application
 				}
 			}
 		};
-		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, false);
+		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, true);
 	}
 
 	/**

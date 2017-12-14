@@ -34,8 +34,11 @@ public class Server extends AbstractServer {
 		 * @param msg
 		 *            The message from the client.
 		 * @return Answer to the client, null to do nothing.
+		 * @throws Exception
+		 *             The method can throw any kind of exception, this method call
+		 *             surround with try/catch.
 		 */
-		Message onMessageReceived(Message msg);
+		Message onMessageReceived(Message msg) throws Exception;
 	}
 
 	/**
@@ -135,65 +138,79 @@ public class Server extends AbstractServer {
 
 	// region AbstractServer Methods Override
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
+
+		String clientDetails = client == null ? "null" : client.toString();
 		if (msg == null) {
-			m_logger.info("A null message has been received from client: " + client.toString());
+			m_logger.info("A null message has been received from client: " + clientDetails);
 			return;
 		}
 		if (!(msg instanceof Message)) {
 			m_logger.info(
 					"A message has been received from client, but the message type is not dirived from Message. The Client: "
-							+ client.toString());
+							+ clientDetails);
 			return;
 		}
 
 		Message receivedMsg = (Message) msg;
 
-		if (m_serverStatusHandler == null) {
+		if (m_messagesHandler == null) {
 			m_logger.info("A message has been received from client, but the handler is null. The Client: "
-					+ client.toString() + " , Message: " + msg.toString());
+					+ clientDetails + ", " + msg.toString());
 			return;
 		} else {
-			m_logger.info("A message has been received from client. The Client: " + client.toString() + " , Message: "
-					+ msg.toString());
+			m_logger.info(
+					"A message has been received from client. The Client: " + clientDetails + ", " + msg.toString());
 		}
 
-		Message answerMsg = m_messagesHandler.onMessageReceived(receivedMsg);
-
-		if (answerMsg != null) {
-			try {
+		try {
+			Message answerMsg = m_messagesHandler.onMessageReceived(receivedMsg);
+			if (answerMsg != null && client != null) {
 				client.sendToClient(answerMsg);
-			} catch (IOException e) {
-				m_logger.severe("Answering to the client failed! Client: " + client.toString() + ", exception: "
-						+ e.getMessage());
 			}
+		} catch (IOException e) {
+			m_logger.severe(
+					"Answering to the client failed! Client: " + clientDetails + ", exception: " + e.getMessage());
+		} catch (Exception e) {
+			m_logger.severe("Some error occurred in message handler! exception: " + e.getMessage());
 		}
 	}
 
-	/*
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected void serverStarted() {
 		if (m_serverStatusHandler != null) {
-			m_serverStatusHandler.onServerStarted();
+			try {
+				m_serverStatusHandler.onServerStarted();
+			} catch (RuntimeException e) {
+				m_logger.warning("An exception occured in server status handler, exception: " +e.getMessage());
+			}
 		}
 		m_logger.info("The server started listen to port " + getPort());
 	}
 
-	/*
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected void serverStopped() {
 		if (m_serverStatusHandler != null) {
-			m_serverStatusHandler.onServerStopped();
+			try {
+				m_serverStatusHandler.onServerStopped();
+			} catch (RuntimeException e) {
+				m_logger.warning("An exception occured in server status handler, exception: " +e.getMessage());
+			}
 		}
 		m_logger.info("The server stopped listen");
 	}
 
-	/*
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -201,7 +218,7 @@ public class Server extends AbstractServer {
 		m_logger.info("The server closed");
 	}
 
-	/*
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -211,7 +228,7 @@ public class Server extends AbstractServer {
 				+ m_numOfConnectedClients);
 	}
 
-	/*
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -221,7 +238,7 @@ public class Server extends AbstractServer {
 				+ m_numOfConnectedClients);
 	}
 
-	/*
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -234,7 +251,7 @@ public class Server extends AbstractServer {
 		}
 	}
 
-	/*
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

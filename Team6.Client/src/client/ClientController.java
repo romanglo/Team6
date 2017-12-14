@@ -138,19 +138,23 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	private void updateItemInServer(ActionEvent updateItem)
 	{
 		if (m_itemIdUpdate.getText().equals("") || m_itemNameUpdate.getText().equals("")
-				|| m_itemTypeUpdate.getValue().equals("")) {
+		 || m_itemTypeUpdate.getValue().equals("") ) {
 			s_logger.info("Empty field(s). Cannot send update request.");
 			return;
 		}
 
 		try {
-			Message msg = MessagesFactory
-					.createUpdateEntityMessage(new ProductEntity(Integer.parseInt(m_itemIdUpdate.getText()),
-							m_itemNameUpdate.getText(), getItemType((String) m_itemTypeUpdate.getValue())));
+			String itemStringId = m_itemIdUpdate.getText().trim();
+			int itemId= Integer.parseInt(itemStringId);
+			String itemName = m_itemNameUpdate.getText().trim();
+			String itemStringType = m_itemTypeUpdate.getValue().trim();
+			ProductType productType = Enum.valueOf(ProductType.class, itemStringType);
+			ProductEntity entity = new ProductEntity(itemId,itemName,productType);
+			Message msg = MessagesFactory.createUpdateEntityMessage(entity);
 			ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
 		catch (Exception ex) {
-			s_logger.warning("Error when sending data for update. Exception: "+ ex.getMessage());
+			s_logger.warning("Error when sending data for update. Exception: " + ex.getMessage());
 		}
 	}
 
@@ -178,7 +182,8 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 
 	private void initializeProductTypeComboBox()
 	{
-		m_itemTypeUpdate.getItems().addAll(ProductType.BridalBouquet.name(), ProductType.Flower.name(), ProductType.FlowerPot.name());
+		m_itemTypeUpdate.getItems().addAll(ProductType.BridalBouquet.name(), ProductType.Flower.name(),
+				ProductType.FlowerPot.name());
 	}
 
 	private void initializeConfigurationTable()
@@ -256,7 +261,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onMessageReceived(Object msg)
+	public synchronized void onMessageReceived(Object msg) throws Exception
 	{
 		Message receivedMessage = (Message) msg;
 		IEntity entity = ((EntityData) receivedMessage.getMessageData()).getEntity();
@@ -264,7 +269,7 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		ProductEntity productEntity = (ProductEntity) entity;
 		m_itemIdUpdate.setText(String.valueOf(productEntity.getId()));
 		m_itemNameUpdate.setText(productEntity.getName());
-		m_itemTypeUpdate.getSelectionModel().select(productEntity.getProductType().name());
+		// m_itemTypeUpdate.getSelectionModel().select(productEntity.getProductType().name());
 	}
 
 	/**
@@ -310,25 +315,11 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		alert.showAndWait();
 	}
 
-	private ProductType getItemType(String type)
-	{
-		switch (type) {
-			case "Flower":
-				return ProductType.Flower;
-			case "FlowerPot":
-				return ProductType.FlowerPot;
-			case "BridalBouquet":
-				return ProductType.BridalBouquet;
-			default:
-				return null;
-		}
-	}
-
 	private void clearFields()
 	{
 		m_itemIdUpdate.setText("");
-		m_itemNameUpdate.setText("");		
-		m_itemTypeUpdate.setValue("");
+		m_itemNameUpdate.setText("");
+		// m_itemTypeUpdate.setValue("");
 	}
 
 	private void drawContantToTable()
