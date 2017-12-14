@@ -90,11 +90,11 @@ public class ApplicationEntryPoint extends Application
 					stop();
 				}
 				catch (Exception ignored) {
-					// Impossible exception.
+
 				}
 			}
 		};
-		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, true);
+		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, false);
 	}
 
 	/**

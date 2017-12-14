@@ -293,25 +293,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	// end region -> UI Methods
 
-	// region Package Internal Methods
-
-	/**
-	 * The method should be called in in application shutdown sequence.
-	 */
-	void shutdown() {
-		// cleanup code here...
-		if (m_logger != null && m_logHandler != null) {
-			m_logger.removeHandler(m_logHandler);
-		}
-
-		if (m_server != null) {
-			m_server.setMessagesHandler(null);
-			m_server.setServerActionHandler(null);
-		}
-
-	}
-	// end region -> Package Internal Methods
-
 	// region Private Methods
 
 	private void drawContantToTable() {
@@ -401,7 +382,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public /* synchronized */ Message onMessageReceived(Message msg) throws Exception {
+	public synchronized Message onMessageReceived(Message msg) throws Exception {
 		IMessageData messageData = msg.getMessageData();
 		if (messageData instanceof EntityData) {
 			IEntity returnEntity = onEntityDataReceived(messageData);

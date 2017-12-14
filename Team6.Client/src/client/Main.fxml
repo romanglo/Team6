@@ -105,7 +105,7 @@
 												<Label layoutX="11.0" layoutY="50.0" text="Name"
 													AnchorPane.leftAnchor="14.0" />
 												<TextField id="tf_displayItemId" fx:id="m_itemIdUpdate"
-													editable="false" layoutX="130.0" layoutY="11.0" prefHeight="25.0"
+													layoutX="130.0" layoutY="11.0" prefHeight="25.0"
 													prefWidth="149.0" stylesheets="@application.css"
 													AnchorPane.leftAnchor="130.0" />
 												<TextField id="tf_displayItemName" fx:id="m_itemNameUpdate"

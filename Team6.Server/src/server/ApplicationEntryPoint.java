@@ -56,18 +56,9 @@ public class ApplicationEntryPoint extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("ServerXML.fxml"));
 			Parent root = loader.load();
-			ServerController controller = loader.getController();
 			Scene scene = new Scene(root, 430, 310);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			
-			//Setting handler to window closing event:
-			primaryStage.setOnCloseRequest(value ->{
-				m_logger.info("Controller shutting down..");
-				controller.shutdown();
-				m_logger.info("Controller shutted down successfully.");
-			});
-			
 			primaryStage.setMinWidth(450);
 			primaryStage.setMinHeight(310);
 			primaryStage.setTitle("Zer-Li Server");
@@ -133,11 +124,11 @@ public class ApplicationEntryPoint extends Application {
 				try {
 					stop();
 				} catch (Exception ignored) {
-					// Impossible exception.
+
 				}
 			}
 		};
-		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, true);
+		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, false);
 	}
 
 	private void intializeServer() throws IOException {
