@@ -1,5 +1,7 @@
 package db;
 
+import java.text.MessageFormat;
+
 import entities.IEntity;
 import entities.ProductEntity;
 import entities.ProductType;
@@ -33,23 +35,24 @@ public class QueryFactory {
 		ProductType productType = productEntity.getProductType();
 
 		// Wrong details
-		if (id < 1 || name == null || name.isEmpty() || productType == null) {
+		if (id < 1 || ((name == null || name.isEmpty()) && productType == null)) {
 			return null;
 		}
 
 		// Update only product type
-		if (name == null || name.isEmpty() && productType != null) {
-			return "UPDATE product SET pType = \"" + productType.toString() + "\" WHERE pId = " + id + ';';
+		if ((name == null || name.isEmpty()) && productType != null) {
+			return MessageFormat.format("UPDATE product SET pType = \"{0}\" WHERE pId = {1} ;", productType.toString(),
+					id);
 		}
 
 		// Update only name
 		if (!(name == null || name.isEmpty()) && productType == null) {
-			return "UPDATE product SET  pName = \"" + name + "\" WHERE pId = " + id + ';';
+			return MessageFormat.format("UPDATE product SET pName = \"{0}\" WHERE pId = {1} ;", name, id);
 		}
 
 		// Update all states
-		return "UPDATE product SET  pName = \"" + name + "\" , pType = \"" + productType.toString() + "\" WHERE pId = "
-				+ id + ';';
+		return MessageFormat.format("UPDATE product SET pName = \"{0}\" , pType = \"{1}\" WHERE pId = {2} ;", name,
+				productType.toString(), id);
 	}
 
 	/**
@@ -70,10 +73,13 @@ public class QueryFactory {
 
 	private static String generateGetEntityQuery(ProductEntity productEntity) {
 		int id = productEntity.getId();
+
+		// Wrong ID
 		if (id < 1) {
 			return null;
 		}
-		return "SELECT * FROM product WHERE pId = " + id + ';';
+
+		return MessageFormat.format("SELECT * FROM product WHERE pId = {0} ;", id);
 	}
-	
+
 }

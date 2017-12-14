@@ -1,5 +1,7 @@
+
 package logger;
 
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Formatter;
@@ -7,8 +9,7 @@ import java.util.logging.LogRecord;
 
 /**
  *
- * LogFormatter:
- * Decorate message style.
+ * LogFormatter: Decorate message style.
  * 
  */
 public class LogFormatter extends Formatter
@@ -23,16 +24,15 @@ public class LogFormatter extends Formatter
 		Date date = new Date(record.getMillis());
 		String time = m_localDateFormat.format(date);
 
-		String msg = time + " - " + record.getLevel() + '/'
-				+ record.getSourceClassName() +'$'+record.getSourceMethodName()+ ": " +record.getMessage() +'.';
-			
 		Throwable thrown = record.getThrown();
-		if(thrown!=null) {
-			msg += ". Exception: " + thrown.toString();
+		String msg;
+		if (thrown == null) {
+			msg = MessageFormat.format("{0} - {1}/{2}${3}: {4}.\n", time, record.getLevel(),
+					record.getSourceClassName(), record.getSourceMethodName(), record.getMessage());
+		} else {
+			msg = MessageFormat.format("{0} - {1}/{2}${3}: {4}. Exception: {5}\n", time, record.getLevel(),
+					record.getSourceClassName(), record.getSourceMethodName(), record.getMessage(), thrown.toString());
 		}
-		
-		msg+= '\n';
-		
 		return msg;
 	}
 }

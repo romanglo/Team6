@@ -189,7 +189,7 @@ public class Server extends AbstractServer {
 			try {
 				m_serverStatusHandler.onServerStarted();
 			} catch (RuntimeException e) {
-				m_logger.warning("An exception occured in server status handler, exception: " +e.getMessage());
+				m_logger.warning("An exception occured in server status handler, exception: " + e.getMessage());
 			}
 		}
 		m_logger.info("The server started listen to port " + getPort());
@@ -204,7 +204,7 @@ public class Server extends AbstractServer {
 			try {
 				m_serverStatusHandler.onServerStopped();
 			} catch (RuntimeException e) {
-				m_logger.warning("An exception occured in server status handler, exception: " +e.getMessage());
+				m_logger.warning("An exception occured in server status handler, exception: " + e.getMessage());
 			}
 		}
 		m_logger.info("The server stopped listen");

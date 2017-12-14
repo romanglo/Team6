@@ -121,7 +121,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	public void initialize(URL url, ResourceBundle rb) {
 		initializeFields();
 
-		//initializeLog();
+		initializeLog();
 
 		initializeServerLogic();
 
@@ -244,11 +244,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		try {
 			m_server.listen();
 			m_logger.info("Trying to start listening..");
-			onServerStarted();
 		} catch (Exception e) {
 			m_logger.log(Level.SEVERE, "Listening request faild.", e);
 			return;
 		}
+		onServerStarted();
 	}
 
 	@FXML
@@ -256,10 +256,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		m_logger.info("Trying to stop listening..");
 		try {
 			m_server.close();
-			onServerStopped();
 		} catch (IOException e) {
 			m_logger.severe("An error occurred on closing connection! exception: " + e.getMessage());
 		}
+		onServerStopped();
 	}
 
 	@FXML
@@ -269,6 +269,25 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	}
 
 	// end region -> UI Methods
+
+	// region Package Internal Methods
+
+	/**
+	 * The method should be called in in application shutdown sequence.
+	 */
+	void shutdown() {
+		// cleanup code here...
+		if (m_logger!=null && m_logHandler != null) {
+			m_logger.removeHandler(m_logHandler);
+		}
+
+		if (m_server != null) {
+			m_server.setMessagesHandler(null);
+			m_server.setServerActionHandler(null);
+		}
+
+	}
+	// end region -> Package Internal Methods
 
 	// region Private Methods
 
@@ -359,7 +378,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	 * {@inheritDoc}
 	 */
 	@Override
-	public synchronized Message onMessageReceived(Message msg) throws Exception {
+	public /* synchronized */ Message onMessageReceived(Message msg) throws Exception {
 		IMessageData messageData = msg.getMessageData();
 		if (messageData instanceof EntityData) {
 			IEntity returnEntity = onEntityDataReceived(messageData);
@@ -423,19 +442,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				}
 				Formatter logFormmater = getFormatter();
 				String msgFormmated = logFormmater.format(record);
-				String currentText = textarea_log.getText();
-				if (currentText == null || currentText.isEmpty()) {
-					currentText = msgFormmated;
-				} else {
-					currentText = currentText.trim() + '\n' + msgFormmated;
-				}
-
-				textarea_log.setText(currentText);
-				textarea_log.selectPositionCaret(textarea_log.getLength());
-				textarea_log.deselect();
+				textarea_log.appendText(msgFormmated);
 			} catch (Exception e) {
 				m_logger.removeHandler(m_logHandler);
-				m_logger.warning("Logging to log UI disabled.");
+				m_logger.warning("Logging to log UI disabled due to an excpetion: " + e.getMessage());
 			}
 		}
 	}

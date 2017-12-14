@@ -54,10 +54,20 @@ public class ApplicationEntryPoint extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			Parent root = FXMLLoader.load(getClass().getResource("ServerXML.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("ServerXML.fxml"));
+			Parent root = loader.load();
+			ServerController controller = loader.getController();
 			Scene scene = new Scene(root, 430, 310);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
+			
+			//Setting handler to window closing event:
+			primaryStage.setOnCloseRequest(value ->{
+				m_logger.info("Controller shutting down..");
+				controller.shutdown();
+				m_logger.info("Controller shutted down successfully.");
+			});
+			
 			primaryStage.setMinWidth(450);
 			primaryStage.setMinHeight(310);
 			primaryStage.setTitle("Zer-Li Server");
