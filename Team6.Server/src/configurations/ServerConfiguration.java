@@ -27,7 +27,7 @@ public class ServerConfiguration {
 	/**
 	 * The path of the configuration XML resource, relative to current class path.
 	 */
-	public final static String CONFIGURATION_PATH = "configuration.xml";
+	public final static String CONFIGURATION_PATH = "server-configuration.xml";
 
 	/**
 	 * A possible path of external configuration XML file.

@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import utilities.XmlUtilities;
 
@@ -45,7 +46,7 @@ import utilities.XmlUtilities;
 	/**
 	 * The path of the configuration XML resource, relative to current class path.
 	 */
-	public final static String CONFIGURATION_PATH = "configuration.xml";
+	public final static String CONFIGURATION_PATH = "client-configuration.xml";
 
 	/**
 	 * A possible path of external configuration XML file.
@@ -103,9 +104,9 @@ import utilities.XmlUtilities;
 
 	private boolean m_defaultConfiguration = false;
 
-	@XmlElement(name = "ip") private String m_ip;
+	@XmlTransient private String m_ip;
 
-	@XmlElement(name = "port") private int m_port;
+	@XmlTransient private int m_port;
 
 	/* End of --> Fields region */
 
@@ -124,6 +125,7 @@ import utilities.XmlUtilities;
 	/**
 	 * @return the connectivity port.
 	 */
+	@XmlElement(name = "port")
 	public int getPort()
 	{
 		return m_port;
@@ -132,6 +134,7 @@ import utilities.XmlUtilities;
 	/**
 	 * @return the connectivity IP.
 	 */
+	@XmlElement(name = "ip")
 	public String getIp()
 	{
 		return m_ip;

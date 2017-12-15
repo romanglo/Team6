@@ -350,7 +350,8 @@ public class ClientController implements Initializable, Client.ClientStatusHandl
 		ObservableList<SettingsRow> settings = FXCollections.observableArrayList();
 
 		settings.add(new SettingsRow(ClientConfiguration.PROPERTY_NAME_IP, dbConfiguration.getIp()));
-		settings.add(new SettingsRow("PORT", Integer.toString(ApplicationEntryPoint.s_clientConfiguration.getPort())));
+		settings.add(
+				new SettingsRow(ClientConfiguration.PROPERTY_NAME_PORT, Integer.toString(dbConfiguration.getPort())));
 		setting_table.setItems(settings);
 	}
 
