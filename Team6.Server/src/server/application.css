@@ -1,0 +1,65 @@
+ .button
+{
+	-fx-background-color: #5490ff;
+	-fx-text-fill: white;
+	-fx-padding: 6.0 6.0 6.0 6.0;
+	-fx-border-radius: 8.0;
+}
+.button:hover 
+{
+    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+}
+
+.tab-pane .tab-header-area .tab-header-background 
+{
+    -fx-opacity: 0.0;
+}
+
+.tab-pane
+{
+    -fx-tab-min-width:90.0px;
+}
+
+.tab
+{
+    -fx-background-insets: 0.0 1.0 0.0 1.0,0.0,0.0;
+}
+.tab-pane .tab
+{
+    -fx-background-color: #9fa4a0;
+}
+
+.tab-pane .tab:selected
+{
+    -fx-background-color: #5490ff;
+}
+
+
+.tab-content-area 
+{
+	-fx-background-color: rgb(218.0,218.0,218.0);
+}
+
+.tab .tab-label 
+{ 
+	-fx-alignment: center-right;
+    -fx-text-fill: black;
+    -fx-font-size: 12.0px;
+    -fx-font-weight: bold; 
+}
+
+.tab:selected .tab-label 
+{ 
+    -fx-alignment: CENTER;
+    -fx-text-fill: white;
+}
+.label
+{
+    -fx-text-fill: #5490ff;
+    -fx-font-weight: bold;
+    -fx-font-size: 16.0px;
+}
+.root
+{
+	-fx-background-color: white;
+}

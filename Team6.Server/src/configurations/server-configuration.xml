@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<connectivity>
+		<port>1234</port>
+	</connectivity>
+	<db>
+		<ip>localhost</ip>
+		<schema>zer-li</schema>
+		<username>root</username>
+		<password>123456</password>
+	</db>
+</configuration>
