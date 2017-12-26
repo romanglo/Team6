@@ -30,7 +30,8 @@ public class MessagesFactory
 	 *
 	 * @param entity
 	 *            The entity to add to message.
-	 * @return An {@link Message}.
+	 * @return An {@link Message} if the creation succeed or <code>null</code> if
+	 *         failed.
 	 */
 	public static Message createEntityMessage(IEntity entity)
 	{
@@ -43,7 +44,8 @@ public class MessagesFactory
 	 *
 	 * @param entity
 	 *            The entity to add to message.
-	 * @return An {@link Message}.
+	 * @return An {@link Message} if the creation succeed or <code>null</code> if
+	 *         failed.
 	 */
 	public static Message createUpdateEntityMessage(IEntity entity)
 	{
@@ -60,4 +62,45 @@ public class MessagesFactory
 		return new Message(data);
 	}
 
+	/**
+	 * Create {@link Message} with a {@link IMessageData} of a {@link LoginData}
+	 * with login request.
+	 * 
+	 * @param username
+	 *            the user name of the requested user to login.
+	 * @param password
+	 *            the password of the requested user to login.
+	 *
+	 * @return An {@link Message} if the creation succeed or <code>null</code> if
+	 *         failed.
+	 */
+	public static Message createLoginMessage(String username, String password)
+	{
+		if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+			return null;
+		}
+		IMessageData data = new LoginData(username, password);
+		return new Message(data);
+	}
+
+	/**
+	 * Create {@link Message} with a {@link IMessageData} of a {@link LoginData}
+	 * with logout request.
+	 * 
+	 * @param username
+	 *            the user name of the requested user to logout.
+	 * @param password
+	 *            the password of the requested user to logout.
+	 *
+	 * @return An {@link Message} if the creation succeed or <code>null</code> if
+	 *         failed.
+	 */
+	public static Message createLogoutMessage(String username, String password)
+	{
+		if (username == null || username.isEmpty() || password == null || password.isEmpty()) {
+			return null;
+		}
+		IMessageData data = new LoginData(username, password, true);
+		return new Message(data);
+	}
 }

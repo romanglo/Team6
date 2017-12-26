@@ -118,34 +118,6 @@ public class DbController extends Startable {
 
 	/**
 	 * 
-	 * The method prints all the rows in product table.
-	 *
-	 * @throws NotRunningException
-	 *             if the method called when the state is not Running.
-	 * 
-	 */
-	public void printAllProducts() throws NotRunningException {
-		if (!isRunning()) {
-			throw new NotRunningException(this);
-		}
-
-		Statement stmt;
-		try {
-			stmt = m_connection.createStatement();
-			ResultSet resultSet = stmt.executeQuery("SELECT * FROM product;");
-			while (resultSet.next()) {
-				// Print out the values
-				System.out.println("ID: " + resultSet.getString(1) + ", Name: " + resultSet.getString(2) + ", Type: "
-						+ resultSet.getString(3));
-			}
-			resultSet.close();
-		} catch (SQLException ex) {
-			System.out.println("Failed to print all the products! Exception: " + ex.getMessage());
-		}
-	}
-
-	/**
-	 * 
 	 * The method execute select query.
 	 *
 	 * @param query
