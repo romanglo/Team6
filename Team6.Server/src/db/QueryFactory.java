@@ -41,17 +41,17 @@ public class QueryFactory {
 
 		// Update only product type
 		if ((name == null || name.isEmpty()) && productType != null) {
-			return MessageFormat.format("UPDATE product SET pType = \"{0}\" WHERE pId = {1} ;", productType.toString(),
+			return MessageFormat.format("UPDATE products SET pType = \"{0}\" WHERE pId = {1} ;", productType.toString(),
 					id);
 		}
 
 		// Update only name
 		if (!(name == null || name.isEmpty()) && productType == null) {
-			return MessageFormat.format("UPDATE product SET pName = \"{0}\" WHERE pId = {1} ;", name, id);
+			return MessageFormat.format("UPDATE products SET pName = \"{0}\" WHERE pId = {1} ;", name, id);
 		}
 
 		// Update all states
-		return MessageFormat.format("UPDATE product SET pName = \"{0}\" , pType = \"{1}\" WHERE pId = {2} ;", name,
+		return MessageFormat.format("UPDATE products SET pName = \"{0}\" , pType = \"{1}\" WHERE pId = {2} ;", name,
 				productType.toString(), id);
 	}
 
@@ -79,7 +79,7 @@ public class QueryFactory {
 			return null;
 		}
 
-		return MessageFormat.format("SELECT * FROM product WHERE pId = {0} ;", id);
+		return MessageFormat.format("SELECT * FROM products WHERE pId = {0} ;", id);
 	}
 
 }
