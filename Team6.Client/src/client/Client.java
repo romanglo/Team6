@@ -1,5 +1,5 @@
 
-package connectivity;
+package client;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -31,12 +31,14 @@ public class Client extends AbstractClient
 		 * server and updating the UI according to the Object details.
 		 *
 		 * @param msg
-		 *            - An Object received from the server.
+		 *            - An message received from the server.
 		 * @throws Exception
 		 *             The method can throw any kind of exception, this method call
 		 *             surround with try/catch.
+		 *             
+		 * @see {@link Message} the received type.
 		 */
-		void onMessageReceived(Object msg) throws Exception;
+		void onMessageReceived(Message msg) throws Exception;
 	}
 
 	/**
@@ -144,14 +146,14 @@ public class Client extends AbstractClient
 	/**
 	 * The method closes the connection with the server.
 	 */
-	public void close()
+	public void closeConnectionWithServer()
 	{
 		try {
 			closeConnection();
 			m_logger.info("The connection with the server closed.");
 		}
 		catch (IOException e) {
-			m_logger.warning("Could not close the connection with the server.");
+			m_logger.warning("Could not close the connection with the server. Exception:" +e.getMessage());
 		}
 	}
 
@@ -170,8 +172,9 @@ public class Client extends AbstractClient
 
 		m_logger.info("A message received from the server.");
 
+		Message message = (Message) msg;
 		try {
-			m_messageReceiveHandler.onMessageReceived(msg);
+			m_messageReceiveHandler.onMessageReceived(message);
 		}
 		catch (Exception ex) {
 			m_logger.warning("Message handler failed!. Exception: " + ex.getMessage());
@@ -208,20 +211,23 @@ public class Client extends AbstractClient
 	}
 
 	/**
-	 * Method handles the event sent from the UI.
+	 * Method send message to server.
 	 *
 	 * @param data
 	 *            - Information sent from the UI.
+	 * @return true if the sending succeed and false if does not.
 	 */
-	public void handleMessageFromClientUI(Object data)
+	public boolean sendMessageToServer(Object data)
 	{
+		boolean returningValue= true;
 		try {
 			sendToServer(data);
 		}
 		catch (IOException e) {
-			m_logger.warning("Could not send message to server. Terminating connection.");
-			close();
+			m_logger.warning("Could not send message to server, exception: "+e.getMessage());
+			returningValue=false;
 		}
+		return returningValue;
 	}
 
 	// end region -> Public Methods

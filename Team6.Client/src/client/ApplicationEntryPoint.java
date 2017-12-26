@@ -6,8 +6,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import common.UncaughetExceptions;
-import configurations.ClientConfiguration;
-import connectivity.Client;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -29,12 +27,12 @@ public class ApplicationEntryPoint extends Application
 	/**
 	 * Client connection configuration.
 	 */
-	public static ClientConfiguration s_clientConfiguration;
+	public static ClientConfiguration ClientConfiguration;
 
 	/**
 	 * Client connection management instance.
 	 */
-	public static Client clientController;
+	public static Client Client;
 
 	/* End of --> Fields region */
 
@@ -61,7 +59,7 @@ public class ApplicationEntryPoint extends Application
 	 */
 	public static void initializeConnection() throws IOException, NumberFormatException
 	{
-		clientController = new Client(s_logger, s_clientConfiguration.getIp(), s_clientConfiguration.getPort());
+		Client = new Client(s_logger, ClientConfiguration.getIp(), ClientConfiguration.getPort());
 		s_logger.info("Client initialized successfully.");
 	}
 
@@ -71,12 +69,12 @@ public class ApplicationEntryPoint extends Application
 	 */
 	private static void initializeConfiguration()
 	{
-		s_clientConfiguration = ClientConfiguration.getInstance();
-		if (s_clientConfiguration.isDefaultConfiguration()) {
-			s_logger.warning("Failed on try to read configuration from \"" + ClientConfiguration.CONFIGURATION_PATH
+		ClientConfiguration = client.ClientConfiguration.getInstance();
+		if (ClientConfiguration.isDefaultConfiguration()) {
+			s_logger.warning("Failed on try to read configuration from \"" + client.ClientConfiguration.CONFIGURATION_PATH
 					+ "\". Created default configuration.");
 		}
-		s_logger.config("Client configuration loaded:" + s_clientConfiguration.toString());
+		s_logger.config("Client configuration loaded:" + ClientConfiguration.toString());
 	}
 
 	private void initializeUncughtExceptionHandler()
@@ -97,6 +95,10 @@ public class ApplicationEntryPoint extends Application
 		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, false);
 	}
 
+	/* End of --> Initializing methods region */
+
+	/* region Application override methods */
+	
 	/**
 	 * Method opens the UI of the client.
 	 */
@@ -104,17 +106,18 @@ public class ApplicationEntryPoint extends Application
 	public void start(Stage primaryStage)
 	{
 		try {
-			Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+			Parent root = FXMLLoader.load(getClass().getResource("/boundaries/Login.fxml"));
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.setMinWidth(445);
 			primaryStage.setMinHeight(450);
-			primaryStage.setTitle("Zer-Li Client");
+			primaryStage.setTitle("Zer-Li");
 			primaryStage.show();
 		}
 		catch (Exception e) {
 			s_logger.log(Level.SEVERE, "Start failed!", e);
+			System.exit(1);
 		}
 	}
 
@@ -135,7 +138,15 @@ public class ApplicationEntryPoint extends Application
 		super.init();
 	}
 
-	/* End of --> Initializing methods region */
+	@Override
+	public void stop() throws Exception
+	{
+		disposeConnection();
+		super.stop();
+	}
+
+	/* End of --> Application override methods region */
+
 
 	/* Private disposing methods region */
 
@@ -143,19 +154,13 @@ public class ApplicationEntryPoint extends Application
 	 * Method closes the connection with the server.
 	 *
 	 */
-	public static void disposeConnection()
+	private static void disposeConnection()
 	{
-		if (clientController != null) {
-			clientController.close();
+		if (Client != null) {
+			Client.closeConnectionWithServer();
 			s_logger.info("Client disposed successfully");
 		}
-	}
-
-	@Override
-	public void stop() throws Exception
-	{
-		disposeConnection();
-		super.stop();
+		Client=null;
 	}
 
 	/* End of --> Private disposing methods region */

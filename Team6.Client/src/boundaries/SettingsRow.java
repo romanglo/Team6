@@ -1,4 +1,4 @@
-package client;
+package boundaries;
 
 import javafx.scene.control.TableView;
 
