@@ -32,6 +32,9 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 	@FXML private ImageView imageview_gif;
 
 	@FXML private ImageView imageview_title;
+	
+	@FXML private ImageView imageview_subtitle;
+	
 
 	/* End of --> UI Binding Fields region */
 
@@ -78,6 +81,12 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 			Image image = new Image(title);
 			imageview_title.setImage(image);
 		}
+		InputStream costumerSeviceHeadLine = getClass().getResourceAsStream("/boundaries/images/CostumerServiceEmployeeHeadLine.png");
+		if (serverGif != null) 
+		{
+			Image image = new Image(costumerSeviceHeadLine);
+			imageview_subtitle.setImage(image);
+		}
 	}
 	
 	private void initializeClientHandler()
@@ -88,6 +97,23 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 
 	/* End of --> Initializing methods region */
 
+	
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/* Client handlers implementation region */
 
 	/**
@@ -118,4 +144,9 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 	}
 
 	/* End of --> Client handlers implementation region */
+	
+	
+	
+	
+	
 }
