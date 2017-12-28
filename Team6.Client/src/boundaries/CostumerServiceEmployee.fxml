@@ -9,7 +9,7 @@
 
 		<AnchorPane layoutY="79.0" prefHeight="368.0" prefWidth="450.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
          <children>
-            <Button layoutX="116.0" layoutY="87.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="174.0" text="Add costumer complaint" />
+            <Button layoutX="116.0" layoutY="87.0" mnemonicParsing="false" onAction="#addCostumerComplaintClick" prefHeight="25.0" prefWidth="174.0" text="Add costumer complaint" />
             <Button layoutX="118.0" layoutY="142.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="174.0" text="Add specialist analysis" />
             <Button layoutX="119.0" layoutY="198.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="174.0" text="Treatment an open complaint" />
             <Button layoutX="166.0" layoutY="264.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="83.0" text="Logout" />
