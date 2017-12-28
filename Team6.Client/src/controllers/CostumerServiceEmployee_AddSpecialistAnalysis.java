@@ -17,9 +17,9 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
@@ -29,28 +29,24 @@ import messages.Message;
 
 /**
  *
- * CostumerServiceEmployee_AddCostumerComplaint :
- * CostumerServiceEmployee_AddCostumerComplaint include:
- *				  Add Costumer Complaint UI methods.
- *
- * 
+ * CostumerServiceEmployee_AddSpecialistAnalysis :
+ * CostumerServiceEmployee_AddSpecialistAnalysis include:
+ *				  Add Specialist Analysis UI methods.
  * 
  */
-public class CostumerServiceEmployee_AddCostumerComplaint implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
 	/* UI Binding Fields region */
 
+	@FXML TextField SurveyIDField;
 	
+	@FXML TextArea SpecialistAnalysisArea;
 	// Title images :
 	@FXML private ImageView imageview_gif;
 
 	@FXML private ImageView imageview_title;
 	
 	@FXML private ImageView imageview_subtitle;
-	
-	@FXML private TextField IDField;
-	
-	@FXML private TextArea CostumerComplaintArea;
 
 	/* End of --> UI Binding Fields region */
 
@@ -70,7 +66,6 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	 * @param event
 	 * 			Back button clicked
 	 */
-	@FXML
 	public void backButtonClick(ActionEvent event) 
 	{
 		try 
@@ -92,7 +87,6 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 		}
 	}
 	
-	
 	/**
 	 * The function checks that the fields aren't empty,
 	 * and call the function "setNewComplaint" that sends data to server.
@@ -103,20 +97,19 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	@FXML
 	public void saveButtonClick(ActionEvent event)
 	{
-		if(IDField.getText().equals("")||CostumerComplaintArea.getText().equals(""))
+		if(SurveyIDField.getText().equals("")||SpecialistAnalysisArea.getText().equals(""))
 		{
 		showInformationMessage("One or more of the fileds are empty");
 		}
 		else
 		{
-			int costumer_id=Integer.parseInt(IDField.getText());
-			//CostumerServiceEmployeeController.setNewComplaint(costumer_id, CostumerComplaintArea.getText());
+			int survey_id=Integer.parseInt(SurveyIDField.getText());
+			//CostumerServiceEmployeeController.setNewSpecialistAnalysis(survey_id, SpecialistAnalysisArea.getText());
 		}
 	}
 	
-	
 	/* End of --> UI events region */
-
+	
 	// region Private Methods
 	
 	private void showInformationMessage(String message)
@@ -166,7 +159,7 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 			Image image = new Image(title);
 			imageview_title.setImage(image);
 		}
-		InputStream costumerSeviceHeadLine = getClass().getResourceAsStream("/boundaries/images/AddCostumerComplaint.png");
+		InputStream costumerSeviceHeadLine = getClass().getResourceAsStream("/boundaries/images/AddSpecialistAnalysis.png");
 		if (serverGif != null) 
 		{
 			Image image = new Image(costumerSeviceHeadLine);

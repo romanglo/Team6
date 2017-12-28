@@ -10,6 +10,7 @@ import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
 import entities.ComplaintEntity;
+import entities.SpecialistAnalysisEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -29,8 +30,10 @@ import messages.MessagesFactory;
 
 /**
  *
- * CompanyEmployeeController :
- * TODO Dolev: Create class description
+ * CostumerServiceEmployeeController :
+ * 		Costumer service employee Controller include:
+ * 			Main costumer service employee UI methods.
+ * 			Send message to the server methods. 
  * 
  */
 public class CostumerServiceEmployeeController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
@@ -59,9 +62,16 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 	/* UI events region */
 	
 	
+	/**
+	 * The function opens add costumer complaint window  
+	 *
+	 * @param event
+	 * 			add costumer complaint button clicked.
+	 */
 	@FXML
-	public void addCostumerComplaintClick(ActionEvent event) throws Exception
+	public void addCostumerComplaintClick(ActionEvent event) 
 	{
+		try {
 		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
 		Stage primaryStage = new Stage();
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/CostumerServiceEmplyee_AddCostumerComplaint.fxml"));
@@ -70,14 +80,48 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 		primaryStage.setScene(scene);		
 		primaryStage.show();
+		}
+		catch(Exception e)
+		{
+			String msg = "Failed on try to load the next window";
+			m_logger.severe(msg + ", excepion: " + e.getMessage());
+			showInformationMessage(msg);
+		}
 	}
 
+	/**
+	 * The function opens add specialist analysis window  
+	 *
+	 * @param event
+	 * 			Add specialist analysis button clicked.
+	 */
+	@FXML
+	public void addSpecialistAnalysisClick(ActionEvent event) 
+	{
+		try {
+		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
+		Stage primaryStage = new Stage();
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/CostumerServiceEmployee_AddSpecialistAnalysis.fxml"));
+		Parent root = loader.load();
+		Scene scene = new Scene(root);			
+		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+		primaryStage.setScene(scene);		
+		primaryStage.show();
+		}
+		catch(Exception e)
+		{
+			String msg = "Failed on try to load the next window";
+			m_logger.severe(msg + ", excepion: " + e.getMessage());
+			showInformationMessage(msg);
+		}
+	}
 	
 	
 	
 
 	
 	/* End of --> UI events region */
+	
 	// region Private Methods
 	
 	private void showInformationMessage(String message)
@@ -98,12 +142,43 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 	// region Public Methods
 	
 	
-	 public static void setNewComplaint(int costumer_id, String costumer_complaint)
+	 /**
+	 * The function create new complaint entity and new message and send it to the server. 
+	 *
+	 * @param costumer_id
+	 * 				costumer id to set
+	 * @param costumer_complaint
+	 * 						costumer complaint to set
+	 */
+	public static void setNewComplaint(int costumer_id, String costumer_complaint)
 	{
 		try {
 			ComplaintEntity entity = new ComplaintEntity(costumer_id, costumer_complaint);
 			Message msg = MessagesFactory.createEntityMessage(entity);
 			//controllers.LoginController.handleMessageFromClientUI(msg);
+		}
+		catch (NumberFormatException e) {
+			System.out.println("Failed to parse string to integer. Invalid value");
+		}
+		catch (Exception ex) {
+			System.out.println("Error when sending data for update. Exception: " + ex.getMessage());
+		}
+	}
+	
+	 /**
+	 * The function create new Specialist analysis entity and new message and send it to the server. 
+	 *
+	 * @param survey_id
+	 * 				Survey id to set
+	 * @param specialist_analysis
+	 * 						Specialist analysis to set
+	 */
+	public static void setNewSpecialistAnalysis(int survey_id, String specialist_analysis)
+	{
+		try {
+			SpecialistAnalysisEntity entity = new SpecialistAnalysisEntity(survey_id, specialist_analysis);
+			Message msg = MessagesFactory.createEntityMessage(entity);
+			//ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
 		}
 		catch (NumberFormatException e) {
 			System.out.println("Failed to parse string to integer. Invalid value");
