@@ -30,6 +30,8 @@ public class ItemEntity implements IEntity
 
 	private Image m_itemImage;
 
+	private String m_domainColor;
+
 	// end region -> Fields
 
 	// region Getters
@@ -72,6 +74,14 @@ public class ItemEntity implements IEntity
 	public Image getItemImage()
 	{
 		return m_itemImage;
+	}
+
+	/**
+	 * @return The domain color of the item.
+	 */
+	public String getColor()
+	{
+		return m_domainColor;
 	}
 
 	// end region -> Getters
@@ -133,6 +143,17 @@ public class ItemEntity implements IEntity
 		this.m_itemImage = m_itemImage;
 	}
 
+	/**
+	 * Upgrade the domain color of the item.
+	 *
+	 * @param m_domainColor
+	 *            the m_domainColor to set
+	 */
+	public void setColor(String m_domainColor)
+	{
+		this.m_domainColor = m_domainColor;
+	}
+
 	// end region -> Setters
 
 	// region Constructors
@@ -149,15 +170,18 @@ public class ItemEntity implements IEntity
 	 *            A enumerator which describes the item type.
 	 * @param itemPrice
 	 *            A number which describes the item price.
+	 * @param color
+	 *            The domain color of the item.
 	 * @param itemImg
 	 *            The image of the item.
 	 */
-	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, Image itemImg)
+	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color, Image itemImg)
 	{
 		m_id = id;
 		m_name = name;
 		m_itemType = itemType;
 		m_itemPrice = itemPrice;
+		m_domainColor = color;
 		m_itemImage = itemImg;
 	}
 
@@ -172,7 +196,23 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, ProductType itemType)
 	{
-		this(id, null, itemType, null, null);
+		this(id, null, itemType, null, null, null);
+	}
+
+	/**
+	 * Create instance of {@link ProductEntity}, with <code>null</code> name.
+	 * Dedicated for update messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the item.
+	 * @param itemType
+	 *            A enumerator which describes the item type.
+	 * @param color
+	 *            The domain color of the item.
+	 */
+	public ItemEntity(Integer id, ProductType itemType, String color)
+	{
+		this(id, null, itemType, null, color, null);
 	}
 
 	/**
@@ -186,7 +226,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, String name)
 	{
-		this(id, name, null, null, null);
+		this(id, name, null, null, null, null);
 	}
 
 	/**
@@ -200,9 +240,9 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, Double price)
 	{
-		this(id, null, null, price, null);
+		this(id, null, null, price, null, null);
 	}
-	
+
 	/**
 	 * Create instance of {@link ProductEntity}, with <code>null</code> item type.
 	 * Dedicated for update messages.
@@ -214,7 +254,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, Image image)
 	{
-		this(id, null, null, null, image);
+		this(id, null, null, null, null, image);
 	}
 
 	/**
@@ -226,7 +266,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id)
 	{
-		this(id, null, null, null, null);
+		this(id, null, null, null, null, null);
 	}
 
 	/**
@@ -242,7 +282,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, String name, Image itemImg)
 	{
-		this(id, name, null, null, itemImg);
+		this(id, name, null, null, null, itemImg);
 	}
 
 	/**
@@ -258,7 +298,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, ProductType type, Image itemImg)
 	{
-		this(id, null, type, null, itemImg);
+		this(id, null, type, null, null, itemImg);
 	}
 
 	// end region -> Constructors

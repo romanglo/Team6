@@ -14,6 +14,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -30,7 +31,8 @@ import messages.Message;
  * costumer menu UI.
  * 
  */
-public class CostumerController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class Costumer_CreateReservationController
+		implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
 	/* UI Binding Fields region */
 
@@ -39,11 +41,13 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 
 	@FXML private ImageView imageview_title;
 
-	@FXML private AnchorPane costumer_anchor;
+	@FXML private AnchorPane create_reservation_anchor;
 
-	@FXML private Button create_reservation_button;
+	@FXML private Button show_catalog_button;
 
-	@FXML private Button cancel_reservation_button;
+	@FXML private Button customize_item_button;
+
+	@FXML private Button back_to_menu;
 
 	/* End of --> UI Binding Fields region */
 
@@ -61,24 +65,24 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 
 	/**
 	 * 
-	 * @param createReservation
-	 *            press on the create reservation button.
+	 * @param openCatalog
+	 *            press on the open catalog button.
 	 */
 	@FXML
-	public void createReservationClick(ActionEvent createReservation)
+	public void openCatalogClick(ActionEvent openCatalog) throws Exception
 	{
-		openSelectedWindow(createReservation, "/boundaries/Costumer_CreateReservation.fxml");
+		openSelectedWindow(openCatalog, "/boundaries/Costumer_CreateReservationCatalog.fxml");
 	}
 
 	/**
 	 * 
-	 * @param cancelReservation
+	 * @param customizeItem
 	 *            press on the customize item button.
 	 */
 	@FXML
-	public void secondButtonClick(ActionEvent cancelReservation)
+	public void customizeItemClick(ActionEvent customizeItem)
 	{
-		openSelectedWindow(cancelReservation, "/boundaries/Costumer_CancelReservation.fxml");
+		// openSelectedWindow(customizeItem, "/boundaries/Costumer_CustomizeItem.fxml");
 	}
 
 	private void openSelectedWindow(ActionEvent event, String fxmlPath)

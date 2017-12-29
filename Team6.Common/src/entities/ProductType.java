@@ -10,7 +10,12 @@ package entities;
 @SuppressWarnings("javadoc") 
 public enum ProductType
 {
+	/**
+	 * Base flower for customized items also.
+	 */
 	Flower,
+	
 	FlowerPot,
-	BridalBouquet
+	BridalBouquet,
+	FlowerArrangement
 }
