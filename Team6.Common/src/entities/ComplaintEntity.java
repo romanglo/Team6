@@ -1,35 +1,38 @@
+
 package entities;
 
 import java.io.Serializable;
 
 /**
  *
- * ComplaintEntity:
- * Describes an entity of Complaint.
+ * ComplaintEntity: Describes an entity of Complaint.
  * 
  */
 public class ComplaintEntity implements IEntity
 {
-	// region Fields
+
 	/**
-	 * Serial version unique ID, necessary due to the class implements {@link Serializable
+	 * Serial version unique ID, necessary due to the class implements
+	 * {@link Serializable}
 	 */
-	@SuppressWarnings("javadoc") private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -9060640992825870520L;
+
+	// region Fields
 	
-	private int costumer_id;
-	
-	private String costumer_complaint;
+	private int m_id;
+
+	private String m_complaint;
 
 	// end region -> Fields
 
 	// region Getters
-	
+
 	/**
 	 * @return An unique ID of the product.
 	 */
 	public int getId()
 	{
-		return costumer_id;
+		return m_id;
 	}
 
 	/**
@@ -37,35 +40,34 @@ public class ComplaintEntity implements IEntity
 	 */
 	public String getComlaint()
 	{
-		return costumer_complaint;
+		return m_complaint;
 	}
 
 	// end region -> Getters
 
 	// region Setters
-	
+
 	/**
-	 * Set costumer id
+	 * Set costumer unique ID
 	 *
-	 * @param costumer_id
-	 *            the costumer_id to set
+	 * @param id
+	 *            the id to set
 	 */
-	public void setId(int costumer_id)
+	public void setId(int id)
 	{
-		this.costumer_id = costumer_id;
+		m_id = id;
 	}
 
 	/**
 	 * set costumer complaint
 	 *
-	 * @param costumer_complaint
-	 *            the costumer_complaint to set
+	 * @param complaint
+	 *            the complaint to set
 	 */
-	public void setComplaint(String costumer_complaint)
+	public void setComplaint(String complaint)
 	{
-		this.costumer_complaint = costumer_complaint;
+		m_complaint = complaint;
 	}
-	
 
 	// end region -> Setters
 
@@ -73,28 +75,25 @@ public class ComplaintEntity implements IEntity
 	/**
 	 * Complaint Entity Constructor
 	 *
-	 * @param costumer_id
-	 * 			the costumer id to set
-	 * @param costumer_complaint
-	 * 			the costumer complaint to set
+	 * @param id
+	 *            the costumer id to set
+	 * @param complaint
+	 *            the costumer complaint to set
 	 */
-	public ComplaintEntity(int costumer_id, String costumer_complaint)
+	public ComplaintEntity(int id, String complaint)
 	{
-		this.costumer_id=costumer_id;
-		this.costumer_complaint=costumer_complaint;
+		m_id = id;
+		m_complaint = complaint;
 	}
-	
+
 	// end region -> Constructors
 
 	// region Public Methods
-	
-	
 
-	
 	@Override
 	public String toString()
 	{
-		return "ProductEntity [Costumer ID=" + costumer_id + ", Costumer Complaint=" + costumer_complaint + "]";
+		return "ComplaintEntity [ID=" + m_id + ", Complaint=" + m_complaint + "]";
 	}
 
 	@Override
@@ -102,7 +101,7 @@ public class ComplaintEntity implements IEntity
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + costumer_id;
+		result = prime * result + m_id;
 		return result;
 	}
 
@@ -113,15 +112,9 @@ public class ComplaintEntity implements IEntity
 		if (obj == null) return false;
 		if (!(obj instanceof ComplaintEntity)) return false;
 		ComplaintEntity other = (ComplaintEntity) obj;
-		if (costumer_complaint == null) {
-			if (other.costumer_complaint != null) return false;
-		} else if (!costumer_complaint.equals(other.costumer_complaint)) return false;
-		if (costumer_id != other.costumer_id) return false;
+		if (m_id != other.m_id) return false;
 		return true;
 	}
-	
-	// end region -> Public Methods
 
-	// region Private Methods
-	// end region -> Private Methods
+	// end region -> Public Methods
 }
