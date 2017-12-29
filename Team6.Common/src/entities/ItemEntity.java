@@ -184,6 +184,26 @@ public class ItemEntity implements IEntity
 		m_domainColor = color;
 		m_itemImage = itemImg;
 	}
+	
+	/**
+	 * Create instance of {@link ProductEntity}. Dedicated for add or update
+	 * messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the item.
+	 * @param name
+	 *            The name of the item.
+	 * @param itemType
+	 *            A enumerator which describes the item type.
+	 * @param itemPrice
+	 *            A number which describes the item price.
+	 * @param itemImg
+	 *            The image of the item.
+	 */
+	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, Image itemImg)
+	{
+		this(id, name, itemType, itemPrice, null, itemImg);
+	}
 
 	/**
 	 * Create instance of {@link ProductEntity}, with <code>null</code> name.
