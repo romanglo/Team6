@@ -26,6 +26,19 @@ public class MessagesFactory
 
 	/**
 	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
+	 * with {@link EntityDataOperation#Get} operation.
+	 *
+	 * @param entity
+	 *            The entity to add to message.
+	 * @return An {@link Message}.
+	 */
+	public static Message createGetAllEntityMessage(IEntity entity)
+	{
+		return createEntityMessage(entity, EntityDataOperation.GetALL);
+	}
+
+	/**
+	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
 	 * with {@link EntityDataOperation#None} operation.
 	 *
 	 * @param entity
@@ -49,8 +62,21 @@ public class MessagesFactory
 	 */
 	public static Message createUpdateEntityMessage(IEntity entity)
 	{
-
 		return createEntityMessage(entity, EntityDataOperation.Update);
+	}
+	
+	/**
+	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
+	 * with {@link EntityDataOperation#Update} operation.
+	 *
+	 * @param entity
+	 *            The entity to add to message.
+	 * @return An {@link Message} if the creation succeed or <code>null</code> if
+	 *         failed.
+	 */
+	public static Message createUpdateAllEntityMessage(IEntity entity)
+	{
+		return createEntityMessage(entity, EntityDataOperation.UpdateAll);
 	}
 
 	private static Message createEntityMessage(IEntity entity, EntityDataOperation entityDataOperation)
