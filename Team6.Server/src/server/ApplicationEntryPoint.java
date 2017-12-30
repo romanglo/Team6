@@ -1,6 +1,13 @@
 package server;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +28,73 @@ import common.UncaughetExceptions;
  */
 public class ApplicationEntryPoint extends Application {
 
+	private final static String s_lockFilePath = "ServerLockFile.lock";
+	private static File s_file;
+	private static FileChannel s_fileChannel;
+	private static FileLock s_lockFile;
+
+	/**
+	 * 
+	 * The main method of the application, the method ensure only one instance of
+	 * the application, using file lock pattern.
+	 *
+	 * @param args
+	 *            Application arguments.
+	 */
+	@SuppressWarnings("resource")
+	public static void main(String[] args) {
+		try {
+			s_file = new File(s_lockFilePath);
+
+			// Delete the lock file if it exist.
+			if (s_file.exists()) {
+				s_file.delete();
+			}
+
+			// Try to get the file lock
+			s_fileChannel = new RandomAccessFile(s_file, "rw").getChannel();
+
+			// Set to lock file hidden attribute
+			Files.setAttribute(Paths.get(s_lockFilePath), "dos:hidden", true, LinkOption.NOFOLLOW_LINKS);
+
+			// Try to get the file lock
+			s_lockFile = s_fileChannel.tryLock();
+			if (s_lockFile == null) {
+				// File is locked by other application
+				s_fileChannel.close();
+				System.out.println("Only one instance of Server can run.");
+				System.exit(1);
+			}
+
+			// Add shutdown hook to release lock when application shutdown
+			Thread shutdownHook = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						if (s_lockFile != null) {
+							s_lockFile.release();
+							s_fileChannel.close();
+							s_file.delete();
+						}
+					} catch (IOException e) {
+						System.err.println("An error occured on try to release and delete instance locks, exception: "
+								+ e.getMessage());
+					}
+				}
+			});
+
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+			// Launch the application
+			launch(args);
+		} catch (IOException e) {
+			System.err.println("An error occured on try to start 'Server' process, exception: " + e.getMessage());
+			System.exit(1);
+		}
+	}
+
+	// region Fields
+
 	private Logger m_logger;
 
 	private ServerConfiguration m_serverConfiguration;
@@ -35,16 +109,7 @@ public class ApplicationEntryPoint extends Application {
 	 */
 	public static Server Server;
 
-	/**
-	 * 
-	 * The main method of the application.
-	 *
-	 * @param args
-	 *            Application arguments.
-	 */
-	public static void main(String[] args) {
-		launch(args);
-	}
+	// end region -> Fields
 
 	// region Application Method Overrides
 
@@ -56,11 +121,11 @@ public class ApplicationEntryPoint extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("ServerXML.fxml"));
 			Parent root = loader.load();
-			Scene scene = new Scene(root, 430, 310);
+			Scene scene = new Scene(root, 450, 500);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.setMinWidth(450);
-			primaryStage.setMinHeight(310);
+			primaryStage.setMinHeight(500);
 			primaryStage.setTitle("Zer-Li Server");
 			primaryStage.show();
 		} catch (Exception ex) {
@@ -161,5 +226,6 @@ public class ApplicationEntryPoint extends Application {
 		DbContoller = null;
 	}
 
-	// end region.
+	// end region - > Private Dispose Methods
+
 }
