@@ -12,17 +12,17 @@ import java.util.logging.LogRecord;
  * LogFormatter: Decorate message style.
  * 
  */
-public class LogFormatter extends Formatter
+class LogFormatter extends Formatter
 {
 
-	private final SimpleDateFormat m_localDateFormat = new SimpleDateFormat("HH:mm:ss");
+	private final static SimpleDateFormat s_localDateFormat = new SimpleDateFormat("HH:mm:ss");
 
 	@Override
 	public String format(LogRecord record)
 	{
 
 		Date date = new Date(record.getMillis());
-		String time = m_localDateFormat.format(date);
+		String time = s_localDateFormat.format(date);
 
 		Throwable thrown = record.getThrown();
 		String msg;
