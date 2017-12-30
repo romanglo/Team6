@@ -7,20 +7,22 @@
 <AnchorPane minHeight="285.0" minWidth="380.0"
 	nodeOrientation="LEFT_TO_RIGHT" prefHeight="372.0" prefWidth="400.0"
 	xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="controllers.CostumerController">
+	fx:controller="controllers.Costumer_CreateReservationController">
 	<children>
 
-		<AnchorPane fx:id="costumer_anchor" layoutY="79.0"
+		<AnchorPane fx:id="create_reservation_anchor" layoutY="79.0"
 			prefHeight="368.0" prefWidth="450.0" AnchorPane.bottomAnchor="5.0"
 			AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
 			AnchorPane.topAnchor="75.0">
 			<children>
-				<Button fx:id="create_reservation_button" layoutX="126.0"
-					layoutY="83.0" mnemonicParsing="false" onAction="#createReservationClick"
-					prefHeight="25.0" prefWidth="154.0" text="Create New Reservation" />
-				<Button fx:id="cancel_reservation_button" layoutX="126.0"
-					layoutY="120.0" mnemonicParsing="false" onAction="#secondButtonClick"
-					prefHeight="25.0" prefWidth="154.0" text="Cancel Reservation" />
+				<Button fx:id="show_catalog_button" layoutX="126.0" layoutY="83.0"
+					mnemonicParsing="false" onAction="#openCatalogClick" prefHeight="25.0"
+					prefWidth="154.0" text="Open Catalog" />
+				<Button fx:id="back_to_menu" layoutX="126.0" layoutY="158.0"
+					mnemonicParsing="false" prefHeight="25.0" prefWidth="154.0" text="Back" />
+				<Button fx:id="customize_item_button" layoutX="126.0"
+					layoutY="120.0" mnemonicParsing="false" onAction="#customizeItemClick"
+					prefHeight="25.0" prefWidth="154.0" text="Customize Item" />
 			</children>
 		</AnchorPane>
 
