@@ -2,15 +2,14 @@ package server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.net.UnknownHostException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Formatter;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import configurations.ConnectivityConfiguration;
@@ -18,15 +17,14 @@ import configurations.DbConfiguration;
 import configurations.ServerConfiguration;
 import connectivity.Server;
 import db.DbController;
-import db.EntitiesResolver;
-import db.QueryFactory;
-import entities.IEntity;
+import db.MessagesResolver;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -34,25 +32,19 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
-import logger.LogFormatter;
 import logger.LogManager;
-import messages.EntityData;
-import messages.EntityDataOperation;
-import messages.Message;
-import messages.IMessageData;
 
 /**
  *
  * ServerController: Server GUI controller.
  * 
  */
-public class ServerController implements Initializable, Server.ServerStatusHandler, Server.MessagesHandler {
+public class ServerController implements Initializable, Server.ServerStatusHandler, Server.ClientConnectionHandler {
 	// region UI Elements
 
 	@FXML
@@ -117,7 +109,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	private Logger m_logger;
 
-	private Handler m_logHandler;
+	private MessagesResolver m_messageResolver;
+
+	private final static DateTimeFormatter s_dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
 	// end region -> Fields
 
@@ -131,8 +125,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		initializeImages();
 
 		initializeFields();
-
-		initializeLog();
 
 		initializeServerLogic();
 
@@ -181,7 +173,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 							m_server.setPort(port);
 							if (m_server.isListening()) {
 								showInformationMessage(
-										"Attention: You must reopen the application for the changes to take effect!");
+										"Attention: You must reopen application connection for the changes to take effect!");
 							}
 						} catch (NumberFormatException e) {
 							return;
@@ -196,9 +188,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 					rowData.setValue(resultString);
 					drawContantToTable();
 					btn_update_settings.setDisable(false);
+					String msg = "The Configuration " + rowData.getType() + '-' + rowData.getSetting()
+							+ " value changed to " + rowData.getValue();
+					m_logger.info(msg);
+					addMessageToLog(msg);
 
-					m_logger.info("The Configuration " + rowData.getType() + '-' + rowData.getSetting()
-							+ " value changed to " + rowData.getValue());
 				}
 			});
 			return tableRow;
@@ -214,14 +208,11 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	private void initializeServerLogic() {
 		m_server.setServerActionHandler(this);
-		m_server.setMessagesHandler(this);
-	}
+		m_server.setClientConnectionHandler(this);
+		
+		m_messageResolver = new MessagesResolver(m_dbContoller);
 
-	private void initializeLog() {
-		m_logHandler = new LogHandler();
-		LogFormatter formatter = new LogFormatter();
-		m_logHandler.setFormatter(formatter);
-		m_logger.addHandler(m_logHandler);
+		m_server.setMessagesHandler(m_messageResolver);
 	}
 
 	private void initializeFields() {
@@ -238,51 +229,72 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	@FXML
 	private void startDb(ActionEvent event) {
 		try {
+			addMessageToLog("Trying to connect to the database with the configuration: "
+					+ m_configuration.getDbConfiguration().toString());
 			m_dbContoller.Start();
 			btn_db_start.setDisable(true);
 			btn_db_stop.setDisable(false);
 			circle_db_on.setFill(Paint.valueOf("green"));
 			circle_db_off.setFill(Paint.valueOf("grey"));
 		} catch (Exception e) {
+			addMessageToLog("Failed to disconnect from database, exception : " + e.getMessage());
 			m_logger.log(Level.SEVERE, "Failed to connect to database", event);
 			return;
 		}
+		addMessageToLog("Connected successfully to the database");
 	}
 
 	@FXML
 	private void stopDb(ActionEvent event) {
 		try {
+			addMessageToLog("Trying to disconnect from the database");
 			m_dbContoller.Stop();
 			btn_db_start.setDisable(false);
 			btn_db_stop.setDisable(true);
 			circle_db_on.setFill(Paint.valueOf("grey"));
 			circle_db_off.setFill(Paint.valueOf("red"));
+
 		} catch (Exception e) {
 			m_logger.log(Level.SEVERE, "Failed to disconnect from database", event);
+			addMessageToLog("Failed to disconnect from database, exception : " + e.getMessage());
+			return;
 		}
+		addMessageToLog("Disconnected successfully from the database");
 	}
 
 	@FXML
 	private void startConnectivity(ActionEvent event) {
+		String ip;
+		try {
+			ip = InetAddress.getLocalHost().toString();
+		} catch (UnknownHostException ignored) {
+			ip = "localhost";
+		}
+		String msg = "Trying to open TCP\\IP connection, IP : " + ip + ", port: " + m_server.getPort();
+		m_logger.info(msg);
+		addMessageToLog(msg);
 		try {
 			m_server.listen();
-			m_logger.info("Trying to start listening..");
 		} catch (Exception e) {
-			m_logger.log(Level.SEVERE, "Listening request faild.", e);
+			msg = "Failed on try to open TCP\\IP connection";
+			m_logger.log(Level.SEVERE, msg, e);
+			addMessageToLog(msg);
 			return;
 		}
-		onServerStarted();
 	}
 
 	@FXML
 	private void stopConnectivity(ActionEvent event) {
-		m_logger.info("Trying to stop listening..");
+		String msg = "Trying to stop TCP\\IP connection";
+		m_logger.info(msg);
+		addMessageToLog(msg);
 		try {
 			m_server.close();
 		} catch (IOException e) {
-			m_logger.severe("An error occurred on closing connection! exception: " + e.getMessage());
+			msg = "Failed on try to close TCP\\IP connection";
+			m_logger.log(Level.SEVERE, msg, e);
+			addMessageToLog(msg);
 		}
-		onServerStopped();
 	}
 
 	@FXML
@@ -313,56 +325,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		setting_table.setItems(settings);
 	}
 
-	private IEntity onEntityDataReceived(IMessageData messageData) throws Exception {
-		EntityData entityData = (EntityData) messageData;
-		IEntity receivedEntity = entityData.getEntity();
-
-		if (receivedEntity == null) {
-			return null;
-		}
-
-		IEntity returningEntity = null;
-
-		ResultSet queryResult = null;
-		try {
-			switch (entityData.getOperation()) {
-			case Update:
-				String generatedUpdateQuery = QueryFactory.generateUpdateEntityQuery(receivedEntity);
-				if (generatedUpdateQuery == null || generatedUpdateQuery.isEmpty()) {
-					break;
-				}
-				m_dbContoller.executeUpdateQuery(generatedUpdateQuery);
-				break;
-
-			case Get:
-				String generatedGetQuery2 = QueryFactory.generateGetEntityQuery(receivedEntity);
-				if (generatedGetQuery2 == null || generatedGetQuery2.isEmpty()) {
-					break;
-				}
-				queryResult = m_dbContoller.executeSelectQuery(generatedGetQuery2);
-				if (queryResult == null) {
-					break;
-				}
-				returningEntity = EntitiesResolver.resolveResultSet(queryResult, receivedEntity);
-				break;
-
-			default:
-				break;
-			}
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			if (queryResult != null) {
-				try {
-					queryResult.close();
-				} catch (SQLException e) {
-					m_logger.warning("Failed on try to close query result. Exception: " + e.getMessage());
-				}
-			}
-		}
-		return returningEntity;
-	}
-
 	private void showInformationMessage(String message) {
 		if (message == null || message.isEmpty()) {
 			return;
@@ -373,27 +335,25 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		alert.setContentText(message);
 
 		alert.showAndWait();
+
+		addMessageToLog(message);
+	}
+
+	private void addMessageToLog(String msg) {
+		if (msg != null && !msg.isEmpty()) {
+			LocalDateTime now = LocalDateTime.now();
+			String time = s_dateTimeFormatter.format(now);
+
+			// updating UI thread from different thread.
+			javafx.application.Platform.runLater(() -> {
+				textarea_log.appendText(time + " - " + msg + ".\n");
+			});
+		}
+
 	}
 	// end region -> Private Methods
 
 	// region Server Handlers Implementation
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public synchronized Message onMessageReceived(Message msg) throws Exception {
-		IMessageData messageData = msg.getMessageData();
-		if (messageData instanceof EntityData) {
-			IEntity returnEntity = onEntityDataReceived(messageData);
-			if (returnEntity != null) {
-				IMessageData returnedMessageData = new EntityData(EntityDataOperation.None, returnEntity);
-				msg.setMessageData(returnedMessageData);
-				return msg;
-			}
-		}
-		return null;
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -405,6 +365,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		btn_connectivity_stop.setDisable(false);
 		circle_connectivity_on.setFill(Paint.valueOf("green"));
 		circle_connectivity_off.setFill(Paint.valueOf("grey"));
+		addMessageToLog("TCP\\IP connection opened successfully");
+
 	}
 
 	/**
@@ -416,43 +378,25 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		btn_connectivity_stop.setDisable(true);
 		circle_connectivity_on.setFill(Paint.valueOf("grey"));
 		circle_connectivity_off.setFill(Paint.valueOf("red"));
+		addMessageToLog("TCP\\IP connection closed successfully");
 	}
 
 	// end region -> Server Handlers Implementation
 
-	// region Nested Classes
+	// region Server.ClientConnectionHandler Implementation
 
-	/**
-	 * LogHandler: A class that connect application {@link Logger} with the server
-	 * log view.
-	 */
-	private class LogHandler extends Handler {
-
-		@Override
-		public void close() throws SecurityException {
-			// ignored
-		}
-
-		@Override
-		public void flush() {
-			// ignored
-		}
-
-		@Override
-		public synchronized void publish(LogRecord record) {
-			try {
-				if (record == null || textarea_log == null) {
-					return;
-				}
-				Formatter logFormmater = getFormatter();
-				String msgFormmated = logFormmater.format(record);
-				textarea_log.appendText(msgFormmated);
-			} catch (Exception e) {
-				m_logger.removeHandler(m_logHandler);
-				m_logger.warning("Logging to log UI disabled due to an excpetion: " + e.getMessage());
-			}
-		}
+	@Override
+	public void onClientConnected(String clientDetails, int numberOfConnectedClients) {
+		addMessageToLog(
+				"A client: " + clientDetails + " connected, number of connected clients: " + numberOfConnectedClients);
 	}
 
-	// end region -> Nested Classes
+	@Override
+	public void onClientDisconnected(String clientDetails, int numberOfConnectedClients) {
+		addMessageToLog("A client: " + clientDetails + " disconnected, number of connected clients: "
+				+ numberOfConnectedClients);
+	}
+
+	// end region -> Server.ClientConnectionHandler Implementation
+
 }
