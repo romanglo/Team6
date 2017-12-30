@@ -2,6 +2,7 @@ package db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,6 +14,8 @@ import common.IStartable;
 import common.NotRunningException;
 import common.Startable;
 import configurations.DbConfiguration;
+import configurations.ServerConfiguration;
+import logger.LogManager;
 
 /**
  *
@@ -58,6 +61,18 @@ public class DbController extends Startable {
 		super(true, logger);
 		m_dbConfiguration = dbConfiguration;
 		m_connection = null;
+	}
+
+	/**
+	 * 
+	 * Create a instance which communicates with the database, you must
+	 * {@link IStartable#Start()} the class before using it. The instance get logger
+	 * from {@link LogManager#getLogger()} and get the configuration from
+	 * {@link ServerConfiguration#getInstance()}.
+	 * 
+	 */
+	public DbController() {
+		this(LogManager.getLogger(), ServerConfiguration.getInstance().getDbConfiguration());
 	}
 
 	// end region -> Constructors
@@ -137,9 +152,7 @@ public class DbController extends Startable {
 		Statement stmt;
 		try {
 			stmt = m_connection.createStatement();
-			ResultSet queryReuslt = stmt.executeQuery(query);
-			m_Logger.info("A select query executed seccessfully! The query: " + query);
-			return queryReuslt;
+			return stmt.executeQuery(query);
 		} catch (SQLException ex) {
 			m_Logger.warning("Failed on try to execute the query: " + query + " , exception: " + ex);
 			return null;
@@ -147,8 +160,8 @@ public class DbController extends Startable {
 	}
 
 	/**
-	 * 
-	 * The method execute update query.
+	 * Executes the given SQL query, which may be an INSERT, UPDATE, or DELETE
+	 * statement or an SQL statement that returns nothing.
 	 *
 	 * @param query
 	 *            The query to execute.
@@ -156,7 +169,7 @@ public class DbController extends Startable {
 	 * @throws NotRunningException
 	 *             if the method called when the state is not Running.
 	 */
-	public boolean executeUpdateQuery(String query) throws NotRunningException {
+	public boolean executeQuery(String query) throws NotRunningException {
 		if (!isRunning()) {
 			throw new NotRunningException(this);
 		}
@@ -168,10 +181,8 @@ public class DbController extends Startable {
 		try {
 			stmt = m_connection.createStatement();
 			boolean result = stmt.executeUpdate(query) == 1;
-			if (result) {
-				m_Logger.info("A update query executed seccessfully! The query: " + query);
-			} else {
-				m_Logger.warning("Failed on try to execute the update query: " + query);
+			if (!result) {
+				m_Logger.info("The query: \"" + query + "\" does not effect any row.");
 			}
 			return result;
 		} catch (SQLException ex) {
@@ -180,6 +191,50 @@ public class DbController extends Startable {
 		}
 	}
 
-	// end region -> Public Methods
+	/**
+	 * The method create a {@link PreparedStatement} that related to the connection.
+	 *
+	 * @param sql
+	 *            An query that matching to {@link PreparedStatement} rules.
+	 * @return A {@link PreparedStatement} that related to the connected schema.
+	 */
+	public PreparedStatement getPreparedStatement(String sql) {
+		if (!isRunning()) {
+			throw new NotRunningException(this);
+		}
 
+		if (sql == null) {
+			return null;
+		}
+
+		PreparedStatement preparedStatement = null;
+		try {
+			preparedStatement = m_connection.prepareStatement(sql);
+		} catch (SQLException e) {
+			m_Logger.warning("Failed on try to create prepere statement with the query: " + sql + ". Exception:"
+					+ e.getMessage());
+		}
+		return preparedStatement;
+	}
+
+	/**
+	 * The method create a {@link Statement} that related to the connection.
+	 *
+	 * @return A {@link Statement} that related to the connected schema.
+	 */
+	public Statement getStatement() {
+		if (!isRunning()) {
+			throw new NotRunningException(this);
+		}
+
+		Statement stmt = null;
+		try {
+			stmt = m_connection.createStatement();
+		} catch (SQLException ex) {
+			m_Logger.warning("Failed on try to create statement, exception: " + ex);
+		}
+		return stmt;
+	}
+
+	// end region -> Public Methods
 }
