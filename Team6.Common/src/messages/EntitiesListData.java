@@ -2,6 +2,7 @@
 package messages;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.sun.istack.internal.NotNull;
 
@@ -9,35 +10,36 @@ import entities.IEntity;
 
 /**
  *
- * AddEntityData: Describes a {@link IMessageData} that contains an
- * {@link IEntity} and an operation to execute on it.
+ * ManyEntityData: Describes a {@link IMessageData} that contains a {@link List}
+ * of {@link IEntity} and an operation to execute on all of them.
  * 
  * @see Message This class suitable to {@link Message}
  */
-public class EntityData implements IMessageData
+public class EntitiesListData implements IMessageData
 {
+
 	// region Fields
 
 	/**
 	 * Serial version unique ID, necessary due to the class implements
 	 * {@link Serializable}
 	 */
-	private static final long serialVersionUID = 4732439024965484856L;
+	private static final long serialVersionUID = -7196038398678029778L;
 
 	private EntityDataOperation m_operation;
 
-	private IEntity m_entity;
+	private List<IEntity> m_entities;
 
 	// end region -> Fields
 
 	// region Getters
 
 	/**
-	 * @return The required {@link IEntity} to manipulate.
+	 * @return The required {@link List} of {@link IEntity} to manipulate.
 	 */
-	public IEntity getEntity()
+	public List<IEntity> getEntities()
 	{
-		return m_entity;
+		return m_entities;
 	}
 
 	/**
@@ -56,37 +58,39 @@ public class EntityData implements IMessageData
 	 *
 	 * @param entityDataOperation
 	 *            The required operation to do on the {@link IEntity}.
-	 * @param entity
-	 *            The {@link IEntity} which manipulated.
+	 * @param entities
+	 *            A {@link List} of {@link IEntity}.
 	 * @throws NullPointerException
 	 *             If the constructor received null.
 	 */
-	public EntityData(@NotNull EntityDataOperation entityDataOperation, @NotNull IEntity entity) throws NullPointerException
+	public EntitiesListData(@NotNull EntityDataOperation entityDataOperation, @NotNull List<IEntity> entities)
+			throws NullPointerException
 	{
-		if (entityDataOperation == null || entity == null) {
+		if (entityDataOperation == null || entities == null) {
 			throw new NullPointerException("The constructor of 'AddEntityData' can not get null parameters.");
 		}
-		m_entity = entity;
+		m_entities = entities;
 		m_operation = entityDataOperation;
 	}
 
-	
-
 	// end region -> Constructors
-	
 
 	// region Object Methods Override
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString()
 	{
-		return "EntityData [Operation=" + m_operation + ", Entity=" + m_entity + "]";
+		StringBuilder stringBuilder = new StringBuilder('[');
+		for (IEntity entity : m_entities) {
+			stringBuilder.append(entity.toString());
+			stringBuilder.append(", ");
+		}
+		stringBuilder.append(']');
+		return "EntitiesListData [Operation=" + m_operation + ", Entities=" + stringBuilder.toString() + "]";
 	}
-	
-	
-	// end region -> Object Methods Override
 
+	// end region -> Object Methods Override
 }
