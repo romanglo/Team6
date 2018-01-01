@@ -2,7 +2,6 @@
 package entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  *
@@ -26,8 +25,6 @@ public class CostumerEntity implements IEntity
 	private CostumerSubscription m_subscription;
 
 	private Boolean m_approved;
-
-	private ArrayList<ItemEntity> m_reservationList;
 
 	// end region -> Fields
 
@@ -63,14 +60,6 @@ public class CostumerEntity implements IEntity
 	public Boolean getCostumerApproved()
 	{
 		return m_approved;
-	}
-
-	/**
-	 * @return An image of the costumer.
-	 */
-	public ArrayList<ItemEntity> getcostumerImage()
-	{
-		return m_reservationList;
 	}
 
 	// end region -> Getters
@@ -121,28 +110,6 @@ public class CostumerEntity implements IEntity
 		this.m_approved = m_approved;
 	}
 
-	/**
-	 * Upgrade the {@link ItemEntity} of the costumer.
-	 *
-	 * @param m_reservationList
-	 *            the m_reservationList to set
-	 */
-	public void setReservationList(ArrayList<ItemEntity> m_reservationList)
-	{
-		this.m_reservationList = m_reservationList;
-	}
-
-	/**
-	 * Add the {@link ItemEntity} to the reservation list of the costumer.
-	 *
-	 * @param m_reservation
-	 *            the m_reservation to add.
-	 */
-	public void addReservation(ItemEntity m_reservation)
-	{
-		this.m_reservationList.add(m_reservation);
-	}
-
 	// end region -> Setters
 
 	// region Constructors
@@ -159,17 +126,13 @@ public class CostumerEntity implements IEntity
 	 *            An enumerator which describes the costumer subscription.
 	 * @param approved
 	 *            A boolean which describes the costumer approval.
-	 * @param reservationList
-	 *            The reservation list.
 	 */
-	public CostumerEntity(Integer id, String creditCard, CostumerSubscription subscription, Boolean approved,
-			ArrayList<ItemEntity> reservationList)
+	public CostumerEntity(Integer id, String creditCard, CostumerSubscription subscription, Boolean approved)
 	{
 		m_id = id;
 		m_creditCard = creditCard;
 		m_subscription = subscription;
 		m_approved = approved;
-		m_reservationList = reservationList;
 	}
 
 	/**
@@ -182,7 +145,7 @@ public class CostumerEntity implements IEntity
 	 */
 	public CostumerEntity(Integer id, CostumerSubscription subscription)
 	{
-		this(id, null, subscription, null, new ArrayList<>());
+		this(id, null, subscription, null);
 	}
 
 	/**
@@ -195,7 +158,7 @@ public class CostumerEntity implements IEntity
 	 */
 	public CostumerEntity(Integer id, String creditCard)
 	{
-		this(id, creditCard, CostumerSubscription.None, null, new ArrayList<>());
+		this(id, creditCard, CostumerSubscription.None, null);
 	}
 
 	/**
@@ -208,20 +171,7 @@ public class CostumerEntity implements IEntity
 	 */
 	public CostumerEntity(Integer id, Boolean approved)
 	{
-		this(id, null, CostumerSubscription.None, approved, null);
-	}
-
-	/**
-	 * Create instance of {@link CostumerEntity}. Dedicated for update messages.
-	 * 
-	 * @param id
-	 *            An unique ID of the costumer.
-	 * @param list
-	 *            The reservation list of the costumer.
-	 */
-	public CostumerEntity(Integer id, ArrayList<ItemEntity> list)
-	{
-		this(id, null, CostumerSubscription.None, null, list);
+		this(id, null, CostumerSubscription.None, approved);
 	}
 
 	/**
@@ -233,37 +183,7 @@ public class CostumerEntity implements IEntity
 	 */
 	public CostumerEntity(Integer id)
 	{
-		this(id, null, CostumerSubscription.None, null, new ArrayList<>());
-	}
-
-	/**
-	 * Create instance of {@link CostumerEntity}. Dedicated for update messages.
-	 *
-	 * @param id
-	 *            An unique ID of the costumer.
-	 * @param creditCard
-	 *            The credit card number of the costumer.
-	 * @param reservationList
-	 *            The reservation list of the costumer.
-	 */
-	public CostumerEntity(Integer id, String creditCard, ArrayList<ItemEntity> reservationList)
-	{
-		this(id, creditCard, CostumerSubscription.None, null, reservationList);
-	}
-
-	/**
-	 * Create instance of {@link CostumerEntity}. Dedicated for update messages.
-	 *
-	 * @param id
-	 *            An unique ID of the costumer.
-	 * @param subscription
-	 *            The subscription of the costumer.
-	 * @param reservationList
-	 *            The reservation list of the costumer.
-	 */
-	public CostumerEntity(Integer id, CostumerSubscription subscription, ArrayList<ItemEntity> reservationList)
-	{
-		this(id, null, subscription, null, reservationList);
+		this(id, null, CostumerSubscription.None, null);
 	}
 
 	// end region -> Constructors
@@ -303,8 +223,7 @@ public class CostumerEntity implements IEntity
 	public String toString()
 	{
 		return "CostumerEntity [ID=" + m_id + ", credit card=" + m_creditCard + ", costumer subscription="
-				+ m_subscription + ", costumer approval=" + m_approved + ", reservation list=" + m_reservationList
-				+ "]";
+				+ m_subscription + ", costumer approval=" + m_approved + "]";
 	}
 
 	// end region -> Override Object Methods

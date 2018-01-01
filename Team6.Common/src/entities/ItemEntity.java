@@ -357,7 +357,7 @@ public class ItemEntity implements IEntity
 	@Override
 	public String toString()
 	{
-		return "ItemEntity [ID=" + m_id + ", Name=" + m_name + ", Item Type=" + m_itemType + "]";
+		return "ItemEntity [ID=" + m_id + ", Name=" + m_name + ", Item Type=" + m_itemType + ", price=" + m_itemPrice + ", color=" + m_domainColor + "]";
 	}
 
 	// end region -> Override Object Methods

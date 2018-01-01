@@ -6,7 +6,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane minHeight="285.0" minWidth="380.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="372.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Costumer_CreateReservationCatalogController">
+<AnchorPane maxHeight="372.0" maxWidth="400.0" minHeight="372.0" minWidth="400.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="372.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.Costumer_CreateReservationCatalogController">
 	<children>
 
 		<AnchorPane layoutY="79.0" prefHeight="368.0" prefWidth="450.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
@@ -19,7 +19,7 @@
 					<TableColumn fx:id="tablecolumn_image" editable="false" minWidth="80.0" prefWidth="82.800048828125" sortable="false" text="Image" />
 				</columns>
 			</TableView>
-         <Button layoutX="308.0" layoutY="253.0" mnemonicParsing="false" onAction="#backButtonClick" text="Back" />
+			<Button layoutX="308.0" layoutY="253.0" mnemonicParsing="false" onAction="#backButtonClick" text="Back" AnchorPane.bottomAnchor="13.8" AnchorPane.rightAnchor="41.2" />
 		</AnchorPane>
 
 		<!-- Title: -->

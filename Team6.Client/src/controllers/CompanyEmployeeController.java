@@ -172,10 +172,10 @@ public class CompanyEmployeeController
 	 */
 	private void catalogInit()
 	{
-		catalog.add(new CatalogItemRow(1, "Rose", "Flower", 19.99));
-		catalog.add(new CatalogItemRow(2, "Rose2", "Flower2", 29.99));
-		catalog.add(new CatalogItemRow(3, "Rose3", "Flower3", 39.99));
-		catalog.add(new CatalogItemRow(4, "Rose4", "Flower4", 49.99));
+		catalog.add(new CatalogItemRow(1, "Rose", "Flower", 19.99, "red"));
+		catalog.add(new CatalogItemRow(2, "Rose2", "Flower2", 29.99, "blue"));
+		catalog.add(new CatalogItemRow(3, "Rose3", "Flower3", 39.99, "red"));
+		catalog.add(new CatalogItemRow(4, "Rose4", "Flower4", 49.99, "blue"));
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class CompanyEmployeeController
 								if (!(resultString.equals(ProductType.Flower.toString())
 										|| resultString.equals(ProductType.FlowerPot.toString())
 										|| resultString.equals(ProductType.BridalBouquet.toString()))) {
-									ErrorMSG("The type you entered doesn't exist");
+									displayErrorMessage("The type you entered doesn't exist");
 									// TODO: log warning and exit method
 
 								} else {
@@ -238,7 +238,7 @@ public class CompanyEmployeeController
 							case "price":
 								Double price = Double.parseDouble(resultString);
 								if (price <= 0) {
-									ErrorMSG("The price you entered lower then 0");
+									displayErrorMessage("The price you entered lower then 0");
 									return;
 									// TODO: log warning and exit method
 								} else {
@@ -249,7 +249,7 @@ public class CompanyEmployeeController
 						ProductType itemType = ParseStringToProductType(rowData.getM_type());
 						itemChanged.add(new ItemEntity(rowData.getM_id(), rowData.getM_name(), itemType,
 								rowData.getM_price(), rowData.getM_image()));
-					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("image")) {
+					} else if (pickType.equals("image")) {
 
 						FileChooser fileChooser = new FileChooser();
 						fileChooser.setTitle("Open Resource File");
@@ -264,7 +264,7 @@ public class CompanyEmployeeController
 									rowData.getM_price(), rowData.getM_image()));
 						}
 						catch (NullPointerException e) {
-							ErrorMSG("The chosen file isn't image file");
+							displayErrorMessage("The chosen file isn't image file");
 							// TODO: log warning : chosen file isn't image file., and exit method
 						}
 						catch (Exception e) {
@@ -295,13 +295,14 @@ public class CompanyEmployeeController
 	 */
 	private ProductType ParseStringToProductType(String stringItemType)
 	{
-		switch (stringItemType) {
-			case "Flower":
-				return ProductType.Flower;
-			case "FlowerPot":
-				return ProductType.FlowerPot;
-			case "BridalBouquet":
-				return ProductType.BridalBouquet;
+		if (stringItemType.equalsIgnoreCase("Flower")) {
+			return ProductType.Flower;
+		}else if (stringItemType.equalsIgnoreCase("FlowerPot")) {
+			return ProductType.FlowerPot;
+		}else if (stringItemType.equalsIgnoreCase("BridalBouquet")) {
+			return ProductType.BridalBouquet;
+		} else if (stringItemType.equalsIgnoreCase("FlowerArrangement")) {
+			return ProductType.FlowerArrangement;
 		}
 		return null;
 	}
@@ -318,7 +319,7 @@ public class CompanyEmployeeController
 		catalog_table.refresh();
 	}
 
-	private void ErrorMSG(String errorType)
+	private void displayErrorMessage(String errorType)
 	{
 		Alert errorMessage = new Alert(AlertType.ERROR);
 		errorMessage.setTitle("Error Message");
@@ -353,7 +354,7 @@ public class CompanyEmployeeController
 		String resultString = result.get();
 
 		if (resultString == null || resultString.isEmpty()) {
-			ErrorMSG("Invalid Input");
+			displayErrorMessage("Invalid Input");
 			return;
 		}
 
@@ -372,7 +373,7 @@ public class CompanyEmployeeController
 				return;
 			}
 		}
-		ErrorMSG("Item ID doesn't exist");
+		displayErrorMessage("Item ID doesn't exist");
 	}
 
 	/**
@@ -451,10 +452,10 @@ public class CompanyEmployeeController
 
 					if (newItemImage == null) {
 						newItem = new CatalogItemRow(5, buttonName.getText(), comboBoxType.getValue(),
-								Double.parseDouble(buttonPrice.getText()));
+								Double.parseDouble(buttonPrice.getText()), "red");
 					} else {
 						newItem = new CatalogItemRow(5, buttonName.getText(), comboBoxType.getValue(),
-								Double.parseDouble(buttonPrice.getText()), newItemImage);
+								Double.parseDouble(buttonPrice.getText()), "red", newItemImage);
 					}
 
 					itemAdded.add(

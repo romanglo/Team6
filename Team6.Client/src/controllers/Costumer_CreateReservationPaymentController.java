@@ -3,6 +3,8 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -10,6 +12,7 @@ import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import entities.CostumerSubscription;
 import entities.ItemEntity;
 import entities.ProductType;
 import javafx.collections.FXCollections;
@@ -20,9 +23,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -37,7 +42,7 @@ import messages.Message;
  * creation.
  * 
  */
-public class Costumer_CreateReservationCatalogController
+public class Costumer_CreateReservationPaymentController
 		implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
 	// UI Binding Fields region
@@ -53,11 +58,11 @@ public class Costumer_CreateReservationCatalogController
 
 	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_name;
 
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_type;
+	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_amount;
 
 	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
 
-	@FXML private TableColumn<CatalogItemRow, ImageView> tablecolumn_image;
+	@FXML private Label total_price_label;
 
 	// end region -> UI Binding Fields
 
@@ -73,22 +78,32 @@ public class Costumer_CreateReservationCatalogController
 
 	/* End of --> Fields region */
 
-	// region Getters
-	// end region -> Getters
-
-	// region Setters
-	// end region -> Setters
-
-	// region Constructors
-	// end region -> Constructors
-
-	// region Public Methods
-	// end region -> Public Methods
-
 	// region Private Methods
 
 	@FXML
 	private void backButtonClick(ActionEvent backEvent)
+	{
+		openSelectedWindow(backEvent, "/boundaries/Costumer_CreateReservation.fxml");
+	}
+	
+	@FXML 
+	private void paymentButtonClick(ActionEvent paymentEvent) {
+		Costumer_SavedData.setReservationList();
+		if (Costumer_SavedData.getSubscription() == CostumerSubscription.None) {
+			openSelectedWindow(paymentEvent, "/boundaries/Costumer_PaymentCreditCard.fxml");
+		}
+		else {
+			/* TODO Yoni: Send the reservation to the server. */
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Attention");
+			alert.setHeaderText(null);
+			alert.setContentText("Reservation completed. Thanks for using our application.");
+			alert.showAndWait();
+			openSelectedWindow(paymentEvent, "/boundaries/Costumer_CreateReservation.fxml");
+		}
+	}
+	
+	private void openSelectedWindow(ActionEvent event, String fxmlPath)
 	{
 		try {
 			/* Clear client handlers. */
@@ -96,10 +111,10 @@ public class Costumer_CreateReservationCatalogController
 			m_client.setMessagesHandler(null);
 
 			/* Hide the current window. */
-			((Node) backEvent.getSource()).getScene().getWindow().hide();
+			((Node) event.getSource()).getScene().getWindow().hide();
 			Stage primaryStage = new Stage();
 			FXMLLoader loader = new FXMLLoader();
-			Pane root = loader.load(getClass().getResource("/boundaries/Costumer_CreateReservation.fxml").openStream());
+			Pane root = loader.load(getClass().getResource(fxmlPath).openStream());
 
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
@@ -111,27 +126,6 @@ public class Costumer_CreateReservationCatalogController
 			String msg = "Failed to load the next window";
 			m_logger.severe(msg + ", excepion: " + e.getMessage());
 		}
-	}
-
-	/**
-	 * Parse string to the product type.
-	 * 
-	 * @param stringItemType
-	 *            Input string.
-	 * @return The product type.
-	 */
-	private ProductType ParseStringToProductType(String stringItemType)
-	{
-		if (stringItemType.equalsIgnoreCase("Flower")) {
-			return ProductType.Flower;
-		} else if (stringItemType.equalsIgnoreCase("FlowerPot")) {
-			return ProductType.FlowerPot;
-		} else if (stringItemType.equalsIgnoreCase("BridalBouquet")) {
-			return ProductType.BridalBouquet;
-		} else if (stringItemType.equalsIgnoreCase("FlowerArrangement")) {
-			return ProductType.FlowerArrangement;
-		}
-		return null;
 	}
 
 	// end region -> Private Methods
@@ -179,39 +173,58 @@ public class Costumer_CreateReservationCatalogController
 
 	private void initializeTable()
 	{
-		getCatalogFromServer();
-
-		catalog_table.setRowFactory(param -> {
-			TableRow<CatalogItemRow> tableRow = new TableRow<>();
-			tableRow.setOnMouseClicked(event -> {
-				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
-					CatalogItemRow rowData = tableRow.getItem();
-					ItemEntity newItemEntity = new ItemEntity(rowData.getM_id(), rowData.getName(),
-							ParseStringToProductType(rowData.getType()), rowData.getM_price(),
-							rowData.getM_domainColor(), rowData.getM_image());
-					Costumer_SavedData.addReservation(newItemEntity);
-				}
-			});
-			return tableRow;
-		});
+		gatherReservationList();
 
 		tablecolumn_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
 		tablecolumn_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
-		tablecolumn_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
+		tablecolumn_amount.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("amount"));
 		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Double>("price"));
-		tablecolumn_image.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, ImageView>("image"));
 
 		catalog_table.setItems(catalog);
 		catalog_table.refresh();
 	}
-
-	private void getCatalogFromServer()
+	
+	/**
+	 * Gather the reservation items and count the amounts of each item.
+	 */
+	private void gatherReservationList()
 	{
-		// TODO Yoni: get catalog list from server.
-		catalog.add(new CatalogItemRow(1, "Rose", "Flower", 19.99, "red"));
-		catalog.add(new CatalogItemRow(2, "Rose2", "Flower2", 29.99, "blue"));
-		catalog.add(new CatalogItemRow(3, "Rose3", "Flower3", 39.99, "red"));
-		catalog.add(new CatalogItemRow(4, "Rose4", "Flower4", 49.99, "blue"));
+		HashMap<Integer, CatalogItemRow> gatheredReservation = new HashMap<>();
+		ArrayList<CatalogItemRow> gatheredCustomized = new ArrayList<>();
+		/*
+		 * Separate the customized items with the catalog ones.
+		 */
+		for (ItemEntity entity : Costumer_SavedData.getCostumerReservationList()) {
+			if (gatheredReservation.containsKey(entity.getId())
+					&& entity.getItemType() != ProductType.CustomizedArrangement) {
+				CatalogItemRow item = gatheredReservation.get(entity.getId());
+				item.setM_amount(item.getM_amount() + 1);
+				item.setM_price(item.getM_price() + entity.getItemPrice());
+				gatheredReservation.put(entity.getId(), item);
+				continue;
+			}
+
+			CatalogItemRow itemReserve = new CatalogItemRow(entity.getId(), entity.getName(), 1, entity.getItemPrice());
+			if (entity.getItemType() == ProductType.CustomizedArrangement) {
+				gatheredCustomized.add(itemReserve);
+				continue;
+			}
+
+			gatheredReservation.put(entity.getId(), itemReserve);
+		}
+
+		double totalPrice = 0;
+		for (CatalogItemRow item : gatheredReservation.values()) {
+			totalPrice += item.getM_price();
+			catalog.add(item);
+		}
+
+		for (CatalogItemRow item : gatheredCustomized) {
+			totalPrice += item.getM_price();
+			catalog.add(item);
+		}
+		
+		total_price_label.setText(String.format("%.2f", totalPrice));
 	}
 
 	/* End of --> Initializing methods region */

@@ -119,6 +119,7 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
+		Costumer_SavedData.initializeSavedData();
 	}
 
 	private void initializeFields()

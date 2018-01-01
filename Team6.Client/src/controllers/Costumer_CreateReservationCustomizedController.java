@@ -1,8 +1,10 @@
 
 package controllers;
 
+import java.awt.Dialog;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -20,10 +22,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -33,33 +34,29 @@ import messages.Message;
 
 /**
  *
- * Costumer_CreateReservationCatalogController: Class generates a reservation
- * creation.
+ * Costumer_CreateReservationCustomizedController: Class generates a reservation
+ * customized item creation.
  * 
  */
-public class Costumer_CreateReservationCatalogController
+public class Costumer_CreateReservationCustomizedController
 		implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
-	// UI Binding Fields region
+	/* UI Binding Fields region */
 
 	// Title images :
 	@FXML private ImageView imageview_gif;
 
 	@FXML private ImageView imageview_title;
 
-	@FXML private TableView<CatalogItemRow> catalog_table;
+	@FXML private TextField domain_color;
 
-	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_id;
+	@FXML private TextField min_price;
 
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_name;
+	@FXML private TextField max_price;
 
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_type;
+	@FXML private TextField item_amount;
 
-	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
-
-	@FXML private TableColumn<CatalogItemRow, ImageView> tablecolumn_image;
-
-	// end region -> UI Binding Fields
+	/* End region -> UI Binding Fields */
 
 	/* Fields region */
 
@@ -70,6 +67,8 @@ public class Costumer_CreateReservationCatalogController
 	private ClientConfiguration m_configuration;
 
 	ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
+
+	private ArrayList<ItemEntity> m_catalogList;
 
 	/* End of --> Fields region */
 
@@ -87,6 +86,12 @@ public class Costumer_CreateReservationCatalogController
 
 	// region Private Methods
 
+	/**
+	 * Return to the create reservation window.
+	 *
+	 * @param backEvent
+	 *            Button pressed event.
+	 */
 	@FXML
 	private void backButtonClick(ActionEvent backEvent)
 	{
@@ -114,25 +119,52 @@ public class Costumer_CreateReservationCatalogController
 	}
 
 	/**
-	 * Parse string to the product type.
-	 * 
-	 * @param stringItemType
-	 *            Input string.
-	 * @return The product type.
+	 * Find a matching item in the catalog and add it to the reservation list.
+	 *
+	 * @param addEvent
+	 *            Button pressed event.
 	 */
-	private ProductType ParseStringToProductType(String stringItemType)
+	@FXML
+	private void addButtonClick(ActionEvent addEvent)
 	{
-		if (stringItemType.equalsIgnoreCase("Flower")) {
-			return ProductType.Flower;
-		} else if (stringItemType.equalsIgnoreCase("FlowerPot")) {
-			return ProductType.FlowerPot;
-		} else if (stringItemType.equalsIgnoreCase("BridalBouquet")) {
-			return ProductType.BridalBouquet;
-		} else if (stringItemType.equalsIgnoreCase("FlowerArrangement")) {
-			return ProductType.FlowerArrangement;
+		if (domain_color.getText().equals("") || min_price.getText().equals("") || max_price.getText().equals("")
+				|| item_amount.getText().equals("")) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Attention");
+			alert.setHeaderText(null);
+			alert.setContentText("You left empty fields.");
+			alert.show();
+			return;
 		}
-		return null;
-	}
+
+		ItemEntity reservation = null;
+		for (ItemEntity entity : m_catalogList) {
+			if (entity.getColor().equals(domain_color.getText())
+					&& (entity.getItemPrice() >= Double.parseDouble(min_price.getText())
+							&& entity.getItemPrice() <= Double.parseDouble(max_price.getText()))
+					&& entity.getItemType() == ProductType.Flower) {
+				// Check the following:
+				// 1. Domain color as requested.
+				// 2. Price is in range.
+				// 3. The entity is of the type 'Flower'.
+				reservation = new ItemEntity(entity.getId(), entity.getName(), ProductType.CustomizedArrangement,
+						Integer.parseInt(item_amount.getText()) * entity.getItemPrice(), entity.getColor(),
+						entity.getItemImage());
+				break;
+			}
+		} /* End of --> for (ItemEntity entity : m_catalogList) */
+
+		if (reservation != null) {
+			Costumer_SavedData.addReservation(reservation);
+			backButtonClick(addEvent);
+		} else {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Attention");
+			alert.setHeaderText(null);
+			alert.setContentText("A match wasn't found, please try again.");
+			alert.show();
+		}
+	} /* End of --> private void addButtonClick(ActionEvent addEvent) */
 
 	// end region -> Private Methods
 
@@ -147,7 +179,7 @@ public class Costumer_CreateReservationCatalogController
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
-		initializeTable();
+		initializeCatalogList();
 	}
 
 	private void initializeFields()
@@ -177,41 +209,10 @@ public class Costumer_CreateReservationCatalogController
 		m_client.setClientStatusHandler(this);
 	}
 
-	private void initializeTable()
+	private void initializeCatalogList()
 	{
-		getCatalogFromServer();
-
-		catalog_table.setRowFactory(param -> {
-			TableRow<CatalogItemRow> tableRow = new TableRow<>();
-			tableRow.setOnMouseClicked(event -> {
-				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
-					CatalogItemRow rowData = tableRow.getItem();
-					ItemEntity newItemEntity = new ItemEntity(rowData.getM_id(), rowData.getName(),
-							ParseStringToProductType(rowData.getType()), rowData.getM_price(),
-							rowData.getM_domainColor(), rowData.getM_image());
-					Costumer_SavedData.addReservation(newItemEntity);
-				}
-			});
-			return tableRow;
-		});
-
-		tablecolumn_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
-		tablecolumn_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
-		tablecolumn_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
-		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Double>("price"));
-		tablecolumn_image.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, ImageView>("image"));
-
-		catalog_table.setItems(catalog);
-		catalog_table.refresh();
-	}
-
-	private void getCatalogFromServer()
-	{
-		// TODO Yoni: get catalog list from server.
-		catalog.add(new CatalogItemRow(1, "Rose", "Flower", 19.99, "red"));
-		catalog.add(new CatalogItemRow(2, "Rose2", "Flower2", 29.99, "blue"));
-		catalog.add(new CatalogItemRow(3, "Rose3", "Flower3", 39.99, "red"));
-		catalog.add(new CatalogItemRow(4, "Rose4", "Flower4", 49.99, "blue"));
+		/* TODO Yoni: Get catalog from the server. */
+		m_catalogList = new ArrayList<>();
 	}
 
 	/* End of --> Initializing methods region */

@@ -3,6 +3,7 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -16,7 +17,10 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -27,8 +31,8 @@ import messages.Message;
 
 /**
  *
- * CompanyEmployeeController: Class controls the events and action in the
- * costumer menu UI.
+ * Costumer_CreateReservationController: Class controls the events and action in
+ * the costumer menu UI.
  * 
  */
 public class Costumer_CreateReservationController
@@ -40,14 +44,6 @@ public class Costumer_CreateReservationController
 	@FXML private ImageView imageview_gif;
 
 	@FXML private ImageView imageview_title;
-
-	@FXML private AnchorPane create_reservation_anchor;
-
-	@FXML private Button show_catalog_button;
-
-	@FXML private Button customize_item_button;
-
-	@FXML private Button back_to_menu;
 
 	/* End of --> UI Binding Fields region */
 
@@ -64,25 +60,62 @@ public class Costumer_CreateReservationController
 	/* UI events region */
 
 	/**
-	 * 
 	 * @param openCatalog
 	 *            press on the open catalog button.
 	 */
 	@FXML
-	public void openCatalogClick(ActionEvent openCatalog) throws Exception
+	public void openCatalogClick(ActionEvent openCatalog)
 	{
 		openSelectedWindow(openCatalog, "/boundaries/Costumer_CreateReservationCatalog.fxml");
 	}
 
 	/**
-	 * 
 	 * @param customizeItem
 	 *            press on the customize item button.
 	 */
 	@FXML
 	public void customizeItemClick(ActionEvent customizeItem)
 	{
-		// openSelectedWindow(customizeItem, "/boundaries/Costumer_CustomizeItem.fxml");
+		openSelectedWindow(customizeItem, "/boundaries/Costumer_CreateReservationCustomized.fxml");
+	}
+
+	/**
+	 * @param backEvent
+	 *            press on the back button.
+	 */
+	@FXML
+	public void backButtonClick(ActionEvent backEvent)
+	{
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Attention");
+		alert.setHeaderText(null);
+		alert.setContentText("This action will cause a loss of the reservation, are you sure?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK) {
+			openSelectedWindow(backEvent, "/boundaries/Costumer.fxml");
+		}
+
+	}
+
+	/**
+	 * Gather all the items the user selected and go to the payment screen.
+	 *
+	 * @param paymentEvent
+	 */
+	@FXML
+	private void paymentButtonClick(ActionEvent paymentEvent)
+	{
+		if (Costumer_SavedData.getCostumerReservationList().isEmpty()) {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Attention");
+			alert.setHeaderText(null);
+			alert.setContentText("Your items cart is empty.");
+			alert.showAndWait();
+			return;
+		}
+		
+		openSelectedWindow(paymentEvent, "/boundaries/Costumer_CreateReservationPayment.fxml");
 	}
 
 	private void openSelectedWindow(ActionEvent event, String fxmlPath)
