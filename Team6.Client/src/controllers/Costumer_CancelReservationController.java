@@ -56,13 +56,7 @@ public class Costumer_CancelReservationController
 
 	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_id;
 
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_name;
-
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_type;
-
 	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
-
-	@FXML private TableColumn<CatalogItemRow, ImageView> tablecolumn_image;
 
 	// end region -> UI Binding Fields
 
@@ -78,24 +72,12 @@ public class Costumer_CancelReservationController
 
 	/* End of --> Fields region */
 
-	// region Getters
-	// end region -> Getters
-
-	// region Setters
-	// end region -> Setters
-
-	// region Constructors
-	// end region -> Constructors
-
-	// region Public Methods
-	// end region -> Public Methods
-
 	// region Private Methods
 
 	@FXML
 	private void backButtonClick(ActionEvent backEvent)
 	{
-		openSelectedWindow(backEvent, "/boundaries/Costumer_CreateReservation.fxml");
+		openSelectedWindow(backEvent, "/boundaries/Costumer.fxml");
 	}
 
 	private void openSelectedWindow(ActionEvent event, String fxmlPath)
@@ -231,7 +213,7 @@ public class Costumer_CancelReservationController
 			
 			ReservationEntity reservation = (ReservationEntity)entity;
 			m_reservationList.add(reservation);
-			CatalogItemRow itemRow = new CatalogItemRow(reservation.getId(), null, null, reservation.getTotalPrice(), null);
+			CatalogItemRow itemRow = new CatalogItemRow(reservation.getId(), null, reservation.getTotalPrice(), null, null, null);
 			reservationTableList.add(itemRow);
 		}
 		

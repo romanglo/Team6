@@ -24,8 +24,6 @@ public class CatalogItemRow
 
 	private String m_type;
 
-	private Integer m_amount;
-
 	private Double m_price;
 
 	private String m_domainColor;
@@ -91,8 +89,6 @@ public class CatalogItemRow
 	 *            Unique item ID.
 	 * @param name
 	 *            Item name.
-	 * @param amount
-	 *            Item amount.
 	 * @param price
 	 *            Summered price.
 	 * @param m_image
@@ -102,7 +98,7 @@ public class CatalogItemRow
 	 * @param type
 	 *            Type of the item.
 	 */
-	public CatalogItemRow(int id, String name, int amount, double price, Image m_image, String domainColor, String type)
+	public CatalogItemRow(int id, String name, double price, Image m_image, String domainColor, String type)
 	{
 		super();
 		this.m_id = id;
@@ -110,7 +106,6 @@ public class CatalogItemRow
 		this.m_type = type;
 		this.m_price = price;
 		this.m_domainColor = domainColor;
-		this.m_amount = amount;
 		this.m_image = ResizeImage(m_image);
 	}
 
@@ -231,31 +226,6 @@ public class CatalogItemRow
 	public void setM_type(String m_type)
 	{
 		this.m_type = m_type;
-	}
-
-	/**
-	 * @return Item amount.
-	 */
-	public Integer getM_amount()
-	{
-		return m_amount;
-	}
-
-	/**
-	 * @return String item amount.
-	 */
-	public String getAmount()
-	{
-		return m_amount.toString();
-	}
-
-	/**
-	 * @param m_amount
-	 *            Item amount to set.
-	 */
-	public void setM_amount(Integer m_amount)
-	{
-		this.m_amount = m_amount;
 	}
 
 	/**

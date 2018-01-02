@@ -78,6 +78,19 @@ public class MessagesFactory
 	{
 		return createEntityMessage(entity, EntityDataOperation.UpdateAll);
 	}
+	
+	/**
+	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
+	 * with {@link EntityDataOperation#Add} operation.
+	 *
+	 * @param entity
+	 *            The entity to add to message.
+	 * @return An {@link Message}.
+	 */
+	public static Message createAddEntityMessage(IEntity entity)
+	{
+		return createEntityMessage(entity, EntityDataOperation.Add);
+	}
 
 	private static Message createEntityMessage(IEntity entity, EntityDataOperation entityDataOperation)
 	{
