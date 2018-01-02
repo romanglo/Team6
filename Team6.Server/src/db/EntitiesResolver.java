@@ -5,12 +5,17 @@ import java.sql.Blob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import entities.CostumerEntity;
+import entities.CostumerSubscription;
 import entities.IEntity;
 import entities.ItemEntity;
 import entities.ProductType;
+import entities.ReservationEntity;
+import entities.ReservationType;
 import entities.UserEntity;
 import entities.UserPrivilege;
 import entities.UserStatus;
@@ -91,6 +96,49 @@ public class EntitiesResolver {
 
 	/**
 	 * The method received {@link ResultSet} and resolve it to {@link List} of
+	 * {@link CostumerEntity}.
+	 *
+	 * @param resultSet
+	 *            A {@link ResultSet} which will be resolved in it to {@link List}
+	 *            of {@link CostumerEntity}.
+	 * @return An {@link List} of {@link CostumerEntity} if the resolving succeed,
+	 *         and <code>null</code> if did not.
+	 */
+	public static List<IEntity> ResultSetToCostumerEntities(ResultSet resultSet) {
+		loggerLazyLoading();
+
+		if (resultSet == null) {
+			s_logger.warning("EntitiesResolver received null ResultSet parameter");
+			return null;
+		}
+
+		ArrayList<IEntity> costumerEntities = new ArrayList<>();
+		int failedResolve = 0;
+		try {
+			while (resultSet.next()) {
+				try {
+					int id = resultSet.getInt(1);
+					String creditCard = resultSet.getString(3);
+					CostumerSubscription costumerSubscription = CostumerSubscription.valueOf(resultSet.getString(4));
+					float refund = resultSet.getFloat(5);
+					costumerEntities.add(new CostumerEntity(id, creditCard, costumerSubscription, (double) refund));
+				} catch (Exception ignored) {
+					failedResolve++;
+				}
+			}
+		} catch (SQLException e) {
+			s_logger.warning("Failed to resolve an ResultSet to CostumerEntity, exception:" + e.getMessage());
+			return null;
+		}
+
+		if (failedResolve != 0) {
+			s_logger.warning("Failed to resolve " + failedResolve + " rows to CostumerEntity");
+		}
+		return costumerEntities.isEmpty() ? null : costumerEntities;
+	}
+
+	/**
+	 * The method received {@link ResultSet} and resolve it to {@link List} of
 	 * {@link UserEntity}.
 	 *
 	 * @param resultSet
@@ -137,6 +185,49 @@ public class EntitiesResolver {
 
 	/**
 	 * The method received {@link ResultSet} and resolve it to {@link List} of
+	 * {@link ReservationEntity}.
+	 *
+	 * @param resultSet
+	 *            A {@link ResultSet} which will be resolved in it to {@link List}
+	 *            of {@link UserEntity}.
+	 * @param costumerId
+	 *            if the resolving succeed this array in place 0 will contain the costumer
+	 *            ID.
+	 * @param itemsList
+	 *            if the resolving succeed this parameter will contain a
+	 *            {@link List} with {@link ItemEntity} IDs.
+	 * @return A {@link ReservationEntity} if the resolving succeed, and
+	 *         <code>null</code> if did not.
+	 */
+	public static IEntity ResultSetToReservationEntities(ResultSet resultSet, String[] costumerId,
+			List<String> itemsList) {
+		loggerLazyLoading();
+
+		if (resultSet == null) {
+			s_logger.warning("EntitiesResolver received null ResultSet parameter");
+			return null;
+		}
+
+		IEntity reservationEntity = null;
+
+		try {
+			int reservationId = resultSet.getInt(1);
+			costumerId[0] = resultSet.getString(2);
+			ReservationType reservationType = Enum.valueOf(ReservationType.class, resultSet.getString(3));
+
+			String itemsString = resultSet.getString(4);
+			String[] items = itemsString.split(",");
+			itemsList.addAll(Arrays.asList(items));
+			float price = resultSet.getFloat(5);
+			reservationEntity = new ReservationEntity(reservationId, reservationType,(double)price);
+		} catch (Exception e) {
+			s_logger.warning("Failed to resolve an ResultSet to ReservationEntity, exception:" + e.getMessage());
+		}
+		return reservationEntity;
+	}
+
+	/**
+	 * The method received {@link ResultSet} and resolve it to {@link List} of
 	 * {@link UserEntity}.
 	 * 
 	 * @param <TData>
@@ -165,9 +256,10 @@ public class EntitiesResolver {
 			returningList = ResultSetToUserEntities(resultSet);
 		} else if (expectedType.equals(ItemEntity.class)) {
 			returningList = ResultSetToItemEntities(resultSet);
+		} else if (expectedType.equals(CostumerEntity.class)) {
+			returningList = ResultSetToCostumerEntities(resultSet);
 		}
 
 		return returningList;
 	}
-
 }

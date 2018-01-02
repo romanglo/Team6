@@ -4,12 +4,15 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import connectivity.Server;
+import entities.CostumerEntity;
 import entities.IEntity;
 import entities.ItemEntity;
+import entities.ReservationEntity;
 import entities.UserEntity;
 import entities.UserStatus;
 import javafx.scene.image.Image;
@@ -111,19 +114,19 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return loginData;
 		}
 
-		if(loginData.isLogoutMessage()) {
-			if(userEntity.getUserStatus() == UserStatus.Connected) {
+		if (loginData.isLogoutMessage()) {
+			if (userEntity.getUserStatus() == UserStatus.Connected) {
 				userEntity.setUserStatus(UserStatus.Disconnected);
 				onUserEntityReceived(userEntity, EntityDataOperation.Update);
 			}
 			return null;
 		}
-		
+
 		if (userEntity.getUserStatus() == UserStatus.Disconnected) {
-			//TODO ROMAN - uncomment it when disconnected message will arrive.
-//			userEntity.setUserStatus(UserStatus.Connected);
-//			onUserEntityReceived(userEntity, EntityDataOperation.Update);
-//			userEntity.setUserStatus(UserStatus.Disconnected);
+			// TODO ROMAN - uncomment it when disconnected message will arrive.
+			// userEntity.setUserStatus(UserStatus.Connected);
+			// onUserEntityReceived(userEntity, EntityDataOperation.Update);
+			// userEntity.setUserStatus(UserStatus.Disconnected);
 		}
 
 		return userEntityData;
@@ -142,6 +145,11 @@ public class MessagesResolver implements Server.MessagesHandler {
 			returnedMessageData = onUserEntityReceived((UserEntity) receivedEntity, entityData.getOperation());
 		} else if (receivedEntity instanceof ItemEntity) {
 			returnedMessageData = onItemEntityReceived((ItemEntity) receivedEntity, entityData.getOperation());
+		} else if (receivedEntity instanceof CostumerEntity) {
+			returnedMessageData = onCosutmerEntityReceived((CostumerEntity) receivedEntity, entityData.getOperation());
+		} else if (receivedEntity instanceof ReservationEntity) {
+			returnedMessageData = onReservationEntityReceived((ReservationEntity) receivedEntity,
+					entityData.getOperation());
 		}
 
 		return returnedMessageData;
@@ -286,7 +294,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return null;
 		}
 
-		String selectQuery = "SELECT * FROM items WHERE iId = " + id + " AND iDeleted = 0;";
+		String selectQuery = "SELECT * FROM items WHERE iId = " + id + ';';
 		ResultSet queryResult = null;
 
 		try {
@@ -421,4 +429,303 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	// end region -> UserEntity Operations
 
+	// region -> CostumerEntity Operations
+
+	private IMessageData onCosutmerEntityReceived(CostumerEntity costumerEntity, EntityDataOperation operation) {
+		switch (operation) {
+		case Get:
+			return getCostumerEntityExecution(costumerEntity);
+		case GetALL:
+			return getAllCostumerEntitiesExecution();
+		case Update:
+			updateCostumerEntityExecution(costumerEntity);
+			break;
+		default:
+			break;
+		}
+		return null;
+	}
+
+	private IMessageData getCostumerEntityExecution(CostumerEntity costumer) {
+		UserEntity userEntity = costumer.getUserEntity();
+		Integer costumerId = costumer.getId();
+		if (userEntity == null && costumerId == null) {
+			m_logger.warning("Received request to get costumer entity without any identification data.");
+			return null;
+		}
+
+		String selectQuery = null;
+		if (!(costumerId != null && costumerId >= 1)) {
+			String userName = userEntity.getUserName();
+			if (!(userName != null && !userName.isEmpty())) {
+				m_logger.warning("Received request to get costumer entity without any identification data.");
+				return null;
+			}
+			selectQuery = "SELECT * FROM costumers WHERE uUserName = '" + userName + "';";
+		} else {
+			selectQuery = "SELECT * FROM costumers WHERE cid = " + costumerId + ";";
+		}
+
+		ResultSet queryResult = null;
+
+		try {
+			queryResult = m_dbController.executeSelectQuery(selectQuery);
+			List<IEntity> costumersEntities = EntitiesResolver.ResultSetToCostumerEntities(queryResult);
+			if (costumersEntities == null) {
+				return null;
+			}
+			return new EntityData(EntityDataOperation.None, costumersEntities.get(0));
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute get costumer entities request! query: " + selectQuery
+					+ ", exception: " + e.getMessage());
+		} finally {
+			if (queryResult != null) {
+				try {
+					queryResult.close();
+				} catch (SQLException e) {
+					m_logger.warning("Failed on try to close the ResultSet of the executed query:" + selectQuery
+							+ ". Exception: " + e.getMessage());
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private IMessageData getAllCostumerEntitiesExecution() {
+		String selectQuery = "SELECT * FROM costumers;";
+		ResultSet queryResult = null;
+
+		try {
+			queryResult = m_dbController.executeSelectQuery(selectQuery);
+			List<IEntity> costumerEntities = EntitiesResolver.ResultSetToCostumerEntities(queryResult);
+			if (costumerEntities == null) {
+				return null;
+			}
+			return costumerEntities.isEmpty() ? null : new EntitiesListData(EntityDataOperation.None, costumerEntities);
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute get all costumer entities request! query: " + selectQuery
+					+ ", exception: " + e.getMessage());
+		} finally {
+			if (queryResult != null) {
+				try {
+					queryResult.close();
+				} catch (SQLException e) {
+					m_logger.warning("Failed on try to close the ResultSet of the executed query:" + selectQuery
+							+ ". Exception: " + e.getMessage());
+				}
+			}
+		}
+		return null;
+	}
+
+	private boolean updateCostumerEntityExecution(CostumerEntity costumerEntity) {
+		if (costumerEntity == null) {
+			return false;
+		}
+
+		Integer id = costumerEntity.getId();
+		if (!(id != null && id >= 1)) {
+			return false;
+		}
+		try {
+
+			String query = "UPDATE costumers SET cCreditCard = \'" + costumerEntity.getCreditCard()
+					+ "\' , cCostumerSubscription = \'" + costumerEntity.getSubscription().toString()
+					+ "\' , uRefund = " + costumerEntity.getCostumerRefunds() + " WHERE cId = " + id + ';';
+			return m_dbController.executeQuery(query);
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute update query of: " + costumerEntity.toString() + ", exception: "
+					+ e.getMessage());
+		}
+		return false;
+	}
+
+	// end region
+
+	// region -> CostumerEntity Operations
+
+	private IMessageData onReservationEntityReceived(ReservationEntity reservationEntity,
+			EntityDataOperation operation) {
+		switch (operation) {
+		case Get:
+			return getReservationEntityExecution(reservationEntity);
+		case GetALL:
+			return getAllReservationEntitiesExecution();
+		case Update:
+			updateReservationEntityExecution(reservationEntity);
+			break;
+		case Add:
+			addReservationEntityExecution(reservationEntity);
+			break;
+		default:
+			break;
+		}
+		return null;
+	}
+
+	private IMessageData getReservationEntityExecution(ReservationEntity reservation) {
+		int id = reservation.getId();
+		if (id < 1) { // Wrong ID
+			m_logger.warning("Received request to get reservation entity with impossiable id: " + id);
+			return null;
+		}
+
+		String selectQuery = "SELECT * FROM reservations WHERE rId = " + id + ';';
+		ResultSet queryResult = null;
+
+		try {
+			queryResult = m_dbController.executeSelectQuery(selectQuery);
+			queryResult.next();
+
+			IEntity entity = createReservationEntity(queryResult);
+
+			return new EntityData(EntityDataOperation.None, entity);
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute get reservation entity request! query: " + selectQuery
+					+ ", exception: " + e.getMessage());
+		} finally {
+			if (queryResult != null) {
+				try {
+					queryResult.close();
+				} catch (SQLException e) {
+					m_logger.warning("Failed on try to close the ResultSet of the executed query:" + selectQuery
+							+ ". Exception: " + e.getMessage());
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private ReservationEntity createReservationEntity(ResultSet resultSet) {
+		String[] costumerId = new String[1];
+		ArrayList<String> itemsList = new ArrayList<>();
+		ReservationEntity entity = (ReservationEntity) EntitiesResolver.ResultSetToReservationEntities(resultSet,
+				costumerId, itemsList);
+		if (entity == null) {
+			return null;
+		}
+
+		int costumerIdInt = Integer.parseInt(costumerId[0]);
+		CostumerEntity costumerEntity = new CostumerEntity(costumerIdInt);
+		EntityData costumerEntityData = (EntityData) getCostumerEntityExecution(costumerEntity);
+
+		costumerEntity = (CostumerEntity) (costumerEntityData.getEntity());
+		entity.setCostumer(costumerEntity);
+
+		for (String itemID : itemsList) {
+			int intId = Integer.parseInt(itemID);
+			ItemEntity itemEntity = new ItemEntity(intId);
+			EntityData itemEntityData = (EntityData) getItemEntityExecution(itemEntity);
+			itemEntity = (ItemEntity) itemEntityData.getEntity();
+			entity.addReservation(itemEntity);
+		}
+
+		return entity;
+	}
+
+	private IMessageData getAllReservationEntitiesExecution() {
+		String selectQuery = "SELECT * FROM reservations;";
+		ResultSet queryResult = null;
+
+		try {
+			List<IEntity> reservationEntities = new ArrayList<>();
+			queryResult = m_dbController.executeSelectQuery(selectQuery);
+			while (queryResult.next()) {
+				IEntity entity = createReservationEntity(queryResult);
+				reservationEntities.add(entity);
+			}
+			return reservationEntities.isEmpty() ? null
+					: new EntitiesListData(EntityDataOperation.None, reservationEntities);
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute get all reservation entities request!query: \"" + selectQuery
+					+ "\", exception: " + e.getMessage());
+		} finally {
+			if (queryResult != null) {
+				try {
+					queryResult.close();
+				} catch (SQLException e) {
+					m_logger.warning("Failed on try to close the ResultSet of the executed query:\"" + selectQuery
+							+ "\". Exception: " + e.getMessage());
+				}
+			}
+		}
+		return null;
+	}
+
+	private boolean updateReservationEntityExecution(ReservationEntity reservationEntity) {
+		if (reservationEntity == null) {
+			return false;
+		}
+
+		Integer reservationId = reservationEntity.getId();
+		Integer costumerId = reservationEntity.getCostumerId();
+
+		if (!(reservationId != null && reservationId >= 1) || !(costumerId != null && costumerId >= 1)) {
+			return false;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		ArrayList<ItemEntity> reservationList = reservationEntity.getReservationList();
+		for (int i = 0, size = reservationList.size(); i < size; i++) {
+			ItemEntity item = reservationList.get(i);
+			stringBuilder.append(item.getId());
+			if (i - 1 == size) {
+				stringBuilder.append(',');
+			}
+		}
+
+		try {
+			String query = "UPDATE reservations SET rType = '" + reservationEntity.getType() + "' , rItems = '"
+					+ stringBuilder.toString() + "', rPrice = " + reservationEntity.getTotalPrice() + " WHERE cId = "
+					+ costumerId + " AND rid = " + reservationId + ';';
+			return m_dbController.executeQuery(query);
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute update query of: " + reservationEntity.toString()
+					+ ", exception: " + e.getMessage());
+		}
+		return false;
+	}
+
+	private boolean addReservationEntityExecution(ReservationEntity reservationEntity) {
+		if (reservationEntity == null) {
+			return false;
+		}
+
+		Integer costumerId = reservationEntity.getCostumerId();
+
+		if (!(costumerId != null && costumerId >= 1)) {
+			return false;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		ArrayList<ItemEntity> reservationList = reservationEntity.getReservationList();
+		for (int i = 0, size = reservationList.size(); i < size; i++) {
+			ItemEntity item = reservationList.get(i);
+			stringBuilder.append(item.getId());
+			if (i < size - 1) {
+				stringBuilder.append(',');
+			}
+		}
+
+		try {
+			String query = "INSERT INTO reservations (cId,rType,rItems,rPrice) VALUES (" + costumerId + ",'"
+					+ reservationEntity.getType() + "','" + stringBuilder.toString() + "',"
+					+ reservationEntity.getTotalPrice() + ");";
+			return m_dbController.executeQuery(query);
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute update query of: " + reservationEntity.toString()
+					+ ", exception: " + e.getMessage());
+		}
+		return false;
+	}
+	// end region
 }

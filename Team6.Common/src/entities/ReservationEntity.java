@@ -88,23 +88,23 @@ public class ReservationEntity implements IEntity
 	/**
 	 * Upgrade the ID of the reservation.
 	 *
-	 * @param m_id
+	 * @param id
 	 *            the m_id to set
 	 */
-	public void setId(Integer m_id)
+	public void setId(Integer id)
 	{
-		this.m_id = m_id;
+		m_id = id;
 	}
 
 	/**
 	 * Upgrade the total price of the reservation.
 	 *
-	 * @param m_totalPrice
+	 * @param totalPrice
 	 *            the m_totalPrice to set
 	 */
-	public void setTotalPrice(Double m_totalPrice)
+	public void setTotalPrice(Double totalPrice)
 	{
-		this.m_totalPrice = m_totalPrice;
+		m_totalPrice = totalPrice;
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class ReservationEntity implements IEntity
 	 */
 	public void setCostumer(CostumerEntity costumer)
 	{
-		this.m_costumer = costumer;
+		m_costumer = costumer;
 	}
 
 	/**
@@ -126,40 +126,40 @@ public class ReservationEntity implements IEntity
 	 */
 	public void setCostumerId(Integer costumerId)
 	{
-		this.m_costumer.setId(costumerId);
+		m_costumer.setId(costumerId);
 	}
 
 	/**
 	 * Upgrade the {@link ReservationType}.
 	 *
-	 * @param m_reservationType
+	 * @param reservationType
 	 *            the m_reservationType to set
 	 */
-	public void setType(ReservationType m_reservationType)
+	public void setType(ReservationType reservationType)
 	{
-		this.m_reservationType = m_reservationType;
+		m_reservationType = reservationType;
 	}
 
 	/**
 	 * Upgrade the {@link ItemEntity} list of the reservation.
 	 *
-	 * @param m_reservationList
+	 * @param reservationList
 	 *            the m_reservationList to set
 	 */
-	public void setReservationList(ArrayList<ItemEntity> m_reservationList)
+	public void setReservationList(ArrayList<ItemEntity> reservationList)
 	{
-		this.m_reservationList = m_reservationList;
+		m_reservationList = reservationList;
 	}
 
 	/**
 	 * Add the {@link ItemEntity} to the list.
 	 *
-	 * @param m_reservation
+	 * @param reservation
 	 *            the m_reservation to add.
 	 */
-	public void addReservation(ItemEntity m_reservation)
+	public void addReservation(ItemEntity reservation)
 	{
-		this.m_reservationList.add(m_reservation);
+		m_reservationList.add(reservation);
 	}
 
 	// end region -> Setters
@@ -195,6 +195,36 @@ public class ReservationEntity implements IEntity
 	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
 	 * messages.
 	 * 
+	 * @param id
+	 *            An unique ID of the costumer.
+	 * @param reservationType
+	 *            the m_reservationType to set The total price of the reservation.
+	 */
+	public ReservationEntity(Integer id, ReservationType reservationType)
+	{
+		this(id, reservationType, null, new ArrayList<>(), null);
+	}
+
+	/**
+	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
+	 * messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the costumer.
+	 * @param reservationType
+	 *            the m_reservationType to set The total price of the reservation.
+	 * @param total
+	 *            The total price of the reservation.
+	 */
+	public ReservationEntity(Integer id, ReservationType reservationType, Double total)
+	{
+		this(id, reservationType, null, new ArrayList<>(), total);
+	}
+
+	/**
+	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
+	 * messages.
+	 * 
 	 * @param type
 	 *            An enumerator which describes the reservation type.
 	 * @param costumerId
@@ -220,7 +250,7 @@ public class ReservationEntity implements IEntity
 	{
 		this(null, type, costumerId, new ArrayList<>(), 0.0);
 	}
-	
+
 	/**
 	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
 	 * messages.
