@@ -116,6 +116,27 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 		}
 	}
 	
+	@FXML
+	public void treatmentAnOpenComplain(ActionEvent event) 
+	{
+		try {
+		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
+		Stage primaryStage = new Stage();
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/CostumerServiceEmplyee_TreatmentAnOpenComplain.fxml"));
+		Parent root = loader.load();
+		Scene scene = new Scene(root);			
+		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+		primaryStage.setScene(scene);		
+		primaryStage.show();
+		}
+		catch(Exception e)
+		{
+			String msg = "Failed on try to load the next window";
+			m_logger.severe(msg + ", excepion: " + e.getMessage());
+			showInformationMessage(msg);
+		}
+	}
+	
 	
 	
 
@@ -140,30 +161,6 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 	/* End of --> Private Methods region */
 	
 	// region Public Methods
-	
-	
-	 /**
-	 * The function create new complaint entity and new message and send it to the server. 
-	 *
-	 * @param costumer_id
-	 * 				costumer id to set
-	 * @param costumer_complaint
-	 * 						costumer complaint to set
-	 */
-	public static void setNewComplaint(int costumer_id, String costumer_complaint)
-	{
-		try {
-			ComplaintEntity entity = new ComplaintEntity(costumer_id, costumer_complaint);
-			Message msg = MessagesFactory.createEntityMessage(entity);
-			//controllers.LoginController.handleMessageFromClientUI(msg);
-		}
-		catch (NumberFormatException e) {
-			System.out.println("Failed to parse string to integer. Invalid value");
-		}
-		catch (Exception ex) {
-			System.out.println("Error when sending data for update. Exception: " + ex.getMessage());
-		}
-	}
 	
 	 /**
 	 * The function create new Specialist analysis entity and new message and send it to the server. 
