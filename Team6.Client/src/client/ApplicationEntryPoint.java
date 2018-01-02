@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import logger.LogManager;
 
 /**
@@ -118,13 +119,10 @@ public class ApplicationEntryPoint extends Application
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.setMinWidth(700);
-			primaryStage.setMinHeight(500);
-			primaryStage.setMaxWidth(700);
-			primaryStage.setMaxHeight(500);
 			primaryStage.setWidth(700);
 			primaryStage.setHeight(500);
 			primaryStage.setTitle("Zer-Li");
+			primaryStage.setResizable(false);
 			primaryStage.show();
 		}
 		catch (Exception e) {

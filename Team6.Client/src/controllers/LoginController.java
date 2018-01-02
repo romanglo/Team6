@@ -111,12 +111,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			Stage nextStage = new Stage();
 			nextStage.setScene(scene);
 			nextStage.setTitle("Zer-Li Settings");
-			nextStage.setMinWidth(300);
-			nextStage.setMinHeight(300);
-			nextStage.setMaxWidth(300);
-			nextStage.setMaxHeight(300);
-			nextStage.setWidth(300);
-			nextStage.setHeight(300);
+			nextStage.setResizable(false);
 			nextStage.initModality(Modality.WINDOW_MODAL);
 			nextStage.initOwner(currentStage);
 			nextStage.showAndWait();
@@ -366,8 +361,6 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				nextStage = new Stage();
 				nextStage.setScene(m_nextScene);
 				nextStage.setTitle("Zer-Li");
-				nextStage.setMinWidth(450);
-				nextStage.setMinHeight(450);
 				nextStage.show();
 			}
 			catch (Exception e) {
