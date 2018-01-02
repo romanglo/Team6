@@ -11,6 +11,7 @@ import client.Client;
 import entities.IEntity;
 import entities.UserEntity;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -23,7 +24,10 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logger.LogManager;
@@ -64,6 +68,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	private Logger m_logger;
 
 	private Client m_client;
+
+	private Scene m_scene;
 
 	/* End of --> Fields region */
 
@@ -125,6 +131,30 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	/* End of --> UI events region */
 
+	/**
+	 * 
+	 * This method should be called by this stage creator! The method set listener to key events.. 
+	 *
+	 * @param thisScene The scene of this stage.
+	 */
+	public void intializeKeyHandler(Scene thisScene)
+	{
+
+		m_scene = thisScene;
+		thisScene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+			final KeyCombination enterCombination = new KeyCodeCombination(KeyCode.ENTER);
+
+			@Override
+			public void handle(KeyEvent event)
+			{
+				if (enterCombination.match(event)) {
+					btn_login.fire();
+				}
+			}
+		});
+	}
+	
 	/* Initializing methods region */
 
 	/**
@@ -165,6 +195,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	{
 		m_client.setMessagesHandler(this);
 		m_client.setClientStatusHandler(this);
+
 	}
 
 	/* End of --> Initializing methods region */
@@ -321,9 +352,10 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 		m_client.setClientStatusHandler(null);
 		m_client.setMessagesHandler(null);
-
-		ApplicationEntryPoint.ConnectedUser = userEntity;
+		m_scene.setOnKeyPressed(null);
 		
+		ApplicationEntryPoint.ConnectedUser = userEntity;
+
 		Scene scene = null;
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader(url);

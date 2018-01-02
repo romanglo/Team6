@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 import com.sun.istack.internal.Nullable;
 
 import common.UncaughetExceptions;
+import controllers.LoginController;
 import entities.UserEntity;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -115,7 +116,9 @@ public class ApplicationEntryPoint extends Application
 	public void start(Stage primaryStage)
 	{
 		try {
-			Parent root = FXMLLoader.load(getClass().getResource("/boundaries/Login.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/Login.fxml"));
+			Parent root = (Parent)loader.load();
+			LoginController controller = (LoginController)loader.getController();
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -123,6 +126,7 @@ public class ApplicationEntryPoint extends Application
 			primaryStage.setHeight(500);
 			primaryStage.setTitle("Zer-Li");
 			primaryStage.setResizable(false);
+			controller.intializeKeyHandler(scene);
 			primaryStage.show();
 		}
 		catch (Exception e) {
