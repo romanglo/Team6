@@ -178,9 +178,9 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	private boolean addItemEntityExecution(ItemEntity itemEntity) {
 		try {
-			String query = "INSERT INTO items (iName,iType,iPrice,iImage) VALUES (?,?,?,?);";
+			String query = "INSERT INTO items (iName,iType,iPrice,iImage,iDomainColor) VALUES (?,?,?,?,?);";
 			PreparedStatement preparedStatement = m_dbController.getPreparedStatement(query);
-			preparedStatement.setString(1, itemEntity.getName());
+			preparedStatement.setString(1, itemEntity.getName().toLowerCase());
 			preparedStatement.setString(2, itemEntity.getItemType().toString());
 			preparedStatement.setFloat(3, itemEntity.getItemPrice().floatValue());
 
@@ -191,7 +191,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			} else {
 				preparedStatement.setNull(4, java.sql.Types.BLOB);
 			}
-
+			preparedStatement.setString(5, itemEntity.getColor().toLowerCase());
 			if (preparedStatement.executeUpdate() == 0) {
 				m_logger.info("The query: \"" + preparedStatement.toString() + "\" does not effect any row.");
 				return false;
@@ -214,15 +214,15 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return false;
 		}
 
-		String removeQuery = "DELETE * FROM items WHERE iId = " + id + " ;";
+		String removeQuery = "UPDATE items SET iDeleted = 1 WHERE iId = " + id + " ;";
 		return m_dbController.executeQuery(removeQuery);
 	}
 
 	private boolean updateItemEntityExecution(ItemEntity itemEntity) {
 		try {
-			String query = "UPDATE items SET iName = ? , iType = ? , iPrice = ? , iImage = ? WHERE iId = ?";
+			String query = "UPDATE items SET iName = ? , iType = ? , iPrice = ? , iImage = ?, iDomainColor = ? WHERE iId = ?";
 			PreparedStatement preparedStatement = m_dbController.getPreparedStatement(query);
-			preparedStatement.setString(1, itemEntity.getName());
+			preparedStatement.setString(1, itemEntity.getName().toLowerCase());
 			preparedStatement.setString(2, itemEntity.getItemType().toString());
 			preparedStatement.setFloat(3, itemEntity.getItemPrice().floatValue());
 
@@ -233,7 +233,8 @@ public class MessagesResolver implements Server.MessagesHandler {
 			} else {
 				preparedStatement.setNull(4, java.sql.Types.BLOB);
 			}
-			preparedStatement.setInt(5, itemEntity.getId());
+			preparedStatement.setString(5, itemEntity.getColor().toLowerCase());
+			preparedStatement.setInt(6, itemEntity.getId());
 
 			if (preparedStatement.executeUpdate() == 0) {
 				m_logger.info("The query: \"" + preparedStatement.toString() + "\" does not effect any row.");
@@ -251,7 +252,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	private IMessageData getAllItemEntitiesExecution() {
 
-		String selectQuery = "SELECT * FROM items;";
+		String selectQuery = "SELECT * FROM items WHERE iDeleted = 0;";
 		ResultSet queryResult = null;
 
 		try {
@@ -285,7 +286,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return null;
 		}
 
-		String selectQuery = "SELECT * FROM items WHERE iId = " + id + " ;";
+		String selectQuery = "SELECT * FROM items WHERE iId = " + id + " AND iDeleted = 0;";
 		ResultSet queryResult = null;
 
 		try {
