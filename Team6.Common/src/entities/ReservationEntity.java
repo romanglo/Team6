@@ -3,6 +3,7 @@ package entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  *
@@ -17,7 +18,7 @@ public class ReservationEntity implements IEntity
 	 * Serial version unique ID, necessary due to the class implements
 	 * {@link Serializable}
 	 */
-	private static final long serialVersionUID = 895842686810231080L;
+	private static final long serialVersionUID = 1L;
 
 	private Integer m_id;
 
@@ -28,6 +29,12 @@ public class ReservationEntity implements IEntity
 	private ReservationType m_reservationType;
 
 	private ArrayList<ItemEntity> m_reservationList;
+
+	private Date m_deliveryDate;
+
+	private ReservationDeliveryType m_deliveryType;
+
+	private String m_blessingCard;
 
 	// end region -> Fields
 
@@ -79,6 +86,30 @@ public class ReservationEntity implements IEntity
 	public ArrayList<ItemEntity> getReservationList()
 	{
 		return m_reservationList;
+	}
+
+	/**
+	 * @return Delivery date requested.
+	 */
+	public Date getDeliveryDate()
+	{
+		return m_deliveryDate;
+	}
+
+	/**
+	 * @return Delivery type.
+	 */
+	public ReservationDeliveryType getDeliveryType()
+	{
+		return m_deliveryType;
+	}
+
+	/**
+	 * @return Blessing card string.
+	 */
+	public String getBlessingCard()
+	{
+		return m_blessingCard;
 	}
 
 	// end region -> Getters
@@ -162,9 +193,75 @@ public class ReservationEntity implements IEntity
 		m_reservationList.add(reservation);
 	}
 
+	/**
+	 * Upgrade the {@link Date} of the delivery.
+	 *
+	 * @param deliveryDate
+	 *            The date of the delivery.
+	 */
+	public void setDeliveryDate(Date deliveryDate)
+	{
+		m_deliveryDate = deliveryDate;
+	}
+
+	/**
+	 * Upgrade the {@link ReservationDeliveryType} of the delivery.
+	 *
+	 * @param deliveryType
+	 *            The delivery type.
+	 */
+	public void setDeliveryType(ReservationDeliveryType deliveryType)
+	{
+		m_deliveryType = deliveryType;
+	}
+
+	/**
+	 * Upgrade the blessing card of the reservation.
+	 *
+	 * @param blessing
+	 *            The blessing string.
+	 */
+	public void setBlessingCard(String blessing)
+	{
+		m_blessingCard = blessing;
+	}
+
 	// end region -> Setters
 
 	// region Constructors
+
+	/**
+	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
+	 * messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the costumer.
+	 * @param type
+	 *            An enumerator which describes the reservation type.
+	 * @param costumerId
+	 *            The costumer id that is connected to the reservation.
+	 * @param reservationList
+	 *            The reservation list.
+	 * @param total
+	 *            The total price of the reservation.
+	 * @param deliveryDate
+	 *            The delivery date.
+	 * @param deliveryType
+	 *            The delivery type.
+	 */
+	public ReservationEntity(Integer id, ReservationType type, Integer costumerId,
+			ArrayList<ItemEntity> reservationList, Double total, Date deliveryDate,
+			ReservationDeliveryType deliveryType)
+	{
+		m_id = id;
+		m_reservationType = type;
+		m_costumer = new CostumerEntity(costumerId);
+		m_reservationList = reservationList;
+		m_totalPrice = total;
+		m_deliveryDate = deliveryDate;
+		m_deliveryType = deliveryType;
+		m_blessingCard = "";
+	}
 
 	/**
 	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
@@ -184,11 +281,7 @@ public class ReservationEntity implements IEntity
 	public ReservationEntity(Integer id, ReservationType type, Integer costumerId,
 			ArrayList<ItemEntity> reservationList, Double total)
 	{
-		m_id = id;
-		m_reservationType = type;
-		m_costumer = new CostumerEntity(costumerId);
-		m_reservationList = reservationList;
-		m_totalPrice = total;
+		this(id, type, costumerId, reservationList, total, null, null);
 	}
 
 	/**

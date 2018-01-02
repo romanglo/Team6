@@ -3,6 +3,8 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.ResourceBundle;
@@ -14,6 +16,7 @@ import client.Client;
 import entities.CostumerSubscription;
 import entities.ItemEntity;
 import entities.ProductType;
+import entities.ReservationDeliveryType;
 import entities.ReservationEntity;
 import entities.ReservationType;
 import javafx.collections.FXCollections;
@@ -27,13 +30,19 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import logger.LogManager;
 import messages.Message;
@@ -116,6 +125,9 @@ public class Costumer_CreateReservationPaymentController
 	{
 		Costumer_SavedData.setReservationList();
 		Costumer_SavedData.setTotalPrice(Double.parseDouble(total_price_label.getText()));
+		/* Check if the user want a blessing card and request a delivery date. */
+		confirmReservation();
+		
 		if (Costumer_SavedData.getSubscription() == CostumerSubscription.None) {
 			Costumer_PaymentCreditCardController.m_discount = m_discount;
 			openSelectedWindow(paymentEvent, "/boundaries/Costumer_PaymentCreditCard.fxml");
@@ -131,6 +143,68 @@ public class Costumer_CreateReservationPaymentController
 			alert.setContentText("Reservation completed. Thanks for using our application.");
 			alert.showAndWait();
 			openSelectedWindow(paymentEvent, "/boundaries/Costumer_CreateReservation.fxml");
+		}
+	}
+
+	private void confirmReservation()
+	{
+		confirmBlessingCard();
+		confirmDelivery();
+	}
+
+	private void confirmDelivery()
+	{
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Add blessing card to reservation");
+		alert.setHeaderText("Please choose the delivery method");
+		alert.setContentText(null);
+
+		CheckBox deliveryImmidiate = new CheckBox("Immidiate delivery");
+		DatePicker deliveryDate = new DatePicker(LocalDate.now());
+
+		GridPane expContent = new GridPane();
+		expContent.setMaxWidth(Double.MAX_VALUE);
+		expContent.add(deliveryImmidiate, 0, 0);
+		expContent.add(deliveryDate, 1, 0);
+
+		alert.getDialogPane().setExpandableContent(expContent);
+		alert.showAndWait();
+
+		if (deliveryImmidiate.isSelected()) {
+			Costumer_SavedData.setDeliveryDate(Date.valueOf(LocalDate.now()));
+			Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Immidiate);
+		} else {
+			Costumer_SavedData.setDeliveryDate(Date.valueOf(deliveryDate.getValue()));
+			Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Future);
+		}
+	}
+
+	private void confirmBlessingCard()
+	{
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Add blessing card to reservation");
+		alert.setHeaderText(null);
+		alert.setContentText(null);
+
+		CheckBox blessingCheckBox = new CheckBox("Add blessing card");
+		TextArea blessingTextArea = new TextArea();
+		blessingTextArea.setWrapText(true);
+
+		blessingTextArea.setMaxWidth(Double.MAX_VALUE);
+		blessingTextArea.setMaxHeight(Double.MAX_VALUE);
+		GridPane.setVgrow(blessingTextArea, Priority.ALWAYS);
+		GridPane.setHgrow(blessingTextArea, Priority.ALWAYS);
+
+		GridPane expContent = new GridPane();
+		expContent.setMaxWidth(Double.MAX_VALUE);
+		expContent.add(blessingCheckBox, 0, 0);
+		expContent.add(blessingTextArea, 0, 1);
+
+		alert.getDialogPane().setExpandableContent(expContent);
+		alert.showAndWait();
+
+		if (blessingCheckBox.isSelected()) {
+			Costumer_SavedData.setBlessingCard(blessingTextArea.getText());
 		}
 	}
 

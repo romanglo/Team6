@@ -2,10 +2,12 @@
 package controllers;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import entities.CostumerEntity;
 import entities.CostumerSubscription;
 import entities.ItemEntity;
+import entities.ReservationDeliveryType;
 import entities.ReservationEntity;
 import entities.ReservationType;
 
@@ -97,6 +99,30 @@ public class Costumer_SavedData
 	public static ReservationType getType()
 	{
 		return s_reservationEntity.getType();
+	}
+	
+	/**
+	 * @return Delivery date requested.
+	 */
+	public static Date getDeliveryDate()
+	{
+		return s_reservationEntity.getDeliveryDate();
+	}
+
+	/**
+	 * @return Delivery type.
+	 */
+	public static ReservationDeliveryType getDeliveryType()
+	{
+		return s_reservationEntity.getDeliveryType();
+	}
+
+	/**
+	 * @return Blessing card string.
+	 */
+	public static String getBlessingCard()
+	{
+		return s_reservationEntity.getBlessingCard();
 	}
 
 	// end region -> Getters
@@ -200,6 +226,39 @@ public class Costumer_SavedData
 	public static void setType(ReservationType m_reservationType)
 	{
 		s_reservationEntity.setType(m_reservationType);
+	}
+	
+	/**
+	 * Upgrade the {@link Date} of the delivery.
+	 *
+	 * @param deliveryDate
+	 *            The date of the delivery.
+	 */
+	public static void setDeliveryDate(Date deliveryDate)
+	{
+		s_reservationEntity.setDeliveryDate(deliveryDate);
+	}
+
+	/**
+	 * Upgrade the {@link ReservationDeliveryType} of the delivery.
+	 *
+	 * @param deliveryType
+	 *            The delivery type.
+	 */
+	public static void setDeliveryType(ReservationDeliveryType deliveryType)
+	{
+		s_reservationEntity.setDeliveryType(deliveryType);
+	}
+
+	/**
+	 * Upgrade the blessing card of the reservation.
+	 *
+	 * @param blessing
+	 *            The blessing string.
+	 */
+	public static void setBlessingCard(String blessing)
+	{
+		s_reservationEntity.setBlessingCard(blessing);
 	}
 
 	// end region -> Setters
