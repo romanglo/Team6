@@ -1,16 +1,19 @@
 
 package controllers;
 
+import java.awt.Label;
+import java.awt.TextField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -18,14 +21,19 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
+import messages.EntitiesListData;
 import messages.Message;
+import ocsf.client.AbstractClient;
 
 
 /**
@@ -34,7 +42,7 @@ import messages.Message;
  * TODO Naal: Create class description
  * 
  */
-public class AdministratorController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class Administrator_CoordinatesController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
 	/* UI Binding Fields region */
 
@@ -44,12 +52,27 @@ public class AdministratorController implements Initializable, Client.ClientStat
 
 	@FXML private ImageView imageview_title;
 	
-	@FXML private Button change_Coordinates;
+	@FXML private Button update;
 	
-	@FXML private Button update_Status;
+	@FXML private Button back;
 	
-	@FXML private Button exit_System;
+	@FXML private Button get;
+	
+	@FXML private TextField customerId;
 
+	@FXML private TextField username;
+
+	@FXML private TextField email;
+
+	@FXML private TextField password;
+	
+	@FXML private Label customerIdLabel;
+	
+	@FXML private Label usernameLabel;
+	
+	@FXML private Label emailLabel;
+	
+	@FXML private Label passwordLabel;
 	/* End of --> UI Binding Fields region */
 
 	/* Fields */
@@ -105,6 +128,7 @@ public class AdministratorController implements Initializable, Client.ClientStat
 
 	/**
 	 * TODO раам: Auto-generated comment stub - Change it!
+	 * @param event 
 	 *
 	 * @param e
 	 * @throws IOException 
@@ -112,21 +136,29 @@ public class AdministratorController implements Initializable, Client.ClientStat
 	/* End of --> Initializing methods region */
 
 	/* Client handlers implementation region */
-	
-	public void changeCustomerCoordinates (ActionEvent e) throws IOException
+	public void getBtn(ActionEvent event)
 	{
-		((Node)e.getSource()).getScene().getWindow().hide(); //hiding primary window
+		String id;
+		id= customerId.getText();
+		//messages.;
+		username.setText("complete");//
+		email.setText("complete");//
+		password.setText("complete");//
+	}
+	public void backbtn (ActionEvent event) throws IOException
+	{
+		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
 		Stage primaryStage = new Stage();
 		FXMLLoader loader = new FXMLLoader();
-		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinatse.fxml").openStream());
-		@SuppressWarnings("unused") Administrator_CoordinatesController AdministratorCoordinatesController  = loader.getController();
+		Parent root = loader.load(getClass().getResource("/boundaries/Administrator.fxml").openStream());
+		AdministratorController AdministratorController  = loader.getController();
 		
 		
 		Scene scene = new Scene(root);			
 		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 		
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Change User Coordinatse");
+		primaryStage.setTitle("Administrator Controller");
 		primaryStage.show();
 		
 	}
@@ -134,51 +166,13 @@ public class AdministratorController implements Initializable, Client.ClientStat
 	/**
 	 * TODO раам: Auto-generated comment stub - Change it!
 	 *
-	 * @param e
-	 * @throws IOException
+	 * @param event
 	 */
-	@SuppressWarnings("javadoc") public void updateUserStatus (ActionEvent e) throws IOException
+	public void updateBtn(ActionEvent event)
 	{
-		((Node)e.getSource()).getScene().getWindow().hide(); //hiding primary window
-		Stage primaryStage = new Stage();
-		FXMLLoader loader = new FXMLLoader();
-		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Update.fxml").openStream());
-		Administrator_StatusController Administrator_StatusController  = loader.getController();
-		
-		
-		Scene scene = new Scene(root);			
-		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
-		
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Change User Status & Privillige");
-		primaryStage.show();
-		
+		//send to server entity to update
 	}
 	
-	/**
-	 * TODO раам: Auto-generated comment stub - Change it!
-	 *
-	 * @param e
-	 * @throws IOException
-	 */
-	@SuppressWarnings("javadoc") public void coordinatesUpdate (ActionEvent e) throws IOException
-	{
-		((Node)e.getSource()).getScene().getWindow().hide(); //hiding primary window
-		Stage primaryStage = new Stage();
-		FXMLLoader loader = new FXMLLoader();
-		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinatse.fxml").openStream());
-		Administrator_CoordinatesController Administrator_CoordinatesController  = loader.getController();
-		
-		
-		Scene scene = new Scene(root);			
-		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
-		
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Change User Status & Privillige");
-		primaryStage.show();
-		
-	}
-
 	/**
 	 * {@inheritDoc}
 	 */

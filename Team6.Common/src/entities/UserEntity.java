@@ -112,6 +112,17 @@ public class UserEntity implements IEntity
 		m_userPrivilege = userPrivilege;
 		m_userStatus = userStatus;
 	}
+	
+	/**
+	 * Create instance of {@link UserEntity}. Dedicated for get all
+	 *
+	 */
+	public UserEntity()
+	{
+		
+	}
+	
+	
 
 	// end region -> Constructors
 
