@@ -32,8 +32,6 @@ public class ItemEntity implements IEntity
 
 	private String m_domainColor;
 
-	private Integer m_amount;
-
 	// end region -> Fields
 
 	// region Getters
@@ -84,14 +82,6 @@ public class ItemEntity implements IEntity
 	public String getColor()
 	{
 		return m_domainColor;
-	}
-
-	/**
-	 * @return The amount of the item.
-	 */
-	public Integer getAmount()
-	{
-		return m_amount;
 	}
 
 	// end region -> Getters
@@ -164,17 +154,6 @@ public class ItemEntity implements IEntity
 		this.m_domainColor = m_domainColor;
 	}
 
-	/**
-	 * Upgrade the amount of the item.
-	 *
-	 * @param m_amount
-	 *            the m_amount to set
-	 */
-	public void setAmount(Integer m_amount)
-	{
-		this.m_amount = m_amount;
-	}
-
 	// end region -> Setters
 
 	// region Constructors
@@ -194,11 +173,8 @@ public class ItemEntity implements IEntity
 	 *            The domain color of the item.
 	 * @param itemImg
 	 *            The image of the item.
-	 * @param amount
-	 *            The amount of the item.
 	 */
-	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color, Image itemImg,
-			Integer amount)
+	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color, Image itemImg)
 	{
 		m_id = id;
 		m_name = name;
@@ -206,28 +182,6 @@ public class ItemEntity implements IEntity
 		m_itemPrice = itemPrice;
 		m_domainColor = color;
 		m_itemImage = itemImg;
-		m_amount = amount;
-	}
-
-	/**
-	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
-	 * 
-	 * @param id
-	 *            An unique ID of the item.
-	 * @param name
-	 *            The name of the item.
-	 * @param itemType
-	 *            A enumerator which describes the item type.
-	 * @param itemPrice
-	 *            A number which describes the item price.
-	 * @param color
-	 *            The domain color of the item.
-	 * @param itemImg
-	 *            The image of the item.
-	 */
-	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color, Image itemImg)
-	{
-		this(id, name, itemType, itemPrice, color, itemImg, 1);
 	}
 
 	/**
@@ -402,7 +356,7 @@ public class ItemEntity implements IEntity
 	public String toString()
 	{
 		return "ItemEntity [ID=" + m_id + ", Name=" + m_name + ", Item Type=" + m_itemType + ", Item Price="
-				+ m_itemPrice + ", Domain Color=" + m_domainColor + ", Amount=" + m_amount + "]";
+				+ m_itemPrice + ", Domain Color=" + m_domainColor + ", Exist Image=" + (m_itemImage != null) + "]";
 	}
 
 	// end region -> Override Object Methods
