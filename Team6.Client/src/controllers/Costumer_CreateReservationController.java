@@ -9,25 +9,23 @@ import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
-import client.ClientConfiguration;
+import entities.CostumerEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
 import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
@@ -52,8 +50,6 @@ public class Costumer_CreateReservationController
 	private Logger m_logger;
 
 	private Client m_client;
-
-	private ClientConfiguration m_configuration;
 
 	/* End of --> Fields region */
 
@@ -115,6 +111,7 @@ public class Costumer_CreateReservationController
 			return;
 		}
 		
+		Costumer_CreateReservationPaymentController.s_isCreateReservation = true;
 		openSelectedWindow(paymentEvent, "/boundaries/Costumer_CreateReservationPayment.fxml");
 	}
 
@@ -161,7 +158,6 @@ public class Costumer_CreateReservationController
 	private void initializeFields()
 	{
 		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
 		m_client = ApplicationEntryPoint.Client;
 	}
 
@@ -195,7 +191,7 @@ public class Costumer_CreateReservationController
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Shimon : Add event handling
+		//Not needed on this screen.
 	}
 
 	/**

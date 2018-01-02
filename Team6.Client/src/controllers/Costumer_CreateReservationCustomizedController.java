@@ -1,21 +1,18 @@
 
 package controllers;
 
-import java.awt.Dialog;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
-import client.ClientConfiguration;
+import entities.IEntity;
 import entities.ItemEntity;
 import entities.ProductType;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -30,7 +27,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
+import messages.EntitiesListData;
+import messages.IMessageData;
 import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
@@ -63,10 +63,6 @@ public class Costumer_CreateReservationCustomizedController
 	private Logger m_logger;
 
 	private Client m_client;
-
-	private ClientConfiguration m_configuration;
-
-	ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
 
 	private ArrayList<ItemEntity> m_catalogList;
 
@@ -185,7 +181,6 @@ public class Costumer_CreateReservationCustomizedController
 	private void initializeFields()
 	{
 		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
 		m_client = ApplicationEntryPoint.Client;
 	}
 
@@ -211,8 +206,8 @@ public class Costumer_CreateReservationCustomizedController
 
 	private void initializeCatalogList()
 	{
-		/* TODO Yoni: Get catalog from the server. */
-		m_catalogList = new ArrayList<>();
+		Message entityMessage = MessagesFactory.createGetAllEntityMessage(new ItemEntity(0));
+		m_client.sendMessageToServer(entityMessage);
 	}
 
 	/* End of --> Initializing methods region */
@@ -225,7 +220,23 @@ public class Costumer_CreateReservationCustomizedController
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Yoni : Add event handling
+		IMessageData entitiesListData = msg.getMessageData();
+		if (!(entitiesListData instanceof EntitiesListData)) {
+			m_logger.warning("Received message data not of the type requested.");
+			return;
+		}
+
+		List<IEntity> entityList = ((EntitiesListData) entitiesListData).getEntities();
+		m_catalogList = new ArrayList<>();
+		for (IEntity entity : entityList) {
+			if (!(entity instanceof ItemEntity)) {
+				m_logger.warning("Received entity not of the type requested.");
+				return;
+			}
+
+			ItemEntity item = (ItemEntity) entity;
+			m_catalogList.add(item);
+		}
 	}
 
 	/**

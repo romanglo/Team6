@@ -11,10 +11,11 @@ import java.util.logging.Logger;
 import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
-import client.ClientConfiguration;
 import entities.CostumerSubscription;
 import entities.ItemEntity;
 import entities.ProductType;
+import entities.ReservationEntity;
+import entities.ReservationType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,10 +25,11 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -35,6 +37,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
 import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
@@ -62,6 +65,8 @@ public class Costumer_CreateReservationPaymentController
 
 	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
 
+	@FXML private Button changing_button;
+
 	@FXML private Label total_price_label;
 
 	// end region -> UI Binding Fields
@@ -72,9 +77,20 @@ public class Costumer_CreateReservationPaymentController
 
 	private Client m_client;
 
-	private ClientConfiguration m_configuration;
+	ObservableList<CatalogItemRow> paymentBill = FXCollections.observableArrayList();
 
-	ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
+	private Double m_discount;
+
+	/**
+	 * When displaying the canceling reservation screen, manage the reservation.
+	 */
+	public static ReservationEntity s_reservationEntity = null;
+
+	/**
+	 * Define whether the window is for the reservation creation or for canceling
+	 * reservation.
+	 */
+	public static boolean s_isCreateReservation;
 
 	/* End of --> Fields region */
 
@@ -85,24 +101,48 @@ public class Costumer_CreateReservationPaymentController
 	{
 		openSelectedWindow(backEvent, "/boundaries/Costumer_CreateReservation.fxml");
 	}
-	
-	@FXML 
-	private void paymentButtonClick(ActionEvent paymentEvent) {
+
+	@FXML
+	private void changingButtonClick(ActionEvent changingEvent)
+	{
+		if (s_isCreateReservation) {
+			paymentButtonClick(changingEvent);
+		} else {
+			cancelButtonClick(changingEvent);
+		}
+	}
+
+	private void paymentButtonClick(ActionEvent paymentEvent)
+	{
 		Costumer_SavedData.setReservationList();
 		if (Costumer_SavedData.getSubscription() == CostumerSubscription.None) {
+			Costumer_PaymentCreditCardController.m_discount = m_discount;
 			openSelectedWindow(paymentEvent, "/boundaries/Costumer_PaymentCreditCard.fxml");
-		}
-		else {
-			/* TODO Yoni: Send the reservation to the server. */
+		} else {
+			Costumer_SavedData.setRefund(Costumer_SavedData.getCostumerRefund() - m_discount);
+			Costumer_SavedData.setTotalPrice(Double.parseDouble(total_price_label.getText()));
+
+			Message entityMessage = MessagesFactory
+					.createUpdateEntityMessage(Costumer_SavedData.getReservationEntity());
+			m_client.sendMessageToServer(entityMessage);
+
 			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Attention");
+			alert.setTitle("Reservation Completed");
 			alert.setHeaderText(null);
 			alert.setContentText("Reservation completed. Thanks for using our application.");
 			alert.showAndWait();
 			openSelectedWindow(paymentEvent, "/boundaries/Costumer_CreateReservation.fxml");
 		}
 	}
-	
+
+	private void cancelButtonClick(ActionEvent cancelEvent)
+	{
+		s_reservationEntity.setType(ReservationType.Canceled);
+		Message entityMessage = MessagesFactory.createUpdateEntityMessage(s_reservationEntity);
+		m_client.sendMessageToServer(entityMessage);
+		openSelectedWindow(cancelEvent, "/boundaries/Costumer_CancelReservation.fxml");
+	}
+
 	private void openSelectedWindow(ActionEvent event, String fxmlPath)
 	{
 		try {
@@ -147,7 +187,6 @@ public class Costumer_CreateReservationPaymentController
 	private void initializeFields()
 	{
 		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
 		m_client = ApplicationEntryPoint.Client;
 	}
 
@@ -173,17 +212,23 @@ public class Costumer_CreateReservationPaymentController
 
 	private void initializeTable()
 	{
-		gatherReservationList();
+		if (s_isCreateReservation) {
+			changing_button.setText("Payment");
+			gatherReservationList();
+		} else {
+			changing_button.setText("Cancel");
+			addReservationList();
+		}
 
 		tablecolumn_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
 		tablecolumn_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
 		tablecolumn_amount.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("amount"));
 		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Double>("price"));
 
-		catalog_table.setItems(catalog);
+		catalog_table.setItems(paymentBill);
 		catalog_table.refresh();
 	}
-	
+
 	/**
 	 * Gather the reservation items and count the amounts of each item.
 	 */
@@ -204,7 +249,8 @@ public class Costumer_CreateReservationPaymentController
 				continue;
 			}
 
-			CatalogItemRow itemReserve = new CatalogItemRow(entity.getId(), entity.getName(), 1, entity.getItemPrice());
+			CatalogItemRow itemReserve = new CatalogItemRow(entity.getId(), entity.getName(), 1, entity.getItemPrice(),
+					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
 			if (entity.getItemType() == ProductType.CustomizedArrangement) {
 				gatheredCustomized.add(itemReserve);
 				continue;
@@ -213,18 +259,64 @@ public class Costumer_CreateReservationPaymentController
 			gatheredReservation.put(entity.getId(), itemReserve);
 		}
 
+		ArrayList<ItemEntity> itemsList = new ArrayList<>();
 		double totalPrice = 0;
 		for (CatalogItemRow item : gatheredReservation.values()) {
 			totalPrice += item.getM_price();
-			catalog.add(item);
+			ItemEntity entity = new ItemEntity(item.getM_id(), item.getM_name(),
+					ParseStringToProductType(item.getM_type()), item.getM_price(), item.getM_domainColor(),
+					item.getM_image(), item.getM_amount());
+			itemsList.add(entity);
+			paymentBill.add(item);
 		}
 
 		for (CatalogItemRow item : gatheredCustomized) {
 			totalPrice += item.getM_price();
-			catalog.add(item);
+			ItemEntity entity = new ItemEntity(item.getM_id(), item.getM_name(),
+					ParseStringToProductType(item.getM_type()), item.getM_price(), item.getM_domainColor(),
+					item.getM_image(), item.getM_amount());
+			itemsList.add(entity);
+			paymentBill.add(item);
 		}
-		
+
+		m_discount = Costumer_SavedData.getCostumerRefund();
+		if (m_discount > totalPrice) {
+			m_discount = totalPrice;
+		}
+
+		if (m_discount > 0.0) {
+			totalPrice -= m_discount;
+			CatalogItemRow item = new CatalogItemRow(-1, "Discount", 1, m_discount * -1.0, null, null, null);
+			paymentBill.add(item);
+		}
+
+		Costumer_SavedData.setReservationList(itemsList);
 		total_price_label.setText(String.format("%.2f", totalPrice));
+	}
+
+	private void addReservationList()
+	{
+		for (ItemEntity entity : s_reservationEntity.getReservationList()) {
+			CatalogItemRow item = new CatalogItemRow(entity.getId(), entity.getName(), entity.getAmount(),
+					entity.getItemPrice(), entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
+			paymentBill.add(item);
+		}
+
+		total_price_label.setText(String.format("%.2f", s_reservationEntity.getTotalPrice()));
+	}
+
+	private ProductType ParseStringToProductType(String stringItemType)
+	{
+		if (stringItemType.equalsIgnoreCase("Flower")) {
+			return ProductType.Flower;
+		} else if (stringItemType.equalsIgnoreCase("FlowerPot")) {
+			return ProductType.FlowerPot;
+		} else if (stringItemType.equalsIgnoreCase("BridalBouquet")) {
+			return ProductType.BridalBouquet;
+		} else if (stringItemType.equalsIgnoreCase("FlowerArrangement")) {
+			return ProductType.FlowerArrangement;
+		}
+		return null;
 	}
 
 	/* End of --> Initializing methods region */
@@ -237,7 +329,7 @@ public class Costumer_CreateReservationPaymentController
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Yoni : Add event handling
+		//Not needed on this screen.
 	}
 
 	/**

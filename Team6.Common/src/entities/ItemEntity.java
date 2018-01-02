@@ -32,6 +32,8 @@ public class ItemEntity implements IEntity
 
 	private String m_domainColor;
 
+	private Integer m_amount;
+
 	// end region -> Fields
 
 	// region Getters
@@ -82,6 +84,14 @@ public class ItemEntity implements IEntity
 	public String getColor()
 	{
 		return m_domainColor;
+	}
+
+	/**
+	 * @return The amount of the item.
+	 */
+	public Integer getAmount()
+	{
+		return m_amount;
 	}
 
 	// end region -> Getters
@@ -154,13 +164,53 @@ public class ItemEntity implements IEntity
 		this.m_domainColor = m_domainColor;
 	}
 
+	/**
+	 * Upgrade the amount of the item.
+	 *
+	 * @param m_amount
+	 *            the m_amount to set
+	 */
+	public void setAmount(Integer m_amount)
+	{
+		this.m_amount = m_amount;
+	}
+
 	// end region -> Setters
 
 	// region Constructors
 
 	/**
-	 * Create instance of {@link ProductEntity}. Dedicated for add or update
-	 * messages.
+	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the item.
+	 * @param name
+	 *            The name of the item.
+	 * @param itemType
+	 *            A enumerator which describes the item type.
+	 * @param itemPrice
+	 *            A number which describes the item price.
+	 * @param color
+	 *            The domain color of the item.
+	 * @param itemImg
+	 *            The image of the item.
+	 * @param amount
+	 *            The amount of the item.
+	 */
+	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color, Image itemImg,
+			Integer amount)
+	{
+		m_id = id;
+		m_name = name;
+		m_itemType = itemType;
+		m_itemPrice = itemPrice;
+		m_domainColor = color;
+		m_itemImage = itemImg;
+		m_amount = amount;
+	}
+
+	/**
+	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
 	 * 
 	 * @param id
 	 *            An unique ID of the item.
@@ -177,17 +227,11 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color, Image itemImg)
 	{
-		m_id = id;
-		m_name = name;
-		m_itemType = itemType;
-		m_itemPrice = itemPrice;
-		m_domainColor = color;
-		m_itemImage = itemImg;
+		this(id, name, itemType, itemPrice, color, itemImg, 1);
 	}
-	
+
 	/**
-	 * Create instance of {@link ProductEntity}. Dedicated for add or update
-	 * messages.
+	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
 	 * 
 	 * @param id
 	 *            An unique ID of the item.
@@ -206,8 +250,8 @@ public class ItemEntity implements IEntity
 	}
 
 	/**
-	 * Create instance of {@link ProductEntity}, with <code>null</code> name.
-	 * Dedicated for update messages.
+	 * Create instance of {@link ItemEntity}, with <code>null</code> name. Dedicated
+	 * for update messages.
 	 * 
 	 * @param id
 	 *            An unique ID of the item.
@@ -220,8 +264,8 @@ public class ItemEntity implements IEntity
 	}
 
 	/**
-	 * Create instance of {@link ProductEntity}, with <code>null</code> name.
-	 * Dedicated for update messages.
+	 * Create instance of {@link ItemEntity}, with <code>null</code> name. Dedicated
+	 * for update messages.
 	 * 
 	 * @param id
 	 *            An unique ID of the item.
@@ -236,7 +280,7 @@ public class ItemEntity implements IEntity
 	}
 
 	/**
-	 * Create instance of {@link ProductEntity}, with <code>null</code> item type.
+	 * Create instance of {@link ItemEntity}, with <code>null</code> item type.
 	 * Dedicated for update messages.
 	 * 
 	 * @param id
@@ -250,7 +294,7 @@ public class ItemEntity implements IEntity
 	}
 
 	/**
-	 * Create instance of {@link ProductEntity}, with <code>null</code> item type.
+	 * Create instance of {@link ItemEntity}, with <code>null</code> item type.
 	 * Dedicated for update messages.
 	 * 
 	 * @param id
@@ -264,7 +308,7 @@ public class ItemEntity implements IEntity
 	}
 
 	/**
-	 * Create instance of {@link ProductEntity}, with <code>null</code> item type.
+	 * Create instance of {@link ItemEntity}, with <code>null</code> item type.
 	 * Dedicated for update messages.
 	 * 
 	 * @param id
@@ -278,7 +322,7 @@ public class ItemEntity implements IEntity
 	}
 
 	/**
-	 * Create instance of {@link ProductEntity} only with id. Dedicated for get or
+	 * Create instance of {@link ItemEntity} only with id. Dedicated for get or
 	 * remove messages.
 	 * 
 	 * @param id
@@ -290,8 +334,8 @@ public class ItemEntity implements IEntity
 	}
 
 	/**
-	 * Create instance of {@link ProductEntity}, with <code>null</code> type.
-	 * Dedicated for update messages.
+	 * Create instance of {@link ItemEntity}, with <code>null</code> type. Dedicated
+	 * for update messages.
 	 *
 	 * @param id
 	 *            An unique ID of the item.
@@ -306,8 +350,8 @@ public class ItemEntity implements IEntity
 	}
 
 	/**
-	 * Create instance of {@link ProductEntity}, with <code>null</code> type.
-	 * Dedicated for update messages.
+	 * Create instance of {@link ItemEntity}, with <code>null</code> type. Dedicated
+	 * for update messages.
 	 *
 	 * @param id
 	 *            An unique ID of the item.
@@ -357,7 +401,8 @@ public class ItemEntity implements IEntity
 	@Override
 	public String toString()
 	{
-		return "ItemEntity [ID=" + m_id + ", Name=" + m_name + ", Item Type=" + m_itemType + ", price=" + m_itemPrice + ", color=" + m_domainColor + "]";
+		return "ItemEntity [ID=" + m_id + ", Name=" + m_name + ", Item Type=" + m_itemType + ", Item Price="
+				+ m_itemPrice + ", Domain Color=" + m_domainColor + ", Amount=" + m_amount + "]";
 	}
 
 	// end region -> Override Object Methods

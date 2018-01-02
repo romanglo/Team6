@@ -21,6 +21,8 @@ public class ReservationEntity implements IEntity
 
 	private Integer m_id;
 
+	private Double m_totalPrice;
+
 	private CostumerEntity m_costumer;
 
 	private ReservationType m_reservationType;
@@ -38,11 +40,20 @@ public class ReservationEntity implements IEntity
 	{
 		return m_id;
 	}
-	
+
+	/**
+	 * @return The total price of the reservation.
+	 */
+	public Double getTotalPrice()
+	{
+		return m_totalPrice;
+	}
+
 	/**
 	 * @return The costumer entity that is connected to the reservation.
 	 */
-	public CostumerEntity getCostumer() {
+	public CostumerEntity getCostumer()
+	{
 		return m_costumer;
 	}
 
@@ -84,7 +95,18 @@ public class ReservationEntity implements IEntity
 	{
 		this.m_id = m_id;
 	}
-	
+
+	/**
+	 * Upgrade the total price of the reservation.
+	 *
+	 * @param m_totalPrice
+	 *            the m_totalPrice to set
+	 */
+	public void setTotalPrice(Double m_totalPrice)
+	{
+		this.m_totalPrice = m_totalPrice;
+	}
+
 	/**
 	 * Upgrade the connected costumer to the reservation.
 	 *
@@ -113,7 +135,7 @@ public class ReservationEntity implements IEntity
 	 * @param m_reservationType
 	 *            the m_reservationType to set
 	 */
-	public void setSubscription(ReservationType m_reservationType)
+	public void setType(ReservationType m_reservationType)
 	{
 		this.m_reservationType = m_reservationType;
 	}
@@ -156,14 +178,17 @@ public class ReservationEntity implements IEntity
 	 *            The costumer id that is connected to the reservation.
 	 * @param reservationList
 	 *            The reservation list.
+	 * @param total
+	 *            The total price of the reservation.
 	 */
 	public ReservationEntity(Integer id, ReservationType type, Integer costumerId,
-			ArrayList<ItemEntity> reservationList)
+			ArrayList<ItemEntity> reservationList, Double total)
 	{
 		m_id = id;
 		m_reservationType = type;
 		m_costumer = new CostumerEntity(costumerId);
 		m_reservationList = reservationList;
+		m_totalPrice = total;
 	}
 
 	/**
@@ -179,7 +204,7 @@ public class ReservationEntity implements IEntity
 	 */
 	public ReservationEntity(ReservationType type, Integer costumerId, ArrayList<ItemEntity> reservationList)
 	{
-		this(null, type, costumerId, reservationList);
+		this(null, type, costumerId, reservationList, 0.0);
 	}
 
 	/**
@@ -193,7 +218,22 @@ public class ReservationEntity implements IEntity
 	 */
 	public ReservationEntity(ReservationType type, Integer costumerId)
 	{
-		this(null, type, costumerId, new ArrayList<>());
+		this(null, type, costumerId, new ArrayList<>(), 0.0);
+	}
+	
+	/**
+	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
+	 * messages.
+	 * 
+	 * @param type
+	 *            An enumerator which describes the reservation type.
+	 * @param costumer
+	 *            The costumer that is connected to the reservation.
+	 */
+	public ReservationEntity(ReservationType type, CostumerEntity costumer)
+	{
+		this(null, type, costumer.getId(), new ArrayList<>(), 0.0);
+		setCostumer(costumer);
 	}
 
 	// end region -> Constructors

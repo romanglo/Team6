@@ -3,12 +3,17 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import entities.CostumerEntity;
+import entities.IEntity;
+import entities.ItemEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,7 +27,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.IMessageData;
 import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
@@ -106,6 +115,13 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		}
 	}
 
+	private void initializeCostumerData()
+	{
+		Message entityMessage = MessagesFactory
+				.createGetEntityMessage(new CostumerEntity(ApplicationEntryPoint.ConnectedUser));
+		m_client.sendMessageToServer(entityMessage);
+	}
+
 	/* End of --> UI events region */
 
 	/* Initializing methods region */
@@ -119,7 +135,7 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
-		Costumer_SavedData.initializeSavedData();
+		initializeCostumerData();
 	}
 
 	private void initializeFields()
@@ -159,7 +175,20 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Shimon : Add event handling
+		IMessageData entitiesListData = msg.getMessageData();
+		if (!(entitiesListData instanceof EntityData)) {
+			m_logger.warning("Received message data not of the type requested.");
+			return;
+		}
+
+		IEntity entity = ((EntityData) entitiesListData).getEntity();
+		if (!(entity instanceof CostumerEntity)) {
+			m_logger.warning("Received entity not of the type requested.");
+			return;
+		}
+
+		CostumerEntity costumer = (CostumerEntity)entity;
+		Costumer_SavedData.initializeSavedData(costumer);
 	}
 
 	/**

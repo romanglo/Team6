@@ -28,6 +28,8 @@ public class CostumerEntity implements IEntity
 
 	private Double m_refund;
 
+	private UserEntity m_user;
+
 	// end region -> Fields
 
 	// region Getters
@@ -70,6 +72,14 @@ public class CostumerEntity implements IEntity
 	public Double getCostumerRefunds()
 	{
 		return m_refund;
+	}
+
+	/**
+	 * @return The user entity of the costumer.
+	 */
+	public UserEntity getUserEntity()
+	{
+		return m_user;
 	}
 
 	// end region -> Getters
@@ -131,6 +141,17 @@ public class CostumerEntity implements IEntity
 		this.m_refund = m_refund;
 	}
 
+	/**
+	 * Upgrade the costumer user.
+	 *
+	 * @param user
+	 *            the user to set
+	 */
+	public void setRefund(UserEntity user)
+	{
+		this.m_user = user;
+	}
+
 	// end region -> Setters
 
 	// region Constructors
@@ -158,6 +179,7 @@ public class CostumerEntity implements IEntity
 		m_subscription = subscription;
 		m_approved = approved;
 		m_refund = refunds;
+		m_user = null;
 	}
 
 	/**
@@ -209,6 +231,19 @@ public class CostumerEntity implements IEntity
 	public CostumerEntity(Integer id)
 	{
 		this(id, null, CostumerSubscription.None, null, 0.0);
+	}
+
+	/**
+	 * Create instance of {@link CostumerEntity} only with id. Dedicated for get or
+	 * remove messages.
+	 * 
+	 * @param user
+	 *            The costumer user.
+	 */
+	public CostumerEntity(UserEntity user)
+	{
+		this(null, null, CostumerSubscription.None, null, 0.0);
+		m_user = user;
 	}
 
 	// end region -> Constructors
