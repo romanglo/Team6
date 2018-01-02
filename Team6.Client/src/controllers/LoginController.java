@@ -1,91 +1,67 @@
 
 package controllers;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import boundaries.SettingsRow;
 import client.ApplicationEntryPoint;
 import client.Client;
-import client.ClientConfiguration;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import entities.IEntity;
+import entities.UserEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logger.LogManager;
+import messages.EntityData;
+import messages.IMessageData;
+import messages.LoginData;
 import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
- * LoginController: Create first connection with the server and login to the system.
+ * LoginController: Create first connection with the server and login to the
+ * system.
  * 
  */
 public class LoginController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
 	/* UI Binding Fields region */
 
-	// Connection circles :
-	@FXML private Circle circle_connectedLight;
+	@FXML private ImageView imageview_background;
 
-	@FXML private Circle circle_disconnectedLight;
+	@FXML private ImageView imageview_usericon;
 
-	// Connection buttons :
-	@FXML private Button btn_connectToServer;
-
-	@FXML private Button btn_disconnectFromServer;
+	@FXML private ImageView btn_imageview_settings;
 
 	// login fields and buttons :
+
 	@FXML private TextField textField_userName;
 
 	@FXML private PasswordField passwordField_userPassword;
 
-	@FXML private AnchorPane anchorPane_login;
-
-	// Setting table declaration :
-	@FXML private TableView<SettingsRow> setting_table;
-
-	@FXML private TableColumn<SettingsRow, String> tablecolumn_setting;
-
-	@FXML private TableColumn<SettingsRow, String> tablecolumn_value;
-
-	@FXML private Button btn_update_settings;
-
-	// Title images :
-	@FXML private ImageView imageview_gif;
-
-	@FXML private ImageView imageview_title;
+	@FXML private Button btn_login;
 
 	/* End of --> UI Binding Fields region */
 
 	/* Fields */
-	private Logger m_logger;
 
-	private ClientConfiguration m_configuration;
+	private Logger m_logger;
 
 	private Client m_client;
 
@@ -93,108 +69,63 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	/* UI events region */
 
-	/**
-	 * Method is called after pressing the connect button and creates new connection
-	 * 
-	 * @param connectionEvent
-	 *            Button click event.
-	 */
 	@FXML
-	private void ServerConnection(ActionEvent connectionEvent) throws IOException
+	private void onLoginButtonPressed(ActionEvent event)
 	{
-		if (connectionEvent.getSource().equals(btn_connectToServer)) {
-			m_client.createConnectionWithServer();
-		} else {
-			m_client.closeConnectionWithServer();
+		String userName = textField_userName.getText().trim();
+		String pasword = passwordField_userPassword.getText();
+
+		if ((userName == null || userName.isEmpty()) && (pasword == null || pasword.isEmpty())) {
+			showInformationMessage("Please enter your username and password.");
+			return;
 		}
 
-		clearFields();
+		if (userName == null || userName.isEmpty()) {
+			showInformationMessage("Please enter your username.");
+			return;
+		}
+
+		if (pasword == null || pasword.isEmpty()) {
+			showInformationMessage("Please enter your password.");
+			return;
+		}
+
+		if (!m_client.isConnected() && !m_client.createConnectionWithServer()) {
+			showInformationMessage("Failed to connect to server! Please check the settings and try again..");
+			return;
+		}
+
+		// TODO ROMAN : show loading message.
 	}
 
 	@FXML
-	private void login(ActionEvent event)
+	private void onSettingsButtonPressed(ActionEvent event)
 	{
-		String userName = textField_userName.getText().trim();
-		if (userName == null || userName.isEmpty()) {
-			m_logger.info("Field is empty. Cannot send login request.");
-			return;
-		}
-
-		String pasword = passwordField_userPassword.getText();
-
-		if (userName == null || userName.isEmpty()) {
-			m_logger.info("Field is empty. Cannot send login request.");
-			return;
-		}
-
-		/*
-		 * try {
-		 * 
-		 * Message msg = MessagesFactory.createLoginMessage();
-		 * m_client.sendMessageToServer(msg); } catch (Exception ex) {
-		 * m_logger.warning("Error when sending get request, excpetion: " +
-		 * ex.getMessage()); }
-		 */
-
-		URL url = null;
-
-		if (userName.equalsIgnoreCase("companyemployee")) {
-			url = getClass().getResource("/boundaries/CompanyEmployee.FXML");
-		} else if (userName.equalsIgnoreCase("shopmanager")) {
-			url = getClass().getResource("/boundaries/ShopManager.FXML");
-		} else if (userName.equalsIgnoreCase("chainmanager")) {
-			url = getClass().getResource("/boundaries/ChainManager.FXML");
-		} else if (userName.equalsIgnoreCase("administrator")) {
-			url = getClass().getResource("/boundaries/Administrator.FXML");
-		} else if (userName.equalsIgnoreCase("shopemployee")) {
-			url = getClass().getResource("/boundaries/ShopEmployee.FXML");
-		} else if (userName.equalsIgnoreCase("costumerservice")) {
-			url = getClass().getResource("/boundaries/CostumerServiceEmployee.FXML");
-		} else if (userName.equalsIgnoreCase("costumer")) {
-			url = getClass().getResource("/boundaries/Costumer.FXML");
-		} else if (userName.equalsIgnoreCase("servicespecialist")) {
-			url = getClass().getResource("/boundaries/ServiceSpecialist.FXML");
-		} else {
-			showInformationMessage("Wrong user name!");
-			return;
-		}
-
-		m_client.setClientStatusHandler(null);
-		m_client.setMessagesHandler(null);
-
-		Stage nextStage = null;
-
 		try {
-			FXMLLoader fxmlLoader = new FXMLLoader(url);
+			Stage currentStage = (Stage) btn_login.getScene().getWindow();
+
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/boundaries/LoginSettings.FXML"));
 			Parent parent = (Parent) fxmlLoader.load();
 			Scene scene = new Scene(parent);
 			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
-			nextStage = new Stage();
+			Stage nextStage = new Stage();
 			nextStage.setScene(scene);
-			nextStage.setTitle("Zer-Li");
-			nextStage.setMinWidth(450);
-			nextStage.setMinHeight(450);
-			nextStage.show();
+			nextStage.setTitle("Zer-Li Settings");
+			nextStage.setMinWidth(300);
+			nextStage.setMinHeight(300);
+			nextStage.setMaxWidth(300);
+			nextStage.setMaxHeight(300);
+			nextStage.setWidth(300);
+			nextStage.setHeight(300);
+			nextStage.initModality(Modality.WINDOW_MODAL);
+			nextStage.initOwner(currentStage);
+			nextStage.showAndWait();
 		}
 		catch (Exception e) {
-			String msg = "Failed on try to load the next window";
-			m_logger.severe(msg + ", excepion: " + e.getMessage());
-			showInformationMessage(msg);
+			m_logger.severe("Failed on try to load the settings window" + ", excepion: " + e.getMessage());
+			showInformationMessage("The settings can not be changed at this time..");
+			return;
 		}
-
-		Stage stage = (Stage) anchorPane_login.getScene().getWindow();
-		if (stage != null) {
-			stage.close();
-		} else {
-			((Node) event.getSource()).getScene().getWindow().hide();
-		}
-	}
-
-	@FXML
-	private void updateSettingsFile(ActionEvent event)
-	{
-		m_configuration.updateResourceFile();
-		btn_update_settings.setDisable(true);
 	}
 
 	/* End of --> UI events region */
@@ -207,90 +138,32 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public void initialize(URL url, ResourceBundle rb)
 	{
-		initializeFields();
-		initializeImages();
-		initializeConfigurationTable();
-		initializeClientHandler();
-	}
 
-	private void initializeFields()
-	{
 		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
 		m_client = ApplicationEntryPoint.Client;
+
+		initializeImages();
+
+		initializeClientHandler();
 	}
 
 	private void initializeImages()
 	{
-		InputStream serverGif = getClass().getResourceAsStream("/boundaries/images/Flower.gif");
-		if (serverGif != null) {
-			Image image = new Image(serverGif);
-			imageview_gif.setImage(image);
+		InputStream backgoundImage = getClass().getResourceAsStream("/boundaries/images/login_background.jpg");
+		if (backgoundImage != null) {
+			Image image = new Image(backgoundImage);
+			imageview_background.setImage(image);
 		}
-		InputStream title = getClass().getResourceAsStream("/boundaries/images/Zerli_Headline.jpg");
-		if (title != null) {
-			Image image = new Image(title);
-			imageview_title.setImage(image);
+		InputStream userImage = getClass().getResourceAsStream("/boundaries/images/default_user.png");
+		if (userImage != null) {
+			Image image = new Image(userImage);
+			imageview_usericon.setImage(image);
 		}
-	}
-
-	private void initializeConfigurationTable()
-	{
-		setting_table.setRowFactory(param -> {
-			TableRow<SettingsRow> tableRow = new TableRow<>();
-			tableRow.setOnMouseClicked(event -> {
-				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
-					SettingsRow rowData = tableRow.getItem();
-
-					TextInputDialog dialog = new TextInputDialog();
-					dialog.setTitle("Update Settings Value");
-					dialog.setHeaderText("Do you want to update the value of " + rowData.getSetting() + " ?");
-					dialog.setContentText("Please enter the new value:");
-
-					Optional<String> result = dialog.showAndWait();
-					if (!result.isPresent()) {
-						return;
-					}
-					String resultString = result.get();
-					if (!(resultString != null && !resultString.equals(rowData.getValue()))) {
-						return;
-					}
-
-					switch (rowData.getSetting()) {
-						case ClientConfiguration.PROPERTY_NAME_IP:
-
-							m_client.setHost(resultString);
-							m_configuration.setIp(resultString);
-						break;
-						case ClientConfiguration.PROPERTY_NAME_PORT:
-							try {
-								int port = Integer.parseInt(resultString);
-								m_client.setPort(port);
-								m_configuration.setPort(port);
-							}
-							catch (Exception e) {
-								return;
-							}
-						break;
-						default:
-						break;
-					}
-					rowData.setValue(resultString);
-					drawContantToTable();
-					btn_update_settings.setDisable(false);
-					if (m_client.isConnected()) {
-						showInformationMessage("Attention: You must reconnect for the changes to take effect!");
-					}
-				}
-			});
-			return tableRow;
-		});
-		tablecolumn_setting.setCellValueFactory(new PropertyValueFactory<>("setting"));
-		tablecolumn_value.setCellValueFactory(new PropertyValueFactory<>("value"));
-
-		drawContantToTable();
-
-		btn_update_settings.setDisable(true);
+		InputStream settingsImage = getClass().getResourceAsStream("/boundaries/images/settings.png");
+		if (settingsImage != null) {
+			Image image = new Image(settingsImage);
+			btn_imageview_settings.setImage(image);
+		}
 	}
 
 	private void initializeClientHandler()
@@ -309,7 +182,45 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Roman : Add message handling
+		IMessageData messageData = msg.getMessageData();
+
+		if (messageData instanceof LoginData) {
+			onLoginFailure((LoginData) messageData);
+			return;
+		}
+
+		if (!(messageData instanceof EntityData)) {
+			m_logger.warning("Received not expected MessageData! Expected : EntityData, received "
+					+ messageData.getClass().getName());
+			return;
+		}
+
+		IEntity entity = ((EntityData) messageData).getEntity();
+
+		if (!(entity instanceof UserEntity)) {
+			m_logger.warning(
+					"Received not expected IEntity! Expected : UserEntity, received " + entity.getClass().getName());
+			return;
+		}
+
+		UserEntity userEntity = (UserEntity) entity;
+		switch (userEntity.getUserStatus()) {
+			case Connected:
+				m_logger.info(
+						"The user is trying to connect while this user is already connected in other place! User details: "
+								+ userEntity.toString());
+				showInformationMessage("This user already connected!");
+				return;
+
+			case Blocked:
+				m_logger.info("The user is trying to connect to blocked user! User details: " + userEntity.toString());
+				showInformationMessage("This user is blocked, please contanct chain support.");
+				return;
+			default:
+			break;
+		}
+
+		showUserWindow(userEntity);
 	}
 
 	/**
@@ -318,11 +229,19 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public void onClientConnected()
 	{
-		btn_connectToServer.setDisable(true);
-		btn_disconnectFromServer.setDisable(false);
-		circle_connectedLight.setFill(Color.GREEN);
-		circle_disconnectedLight.setFill(Color.GREY);
-		anchorPane_login.setDisable(false);
+
+		try {
+			String userName = textField_userName.getText().trim();
+			String pasword = passwordField_userPassword.getText();
+
+			Message msg = MessagesFactory.createLoginMessage(userName, pasword);
+			m_client.sendMessageToServer(msg);
+		}
+		catch (Exception ex) {
+			m_logger.warning("Error when sending get request, excpetion: " + ex.getMessage());
+			showInformationMessage("Could not send message to server at the moment,\nplease try again later.");
+		}
+
 	}
 
 	/**
@@ -331,11 +250,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public void onClientDisconnected()
 	{
-		btn_connectToServer.setDisable(false);
-		btn_disconnectFromServer.setDisable(true);
-		circle_connectedLight.setFill(Color.GREY);
-		circle_disconnectedLight.setFill(Color.RED);
-		anchorPane_login.setDisable(true);
+		// TODO ROMAN : check if try to connect in this moment and back to regular
+		// window.
 	}
 
 	/* End of --> Implemented methods region */
@@ -347,29 +263,127 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		if (message == null || message.isEmpty()) {
 			return;
 		}
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-
-		alert.showAndWait();
+		javafx.application.Platform.runLater(() -> {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Information Dialog");
+			alert.setHeaderText(null);
+			alert.setContentText(message);
+			alert.showAndWait();
+		});
 	}
 
-	private void clearFields()
+	private void onLoginFailure(LoginData loginData)
 	{
-		textField_userName.clear();
-		passwordField_userPassword.clear();
+		javafx.application.Platform.runLater(() -> {
+			passwordField_userPassword.clear();
+		});
+		m_client.closeConnectionWithServer();
+		m_logger.info("Login failed! Login message: " + loginData.toString());
+		showInformationMessage("Login Failed! Reason:\n" + loginData.getMessage());
 	}
 
-	private void drawContantToTable()
+	private void showUserWindow(UserEntity userEntity)
 	{
-		ObservableList<SettingsRow> settings = FXCollections.observableArrayList();
+		URL url = null;
 
-		settings.add(new SettingsRow(ClientConfiguration.PROPERTY_NAME_IP, m_configuration.getIp()));
-		settings.add(
-				new SettingsRow(ClientConfiguration.PROPERTY_NAME_PORT, Integer.toString(m_configuration.getPort())));
-		setting_table.setItems(settings);
+		switch (userEntity.getUserPrivilege()) {
+			case Administrator:
+				url = getClass().getResource("/boundaries/Administrator.FXML");
+			break;
+
+			case ChainManager:
+				url = getClass().getResource("/boundaries/ChainManager.FXML");
+			break;
+
+			case CompanyEmployee:
+				url = getClass().getResource("/boundaries/CompanyEmployee.FXML");
+			break;
+
+			case Costumer:
+				url = getClass().getResource("/boundaries/Costumer.FXML");
+			break;
+
+			case CostumerService:
+				url = getClass().getResource("/boundaries/CostumerServiceEmployee.FXML");
+			break;
+
+			case ServiceSpecialist:
+				url = getClass().getResource("/boundaries/ServiceSpecialist.FXML");
+			break;
+
+			case ShopEmployee:
+				url = getClass().getResource("/boundaries/ShopEmployee.FXML");
+			break;
+
+			case ShopManager:
+				url = getClass().getResource("/boundaries/ShopManager.FXML");
+			break;
+
+			default:
+				m_logger.warning("Received unreconized user privilege.");
+				return;
+		}
+
+		m_client.setClientStatusHandler(null);
+		m_client.setMessagesHandler(null);
+
+		ApplicationEntryPoint.ConnectedUser = userEntity;
+		
+		Scene scene = null;
+		try {
+			FXMLLoader fxmlLoader = new FXMLLoader(url);
+			Parent parent = (Parent) fxmlLoader.load();
+			scene = new Scene(parent);
+			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+		}
+		catch (Exception e) {
+			String errorString = "Failed on try to load the next scene";
+			m_logger.severe(errorString + ", excepion: " + e.getMessage());
+			showInformationMessage(errorString);
+			return;
+		}
+		if (scene != null) {
+			javafx.application.Platform.runLater(new NextWindowLoader(scene));
+		}
+
 	}
 
+	private class NextWindowLoader implements Runnable
+	{
+
+		private Scene m_nextScene;
+
+		public NextWindowLoader(Scene nextScene)
+		{
+			m_nextScene = nextScene;
+		}
+
+		@Override
+		public void run()
+		{
+			Stage nextStage;
+			try {
+				nextStage = new Stage();
+				nextStage.setScene(m_nextScene);
+				nextStage.setTitle("Zer-Li");
+				nextStage.setMinWidth(450);
+				nextStage.setMinHeight(450);
+				nextStage.show();
+			}
+			catch (Exception e) {
+				String errorString = "Failed on try to load the next window";
+				m_logger.severe(errorString + ", excepion: " + e.getMessage());
+				showInformationMessage(errorString);
+				return;
+			}
+
+			Stage stage = (Stage) btn_login.getScene().getWindow();
+			if (stage != null) {
+				stage.close();
+			} else {
+				btn_login.getScene().getWindow().hide();
+			}
+		}
+	}
 	/* End of --> Private methods region */
 }

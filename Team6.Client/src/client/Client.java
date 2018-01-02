@@ -35,7 +35,7 @@ public class Client extends AbstractClient
 		 * @throws Exception
 		 *             The method can throw any kind of exception, this method call
 		 *             surround with try/catch.
-		 *             
+		 * 
 		 * @see {@link Message} the received type.
 		 */
 		void onMessageReceived(Message msg) throws Exception;
@@ -131,16 +131,22 @@ public class Client extends AbstractClient
 
 	/**
 	 * Open connection with the server.
+	 * 
+	 * @return <code>true</code> if the connection opened successfully and
+	 *         <code>false</code> otherwise.
 	 *
 	 */
-	public void createConnectionWithServer()
+	public boolean createConnectionWithServer()
 	{
 		try {
 			openConnection();
 		}
 		catch (IOException e) {
-			m_logger.warning("Failed to open connection. Exception:" + e.getMessage());
+			m_logger.warning("Failed to open connection! host = " + getHost() + ", port = " + getPort() + ", exception:"
+					+ e.getMessage());
+			return false;
 		}
+		return true;
 	}
 
 	/**
@@ -153,7 +159,7 @@ public class Client extends AbstractClient
 			m_logger.info("The connection with the server closed.");
 		}
 		catch (IOException e) {
-			m_logger.warning("Could not close the connection with the server. Exception:" +e.getMessage());
+			m_logger.warning("Could not close the connection with the server. Exception:" + e.getMessage());
 		}
 	}
 
@@ -219,13 +225,13 @@ public class Client extends AbstractClient
 	 */
 	public boolean sendMessageToServer(Object data)
 	{
-		boolean returningValue= true;
+		boolean returningValue = true;
 		try {
 			sendToServer(data);
 		}
 		catch (IOException e) {
-			m_logger.warning("Could not send message to server, exception: "+e.getMessage());
-			returningValue=false;
+			m_logger.warning("Could not send message to server, exception: " + e.getMessage());
+			returningValue = false;
 		}
 		return returningValue;
 	}

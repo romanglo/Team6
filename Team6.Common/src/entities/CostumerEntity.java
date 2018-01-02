@@ -26,6 +26,8 @@ public class CostumerEntity implements IEntity
 
 	private Boolean m_approved;
 
+	private Double m_refund;
+
 	// end region -> Fields
 
 	// region Getters
@@ -60,6 +62,14 @@ public class CostumerEntity implements IEntity
 	public Boolean getCostumerApproved()
 	{
 		return m_approved;
+	}
+
+	/**
+	 * @return A double which describes the costumer refunding.
+	 */
+	public Double getCostumerRefunds()
+	{
+		return m_refund;
 	}
 
 	// end region -> Getters
@@ -110,6 +120,17 @@ public class CostumerEntity implements IEntity
 		this.m_approved = m_approved;
 	}
 
+	/**
+	 * Upgrade the refunds of the costumer.
+	 *
+	 * @param m_refund
+	 *            the m_refund to set
+	 */
+	public void setRefund(Double m_refund)
+	{
+		this.m_refund = m_refund;
+	}
+
 	// end region -> Setters
 
 	// region Constructors
@@ -126,13 +147,17 @@ public class CostumerEntity implements IEntity
 	 *            An enumerator which describes the costumer subscription.
 	 * @param approved
 	 *            A boolean which describes the costumer approval.
+	 * @param refunds
+	 *            The amount of refund the costumer has.
 	 */
-	public CostumerEntity(Integer id, String creditCard, CostumerSubscription subscription, Boolean approved)
+	public CostumerEntity(Integer id, String creditCard, CostumerSubscription subscription, Boolean approved,
+			Double refunds)
 	{
 		m_id = id;
 		m_creditCard = creditCard;
 		m_subscription = subscription;
 		m_approved = approved;
+		m_refund = refunds;
 	}
 
 	/**
@@ -145,7 +170,7 @@ public class CostumerEntity implements IEntity
 	 */
 	public CostumerEntity(Integer id, CostumerSubscription subscription)
 	{
-		this(id, null, subscription, null);
+		this(id, null, subscription, null, 0.0);
 	}
 
 	/**
@@ -158,7 +183,7 @@ public class CostumerEntity implements IEntity
 	 */
 	public CostumerEntity(Integer id, String creditCard)
 	{
-		this(id, creditCard, CostumerSubscription.None, null);
+		this(id, creditCard, CostumerSubscription.None, null, 0.0);
 	}
 
 	/**
@@ -171,7 +196,7 @@ public class CostumerEntity implements IEntity
 	 */
 	public CostumerEntity(Integer id, Boolean approved)
 	{
-		this(id, null, CostumerSubscription.None, approved);
+		this(id, null, CostumerSubscription.None, approved, 0.0);
 	}
 
 	/**
@@ -183,7 +208,7 @@ public class CostumerEntity implements IEntity
 	 */
 	public CostumerEntity(Integer id)
 	{
-		this(id, null, CostumerSubscription.None, null);
+		this(id, null, CostumerSubscription.None, null, 0.0);
 	}
 
 	// end region -> Constructors
@@ -223,7 +248,7 @@ public class CostumerEntity implements IEntity
 	public String toString()
 	{
 		return "CostumerEntity [ID=" + m_id + ", credit card=" + m_creditCard + ", costumer subscription="
-				+ m_subscription + ", costumer approval=" + m_approved + "]";
+				+ m_subscription + ", costumer approval=" + m_approved + ", costumer refunds=" + m_refund + "]";
 	}
 
 	// end region -> Override Object Methods

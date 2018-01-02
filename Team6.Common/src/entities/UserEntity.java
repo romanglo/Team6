@@ -124,6 +124,18 @@ public class UserEntity implements IEntity
 	
 	
 
+	/**
+	 * Create instance of {@link UserEntity}. The message contains only 'UserName'
+	 * field all the other fields are <code>null</code>.
+	 * 
+	 * @param userName
+	 *            An unique UserName of the user.
+	 */
+	public UserEntity(String userName)
+	{
+		this(userName, null, null, null, null);
+	}
+
 	// end region -> Constructors
 
 	// region Override Object Methods
@@ -140,7 +152,7 @@ public class UserEntity implements IEntity
 		return result;
 	}
 
-	/** 
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -155,6 +167,16 @@ public class UserEntity implements IEntity
 		} else if (!m_userName.equals(other.m_userName)) return false;
 		return true;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString()
+	{
+		return "UserEntity [UserName=" + m_userName + ", Password=" + m_password + ", Email=" + m_email
+				+ ", UserPrivilege=" + m_userPrivilege + ", UserStatus=" + m_userStatus + "]";
+	}
+
 	// end region -> Override Object Methods
 }

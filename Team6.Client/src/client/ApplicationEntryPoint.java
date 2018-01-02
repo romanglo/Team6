@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.istack.internal.Nullable;
+
 import common.UncaughetExceptions;
+import entities.UserEntity;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -33,6 +36,11 @@ public class ApplicationEntryPoint extends Application
 	 * Client connection management instance.
 	 */
 	public static Client Client;
+
+	/**
+	 * The connected user, can be <code>null</code> if no connected user exists.
+	 */
+	@Nullable public static UserEntity ConnectedUser = null;
 
 	/* End of --> Fields region */
 
@@ -71,8 +79,8 @@ public class ApplicationEntryPoint extends Application
 	{
 		ClientConfiguration = client.ClientConfiguration.getInstance();
 		if (ClientConfiguration.isDefaultConfiguration()) {
-			s_logger.warning("Failed on try to read configuration from \"" + client.ClientConfiguration.CONFIGURATION_PATH
-					+ "\". Created default configuration.");
+			s_logger.warning("Failed on try to read configuration from \""
+					+ client.ClientConfiguration.CONFIGURATION_PATH + "\". Created default configuration.");
 		}
 		s_logger.config("Client configuration loaded:" + ClientConfiguration.toString());
 	}
@@ -98,7 +106,7 @@ public class ApplicationEntryPoint extends Application
 	/* End of --> Initializing methods region */
 
 	/* region Application override methods */
-	
+
 	/**
 	 * Method opens the UI of the client.
 	 */
@@ -110,8 +118,12 @@ public class ApplicationEntryPoint extends Application
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.setMinWidth(445);
-			primaryStage.setMinHeight(450);
+			primaryStage.setMinWidth(700);
+			primaryStage.setMinHeight(500);
+			primaryStage.setMaxWidth(700);
+			primaryStage.setMaxHeight(500);
+			primaryStage.setWidth(700);
+			primaryStage.setHeight(500);
 			primaryStage.setTitle("Zer-Li");
 			primaryStage.show();
 		}
@@ -147,7 +159,6 @@ public class ApplicationEntryPoint extends Application
 
 	/* End of --> Application override methods region */
 
-
 	/* Private disposing methods region */
 
 	/**
@@ -160,7 +171,7 @@ public class ApplicationEntryPoint extends Application
 			Client.closeConnectionWithServer();
 			s_logger.info("Client disposed successfully");
 		}
-		Client=null;
+		Client = null;
 	}
 
 	/* End of --> Private disposing methods region */

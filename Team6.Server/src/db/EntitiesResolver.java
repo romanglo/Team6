@@ -129,7 +129,7 @@ public class EntitiesResolver {
 		}
 
 		if (failedResolve != 0) {
-			s_logger.warning("Failed to resolve " + failedResolve + " rows to ItemEntity");
+			s_logger.warning("Failed to resolve " + failedResolve + " rows to UserEntity");
 		}
 		return userEntities.isEmpty() ? null : userEntities;
 	}
