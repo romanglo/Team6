@@ -123,6 +123,9 @@ public class CatalogItemRow
 	 */
 	private Image ResizeImage(Image imageToResize)
 	{
+		if (imageToResize == null) {
+			return null;
+		}
 		BufferedImage imageReader = SwingFXUtils.fromFXImage(imageToResize, null);
 		BufferedImage newImage = ImageNewScale(imageReader, 80, 80);
 		Image finalImage = SwingFXUtils.toFXImage(newImage, null);
