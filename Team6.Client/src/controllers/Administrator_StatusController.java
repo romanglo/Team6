@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -28,11 +29,13 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
+import messages.EntitiesListData;
 import messages.Message;
 import messages.MessagesFactory;
 
@@ -57,7 +60,7 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	
 	@FXML private Button back_btn;
 	
-	@FXML private ChoiceBox<String> usercmb;
+	@FXML private ChoiceBox<String> cmb_user;
 	
 	@FXML private ChoiceBox<String> cmb_status;
 	
@@ -75,10 +78,12 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	ObservableList<String> list;
 	
 	ArrayList<IEntity> arrlist;
+	
+	ArrayList<String> userNameArr= new ArrayList<String>();
 
 
 	
-	String[] statuses = {"Actived", "Blocked"};	/* End of --> Fields region */
+	String[] statuses = {"disconnected", "Blocked"};	/* End of --> Fields region */
 
 	/* UI events region */
 
@@ -101,24 +106,13 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 
 	private void initializeUsers()
 	{
-		ArrayList<String> temp = new ArrayList<>();
-		UserEntity entity= new UserEntity();
-		Message msg= MessagesFactory.createGetAllEntityMessage(entity);
+		UserEntity tempEntity = new UserEntity();
+		Message msg= MessagesFactory.createGetAllEntityMessage(tempEntity);
 		m_client.sendMessageToServer(msg);
-		for(int i=0;i<arrlist.size();i++)
-		{
-			UserEntity tempEntity = (UserEntity) arrlist.get(i);
-			temp.add(tempEntity.getUserName());	
-		}
-		list = FXCollections.observableArrayList(temp);
-		cmb_privillge.setItems(list);
-		
-		
 	}
 
 	private void initializePrivillge()
 	{
-		// TODO раам: Auto-generated method stub
 		ArrayList<String> al = new ArrayList<String>();	
 		al.add("CompanyEmployee");
 		al.add("ShopManager");
@@ -197,6 +191,46 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 		
 	}
 	
+	/**
+	 * TODO раам: Auto-generated comment stub - Change it!
+	 *
+	 * @param event
+	 * @throws IOException
+	 */
+	public void updatebtn(ActionEvent event) throws IOException
+	{
+		if(cmb_status.getValue()!=null&&cmb_privillge.getValue()!=null)
+		{
+
+		}
+	}
+	
+	/**
+	 * TODO раам: Auto-generated comment stub - Change it!
+	 *
+	 * @param event
+	 * @throws IOException
+	 */
+	
+	@FXML
+	public void checkBoxSelected(ActionEvent event) throws IOException
+	{
+		for(int i=0;i<arrlist.size();i++) 
+		{
+			UserEntity tempEntity = (UserEntity) arrlist.get(i);
+			if(tempEntity.getUserName().equals(cmb_user.getValue())) 
+			{
+				//	cmb_status.setSelectionModel();
+				//for(int j=0 ; j<8 ; j++) 
+				//{
+				//	if(tempEntity.getUserPrivilege().equals(((List<String>) cmb_privillge).get(j)))
+				//		cmb_status.setAccessibleText(tempEntity.getUserPrivilege().toString());
+				//}
+			}
+		} 
+		
+	}
+	
 	
 
 	/**
@@ -204,13 +238,19 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	 */
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		if(msg.getMessageData() instanceof ArrayList<?>)
+		//if(msg.getMessageData() instanceof ArrayList<?>)
 		{
-		arrlist = (ArrayList<IEntity>) msg.getMessageData();
+		EntitiesListData entityListData=(EntitiesListData) msg.getMessageData();
+		arrlist = (ArrayList<IEntity>) entityListData.getEntities();
+		for(int i=0;i<arrlist.size();i++)
+		{
+			UserEntity tempEntity = (UserEntity) arrlist.get(i);
+			userNameArr.add(tempEntity.getUserName());	
 		}
-		//message
-		//message-> Data
-		//message data cast arrtlist<IEntity>
+		list = FXCollections.observableArrayList(userNameArr);
+		cmb_user.setItems(list);
+		}
+		
 		
 	}
 

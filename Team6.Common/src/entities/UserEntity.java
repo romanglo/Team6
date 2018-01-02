@@ -84,6 +84,25 @@ public class UserEntity implements IEntity
 	{
 		m_userStatus = userStatus;
 	}
+	
+	/**
+	 *
+	 * @param userEntity
+	 */
+	public void setUserPassword(String password)
+	{
+		m_password = password;
+	}
+	
+	/**
+	 *
+	 * @param userEntity
+	 */
+	public void setUserEmail(String email)
+	{
+		m_email= email;
+	}
+	
 
 	// end region -> Setters
 

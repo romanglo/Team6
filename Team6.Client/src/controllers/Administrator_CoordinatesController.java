@@ -7,13 +7,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import entities.IEntity;
+import entities.UserEntity;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -22,18 +24,17 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
 import messages.EntitiesListData;
+import messages.EntityData;
 import messages.Message;
-import ocsf.client.AbstractClient;
+import messages.MessagesFactory;
+
 
 
 /**
@@ -52,19 +53,13 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 
 	@FXML private ImageView imageview_title;
 	
-	@FXML private Button update;
-	
-	@FXML private Button back;
-	
-	@FXML private Button get;
-	
-	@FXML private TextField customerId;
+	@FXML private javafx.scene.control.TextField customerId;
 
-	@FXML private TextField username;
+//	@FXML private TextField customerId;
 
-	@FXML private TextField email;
+	@FXML private javafx.scene.control.TextField email;
 
-	@FXML private TextField password;
+	@FXML private javafx.scene.control.TextField password;
 	
 	@FXML private Label customerIdLabel;
 	
@@ -81,7 +76,29 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 	private Client m_client;
 
 	private ClientConfiguration m_configuration;
+	
+	private UserEntity userEntity;
+	
+	ArrayList<IEntity> arrlist;
+
+	UserEntity tempEntity;
 	/* End of --> Fields region */
+	
+	/* Private methods region*/
+	private void showInformationMessage(String message)
+	{
+		if (message == null || message.isEmpty()) {
+			return;
+		}
+		javafx.application.Platform.runLater(() -> {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Information Dialog");
+			alert.setHeaderText(null);
+			alert.setContentText(message);
+			alert.showAndWait();
+		});
+	}
+	/* End of --> Private methods reegion*/
 
 	/* UI events region */
 
@@ -138,13 +155,17 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 	/* Client handlers implementation region */
 	public void getBtn(ActionEvent event)
 	{
-		String id;
-		id= customerId.getText();
-		//messages.;
-		username.setText("complete");//
-		email.setText("complete");//
-		password.setText("complete");//
+		String userName;
+		userName= customerId.getText();
+		UserEntity tempEntity = new UserEntity();
+		Message msg= MessagesFactory.createGetAllEntityMessage(tempEntity);
+		m_client.sendMessageToServer(msg);
 	}
+	/**
+	 *
+	 * @param event
+	 * @throws IOException
+	 */
 	public void backbtn (ActionEvent event) throws IOException
 	{
 		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
@@ -167,11 +188,29 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 	 * TODO раам: Auto-generated comment stub - Change it!
 	 *
 	 * @param event
+	 * @throws IOException
 	 */
-	public void updateBtn(ActionEvent event)
+	public void updatebtn (ActionEvent event) throws IOException
 	{
-		//send to server entity to update
+		if(email.getText().equals(""))
+			showInformationMessage("Please enter email.");
+		else if(password.getText().equals(""))
+			showInformationMessage("Please enter password.");
+		else if (customerId.getText().equals(""))
+			showInformationMessage("Please enter username to edit.");
+		else
+		{
+			tempEntity.setUserEmail(email.getText());
+			tempEntity.setUserPassword(password.getText());
+			Message entityMessage = MessagesFactory
+					.createUpdateEntityMessage(tempEntity);
+			m_client.sendMessageToServer(entityMessage);
+		}
+
+
 	}
+	
+	
 	
 	/**
 	 * {@inheritDoc}
@@ -179,7 +218,24 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Shimon : Add event handling
+		{
+			EntitiesListData entityListData=(EntitiesListData) msg.getMessageData();
+			arrlist = (ArrayList<IEntity>) entityListData.getEntities();
+			for(int i=0;i<arrlist.size();i++)
+			{
+				String name = customerId.getText();
+				tempEntity = (UserEntity) arrlist.get(i);
+				if(tempEntity.getUserName().equals(name))
+					break;
+					
+			}
+			if(tempEntity!=null) 
+			{
+				email.setText(tempEntity.getEmail());
+				password.setText(tempEntity.getPassword());	
+			}
+			
+		}
 	}
 
 	/**

@@ -11,7 +11,7 @@
          <children>
             <Button layoutX="59.0" layoutY="99.0" mnemonicParsing="false" onAction="#changeCustomerCoordinates" text="Change customer coordinates" /> 
             <Button layoutX="59.0" layoutY="166.0" mnemonicParsing="false" text="Update customer status and privilge" onAction="#updateUserStatus" />
-            <Button layoutX="59.0" layoutY="229.0" mnemonicParsing="false" text="Exit from system" />
+            <Button layoutX="59.0" layoutY="229.0" mnemonicParsing="false" text="Exit from system" onAction="#closeWindow" />
          </children></AnchorPane>
 
 		<!--  Title: -->

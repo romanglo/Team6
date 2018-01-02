@@ -11,17 +11,15 @@
 
 		<AnchorPane layoutY="79.0" prefHeight="368.0" prefWidth="450.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
          <children>
-            <TextField layoutX="129.0" layoutY="35.0" />
-            <Label layoutX="40.0" layoutY="39.0" text="Customer I.D." />
-            <Label layoutX="42.0" layoutY="89.0" text="Username" />
-            <Label layoutX="40.0" layoutY="134.0" text="Email" />
-            <Label layoutX="41.0" layoutY="184.0" text="Password" />
-            <TextField layoutX="129.0" layoutY="85.0" />
-            <TextField layoutX="129.0" layoutY="130.0" />
-            <TextField layoutX="129.0" layoutY="180.0" />
-            <Button layoutX="112.0" layoutY="244.0" mnemonicParsing="false" text="Update" />
+            <Label layoutX="40.0" layoutY="35.0" text="Username" />
+            <Label layoutX="40.0" layoutY="70.0" text="Email" />
+            <Label layoutX="41.0" layoutY="105.0" text="Password" />
+            <TextField fx:id="customerId" layoutX="140" layoutY="35.0" />
+            <TextField fx:id="email" layoutX="140.0" layoutY="70.0" />
+            <TextField fx:id="password" layoutX="140.0" layoutY="105.0" />
+            <Button layoutX="112.0" layoutY="244.0" mnemonicParsing="false" text="Update" onAction="#updatebtn" />
             <Button layoutX="224.0" layoutY="244.0" mnemonicParsing="false" text="Back" onAction="#backbtn" />
-            <Button layoutX="296.0" layoutY="35.0" mnemonicParsing="false" text="Get" />
+            <Button layoutX="296.0" layoutY="35.0" mnemonicParsing="false" text="Get" onAction="#getBtn" />
          </children></AnchorPane>
 
 		<!--  Title: -->

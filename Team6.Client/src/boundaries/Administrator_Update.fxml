@@ -11,7 +11,7 @@
 
 		<AnchorPane layoutY="79.0" prefHeight="368.0" prefWidth="450.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
          <children>
-            <ChoiceBox fx:id="cmb_users" layoutX="140.0" layoutY="39.0" prefWidth="150.0" />
+            <ChoiceBox fx:id= "cmb_user" layoutX="140.0" layoutY="39.0" prefWidth="150.0" onAction="#checkBoxSelected" />
             <ChoiceBox fx:id="cmb_privillge" layoutX="140.0" layoutY="155.0" prefWidth="150.0"  />
             <ChoiceBox fx:id="cmb_status" layoutX="140.0" layoutY="97.0" prefWidth="150.0" /> 
             <Label layoutX="21.0" layoutY="43.0" text="Customer's user" />

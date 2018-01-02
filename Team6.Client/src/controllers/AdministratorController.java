@@ -118,7 +118,7 @@ public class AdministratorController implements Initializable, Client.ClientStat
 		((Node)e.getSource()).getScene().getWindow().hide(); //hiding primary window
 		Stage primaryStage = new Stage();
 		FXMLLoader loader = new FXMLLoader();
-		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinatse.fxml").openStream());
+		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinates.fxml").openStream());
 		@SuppressWarnings("unused") Administrator_CoordinatesController AdministratorCoordinatesController  = loader.getController();
 		
 		
@@ -156,17 +156,27 @@ public class AdministratorController implements Initializable, Client.ClientStat
 	}
 	
 	/**
+	 *
+	 * @param event
+	 * @throws IOException
+	 */
+	public void closeWindow(ActionEvent event) throws IOException
+	{
+		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
+	}
+	
+	/**
 	 * TODO раам: Auto-generated comment stub - Change it!
 	 *
 	 * @param e
 	 * @throws IOException
 	 */
-	@SuppressWarnings("javadoc") public void coordinatesUpdate (ActionEvent e) throws IOException
+	/*@SuppressWarnings("javadoc") public void coordinatesUpdate (ActionEvent e) throws IOException
 	{
 		((Node)e.getSource()).getScene().getWindow().hide(); //hiding primary window
 		Stage primaryStage = new Stage();
 		FXMLLoader loader = new FXMLLoader();
-		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinatse.fxml").openStream());
+		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinates.fxml").openStream());
 		Administrator_CoordinatesController Administrator_CoordinatesController  = loader.getController();
 		
 		
@@ -177,7 +187,7 @@ public class AdministratorController implements Initializable, Client.ClientStat
 		primaryStage.setTitle("Change User Status & Privillige");
 		primaryStage.show();
 		
-	}
+	}*/
 
 	/**
 	 * {@inheritDoc}
