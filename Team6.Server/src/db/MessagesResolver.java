@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -12,6 +11,7 @@ import connectivity.Server;
 import entities.IEntity;
 import entities.ItemEntity;
 import entities.UserEntity;
+import entities.UserStatus;
 import javafx.scene.image.Image;
 import logger.LogManager;
 import messages.EntitiesListData;
@@ -19,6 +19,7 @@ import messages.EntityData;
 import messages.EntityDataCollection;
 import messages.EntityDataOperation;
 import messages.IMessageData;
+import messages.LoginData;
 import messages.Message;
 import utilities.ImageUtilities;
 
@@ -75,18 +76,57 @@ public class MessagesResolver implements Server.MessagesHandler {
 	@Override
 	public synchronized Message onMessageReceived(Message msg) throws Exception {
 		IMessageData messageData = msg.getMessageData();
-		if (messageData instanceof EntityData) {
-			IMessageData returnedMessageData = onEntityDataReceived(messageData);
-			if (returnedMessageData != null) {
-				msg.setMessageData(returnedMessageData);
-				return msg;
-			}
+		IMessageData returnedMessageData = null;
+		if (messageData instanceof LoginData) {
+			returnedMessageData = onLoginDataReceived((LoginData) messageData);
+		} else if (messageData instanceof EntityData) {
+			returnedMessageData = onEntityDataReceived(messageData);
 		} else if (messageData instanceof EntitiesListData) {
 
 		} else if (messageData instanceof EntityDataCollection) {
 
 		}
+
+		if (returnedMessageData != null) {
+			msg.setMessageData(returnedMessageData);
+			return msg;
+		}
+
 		return null;
+	}
+
+	private IMessageData onLoginDataReceived(LoginData loginData) {
+		IMessageData userEntityData = onUserEntityReceived(new UserEntity(loginData.getUserName()),
+				EntityDataOperation.Get);
+
+		if (userEntityData == null) {
+			loginData.setMessage("The username does not exist.");
+			return loginData;
+		}
+
+		IEntity entity = ((EntityData) userEntityData).getEntity();
+		UserEntity userEntity = (UserEntity) entity;
+		if (!loginData.getPassword().equals(userEntity.getPassword())) {
+			loginData.setMessage("The password does not match!");
+			return loginData;
+		}
+
+		if(loginData.isLogoutMessage()) {
+			if(userEntity.getUserStatus() == UserStatus.Connected) {
+				userEntity.setUserStatus(UserStatus.Disconnected);
+				onUserEntityReceived(userEntity, EntityDataOperation.Update);
+			}
+			return null;
+		}
+		
+		if (userEntity.getUserStatus() == UserStatus.Disconnected) {
+			//TODO ROMAN - uncomment it when disconnected message will arrive.
+//			userEntity.setUserStatus(UserStatus.Connected);
+//			onUserEntityReceived(userEntity, EntityDataOperation.Update);
+//			userEntity.setUserStatus(UserStatus.Disconnected);
+		}
+
+		return userEntityData;
 	}
 
 	private IMessageData onEntityDataReceived(IMessageData messageData) throws Exception {
@@ -174,7 +214,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return false;
 		}
 
-		String removeQuery = MessageFormat.format("DELETE * FROM items WHERE iId = {0} ;", id);
+		String removeQuery = "DELETE * FROM items WHERE iId = " + id + " ;";
 		return m_dbController.executeQuery(removeQuery);
 	}
 
@@ -245,7 +285,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return null;
 		}
 
-		String selectQuery = MessageFormat.format("SELECT * FROM items WHERE iId = {0} ;", id);
+		String selectQuery = "SELECT * FROM items WHERE iId = " + id + " ;";
 		ResultSet queryResult = null;
 
 		try {
@@ -283,7 +323,9 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return getUserEntityExecution(userEntity);
 		case GetALL:
 			return getAllUserEntitiesExecution();
-
+		case Update:
+			updateUserEntityExecution(userEntity);
+			break;
 		default:
 			break;
 		}
@@ -325,7 +367,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return null;
 		}
 
-		String selectQuery = MessageFormat.format("SELECT * FROM users WHERE uUserName = {0} ;", userName);
+		String selectQuery = "SELECT * FROM users WHERE uUserName = '" + userName + "';";
 		ResultSet queryResult = null;
 
 		try {
@@ -351,6 +393,29 @@ public class MessagesResolver implements Server.MessagesHandler {
 		}
 
 		return null;
+	}
+
+	private boolean updateUserEntityExecution(UserEntity userEntity) {
+		if (userEntity == null) {
+			return false;
+		}
+
+		String userName = userEntity.getUserName();
+		if (!(userName != null && !userName.isEmpty())) {
+			return false;
+		}
+		try {
+
+			String query = "UPDATE users SET uPassword = \'" + userEntity.getPassword() + "\' , uEmail = \'"
+					+ userEntity.getEmail() + "\' , uPrivilege = \'" + userEntity.getUserPrivilege()
+					+ "\' , uStatus = \'" + userEntity.getUserStatus() + "\' WHERE uUserName = \'" + userName + "\';";
+			return m_dbController.executeQuery(query);
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute update query of: " + userEntity.toString() + ", exception: "
+					+ e.getMessage());
+		}
+		return false;
 	}
 
 	// end region -> UserEntity Operations
