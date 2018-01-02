@@ -20,9 +20,9 @@
 				</columns>
 			</TableView>
 			<Button layoutX="236.0" layoutY="253.0" mnemonicParsing="false" onAction="#backButtonClick" text="Back" AnchorPane.bottomAnchor="13.800000000000011" AnchorPane.rightAnchor="113.19999999999999" />
-			<Label layoutX="12.000000000000021" layoutY="257.0" text="Total Price" AnchorPane.bottomAnchor="17.80000000000001" AnchorPane.rightAnchor="322.4" />
-			<Label fx:id="total_price_label" layoutX="110.0" layoutY="257.0" prefHeight="17.0" prefWidth="81.0" AnchorPane.bottomAnchor="17.8" AnchorPane.rightAnchor="198.8" />
-			<Button layoutX="292.0" layoutY="253.0" mnemonicParsing="false" onAction="#paymentButtonClick" text="Payment" AnchorPane.bottomAnchor="13.8" AnchorPane.rightAnchor="35.6" />
+			<Label layoutX="34.00000000000002" layoutY="257.0" text="Total Price" AnchorPane.bottomAnchor="17.80000000000001" AnchorPane.rightAnchor="300.4" />
+			<Label fx:id="total_price_label" layoutX="132.0" layoutY="257.0" prefHeight="17.0" prefWidth="81.0" AnchorPane.bottomAnchor="17.80000000000001" AnchorPane.rightAnchor="176.8" />
+			<Button fx:id="changing_button" layoutX="292.0" layoutY="253.0" mnemonicParsing="false" onAction="#changingButtonClick" text="Payment" AnchorPane.bottomAnchor="13.8" AnchorPane.rightAnchor="35.6" />
 		</AnchorPane>
 
 		<!-- Title: -->

@@ -172,10 +172,10 @@ public class CompanyEmployeeController
 	 */
 	private void catalogInit()
 	{
-		catalog.add(new CatalogItemRow(1, "Rose", "Flower", 19.99, "red"));
-		catalog.add(new CatalogItemRow(2, "Rose2", "Flower2", 29.99, "blue"));
-		catalog.add(new CatalogItemRow(3, "Rose3", "Flower3", 39.99, "red"));
-		catalog.add(new CatalogItemRow(4, "Rose4", "Flower4", 49.99, "blue"));
+		catalog.add(new CatalogItemRow(1, "Rose", "Flower", 19.99, "White"));
+		catalog.add(new CatalogItemRow(2, "Rose2", "Flower2", 29.99, "Red"));
+		catalog.add(new CatalogItemRow(3, "Rose3", "Flower3", 39.99, "Green"));
+		catalog.add(new CatalogItemRow(4, "Rose4", "Flower4", 49.99, "Blue"));
 	}
 
 	/**
@@ -227,8 +227,9 @@ public class CompanyEmployeeController
 							case "type":
 								if (!(resultString.equals(ProductType.Flower.toString())
 										|| resultString.equals(ProductType.FlowerPot.toString())
-										|| resultString.equals(ProductType.BridalBouquet.toString()))) {
-									displayErrorMessage("The type you entered doesn't exist");
+										|| resultString.equals(ProductType.BridalBouquet.toString())
+										|| resultString.equals(ProductType.FlowerArrangement.toString()))) {
+									ErrorMSG("The type you entered doesn't exist");
 									// TODO: log warning and exit method
 
 								} else {
@@ -238,7 +239,7 @@ public class CompanyEmployeeController
 							case "price":
 								Double price = Double.parseDouble(resultString);
 								if (price <= 0) {
-									displayErrorMessage("The price you entered lower then 0");
+									ErrorMSG("The price you entered lower then 0");
 									return;
 									// TODO: log warning and exit method
 								} else {
@@ -246,10 +247,9 @@ public class CompanyEmployeeController
 								}
 
 						}
-						ProductType itemType = ParseStringToProductType(rowData.getM_type());
-						itemChanged.add(new ItemEntity(rowData.getM_id(), rowData.getM_name(), itemType,
-								rowData.getM_price(), rowData.getM_image()));
-					} else if (pickType.equals("image")) {
+						itemChanged.add(new ItemEntity(rowData.getM_id(), rowData.getM_name(), ParseStringToProductType(rowData.getM_type()),
+								rowData.getM_price(), rowData.getM_domainColor(), rowData.getM_image()));
+					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("image")) {
 
 						FileChooser fileChooser = new FileChooser();
 						fileChooser.setTitle("Open Resource File");
@@ -259,12 +259,11 @@ public class CompanyEmployeeController
 							BufferedImage imageReader = ImageIO.read(selectedImage);
 							Image finalImage = SwingFXUtils.toFXImage(imageReader, null);
 							rowData.setM_image(finalImage);
-							ProductType itemType = ParseStringToProductType(rowData.getM_type());
-							itemChanged.add(new ItemEntity(rowData.getM_id(), rowData.getM_name(), itemType,
-									rowData.getM_price(), rowData.getM_image()));
+							itemChanged.add(new ItemEntity(rowData.getM_id(), rowData.getM_name(), ParseStringToProductType(rowData.getM_type()),
+									rowData.getM_price(), rowData.getM_domainColor(), rowData.getM_image()));
 						}
 						catch (NullPointerException e) {
-							displayErrorMessage("The chosen file isn't image file");
+							ErrorMSG("The chosen file isn't image file");
 							// TODO: log warning : chosen file isn't image file., and exit method
 						}
 						catch (Exception e) {
@@ -295,14 +294,15 @@ public class CompanyEmployeeController
 	 */
 	private ProductType ParseStringToProductType(String stringItemType)
 	{
-		if (stringItemType.equalsIgnoreCase("Flower")) {
-			return ProductType.Flower;
-		}else if (stringItemType.equalsIgnoreCase("FlowerPot")) {
-			return ProductType.FlowerPot;
-		}else if (stringItemType.equalsIgnoreCase("BridalBouquet")) {
-			return ProductType.BridalBouquet;
-		} else if (stringItemType.equalsIgnoreCase("FlowerArrangement")) {
-			return ProductType.FlowerArrangement;
+		switch (stringItemType) {
+			case "Flower":
+				return ProductType.Flower;
+			case "FlowerPot":
+				return ProductType.FlowerPot;
+			case "BridalBouquet":
+				return ProductType.BridalBouquet;
+			case "FlowerArrangement":
+				return ProductType.FlowerArrangement;
 		}
 		return null;
 	}
@@ -319,7 +319,7 @@ public class CompanyEmployeeController
 		catalog_table.refresh();
 	}
 
-	private void displayErrorMessage(String errorType)
+	private void ErrorMSG(String errorType)
 	{
 		Alert errorMessage = new Alert(AlertType.ERROR);
 		errorMessage.setTitle("Error Message");
@@ -331,6 +331,15 @@ public class CompanyEmployeeController
 	{
 		button_save.setDisable(false);
 		button_reset.setDisable(false);
+	}
+	
+	private void CleanSavedDataArray()
+	{
+		button_reset.setDisable(true);
+		button_save.setDisable(true);
+		itemAdded.clear();
+		itemChanged.clear();
+		itemRemoved.clear();
 	}
 	/* End of --> Initializing methods region */
 
@@ -354,7 +363,7 @@ public class CompanyEmployeeController
 		String resultString = result.get();
 
 		if (resultString == null || resultString.isEmpty()) {
-			displayErrorMessage("Invalid Input");
+			ErrorMSG("Invalid Input");
 			return;
 		}
 
@@ -365,15 +374,14 @@ public class CompanyEmployeeController
 		for (i = 0; i < catalog.size(); i++) {
 			idInTable = catalog.get(i).getM_id();
 			if (idToRemove == idInTable) {
-				ProductType itemType = ParseStringToProductType(catalog.get(i).getM_type());
-				itemRemoved.add(new ItemEntity(idToRemove, catalog.get(i).getM_name(), itemType,
-						catalog.get(i).getM_price(), catalog.get(i).getM_image()));
+				itemRemoved.add(new ItemEntity(idToRemove, catalog.get(i).getM_name(), ParseStringToProductType(catalog.get(i).getM_type()),
+						catalog.get(i).getM_price(), catalog.get(i).getM_domainColor(), catalog.get(i).getM_image()));
 				catalog.remove(i);
 				drawContantToTable();
 				return;
 			}
 		}
-		displayErrorMessage("Item ID doesn't exist");
+		ErrorMSG("Item ID doesn't exist");
 	}
 
 	/**
@@ -385,11 +393,7 @@ public class CompanyEmployeeController
 	private void ResetChanges(ActionEvent event)
 	{
 		// TODO: get item list from server (re-init ObservableList)
-		button_reset.setDisable(true);
-		button_save.setDisable(true);
-		itemAdded.clear();
-		itemChanged.clear();
-		itemRemoved.clear();
+		CleanSavedDataArray();
 	}
 
 	@FXML
@@ -426,6 +430,9 @@ public class CompanyEmployeeController
 				imagePath.setText(addItemImage.showOpenDialog(null).getAbsolutePath());
 			}
 		});
+		
+		TextField textDomainColor = new TextField();
+		textDomainColor.setPromptText("Enter Domain Color");
 
 		ButtonType buttonTypeOk = new ButtonType("Done", ButtonData.OK_DONE);
 		addDialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
@@ -452,15 +459,15 @@ public class CompanyEmployeeController
 
 					if (newItemImage == null) {
 						newItem = new CatalogItemRow(5, buttonName.getText(), comboBoxType.getValue(),
-								Double.parseDouble(buttonPrice.getText()), "red");
+								Double.parseDouble(buttonPrice.getText()), textDomainColor.getText());
 					} else {
 						newItem = new CatalogItemRow(5, buttonName.getText(), comboBoxType.getValue(),
-								Double.parseDouble(buttonPrice.getText()), "red", newItemImage);
+								Double.parseDouble(buttonPrice.getText()), textDomainColor.getText(), newItemImage);
 					}
 
 					itemAdded.add(
 							new ItemEntity(5, buttonName.getText(), ParseStringToProductType(comboBoxType.getValue()),
-									Double.parseDouble(buttonPrice.getText()), newItem.getM_image()));
+									Double.parseDouble(buttonPrice.getText()),textDomainColor.getText(), newItem.getM_image()));
 					catalog.add(newItem);
 					CatalogChanged();
 					drawContantToTable();
@@ -477,10 +484,12 @@ public class CompanyEmployeeController
 		dialogGrid.add(comboBoxType, 2, 8);
 		dialogGrid.add(new Label("Price: "), 1, 10);
 		dialogGrid.add(buttonPrice, 2, 10);
-		dialogGrid.add(new Label("Image (Optional): "), 1, 20);
-		dialogGrid.add(buttonImage, 2, 20);
-		dialogGrid.add(new Label("Image Path:"), 1, 22);
-		dialogGrid.add(imagePath, 2, 22);
+		dialogGrid.add(new Label("Domain Color: "), 1, 20);
+		dialogGrid.add(textDomainColor, 2, 20);
+		dialogGrid.add(new Label("Image (Optional): "), 1, 22);
+		dialogGrid.add(buttonImage, 2, 22);
+		dialogGrid.add(new Label("Image Path:"), 1, 24);
+		dialogGrid.add(imagePath, 2, 24);
 		addDialog.getDialogPane().setContent(dialogGrid);
 
 		Optional<CatalogItemRow> result = addDialog.showAndWait();
@@ -496,11 +505,7 @@ public class CompanyEmployeeController
 	private void SaveChanges(ActionEvent event)
 	{
 		// TODO: Send saved changes to server and re-init catalog
-		button_reset.setDisable(true);
-		button_save.setDisable(true);
-		itemAdded.clear();
-		itemChanged.clear();
-		itemRemoved.clear();
+		CleanSavedDataArray();
 	}
 
 	/**

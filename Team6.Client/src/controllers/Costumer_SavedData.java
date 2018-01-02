@@ -28,6 +28,14 @@ public class Costumer_SavedData
 	// region Getters
 
 	/**
+	 * @return Reservation entity.
+	 */
+	public static ReservationEntity getReservationEntity()
+	{
+		return s_reservationEntity;
+	}
+
+	/**
 	 * @return costumer entity.
 	 */
 	public static CostumerEntity getCostumer()
@@ -65,6 +73,30 @@ public class Costumer_SavedData
 	public static CostumerSubscription getSubscription()
 	{
 		return s_reservationEntity.getCostumer().getSubscription();
+	}
+
+	/**
+	 * @return The refunds that the costumer has.
+	 */
+	public static Double getCostumerRefund()
+	{
+		return s_reservationEntity.getCostumer().getCostumerRefunds();
+	}
+
+	/**
+	 * @return The total price of the reservation.
+	 */
+	public static Double getTotalPrice()
+	{
+		return s_reservationEntity.getTotalPrice();
+	}
+
+	/**
+	 * @return A enumerator which describes the reservation type.
+	 */
+	public static ReservationType getType()
+	{
+		return s_reservationEntity.getType();
 	}
 
 	// end region -> Getters
@@ -105,17 +137,6 @@ public class Costumer_SavedData
 	}
 
 	/**
-	 * Upgrade the approval status of the costumer.
-	 *
-	 * @param approved
-	 *            the approved to set
-	 */
-	public static void setApproved(Boolean approved)
-	{
-		s_reservationEntity.getCostumer().setApproved(approved);
-	}
-
-	/**
 	 * Upgrade the {@link ItemEntity} of the costumer.
 	 *
 	 * @param reservationList
@@ -123,9 +144,9 @@ public class Costumer_SavedData
 	 */
 	public static void setReservationList(ArrayList<ItemEntity> reservationList)
 	{
-		s_reservationEntity.setReservationList(reservationList);
+		s_reservationList = reservationList;
 	}
-	
+
 	/**
 	 * Upgrade the {@link ItemEntity} of the costumer.
 	 */
@@ -148,26 +169,54 @@ public class Costumer_SavedData
 		}
 	}
 
+	/**
+	 * Update the refunds of the costumer.
+	 *
+	 * @param refund
+	 *            The refunds of the costumer.
+	 */
+	public static void setRefund(Double refund)
+	{
+		s_reservationEntity.getCostumer().setRefund(refund);
+	}
+
+	/**
+	 * Update the price of the reservation.
+	 *
+	 * @param price
+	 *            The total price of the reservation.
+	 */
+	public static void setTotalPrice(Double price)
+	{
+		s_reservationEntity.setTotalPrice(price);
+	}
+
+	/**
+	 * Upgrade the {@link ReservationType}.
+	 *
+	 * @param m_reservationType
+	 *            the m_reservationType to set
+	 */
+	public static void setType(ReservationType m_reservationType)
+	{
+		s_reservationEntity.setType(m_reservationType);
+	}
+
 	// end region -> Setters
 
 	// region Initializing methods
-	
+
 	/**
 	 * Initialize the fields.
+	 * 
+	 * @param costumer
+	 *            The costumer connected to the system.
 	 */
-	public static void initializeSavedData() {
-		/* TODO Yoni: initialize with the correct user ID. */
-		if (s_reservationEntity == null) {
-			s_reservationEntity = new ReservationEntity(ReservationType.Open, 4);
-		}
+	public static void initializeSavedData(CostumerEntity costumer)
+	{
+		s_reservationEntity = new ReservationEntity(ReservationType.Open, costumer);
 		s_reservationList = new ArrayList<>();
 	}
-	
+
 	// end region -> Initializing methods
-
-	// region Public Methods
-	// end region -> Public Methods
-
-	// region Private Methods
-	// end region -> Private Methods
 }

@@ -62,13 +62,14 @@ public class EntitiesResolver {
 					ProductType productType = Enum.valueOf(ProductType.class, resultSet.getString(3));
 					float price = resultSet.getFloat(4);
 					Blob blob = resultSet.getBlob(5);
+					String domainColor = resultSet.getString(6);
 					ItemEntity toAdd;
 					if (blob != null) {
 						InputStream inputStream = blob.getBinaryStream();
 						Image image = ImageUtilities.InputStreamToImage(inputStream, s_logger);
-						toAdd = new ItemEntity(id, name, productType, (double) price, image);
+						toAdd = new ItemEntity(id, name, productType, (double) price, domainColor, image);
 					} else {
-						toAdd = new ItemEntity(id, name, productType, (double) price, null);
+						toAdd = new ItemEntity(id, name, productType, (double) price, domainColor, null);
 					}
 					itemEntities.add(toAdd);
 				} catch (Exception ignored) {

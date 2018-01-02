@@ -11,8 +11,7 @@
          <children>
             <Button layoutX="116.0" layoutY="87.0" mnemonicParsing="false" onAction="#addCostumerComplaintClick" prefHeight="25.0" prefWidth="174.0" text="Add costumer complaint" />
             <Button layoutX="118.0" layoutY="142.0" mnemonicParsing="false" onAction="#addSpecialistAnalysisClick" prefHeight="25.0" prefWidth="174.0" text="Add specialist analysis" />
-            <Button layoutX="119.0" layoutY="198.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="174.0" text="Treatment an open complaint" />
-            <Button layoutX="166.0" layoutY="264.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="83.0" text="Logout" />
+            <Button layoutX="119.0" layoutY="198.0" mnemonicParsing="false" onAction="#treatmentAnOpenComplain" prefHeight="25.0" prefWidth="174.0" text="Treatment an open complaint" />
             <ImageView fx:id="imageview_subtitle" fitHeight="48.0" fitWidth="375.0" layoutX="18.0" layoutY="24.0" pickOnBounds="true" preserveRatio="true" />
          </children></AnchorPane>
 

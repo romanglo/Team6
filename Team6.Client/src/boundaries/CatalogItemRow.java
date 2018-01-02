@@ -95,14 +95,23 @@ public class CatalogItemRow
 	 *            Item amount.
 	 * @param price
 	 *            Summered price.
+	 * @param m_image
+	 *            Image of the item.
+	 * @param domainColor
+	 *            Domain color of the item
+	 * @param type
+	 *            Type of the item.
 	 */
-	public CatalogItemRow(int id, String name, int amount, double price)
+	public CatalogItemRow(int id, String name, int amount, double price, Image m_image, String domainColor, String type)
 	{
 		super();
 		this.m_id = id;
 		this.m_name = name;
-		this.m_amount = amount;
+		this.m_type = type;
 		this.m_price = price;
+		this.m_domainColor = domainColor;
+		this.m_amount = amount;
+		this.m_image = ResizeImage(m_image);
 	}
 
 	/**
@@ -114,6 +123,9 @@ public class CatalogItemRow
 	 */
 	private Image ResizeImage(Image imageToResize)
 	{
+		if (imageToResize == null) {
+			return null;
+		}
 		BufferedImage imageReader = SwingFXUtils.fromFXImage(imageToResize, null);
 		BufferedImage newImage = ImageNewScale(imageReader, 80, 80);
 		Image finalImage = SwingFXUtils.toFXImage(newImage, null);
@@ -220,7 +232,7 @@ public class CatalogItemRow
 	{
 		this.m_type = m_type;
 	}
-	
+
 	/**
 	 * @return Item amount.
 	 */

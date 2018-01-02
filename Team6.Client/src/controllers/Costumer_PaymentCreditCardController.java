@@ -1,19 +1,14 @@
 
 package controllers;
 
-import java.awt.Dialog;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
-import client.ClientConfiguration;
-import entities.ItemEntity;
-import entities.ProductType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,6 +26,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
 import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
@@ -58,11 +54,12 @@ public class Costumer_PaymentCreditCardController
 
 	private Client m_client;
 
-	private ClientConfiguration m_configuration;
-
 	ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
 
-	private ArrayList<ItemEntity> m_catalogList;
+	/**
+	 * Manage discount according to the refund of the costumer.
+	 */
+	public static Double m_discount;
 
 	/* End of --> Fields region */
 
@@ -89,27 +86,7 @@ public class Costumer_PaymentCreditCardController
 	@FXML
 	private void backButtonClick(ActionEvent backEvent)
 	{
-		try {
-			/* Clear client handlers. */
-			m_client.setClientStatusHandler(null);
-			m_client.setMessagesHandler(null);
-
-			/* Hide the current window. */
-			((Node) backEvent.getSource()).getScene().getWindow().hide();
-			Stage primaryStage = new Stage();
-			FXMLLoader loader = new FXMLLoader();
-			Pane root = loader.load(getClass().getResource("/boundaries/Costumer_CreateReservation.fxml").openStream());
-
-			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
-
-			primaryStage.setScene(scene);
-			primaryStage.show();
-		}
-		catch (Exception e) {
-			String msg = "Failed to load the next window";
-			m_logger.severe(msg + ", excepion: " + e.getMessage());
-		}
+		openSelectedWindow(backEvent, "/boundaries/Costumer_CreateReservationPayment.fxml");
 	}
 
 	/**
@@ -130,9 +107,44 @@ public class Costumer_PaymentCreditCardController
 			return;
 		}
 		
-		/* TODO Yoni: Send the reservation to the server. */
+		Costumer_SavedData.setCreditCard(credit_card_number.getText());
+		Costumer_SavedData.setRefund(Costumer_SavedData.getCostumerRefund() - m_discount);
 		
-		backButtonClick(finishEvent);
+		Message entityMessage = MessagesFactory
+				.createUpdateEntityMessage(Costumer_SavedData.getReservationEntity());
+		m_client.sendMessageToServer(entityMessage);
+		
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Reservation Completed");
+		alert.setHeaderText(null);
+		alert.setContentText("Reservation completed. Thanks for using our application.");
+		alert.showAndWait();
+		openSelectedWindow(finishEvent, "/boundaries/Costumer.fxml");
+	}
+	
+	private void openSelectedWindow(ActionEvent event, String fxmlPath)
+	{
+		try {
+			/* Clear client handlers. */
+			m_client.setClientStatusHandler(null);
+			m_client.setMessagesHandler(null);
+
+			/* Hide the current window. */
+			((Node) event.getSource()).getScene().getWindow().hide();
+			Stage primaryStage = new Stage();
+			FXMLLoader loader = new FXMLLoader();
+			Pane root = loader.load(getClass().getResource(fxmlPath).openStream());
+
+			Scene scene = new Scene(root);
+			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+
+			primaryStage.setScene(scene);
+			primaryStage.show();
+		}
+		catch (Exception e) {
+			String msg = "Failed to load the next window";
+			m_logger.severe(msg + ", excepion: " + e.getMessage());
+		}
 	}
 
 	// end region -> Private Methods
@@ -148,13 +160,11 @@ public class Costumer_PaymentCreditCardController
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
-		initializeCatalogList();
 	}
 
 	private void initializeFields()
 	{
 		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
 		m_client = ApplicationEntryPoint.Client;
 	}
 
@@ -176,12 +186,6 @@ public class Costumer_PaymentCreditCardController
 	{
 		m_client.setMessagesHandler(this);
 		m_client.setClientStatusHandler(this);
-	}
-
-	private void initializeCatalogList()
-	{
-		/* TODO Yoni: Get catalog from the server. */
-		m_catalogList = new ArrayList<>();
 	}
 
 	/* End of --> Initializing methods region */

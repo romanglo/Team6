@@ -9,7 +9,9 @@ CREATE TABLE items (
 	iName VARCHAR(20) NOT NULL,
 	iType VARCHAR(20) NOT NULL,
 	iPrice FLOAT NOT NULL,
-	iImage BLOB,
+	iImage BLOB NULL DEFAULT NULL,
+	iDomainColor VARCHAR(20) NULL DEFAULT NULL,
+	iDeleted BIT(1) NOT NULL DEFAULT 0,
 	PRIMARY KEY (iId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -22,25 +24,47 @@ CREATE TABLE users (
 	PRIMARY KEY (uUserName)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE costumers (
+  cId INT NOT NULL AUTO_INCREMENT,
+  uUserName VARCHAR(20) NOT NULL,
+  cCreditCard VARCHAR(16) NULL DEFAULT NULL,
+  cCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
+  cRefund FLOAT NOT NULL DEFAULT 0,
+  INDEX uUserName_idx (uUserName ASC),
+  PRIMARY KEY (uUserName),
+  UNIQUE INDEX cId_UNIQUE (cId ASC),
+  CONSTRAINT uUserName FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE reservations (
+  rId INT NOT NULL AUTO_INCREMENT,
+  cId INT NOT NULL,
+  rType VARCHAR(7) NULL DEFAULT 'Open',
+  rItems VARCHAR(100) NULL DEFAULT NULL,
+  PRIMARY KEY (rId, cId),
+  INDEX cId_idx (cId ASC),
+  CONSTRAINT cId FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 LOCK TABLES items WRITE;
 
-INSERT INTO items (iName,iType,iPrice) VALUES 
-('Rose','Flower',1.0),
-('Sunflower','Flower',2.0),
-('Lily','Flower',3.0),
-('Anemone','Flower',4.0),
-('Aconite','Flower',5.0),
-('Balloon Flower','Flower',6.0),
-('Canterbury Bells','Flower',7.0),
-('Dusty Miller','Flower',8.0),
-('Epimedium','Flower',9.0),
-('Fennel','Flower',10.0),
-('Gaillardia','Flower',11.0),
-('Hepatica','Flower',12.0),
-('Iris','Flower',13.0),
-('Lavender','Flower',14.0),
-('Marigold','Flower',15.0),
-('Orchid','Flower',16.0);
+INSERT INTO items (iName,iType,iPrice,iDomainColor) VALUES 
+('Rose','Flower',1.0,'red'),
+('Sunflower','Flower',2.0,'yellow'),
+('Lily','Flower',3.0,'white'),
+('Anemone','Flower',4.0,'red'),
+('Aconite','Flower',5.0, 'purple'),
+('Balloon Flower','Flower',6.0,'purple'),
+('Canterbury Bells','Flower',7.0,'pink'),
+('Dusty Miller','Flower',8.0,'white'),
+('Epimedium','Flower',9.0,'yellow'),
+('Fennel','Flower',10.0,'white'),
+('Gaillardia','Flower',11.0,'yellow'),
+('Hepatica','Flower',12.0,'purple'),
+('Iris','Flower',13.0,'purple'),
+('Lavender','Flower',14.0,'purple'),
+('Marigold','Flower',15.0,'orange'),
+('Orchid','Flower',16.0,'pink');
 
 LOCK TABLES users WRITE;
 
@@ -54,4 +78,9 @@ INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES
 ('costumer','costumer','costumer@local','Costumer'),
 ('servicespecialist','servicespecialist','servicespecialist@local','ServiceSpecialist');
 
-UNLOCK TABLES;
+LOCK TABLES costumers WRITE;
+
+INSERT INTO costumers (uUserName) VALUES
+('costumer');
+
+UNLOCK TABLES;         

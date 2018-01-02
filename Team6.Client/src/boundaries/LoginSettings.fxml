@@ -16,8 +16,7 @@
 <?import javafx.scene.shape.Ellipse?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="300" maxWidth="300" minHeight="300"
-	minWidth="300" prefHeight="300" prefWidth="300" nodeOrientation="LEFT_TO_RIGHT"
+<AnchorPane prefHeight="300" prefWidth="300" nodeOrientation="LEFT_TO_RIGHT"
 	xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="controllers.LoginSettingsController">
 	<children>

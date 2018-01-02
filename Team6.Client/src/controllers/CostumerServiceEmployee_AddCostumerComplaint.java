@@ -9,6 +9,9 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import entities.ComplaintEntity;
+import entities.CostumerEntity;
+import entities.IEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,6 +28,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import logger.LogManager;
 import messages.Message;
+import messages.MessagesFactory;
 
 
 /**
@@ -50,7 +54,7 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	
 	@FXML private TextField IDField;
 	
-	@FXML private TextArea CostumerComplaintArea;
+	@FXML private TextArea textarea_costumercomplaint;
 
 	/* End of --> UI Binding Fields region */
 
@@ -103,14 +107,15 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	@FXML
 	public void saveButtonClick(ActionEvent event)
 	{
-		if(IDField.getText().equals("")||CostumerComplaintArea.getText().equals(""))
+		if(IDField.getText().equals("")||textarea_costumercomplaint.getText().equals(""))
 		{
 		showInformationMessage("One or more of the fileds are empty");
 		}
 		else
 		{
 			int costumer_id=Integer.parseInt(IDField.getText());
-			//CostumerServiceEmployeeController.setNewComplaint(costumer_id, CostumerComplaintArea.getText());
+			CostumerEntity entity=new CostumerEntity(costumer_id);
+			Message msg= MessagesFactory.createGetEntityMessage(entity);
 		}
 	}
 	
@@ -190,7 +195,15 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Shimon : Add event handling
+		if(msg.getMessageData() instanceof IEntity)
+		{
+			CostumerEntity entity=(CostumerEntity) msg.getMessageData();
+			int id=entity.getId();
+			String complaint=textarea_costumercomplaint.getText();
+			ComplaintEntity complaint_entity= new ComplaintEntity(id,complaint,entity);
+			msg=MessagesFactory.createEntityMessage(complaint_entity);
+			m_client.sendMessageToServer(msg);
+		}
 	}
 
 	/**
