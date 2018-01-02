@@ -115,15 +115,14 @@ public class Costumer_CreateReservationPaymentController
 	private void paymentButtonClick(ActionEvent paymentEvent)
 	{
 		Costumer_SavedData.setReservationList();
+		Costumer_SavedData.setTotalPrice(Double.parseDouble(total_price_label.getText()));
 		if (Costumer_SavedData.getSubscription() == CostumerSubscription.None) {
 			Costumer_PaymentCreditCardController.m_discount = m_discount;
 			openSelectedWindow(paymentEvent, "/boundaries/Costumer_PaymentCreditCard.fxml");
 		} else {
 			Costumer_SavedData.setRefund(Costumer_SavedData.getCostumerRefund() - m_discount);
-			Costumer_SavedData.setTotalPrice(Double.parseDouble(total_price_label.getText()));
 
-			Message entityMessage = MessagesFactory
-					.createUpdateEntityMessage(Costumer_SavedData.getReservationEntity());
+			Message entityMessage = MessagesFactory.createAddEntityMessage(Costumer_SavedData.getReservationEntity());
 			m_client.sendMessageToServer(entityMessage);
 
 			Alert alert = new Alert(AlertType.INFORMATION);
@@ -222,7 +221,6 @@ public class Costumer_CreateReservationPaymentController
 
 		tablecolumn_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
 		tablecolumn_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
-		tablecolumn_amount.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("amount"));
 		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Double>("price"));
 
 		catalog_table.setItems(paymentBill);
@@ -234,49 +232,13 @@ public class Costumer_CreateReservationPaymentController
 	 */
 	private void gatherReservationList()
 	{
-		HashMap<Integer, CatalogItemRow> gatheredReservation = new HashMap<>();
-		ArrayList<CatalogItemRow> gatheredCustomized = new ArrayList<>();
-		/*
-		 * Separate the customized items with the catalog ones.
-		 */
-		for (ItemEntity entity : Costumer_SavedData.getCostumerReservationList()) {
-			if (gatheredReservation.containsKey(entity.getId())
-					&& entity.getItemType() != ProductType.CustomizedArrangement) {
-				CatalogItemRow item = gatheredReservation.get(entity.getId());
-				item.setM_amount(item.getM_amount() + 1);
-				item.setM_price(item.getM_price() + entity.getItemPrice());
-				gatheredReservation.put(entity.getId(), item);
-				continue;
-			}
-
-			CatalogItemRow itemReserve = new CatalogItemRow(entity.getId(), entity.getName(), 1, entity.getItemPrice(),
-					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
-			if (entity.getItemType() == ProductType.CustomizedArrangement) {
-				gatheredCustomized.add(itemReserve);
-				continue;
-			}
-
-			gatheredReservation.put(entity.getId(), itemReserve);
-		}
-
 		ArrayList<ItemEntity> itemsList = new ArrayList<>();
 		double totalPrice = 0;
-		for (CatalogItemRow item : gatheredReservation.values()) {
-			totalPrice += item.getM_price();
-			ItemEntity entity = new ItemEntity(item.getM_id(), item.getM_name(),
-					ParseStringToProductType(item.getM_type()), item.getM_price(), item.getM_domainColor(),
-					item.getM_image(), item.getM_amount());
+		for (ItemEntity entity : Costumer_SavedData.getCostumerReservationList()) {
+			CatalogItemRow itemReserve = new CatalogItemRow(entity.getId(), entity.getName(), entity.getItemPrice(),
+					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
 			itemsList.add(entity);
-			paymentBill.add(item);
-		}
-
-		for (CatalogItemRow item : gatheredCustomized) {
-			totalPrice += item.getM_price();
-			ItemEntity entity = new ItemEntity(item.getM_id(), item.getM_name(),
-					ParseStringToProductType(item.getM_type()), item.getM_price(), item.getM_domainColor(),
-					item.getM_image(), item.getM_amount());
-			itemsList.add(entity);
-			paymentBill.add(item);
+			paymentBill.add(itemReserve);
 		}
 
 		m_discount = Costumer_SavedData.getCostumerRefund();
@@ -286,7 +248,7 @@ public class Costumer_CreateReservationPaymentController
 
 		if (m_discount > 0.0) {
 			totalPrice -= m_discount;
-			CatalogItemRow item = new CatalogItemRow(-1, "Discount", 1, m_discount * -1.0, null, null, null);
+			CatalogItemRow item = new CatalogItemRow(99, "Discount", m_discount * -1.0, null, null, null);
 			paymentBill.add(item);
 		}
 
@@ -297,26 +259,12 @@ public class Costumer_CreateReservationPaymentController
 	private void addReservationList()
 	{
 		for (ItemEntity entity : s_reservationEntity.getReservationList()) {
-			CatalogItemRow item = new CatalogItemRow(entity.getId(), entity.getName(), entity.getAmount(),
-					entity.getItemPrice(), entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
+			CatalogItemRow item = new CatalogItemRow(entity.getId(), entity.getName(), entity.getItemPrice(),
+					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
 			paymentBill.add(item);
 		}
 
 		total_price_label.setText(String.format("%.2f", s_reservationEntity.getTotalPrice()));
-	}
-
-	private ProductType ParseStringToProductType(String stringItemType)
-	{
-		if (stringItemType.equalsIgnoreCase("Flower")) {
-			return ProductType.Flower;
-		} else if (stringItemType.equalsIgnoreCase("FlowerPot")) {
-			return ProductType.FlowerPot;
-		} else if (stringItemType.equalsIgnoreCase("BridalBouquet")) {
-			return ProductType.BridalBouquet;
-		} else if (stringItemType.equalsIgnoreCase("FlowerArrangement")) {
-			return ProductType.FlowerArrangement;
-		}
-		return null;
 	}
 
 	/* End of --> Initializing methods region */
@@ -329,7 +277,7 @@ public class Costumer_CreateReservationPaymentController
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		//Not needed on this screen.
+		// Not needed on this screen.
 	}
 
 	/**

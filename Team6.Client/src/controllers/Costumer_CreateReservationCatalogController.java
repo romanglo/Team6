@@ -234,8 +234,8 @@ public class Costumer_CreateReservationCatalogController
 			}
 
 			ItemEntity item = (ItemEntity) entity;
-			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getAmount(),
-					item.getItemPrice(), item.getItemImage(), item.getColor(), item.getItemType().toString());
+			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getItemPrice(),
+					item.getItemImage(), item.getColor(), item.getItemType().toString());
 			catalog.add(itemRow);
 		}
 

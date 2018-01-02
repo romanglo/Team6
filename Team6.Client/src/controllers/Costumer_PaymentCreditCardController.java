@@ -111,8 +111,9 @@ public class Costumer_PaymentCreditCardController
 		Costumer_SavedData.setRefund(Costumer_SavedData.getCostumerRefund() - m_discount);
 		
 		Message entityMessage = MessagesFactory
-				.createUpdateEntityMessage(Costumer_SavedData.getReservationEntity());
+				.createAddEntityMessage(Costumer_SavedData.getReservationEntity());
 		m_client.sendMessageToServer(entityMessage);
+		System.out.println(entityMessage);
 		
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Reservation Completed");
