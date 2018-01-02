@@ -137,17 +137,6 @@ public class Costumer_SavedData
 	}
 
 	/**
-	 * Upgrade the approval status of the costumer.
-	 *
-	 * @param approved
-	 *            the approved to set
-	 */
-	public static void setApproved(Boolean approved)
-	{
-		s_reservationEntity.getCostumer().setApproved(approved);
-	}
-
-	/**
 	 * Upgrade the {@link ItemEntity} of the costumer.
 	 *
 	 * @param reservationList
