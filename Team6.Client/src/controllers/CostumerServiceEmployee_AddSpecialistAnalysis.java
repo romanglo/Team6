@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import entities.IEntity;
+import entities.SurveyEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -25,6 +27,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import logger.LogManager;
 import messages.Message;
+import messages.MessagesFactory;
 
 
 /**
@@ -38,9 +41,9 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 {
 	/* UI Binding Fields region */
 
-	@FXML TextField SurveyIDField;
+	@FXML TextField textfield_surveyid;
 	
-	@FXML TextArea SpecialistAnalysisArea;
+	@FXML TextArea textarea_analysis;
 	// Title images :
 	@FXML private ImageView imageview_gif;
 
@@ -97,14 +100,15 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 	@FXML
 	public void saveButtonClick(ActionEvent event)
 	{
-		if(SurveyIDField.getText().equals("")||SpecialistAnalysisArea.getText().equals(""))
+		if(textfield_surveyid.getText().equals("")||textarea_analysis.getText().equals(""))
 		{
 		showInformationMessage("One or more of the fileds are empty");
 		}
 		else
 		{
-			int survey_id=Integer.parseInt(SurveyIDField.getText());
-			//CostumerServiceEmployeeController.setNewSpecialistAnalysis(survey_id, SpecialistAnalysisArea.getText());
+			SurveyEntity entity = new SurveyEntity(Integer.parseInt(textfield_surveyid.getText()));
+			Message msg= MessagesFactory.createGetEntityMessage(entity);
+			m_client.sendMessageToServer(msg);
 		}
 	}
 	
@@ -183,7 +187,14 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Shimon : Add event handling
+		if(msg.getMessageData() instanceof IEntity)
+		{
+			SurveyEntity entity=(SurveyEntity)msg.getMessageData();
+			entity.setAnalysis(textarea_analysis.getText());
+			msg=MessagesFactory.createUpdateEntityMessage(entity);
+			m_client.sendMessageToServer(msg);
+		}
+			
 	}
 
 	/**

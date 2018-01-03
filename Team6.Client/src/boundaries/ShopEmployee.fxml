@@ -1,38 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Circle?>
-<?import javafx.scene.text.Font?>
 
-<AnchorPane minHeight="285.0" minWidth="380.0"
-	nodeOrientation="LEFT_TO_RIGHT" prefHeight="372.0" prefWidth="400.0"
-	xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="controllers.ShopEmployeeController">
+<AnchorPane minHeight="285.0" minWidth="380.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="450.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ShopEmployeeController">
 	<children>
 
-		<AnchorPane layoutY="79.0" prefHeight="368.0" prefWidth="450.0"
-			AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
-			AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
-
-		</AnchorPane>
+		<AnchorPane layoutY="79.0" prefHeight="400" prefWidth="450.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
+         <children>
+            <ImageView fx:id="imageview_subtitle" fitHeight="48.0" fitWidth="390.0" layoutX="-3.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true" />
+            <TextField fx:id="textfiled_question1" layoutX="76.0" layoutY="130.0" />
+            <TextField fx:id="textfiled_question2" layoutX="76.0" layoutY="165.0" />
+            <TextField fx:id="textfiled_question3" layoutX="76.0" layoutY="201.0" />
+            <TextField fx:id="textfiled_question4" layoutX="76.0" layoutY="233.0" />
+            <TextField fx:id="textfiled_question5" layoutX="76.0" layoutY="266.0" />
+            <TextField fx:id="textfiled_question6" layoutX="76.0" layoutY="299.0" />
+            <ComboBox fx:id="combobox_answer1" layoutX="260.0" layoutY="130.0" prefHeight="25.0" prefWidth="51.0" />
+            <ComboBox fx:id="combobox_answer2" layoutX="260.0" layoutY="165.0" prefHeight="25.0" prefWidth="51.0" />
+            <ComboBox fx:id="combobox_answer3" layoutX="260.0" layoutY="201.0" prefHeight="25.0" prefWidth="51.0" />
+            <ComboBox fx:id="combobox_answer4" layoutX="260.0" layoutY="233.0" prefHeight="25.0" prefWidth="51.0" />
+            <ComboBox fx:id="combobox_answer5" layoutX="260.0" layoutY="266.0" prefHeight="25.0" prefWidth="51.0" />
+            <ComboBox fx:id="combobox_answer6" layoutX="260.0" layoutY="299.0" prefHeight="25.0" prefWidth="51.0" />
+            <Label layoutX="22.0" layoutY="134.0" prefHeight="17.0" prefWidth="45.0" text="1." />
+            <Label layoutX="22.0" layoutY="169.0" prefHeight="17.0" prefWidth="45.0" text="2." />
+            <Label layoutX="22.0" layoutY="205.0" prefHeight="17.0" prefWidth="45.0" text="3." />
+            <Label layoutX="22.0" layoutY="237.0" prefHeight="17.0" prefWidth="45.0" text="4." />
+            <Label layoutX="22.0" layoutY="270.0" prefHeight="17.0" prefWidth="45.0" text="5." />
+            <Label layoutX="22.0" layoutY="303.0" prefHeight="17.0" prefWidth="45.0" text="6." />
+            <Button layoutX="76.0" layoutY="335.0" mnemonicParsing="false" onAction="#addSurvey" prefHeight="25.0" prefWidth="97.0" text="Add survey" />
+            <Label layoutX="102.0" layoutY="104.0" prefHeight="17.0" prefWidth="97.0" text="Questions" />
+            <Label layoutX="257.0" layoutY="104.0" prefHeight="17.0" prefWidth="97.0" text="Answers" />
+            <Label layoutX="14.0" layoutY="77.0" prefHeight="17.0" prefWidth="81.0" text="Survey Id:" />
+            <TextField fx:id="textfiled_id" layoutX="102.0" layoutY="73.0" prefHeight="25.0" prefWidth="97.0" />
+            <Button fx:id="button_checkifexistenc" layoutX="225.0" layoutY="73.0" mnemonicParsing="false" onAction="#surveyExistenceCheck" prefHeight="25.0" prefWidth="97.0" text="Check If Exist" />
+            <Button layoutX="212.0" layoutY="335.0" mnemonicParsing="false" onAction="#clearFileds" prefHeight="25.0" prefWidth="97.0" text="Clear" />
+         </children></AnchorPane>
 
 		<!--  Title: -->
-		<ImageView fx:id="imageview_gif" fitHeight="84.0" fitWidth="59.0"
-			layoutX="336.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true"
-			AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="6.0" />
-		<ImageView fx:id="imageview_title" fitHeight="48.0"
-			fitWidth="154.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true"
-			AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="6.0" />
+		<ImageView fx:id="imageview_gif" fitHeight="84.0" fitWidth="59.0" layoutX="336.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="6.0" />
+		<ImageView fx:id="imageview_title" fitHeight="48.0" fitWidth="154.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="6.0" />
 	</children>
 </AnchorPane>

@@ -10,7 +10,7 @@ import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
 import entities.ComplaintEntity;
-import entities.SpecialistAnalysisEntity;
+import entities.SurveyEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -160,34 +160,7 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 	
 	/* End of --> Private Methods region */
 	
-	// region Public Methods
-	
-	 /**
-	 * The function create new Specialist analysis entity and new message and send it to the server. 
-	 *
-	 * @param survey_id
-	 * 				Survey id to set
-	 * @param specialist_analysis
-	 * 						Specialist analysis to set
-	 */
-	public static void setNewSpecialistAnalysis(int survey_id, String specialist_analysis)
-	{
-		try {
-			SpecialistAnalysisEntity entity = new SpecialistAnalysisEntity(survey_id, specialist_analysis);
-			Message msg = MessagesFactory.createEntityMessage(entity);
-			//ApplicationEntryPoint.clientController.handleMessageFromClientUI(msg);
-		}
-		catch (NumberFormatException e) {
-			System.out.println("Failed to parse string to integer. Invalid value");
-		}
-		catch (Exception ex) {
-			System.out.println("Error when sending data for update. Exception: " + ex.getMessage());
-		}
-	}
-	 
-	 
-	
-	
+
 	/* Initializing methods region */
 
 	/**
