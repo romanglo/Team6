@@ -2,6 +2,7 @@ package db;
 
 import java.io.InputStream;
 import java.sql.Blob;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import entities.CostumerSubscription;
 import entities.IEntity;
 import entities.ItemEntity;
 import entities.ProductType;
+import entities.ReservationDeliveryType;
 import entities.ReservationEntity;
 import entities.ReservationType;
 import entities.UserEntity;
@@ -191,8 +193,8 @@ public class EntitiesResolver {
 	 *            A {@link ResultSet} which will be resolved in it to {@link List}
 	 *            of {@link UserEntity}.
 	 * @param costumerId
-	 *            if the resolving succeed this array in place 0 will contain the costumer
-	 *            ID.
+	 *            if the resolving succeed this array in place 0 will contain the
+	 *            costumer ID.
 	 * @param itemsList
 	 *            if the resolving succeed this parameter will contain a
 	 *            {@link List} with {@link ItemEntity} IDs.
@@ -219,7 +221,12 @@ public class EntitiesResolver {
 			String[] items = itemsString.split(",");
 			itemsList.addAll(Arrays.asList(items));
 			float price = resultSet.getFloat(5);
-			reservationEntity = new ReservationEntity(reservationId, reservationType,(double)price);
+			Date mysqlDate = resultSet.getDate(6);
+			java.util.Date javaDate = new java.util.Date(mysqlDate.getTime());
+			ReservationDeliveryType deliveryType = Enum.valueOf(ReservationDeliveryType.class, resultSet.getString(7));
+			String BlessingCard = resultSet.getString(8);
+			reservationEntity = new ReservationEntity(reservationId, reservationType, (double) price, javaDate,
+					deliveryType, BlessingCard);
 		} catch (Exception e) {
 			s_logger.warning("Failed to resolve an ResultSet to ReservationEntity, exception:" + e.getMessage());
 		}

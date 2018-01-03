@@ -238,6 +238,82 @@ public class ReservationEntity implements IEntity
 	 *            An unique ID of the costumer.
 	 * @param type
 	 *            An enumerator which describes the reservation type.
+	 * @param costumerEntity
+	 *            The costumer entity that is connected to the reservation.
+	 * @param reservationList
+	 *            The reservation list.
+	 * @param total
+	 *            The total price of the reservation.
+	 * @param deliveryDate
+	 *            The delivery date.
+	 * @param deliveryType
+	 *            The delivery type.
+	 * @param blessingCard
+	 *            The blessing card in the reservation.
+	 */
+	public ReservationEntity(Integer id, ReservationType type, CostumerEntity costumerEntity,
+			ArrayList<ItemEntity> reservationList, Double total, Date deliveryDate,
+			ReservationDeliveryType deliveryType, String blessingCard)
+	{
+		m_id = id;
+		m_reservationType = type;
+		m_costumer = costumerEntity;
+		m_reservationList = reservationList;
+		m_totalPrice = total;
+		m_deliveryDate = deliveryDate;
+		m_deliveryType = deliveryType;
+		m_blessingCard = blessingCard;
+	}
+
+	/**
+	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
+	 * messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the costumer.
+	 * 
+	 * @param type
+	 *            An enumerator which describes the reservation type.
+	 * 
+	 * @param costumerId
+	 *            The costumer id that is connected to the reservation.
+	 * 
+	 * @param reservationList
+	 *            The reservation list.
+	 * 
+	 * @param total
+	 *            The total price of the reservation.
+	 * 
+	 * @param deliveryDate
+	 *            The delivery date.
+	 * 
+	 * @param deliveryType
+	 *            The delivery type.
+	 * 
+	 * @param blessingCard
+	 *            The blessing card in the reservation.
+	 */
+	public ReservationEntity(Integer id, ReservationType type, int costumerId, ArrayList<ItemEntity> reservationList,
+			Double total, Date deliveryDate, ReservationDeliveryType deliveryType, String blessingCard)
+	{
+		m_id = id;
+		m_reservationType = type;
+		m_costumer = new CostumerEntity(costumerId);
+		m_reservationList = reservationList;
+		m_totalPrice = total;
+		m_deliveryDate = deliveryDate;
+		m_deliveryType = deliveryType;
+		m_blessingCard = blessingCard;
+	}
+
+	/**
+	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
+	 * messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the costumer.
+	 * @param type
+	 *            An enumerator which describes the reservation type.
 	 * @param costumerId
 	 *            The costumer id that is connected to the reservation.
 	 * @param reservationList
@@ -253,14 +329,32 @@ public class ReservationEntity implements IEntity
 			ArrayList<ItemEntity> reservationList, Double total, Date deliveryDate,
 			ReservationDeliveryType deliveryType)
 	{
-		m_id = id;
-		m_reservationType = type;
-		m_costumer = new CostumerEntity(costumerId);
-		m_reservationList = reservationList;
-		m_totalPrice = total;
-		m_deliveryDate = deliveryDate;
-		m_deliveryType = deliveryType;
-		m_blessingCard = "";
+		this(id, type, new CostumerEntity(costumerId), reservationList, total, deliveryDate, deliveryType, "");
+
+	}
+
+	/**
+	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
+	 * messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the costumer.
+	 * @param type
+	 *            An enumerator which describes the reservation type.
+	 * @param total
+	 *            The total price of the reservation.
+	 * @param deliveryDate
+	 *            The delivery date.
+	 * @param deliveryType
+	 *            The delivery type.
+	 * @param blessingCard
+	 *            The blessing card.
+	 */
+	public ReservationEntity(Integer id, ReservationType type, Double total, Date deliveryDate,
+			ReservationDeliveryType deliveryType, String blessingCard)
+	{
+		this(id, type, null, new ArrayList<>(), total, deliveryDate, deliveryType, blessingCard);
+
 	}
 
 	/**

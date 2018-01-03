@@ -37,6 +37,8 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	// region Fields
 
+	private final static java.text.SimpleDateFormat s_dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+
 	private Logger m_logger;
 
 	private DbController m_dbController;
@@ -681,10 +683,14 @@ public class MessagesResolver implements Server.MessagesHandler {
 			}
 		}
 
+		String date = s_dateFormat.format(reservationEntity.getDeliveryDate());
+
 		try {
 			String query = "UPDATE reservations SET rType = '" + reservationEntity.getType() + "' , rItems = '"
-					+ stringBuilder.toString() + "', rPrice = " + reservationEntity.getTotalPrice() + " WHERE cId = "
-					+ costumerId + " AND rid = " + reservationId + ';';
+					+ stringBuilder.toString() + "', rPrice = " + reservationEntity.getTotalPrice()
+					+ ", rDeliveryDate = '" + date + "', rDeliveryType = '" + reservationEntity.getDeliveryType()
+					+ "', BlessingCard = '" + reservationEntity.getBlessingCard() + "' WHERE cId = " + costumerId
+					+ " AND rid = " + reservationId + ';';
 			return m_dbController.executeQuery(query);
 
 		} catch (Exception e) {
@@ -715,10 +721,13 @@ public class MessagesResolver implements Server.MessagesHandler {
 			}
 		}
 
+		String date = s_dateFormat.format(reservationEntity.getDeliveryDate());
+
 		try {
-			String query = "INSERT INTO reservations (cId,rType,rItems,rPrice) VALUES (" + costumerId + ",'"
-					+ reservationEntity.getType() + "','" + stringBuilder.toString() + "',"
-					+ reservationEntity.getTotalPrice() + ");";
+			String query = "INSERT INTO reservations (cId,rType,rItems,rPrice,rDeliveryDate,rDeliveryType,rBlessingCard) VALUES ("
+					+ costumerId + ", '" + reservationEntity.getType() + "', '" + stringBuilder.toString() + "', "
+					+ reservationEntity.getTotalPrice() + ", '" + date + "', '" + reservationEntity.getDeliveryType()
+					+ "', '" + reservationEntity.getBlessingCard() + "' );";
 			return m_dbController.executeQuery(query);
 
 		} catch (Exception e) {
