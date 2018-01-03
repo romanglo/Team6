@@ -108,6 +108,54 @@ public class CatalogItemRow
 		this.m_domainColor = domainColor;
 		this.m_image = ResizeImage(m_image);
 	}
+	
+	/**
+	 * Constructor for new item in local catalog.
+	 *
+	 * @param name
+	 *            Item name.
+	 * @param price
+	 *            Summered price.
+	 * @param domainColor
+	 *            Domain color of the item
+	 * @param type
+	 *            Type of the item.
+	 */
+	public CatalogItemRow(String name, String type, double price, String domainColor)
+	{
+		super();
+		this.m_id = null;
+		this.m_name = name;
+		this.m_type = type;
+		this.m_price = price;
+		this.m_domainColor = domainColor;
+		this.m_image = null;
+	}
+	
+	/**
+	 * Constructor for new item in local catalog with default image.
+	 *
+	 * @param name
+	 *            Item name.
+	 * @param price
+	 *            Summered price.
+	 * @param m_image
+	 *            Image of the item.
+	 * @param domainColor
+	 *            Domain color of the item
+	 * @param type
+	 *            Type of the item.
+	 */
+	public CatalogItemRow(String name, String type, double price, String domainColor, Image m_image)
+	{
+		super();
+		this.m_id = null;
+		this.m_name = name;
+		this.m_type = type;
+		this.m_price = price;
+		this.m_domainColor = domainColor;
+		this.m_image = ResizeImage(m_image);
+	}
 
 	/**
 	 * Scale image to defined size.

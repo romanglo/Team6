@@ -278,6 +278,25 @@ public class ItemEntity implements IEntity
 	{
 		this(id, name, itemType, itemPrice, null, itemImg);
 	}
+	
+	/**
+	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
+	 * 
+	 * @param name
+	 *            The name of the item.
+	 * @param itemType
+	 *            A enumerator which describes the item type.
+	 * @param itemPrice
+	 *            A number which describes the item price.
+	 * @param color
+	 *            The domain color of the item.
+	 * @param itemImg
+	 *            The image of the item.
+	 */
+	public ItemEntity(String name, ProductType itemType, Double itemPrice, String color, Image itemImg)
+	{
+		this(null, name, itemType, itemPrice, color, itemImg);
+	}
 
 	/**
 	 * Create instance of {@link ItemEntity}, with <code>null</code> name. Dedicated

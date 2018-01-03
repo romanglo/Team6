@@ -384,6 +384,8 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 			default:
 				ShowSatisfactionReport(barToChange, selectionStore, Integer.toString(selectionYear), quarter);
 		}
+		if(secondSubmitButton != null)
+			secondSubmitButton.fire();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
