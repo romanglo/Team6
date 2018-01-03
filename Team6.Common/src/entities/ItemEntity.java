@@ -1,6 +1,7 @@
 
 package entities;
 
+import java.io.InputStream;
 import java.io.Serializable;
 
 import javafx.scene.image.Image;
@@ -73,7 +74,21 @@ public class ItemEntity implements IEntity
 	 */
 	public Image getItemImage()
 	{
+		if (m_itemImage == null) {
+			return null;
+		}
 		return m_itemImage.getImage();
+	}
+
+	/**
+	 * @return an {@link InputStream} which describes the {@link Image}.
+	 */
+	public InputStream getItemImageInputStream()
+	{
+		if (m_itemImage == null) {
+			return null;
+		}
+		return m_itemImage.getInputStream();
 	}
 
 	/**
@@ -158,6 +173,17 @@ public class ItemEntity implements IEntity
 
 	// region Constructors
 
+	private ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color,
+			SerializableImage serializableImage)
+	{
+		m_id = id;
+		m_name = name;
+		m_itemType = itemType;
+		m_itemPrice = itemPrice;
+		m_domainColor = color;
+		m_itemImage = serializableImage;
+	}
+
 	/**
 	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
 	 * 
@@ -195,6 +221,56 @@ public class ItemEntity implements IEntity
 	 *            A enumerator which describes the item type.
 	 * @param itemPrice
 	 *            A number which describes the item price.
+	 * @param color
+	 *            The domain color of the item.
+	 */
+	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color)
+	{
+		m_id = id;
+		m_name = name;
+		m_itemType = itemType;
+		m_itemPrice = itemPrice;
+		m_domainColor = color;
+	}
+
+	/**
+	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the item.
+	 * @param name
+	 *            The name of the item.
+	 * @param itemType
+	 *            A enumerator which describes the item type.
+	 * @param itemPrice
+	 *            A number which describes the item price.
+	 * @param color
+	 *            The domain color of the item.
+	 * @param itemImageInputStream
+	 *            An InputStream which describes the image of the item.
+	 */
+	public ItemEntity(Integer id, String name, ProductType itemType, Double itemPrice, String color,
+			InputStream itemImageInputStream)
+	{
+		m_id = id;
+		m_name = name;
+		m_itemType = itemType;
+		m_itemPrice = itemPrice;
+		m_domainColor = color;
+		m_itemImage = new SerializableImage(itemImageInputStream);
+	}
+
+	/**
+	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
+	 * 
+	 * @param id
+	 *            An unique ID of the item.
+	 * @param name
+	 *            The name of the item.
+	 * @param itemType
+	 *            A enumerator which describes the item type.
+	 * @param itemPrice
+	 *            A number which describes the item price.
 	 * @param itemImg
 	 *            The image of the item.
 	 */
@@ -214,7 +290,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, ProductType itemType)
 	{
-		this(id, null, itemType, null, null, null);
+		this(id, null, itemType, null, null, new SerializableImage());
 	}
 
 	/**
@@ -230,7 +306,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, ProductType itemType, String color)
 	{
-		this(id, null, itemType, null, color, null);
+		this(id, null, itemType, null, color, new SerializableImage());
 	}
 
 	/**
@@ -244,7 +320,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, String name)
 	{
-		this(id, name, null, null, null, null);
+		this(id, name, null, null, null, new SerializableImage());
 	}
 
 	/**
@@ -258,7 +334,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id, Double price)
 	{
-		this(id, null, null, price, null, null);
+		this(id, null, null, price, null, new SerializableImage());
 	}
 
 	/**
@@ -267,12 +343,12 @@ public class ItemEntity implements IEntity
 	 * 
 	 * @param id
 	 *            An unique ID of the item.
-	 * @param image
+	 * @param itemImg
 	 *            The image of the item.
 	 */
-	public ItemEntity(Integer id, Image image)
+	public ItemEntity(Integer id, Image itemImg)
 	{
-		this(id, null, null, null, null, image);
+		this(id, null, null, null, null, itemImg);
 	}
 
 	/**
@@ -284,7 +360,7 @@ public class ItemEntity implements IEntity
 	 */
 	public ItemEntity(Integer id)
 	{
-		this(id, null, null, null, null, null);
+		this(id, null, null, null, null, new SerializableImage());
 	}
 
 	/**
@@ -357,10 +433,9 @@ public class ItemEntity implements IEntity
 	{
 		return "ItemEntity [ID=" + m_id + ", Name=" + m_name + ", Item Type=" + m_itemType + ", Item Price="
 				+ m_itemPrice + ", Domain Color=" + m_domainColor + ", Exist Image="
-				+ (m_itemImage != null && m_itemImage.getImage() != null) + "]";
+				+ (m_itemImage != null && m_itemImage.isEmpty()) + "]";
 	}
 
 	// end region -> Override Object Methods
-	
 
 }

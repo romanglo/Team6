@@ -15,7 +15,6 @@ import entities.ItemEntity;
 import entities.ReservationEntity;
 import entities.UserEntity;
 import entities.UserStatus;
-import javafx.scene.image.Image;
 import logger.LogManager;
 import messages.EntitiesListData;
 import messages.EntityData;
@@ -24,7 +23,6 @@ import messages.EntityDataOperation;
 import messages.IMessageData;
 import messages.LoginData;
 import messages.Message;
-import utilities.ImageUtilities;
 
 /**
  *
@@ -194,10 +192,9 @@ public class MessagesResolver implements Server.MessagesHandler {
 			preparedStatement.setString(2, itemEntity.getItemType().toString());
 			preparedStatement.setFloat(3, itemEntity.getItemPrice().floatValue());
 
-			Image itemImage = itemEntity.getItemImage();
-			if (itemImage != null) {
-				InputStream imageInputStream = ImageUtilities.ImageToInputStream(itemImage, "jpg", m_logger);
-				preparedStatement.setBlob(4, imageInputStream);
+			InputStream inputStream = itemEntity.getItemImageInputStream();
+			if (inputStream != null) {
+				preparedStatement.setBlob(4, inputStream);
 			} else {
 				preparedStatement.setNull(4, java.sql.Types.BLOB);
 			}
@@ -236,10 +233,9 @@ public class MessagesResolver implements Server.MessagesHandler {
 			preparedStatement.setString(2, itemEntity.getItemType().toString());
 			preparedStatement.setFloat(3, itemEntity.getItemPrice().floatValue());
 
-			Image itemImage = itemEntity.getItemImage();
-			if (itemImage != null) {
-				InputStream imageInputStream = ImageUtilities.ImageToInputStream(itemImage, "jpg", m_logger);
-				preparedStatement.setBlob(4, imageInputStream);
+			InputStream inputStream = itemEntity.getItemImageInputStream();
+			if (inputStream != null) {
+				preparedStatement.setBlob(4, inputStream);
 			} else {
 				preparedStatement.setNull(4, java.sql.Types.BLOB);
 			}

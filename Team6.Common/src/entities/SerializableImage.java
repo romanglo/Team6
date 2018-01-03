@@ -1,17 +1,13 @@
 
 package entities;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
 import java.io.Serializable;
-
-import javax.imageio.ImageIO;
 
 import com.sun.istack.internal.NotNull;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import utilities.ImageUtilities;
 
 /**
  *
@@ -32,18 +28,42 @@ public class SerializableImage implements Serializable
 
 	private transient Image m_image;
 
+	private InputStream m_inputStream;
+
 	// end region -> Fields
 
 	// region Getters
+
+	/**
+	 * TODO Roman: Auto-generated comment stub - Change it!
+	 *
+	 * @return the m_inputStream
+	 */
+	public InputStream getInputStream()
+	{
+		return m_inputStream;
+	}
 
 	/**
 	 * @return The contained {@link Image} in the class.
 	 */
 	public Image getImage()
 	{
+		if (m_image == null && m_inputStream != null) {
+			m_image = ImageUtilities.InputStreamToImage(m_inputStream, null);
+		}
 		return m_image;
 	}
 
+	/**
+	 * 
+	 * @return <code>true</code> if an image contained, and <code>false</code> if
+	 *         does not.
+	 */
+	public boolean isEmpty()
+	{
+		return m_image == null && m_inputStream == null;
+	}
 	// end region -> Getters
 
 	// region Setters
@@ -55,8 +75,19 @@ public class SerializableImage implements Serializable
 	public void setImage(Image image)
 	{
 		m_image = image;
+		m_inputStream = ImageUtilities.ImageToInputStream(image, "jpeg", null);
 	}
 
+	/**
+	 * 
+	 * @param inputStream
+	 *            the inputStream to set
+	 */
+	public void setInputStream(InputStream inputStream)
+	{
+		m_inputStream = inputStream;
+		m_image = ImageUtilities.InputStreamToImage(inputStream, null);
+	}
 	// end region -> Setters
 
 	// region Constructors
@@ -69,6 +100,7 @@ public class SerializableImage implements Serializable
 	public SerializableImage()
 	{
 		m_image = null;
+		m_inputStream = null;
 	}
 
 	/**
@@ -81,29 +113,21 @@ public class SerializableImage implements Serializable
 	SerializableImage(@NotNull Image image)
 	{
 		m_image = image;
+		m_inputStream = ImageUtilities.ImageToInputStream(image, "jpeg", null);
+	}
+
+	/**
+	 * 
+	 * Create instance with contained {@link Image}.
+	 *
+	 * @param image
+	 *            An image to contain in class.
+	 */
+	SerializableImage(@NotNull InputStream inputStream)
+	{
+		m_inputStream = inputStream;
+		m_image = ImageUtilities.InputStreamToImage(inputStream, null);
 	}
 
 	// end region -> Constructors
-
-	// region Private Methods
-
-	private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException
-	{
-		if (m_image == null) {
-			return;
-		}
-		s.defaultReadObject();
-		setImage(SwingFXUtils.toFXImage(ImageIO.read(s), null));
-	}
-
-	private void writeObject(ObjectOutputStream s) throws IOException
-	{
-		if (m_image == null) {
-			return;
-		}
-		s.defaultWriteObject();
-		ImageIO.write(SwingFXUtils.fromFXImage(m_image, null), "jpeg", s);
-	}
-
-	// end region -> Private Methods
 }

@@ -21,9 +21,7 @@ import entities.ReservationType;
 import entities.UserEntity;
 import entities.UserPrivilege;
 import entities.UserStatus;
-import javafx.scene.image.Image;
 import logger.LogManager;
-import utilities.ImageUtilities;
 
 /**
  *
@@ -73,10 +71,10 @@ public class EntitiesResolver {
 					ItemEntity toAdd;
 					if (blob != null) {
 						InputStream inputStream = blob.getBinaryStream();
-						Image image = ImageUtilities.InputStreamToImage(inputStream, s_logger);
-						toAdd = new ItemEntity(id, name, productType, (double) price, domainColor, image);
+						toAdd = new ItemEntity(id, name, productType, (double) price, domainColor, inputStream);
 					} else {
-						toAdd = new ItemEntity(id, name, productType, (double) price, domainColor, null);
+
+						toAdd = new ItemEntity(id, name, productType, (double) price, domainColor);
 					}
 					itemEntities.add(toAdd);
 				} catch (Exception ignored) {
