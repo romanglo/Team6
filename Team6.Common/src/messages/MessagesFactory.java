@@ -111,9 +111,9 @@ public class MessagesFactory
 	 *            The entity to add to message.
 	 * @return An {@link Message}.
 	 */
-	public static Message createGetEntityMessage(ArrayList<IEntity> entity)
+	public static Message createGetEntitiesMessage(ArrayList<IEntity> entity)
 	{
-		return createEntityCollectionMessage(entity, EntityDataOperation.Get);
+		return createEntitiesListMessage(entity, EntityDataOperation.Get);
 	}
 
 	/**
@@ -124,9 +124,9 @@ public class MessagesFactory
 	 *            The entity to add to message.
 	 * @return An {@link Message}.
 	 */
-	public static Message createGetAllEntityMessage(ArrayList<IEntity> entity)
+	public static Message createGetAllEntitiesMessage(ArrayList<IEntity> entity)
 	{
-		return createEntityCollectionMessage(entity, EntityDataOperation.GetALL);
+		return createEntitiesListMessage(entity, EntityDataOperation.GetALL);
 	}
 
 	/**
@@ -138,9 +138,9 @@ public class MessagesFactory
 	 * @return An {@link Message} if the creation succeed or <code>null</code> if
 	 *         failed.
 	 */
-	public static Message createEntityMessage(ArrayList<IEntity> entity)
+	public static Message createEntitiesMessage(ArrayList<IEntity> entity)
 	{
-		return createEntityCollectionMessage(entity, EntityDataOperation.None);
+		return createEntitiesListMessage(entity, EntityDataOperation.None);
 	}
 
 	/**
@@ -152,9 +152,9 @@ public class MessagesFactory
 	 * @return An {@link Message} if the creation succeed or <code>null</code> if
 	 *         failed.
 	 */
-	public static Message createUpdateEntityMessage(ArrayList<IEntity> entity)
+	public static Message createUpdateEntitiesMessage(ArrayList<IEntity> entity)
 	{
-		return createEntityCollectionMessage(entity, EntityDataOperation.Update);
+		return createEntitiesListMessage(entity, EntityDataOperation.Update);
 	}
 
 	/**
@@ -166,9 +166,9 @@ public class MessagesFactory
 	 * @return An {@link Message} if the creation succeed or <code>null</code> if
 	 *         failed.
 	 */
-	public static Message createUpdateAllEntityMessage(ArrayList<IEntity> entity)
+	public static Message createUpdateAllEntitiesMessage(ArrayList<IEntity> entity)
 	{
-		return createEntityCollectionMessage(entity, EntityDataOperation.UpdateAll);
+		return createEntitiesListMessage(entity, EntityDataOperation.UpdateAll);
 	}
 
 	/**
@@ -179,12 +179,12 @@ public class MessagesFactory
 	 *            The entity to add to message.
 	 * @return An {@link Message}.
 	 */
-	public static Message createAddEntityMessage(ArrayList<IEntity> entity)
+	public static Message createAddEntitiesMessage(ArrayList<IEntity> entity)
 	{
-		return createEntityCollectionMessage(entity, EntityDataOperation.Add);
+		return createEntitiesListMessage(entity, EntityDataOperation.Add);
 	}
 
-	private static Message createEntityCollectionMessage(ArrayList<IEntity> entity,
+	private static Message createEntitiesListMessage(ArrayList<IEntity> entity,
 			EntityDataOperation entityDataOperation)
 	{
 		if (entity == null || entity.isEmpty()) {
