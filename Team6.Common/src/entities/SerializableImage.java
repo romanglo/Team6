@@ -1,6 +1,7 @@
 
 package entities;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
 
@@ -28,7 +29,7 @@ public class SerializableImage implements Serializable
 
 	private transient Image m_image;
 
-	private InputStream m_inputStream;
+	private byte[] m_imageInBytes;
 
 	// end region -> Fields
 
@@ -41,7 +42,10 @@ public class SerializableImage implements Serializable
 	 */
 	public InputStream getInputStream()
 	{
-		return m_inputStream;
+		if (m_imageInBytes == null) {
+			return null;
+		}
+		return new ByteArrayInputStream(m_imageInBytes);
 	}
 
 	/**
@@ -49,8 +53,8 @@ public class SerializableImage implements Serializable
 	 */
 	public Image getImage()
 	{
-		if (m_image == null && m_inputStream != null) {
-			m_image = ImageUtilities.InputStreamToImage(m_inputStream, null);
+		if (m_image == null && m_imageInBytes != null) {
+			m_image = ImageUtilities.ByteArrayToImage(m_imageInBytes, null);
 		}
 		return m_image;
 	}
@@ -62,7 +66,7 @@ public class SerializableImage implements Serializable
 	 */
 	public boolean isEmpty()
 	{
-		return m_image == null && m_inputStream == null;
+		return m_image == null && m_imageInBytes == null;
 	}
 	// end region -> Getters
 
@@ -74,19 +78,42 @@ public class SerializableImage implements Serializable
 	 */
 	public void setImage(Image image)
 	{
+		if (image == null) {
+			m_image = null;
+			m_imageInBytes = null;
+		}
 		m_image = image;
-		m_inputStream = ImageUtilities.ImageToInputStream(image, "jpeg", null);
+		m_imageInBytes = ImageUtilities.ImageToByteArray(image, "jpeg", null);
 	}
 
 	/**
 	 * 
 	 * @param inputStream
-	 *            the inputStream to set
+	 *            the {@link Image} in {@link InputStream} format to set.
 	 */
-	public void setInputStream(InputStream inputStream)
+	public void setImage(InputStream inputStream)
 	{
-		m_inputStream = inputStream;
+		if (inputStream == null) {
+			m_image = null;
+			m_imageInBytes = null;
+		}
 		m_image = ImageUtilities.InputStreamToImage(inputStream, null);
+		m_imageInBytes = ImageUtilities.ImageToByteArray(m_image, "jpeg", null);
+	}
+
+	/**
+	 * 
+	 * @param bytes
+	 *            the {@link Image} in byte array format to set
+	 */
+	public void setImage(byte[] bytes)
+	{
+		if (bytes == null) {
+			m_image = null;
+			m_imageInBytes = null;
+		}
+		m_image = ImageUtilities.ByteArrayToImage(bytes, null);
+		m_imageInBytes = bytes;
 	}
 	// end region -> Setters
 
@@ -100,7 +127,7 @@ public class SerializableImage implements Serializable
 	public SerializableImage()
 	{
 		m_image = null;
-		m_inputStream = null;
+		m_imageInBytes = null;
 	}
 
 	/**
@@ -108,12 +135,12 @@ public class SerializableImage implements Serializable
 	 * Create instance with contained {@link Image}.
 	 *
 	 * @param image
-	 *            An image to contain in class.
+	 *            An {@link Image} to contain in class.
 	 */
 	SerializableImage(@NotNull Image image)
 	{
 		m_image = image;
-		m_inputStream = ImageUtilities.ImageToInputStream(image, "jpeg", null);
+		m_imageInBytes = ImageUtilities.ImageToByteArray(image, "jpeg", null);
 	}
 
 	/**
@@ -121,12 +148,26 @@ public class SerializableImage implements Serializable
 	 * Create instance with contained {@link Image}.
 	 *
 	 * @param image
-	 *            An image to contain in class.
+	 *            An {@link InputStream} the describes {@link Image} to contain in
+	 *            class.
 	 */
 	SerializableImage(@NotNull InputStream inputStream)
 	{
-		m_inputStream = inputStream;
 		m_image = ImageUtilities.InputStreamToImage(inputStream, null);
+		m_imageInBytes = ImageUtilities.ImageToByteArray(m_image, "jpeg", null);
+	}
+
+	/**
+	 * 
+	 * Create instance with contained {@link Image}.
+	 *
+	 * @param image
+	 *            A byte array the describes {@link Image} to contain in class.
+	 */
+	SerializableImage(@NotNull byte[] bytes)
+	{
+		m_image = ImageUtilities.ByteArrayToImage(bytes, null);
+		m_imageInBytes = bytes;
 	}
 
 	// end region -> Constructors
