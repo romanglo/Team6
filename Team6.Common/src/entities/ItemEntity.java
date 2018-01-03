@@ -28,7 +28,7 @@ public class ItemEntity implements IEntity
 
 	private Double m_itemPrice;
 
-	private Image m_itemImage;
+	private SerializableImage m_itemImage;
 
 	private String m_domainColor;
 
@@ -73,7 +73,7 @@ public class ItemEntity implements IEntity
 	 */
 	public Image getItemImage()
 	{
-		return m_itemImage;
+		return m_itemImage.getImage();
 	}
 
 	/**
@@ -91,67 +91,67 @@ public class ItemEntity implements IEntity
 	/**
 	 * Upgrade the ID of the item.
 	 *
-	 * @param m_id
-	 *            the m_id to set
+	 * @param id
+	 *            the id to set
 	 */
-	public void setId(Integer m_id)
+	public void setId(Integer id)
 	{
-		this.m_id = m_id;
+		m_id = id;
 	}
 
 	/**
 	 * Upgrade the name of the item.
 	 *
-	 * @param m_name
-	 *            the m_name to set
+	 * @param name
+	 *            the name to set
 	 */
-	public void setName(String m_name)
+	public void setName(String name)
 	{
-		this.m_name = m_name;
+		m_name = name;
 	}
 
 	/**
 	 * Upgrade the {@link ProductType} of the item.
 	 *
-	 * @param m_itemType
-	 *            the m_itemType to set
+	 * @param itemType
+	 *            the itemType to set
 	 */
-	public void setItemType(ProductType m_itemType)
+	public void setItemType(ProductType itemType)
 	{
-		this.m_itemType = m_itemType;
+		m_itemType = itemType;
 	}
 
 	/**
 	 * Upgrade the price of the item.
 	 *
-	 * @param m_itemPrice
-	 *            the m_itemPrice to set
+	 * @param itemPrice
+	 *            the itemPrice to set
 	 */
-	public void setItemPrice(Double m_itemPrice)
+	public void setItemPrice(Double itemPrice)
 	{
-		this.m_itemPrice = m_itemPrice;
+		m_itemPrice = itemPrice;
 	}
 
 	/**
 	 * Upgrade the {@link Image} of the item.
 	 *
-	 * @param m_itemImage
-	 *            the m_itemImage to set
+	 * @param itemImage
+	 *            the itemImage to set
 	 */
-	public void setItemImage(Image m_itemImage)
+	public void setItemImage(Image itemImage)
 	{
-		this.m_itemImage = m_itemImage;
+		m_itemImage.setImage(itemImage);
 	}
 
 	/**
 	 * Upgrade the domain color of the item.
 	 *
-	 * @param m_domainColor
-	 *            the m_domainColor to set
+	 * @param domainColor
+	 *            the domainColor to set
 	 */
-	public void setColor(String m_domainColor)
+	public void setColor(String domainColor)
 	{
-		this.m_domainColor = m_domainColor;
+		m_domainColor = domainColor;
 	}
 
 	// end region -> Setters
@@ -181,7 +181,7 @@ public class ItemEntity implements IEntity
 		m_itemType = itemType;
 		m_itemPrice = itemPrice;
 		m_domainColor = color;
-		m_itemImage = itemImg;
+		m_itemImage = new SerializableImage(itemImg);
 	}
 
 	/**
@@ -356,8 +356,11 @@ public class ItemEntity implements IEntity
 	public String toString()
 	{
 		return "ItemEntity [ID=" + m_id + ", Name=" + m_name + ", Item Type=" + m_itemType + ", Item Price="
-				+ m_itemPrice + ", Domain Color=" + m_domainColor + ", Exist Image=" + (m_itemImage != null) + "]";
+				+ m_itemPrice + ", Domain Color=" + m_domainColor + ", Exist Image="
+				+ (m_itemImage != null && m_itemImage.getImage() != null) + "]";
 	}
 
 	// end region -> Override Object Methods
+	
+
 }
