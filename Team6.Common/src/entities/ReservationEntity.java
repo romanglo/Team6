@@ -483,14 +483,13 @@ public class ReservationEntity implements IEntity
 		return true;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String toString()
 	{
-		return "ReservationEntity [ID=" + m_id + ", reservation type=" + m_reservationType + ", reservation list="
-				+ m_reservationList + "]";
+		return "ReservationEntity [ID=" + m_id + ", Total Price=" + m_totalPrice + ", Costumer=" + m_costumer
+				+ ", Reservation Type=" + m_reservationType + ", Reservation List=" + m_reservationList
+				+ ", Delivery Date=" + m_deliveryDate + ", Delivery Type=" + m_deliveryType + ", Blessing Card="
+				+ m_blessingCard + "]";
 	}
 
 	// end region -> Override Object Methods

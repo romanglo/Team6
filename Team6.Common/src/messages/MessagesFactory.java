@@ -41,6 +41,19 @@ public class MessagesFactory
 
 	/**
 	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
+	 * with {@link EntityDataOperation#Remove} operation.
+	 *
+	 * @param entity
+	 *            The entity to add to message.
+	 * @return An {@link Message}.
+	 */
+	public static Message createRemoveEntityMessage(IEntity entity)
+	{
+		return createEntityMessage(entity, EntityDataOperation.Remove);
+	}
+
+	/**
+	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
 	 * with {@link EntityDataOperation#None} operation.
 	 *
 	 * @param entity
@@ -131,6 +144,19 @@ public class MessagesFactory
 
 	/**
 	 * Create {@link Message} with a {@link IMessageData} of a
+	 * {@link EntitiesListData} with {@link EntityDataOperation#Remove} operation.
+	 *
+	 * @param entity
+	 *            The entity to add to message.
+	 * @return An {@link Message}.
+	 */
+	public static Message createRemoveEntitiesMessage(ArrayList<IEntity> entity)
+	{
+		return createEntitiesListMessage(entity, EntityDataOperation.Remove);
+	}
+
+	/**
+	 * Create {@link Message} with a {@link IMessageData} of a
 	 * {@link EntitiesListData} with {@link EntityDataOperation#None} operation.
 	 *
 	 * @param entity
@@ -184,8 +210,7 @@ public class MessagesFactory
 		return createEntitiesListMessage(entity, EntityDataOperation.Add);
 	}
 
-	private static Message createEntitiesListMessage(ArrayList<IEntity> entity,
-			EntityDataOperation entityDataOperation)
+	private static Message createEntitiesListMessage(ArrayList<IEntity> entity, EntityDataOperation entityDataOperation)
 	{
 		if (entity == null || entity.isEmpty()) {
 			return null;

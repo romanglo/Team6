@@ -1,3 +1,4 @@
+
 package entities;
 
 /**
@@ -14,5 +15,9 @@ public enum ReservationDeliveryType {
 	/**
 	 * Delivery for future date.
 	 */
-	Future
+	Future,
+	/**
+	 * The costumer does not want a delivery.
+	 */
+	None
 }

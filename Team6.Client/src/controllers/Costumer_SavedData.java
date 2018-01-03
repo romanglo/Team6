@@ -124,7 +124,7 @@ public class Costumer_SavedData
 	{
 		return s_reservationEntity.getBlessingCard();
 	}
-
+	
 	// end region -> Getters
 
 	// region Setters
@@ -260,7 +260,7 @@ public class Costumer_SavedData
 	{
 		s_reservationEntity.setBlessingCard(blessing);
 	}
-
+	
 	// end region -> Setters
 
 	// region Initializing methods

@@ -57,6 +57,8 @@ public class Costumer_CancelReservationController
 	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_id;
 
 	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
+	
+	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_type;
 
 	// end region -> UI Binding Fields
 
@@ -172,6 +174,9 @@ public class Costumer_CancelReservationController
 			tableRow.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
+					if (!rowData.getM_type().equalsIgnoreCase("open")) {
+						return;
+					}
 					Costumer_CreateReservationPaymentController.s_reservationEntity = getReservation(rowData.getM_id());
 					Costumer_CreateReservationPaymentController.s_isCreateReservation = false;
 					openSelectedWindow(new ActionEvent(), "/boundaries/Costumer_CreateReservationPayment.fxml");
@@ -182,6 +187,7 @@ public class Costumer_CancelReservationController
 
 		tablecolumn_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
 		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Double>("price"));
+		tablecolumn_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
 
 		catalog_table.setItems(reservationTableList);
 		catalog_table.refresh();
@@ -197,26 +203,27 @@ public class Costumer_CancelReservationController
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		IMessageData entitiesListData = msg.getMessageData(); 
+		IMessageData entitiesListData = msg.getMessageData();
 		if (!(entitiesListData instanceof EntitiesListData)) {
 			m_logger.warning("Received message data not of the type requested.");
 			return;
 		}
-		
-		List<IEntity> entityList = ((EntitiesListData)entitiesListData).getEntities();
+
+		List<IEntity> entityList = ((EntitiesListData) entitiesListData).getEntities();
 		m_reservationList = new ArrayList<>();
 		for (IEntity entity : entityList) {
 			if (!(entity instanceof ReservationEntity)) {
 				m_logger.warning("Received entity not of the type requested.");
 				return;
 			}
-			
-			ReservationEntity reservation = (ReservationEntity)entity;
+
+			ReservationEntity reservation = (ReservationEntity) entity;
 			m_reservationList.add(reservation);
-			CatalogItemRow itemRow = new CatalogItemRow(reservation.getId(), null, reservation.getTotalPrice(), null, null, null);
+			CatalogItemRow itemRow = new CatalogItemRow(reservation.getId(), null, reservation.getType().toString(),
+					reservation.getTotalPrice(), null, null);
 			reservationTableList.add(itemRow);
 		}
-		
+
 		initializeTable();
 	}
 

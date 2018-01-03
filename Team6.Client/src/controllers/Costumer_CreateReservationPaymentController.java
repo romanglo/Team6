@@ -4,9 +4,13 @@ package controllers;
 import java.io.InputStream;
 import java.net.URL;
 import java.sql.Date;
+import java.sql.Time;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Observable;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -19,9 +23,11 @@ import entities.ProductType;
 import entities.ReservationDeliveryType;
 import entities.ReservationEntity;
 import entities.ReservationType;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -31,8 +37,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -127,7 +135,7 @@ public class Costumer_CreateReservationPaymentController
 		Costumer_SavedData.setTotalPrice(Double.parseDouble(total_price_label.getText()));
 		/* Check if the user want a blessing card and request a delivery date. */
 		confirmReservation();
-		
+
 		if (Costumer_SavedData.getSubscription() == CostumerSubscription.None) {
 			Costumer_PaymentCreditCardController.m_discount = m_discount;
 			openSelectedWindow(paymentEvent, "/boundaries/Costumer_PaymentCreditCard.fxml");
@@ -157,33 +165,90 @@ public class Costumer_CreateReservationPaymentController
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle("Add blessing card to reservation");
 		alert.setHeaderText("Please choose the delivery method");
-		alert.setContentText(null);
+		// alert.setContentText(null);
 
+		RadioButton deliveryIgnore = new RadioButton("Self pickup");
+		RadioButton deliveryAccept = new RadioButton("Delivery");
 		CheckBox deliveryImmidiate = new CheckBox("Immidiate delivery");
 		DatePicker deliveryDate = new DatePicker(LocalDate.now());
+		ArrayList<Integer> values = new ArrayList<>();
+		for (int i = 1; i < 24; i++) {
+			values.add(i);
+		}
+		ObservableList<Integer> list = FXCollections.observableArrayList(values);
+		ComboBox<Integer> deliveryComboBox = new ComboBox<>();
+		deliveryComboBox.setItems(list);
+
+		deliveryAccept.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event)
+			{
+				deliveryIgnore.setSelected(false);
+			}
+		});
+		deliveryIgnore.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event)
+			{
+				deliveryAccept.setSelected(false);
+			}
+		});
 
 		GridPane expContent = new GridPane();
 		expContent.setMaxWidth(Double.MAX_VALUE);
-		expContent.add(deliveryImmidiate, 0, 0);
-		expContent.add(deliveryDate, 1, 0);
+		expContent.add(deliveryAccept, 0, 0);
+		expContent.add(deliveryDate, 2, 0);
+		expContent.add(deliveryComboBox, 2, 1);
+		expContent.add(deliveryIgnore, 0, 1);
+		expContent.add(deliveryImmidiate, 2, 2);
 
 		alert.getDialogPane().setExpandableContent(expContent);
 		alert.showAndWait();
-
-		if (deliveryImmidiate.isSelected()) {
-			Costumer_SavedData.setDeliveryDate(Date.valueOf(LocalDate.now()));
-			Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Immidiate);
+		
+		java.util.Date date;
+		if (deliveryIgnore.isSelected()) {
+			if (deliveryImmidiate.isSelected()) {
+				date = new java.util.Date();
+				Calendar cl = Calendar.getInstance();
+				cl.setTime(date);
+				cl.add(Calendar.HOUR, 3);
+				date = cl.getTime();
+			} else {
+				date = Date.valueOf(deliveryDate.getValue());
+				Calendar cl = Calendar.getInstance();
+				cl.setTime(date);
+				cl.set(Calendar.HOUR, Integer.valueOf(deliveryComboBox.getValue()));
+				date = cl.getTime();
+			}
+			Costumer_SavedData.setDeliveryType(ReservationDeliveryType.None);
 		} else {
-			Costumer_SavedData.setDeliveryDate(Date.valueOf(deliveryDate.getValue()));
-			Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Future);
+			if (deliveryImmidiate.isSelected()) {
+				date = new java.util.Date();
+				Calendar cl = Calendar.getInstance();
+				cl.setTime(date);
+				cl.add(Calendar.HOUR, 3);
+				date = cl.getTime();
+				Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Immidiate);
+			} else {
+				date = Date.valueOf(deliveryDate.getValue());
+				Calendar cl = Calendar.getInstance();
+				cl.setTime(date);
+				cl.set(Calendar.HOUR, Integer.valueOf(deliveryComboBox.getValue()));
+				date = cl.getTime();
+				Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Future);
+			}
+			Costumer_SavedData.setTotalPrice(Costumer_SavedData.getTotalPrice() + 30);
 		}
+		Costumer_SavedData.setDeliveryDate(date);
 	}
 
 	private void confirmBlessingCard()
 	{
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Add blessing card to reservation");
-		alert.setHeaderText(null);
+		alert.setTitle("Blessing Card");
+		alert.setHeaderText("Add blessing card to reservation");
 		alert.setContentText(null);
 
 		CheckBox blessingCheckBox = new CheckBox("Add blessing card");
@@ -206,6 +271,47 @@ public class Costumer_CreateReservationPaymentController
 		if (blessingCheckBox.isSelected()) {
 			Costumer_SavedData.setBlessingCard(blessingTextArea.getText());
 		}
+	}
+
+	/**
+	 * Gather the reservation items and count the amounts of each item.
+	 */
+	private void gatherReservationList()
+	{
+		ArrayList<ItemEntity> itemsList = new ArrayList<>();
+		double totalPrice = 0;
+		for (ItemEntity entity : Costumer_SavedData.getCostumerReservationList()) {
+			CatalogItemRow itemReserve = new CatalogItemRow(entity.getId(), entity.getName(), entity.getItemPrice(),
+					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
+			totalPrice += entity.getItemPrice();
+			itemsList.add(entity);
+			paymentBill.add(itemReserve);
+		}
+
+		m_discount = Costumer_SavedData.getCostumerRefund();
+		if (m_discount > totalPrice) {
+			m_discount = totalPrice;
+		}
+
+		if (m_discount > 0.0) {
+			totalPrice -= m_discount;
+			CatalogItemRow item = new CatalogItemRow(99, "Discount", m_discount * -1.0, null, null, null);
+			paymentBill.add(item);
+		}
+
+		Costumer_SavedData.setReservationList(itemsList);
+		total_price_label.setText(String.format("%.2f", totalPrice));
+	}
+
+	private void addReservationList()
+	{
+		for (ItemEntity entity : s_reservationEntity.getReservationList()) {
+			CatalogItemRow item = new CatalogItemRow(entity.getId(), entity.getName(), entity.getItemPrice(),
+					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
+			paymentBill.add(item);
+		}
+
+		total_price_label.setText(String.format("%.2f", s_reservationEntity.getTotalPrice()));
 	}
 
 	private void cancelButtonClick(ActionEvent cancelEvent)
@@ -299,46 +405,6 @@ public class Costumer_CreateReservationPaymentController
 
 		catalog_table.setItems(paymentBill);
 		catalog_table.refresh();
-	}
-
-	/**
-	 * Gather the reservation items and count the amounts of each item.
-	 */
-	private void gatherReservationList()
-	{
-		ArrayList<ItemEntity> itemsList = new ArrayList<>();
-		double totalPrice = 0;
-		for (ItemEntity entity : Costumer_SavedData.getCostumerReservationList()) {
-			CatalogItemRow itemReserve = new CatalogItemRow(entity.getId(), entity.getName(), entity.getItemPrice(),
-					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
-			itemsList.add(entity);
-			paymentBill.add(itemReserve);
-		}
-
-		m_discount = Costumer_SavedData.getCostumerRefund();
-		if (m_discount > totalPrice) {
-			m_discount = totalPrice;
-		}
-
-		if (m_discount > 0.0) {
-			totalPrice -= m_discount;
-			CatalogItemRow item = new CatalogItemRow(99, "Discount", m_discount * -1.0, null, null, null);
-			paymentBill.add(item);
-		}
-
-		Costumer_SavedData.setReservationList(itemsList);
-		total_price_label.setText(String.format("%.2f", totalPrice));
-	}
-
-	private void addReservationList()
-	{
-		for (ItemEntity entity : s_reservationEntity.getReservationList()) {
-			CatalogItemRow item = new CatalogItemRow(entity.getId(), entity.getName(), entity.getItemPrice(),
-					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
-			paymentBill.add(item);
-		}
-
-		total_price_label.setText(String.format("%.2f", s_reservationEntity.getTotalPrice()));
 	}
 
 	/* End of --> Initializing methods region */
