@@ -4,8 +4,49 @@ CREATE SCHEMA `zer-li`;
 
 USE `zer-li`;
 
+CREATE TABLE users (
+	uUserName VARCHAR(20),
+	uPassword VARCHAR(20) NOT NULL,
+	uEmail VARCHAR(40) NOT NULL,
+	uPrivilege VARCHAR(20) NOT NULL,
+	uStatus VARCHAR(12) NOT NULL DEFAULT 'Disconnected',
+	PRIMARY KEY (uUserName)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE costumers (
+  cId INT AUTO_INCREMENT,
+  uUserName VARCHAR(20),
+  cCreditCard VARCHAR(16) NULL DEFAULT NULL,
+  cCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
+  cRefund FLOAT NOT NULL DEFAULT 0,
+  PRIMARY KEY (uUserName,cId),
+  UNIQUE INDEX cId_UNIQUE (cId ASC),
+  UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
+  FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE shop_managers (
+  smId INT AUTO_INCREMENT,
+  uUserName VARCHAR(20) NOT NULL,
+  FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION,
+  UNIQUE INDEX smId_UNIQUE (smId ASC),
+  UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
+  PRIMARY KEY (uUserName,smId)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE shop_employees (
+  seId INT AUTO_INCREMENT,
+  uUserName VARCHAR(20),
+  smId INT,
+  FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
+  UNIQUE INDEX seId_UNIQUE (seId ASC),
+  UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
+  PRIMARY KEY (uUserName,seId,smId)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE items (
-	iId INT NOT NULL AUTO_INCREMENT,
+	iId INT AUTO_INCREMENT,
 	iName VARCHAR(20) NOT NULL,
 	iType VARCHAR(20) NOT NULL,
 	iPrice FLOAT NOT NULL,
@@ -15,39 +56,41 @@ CREATE TABLE items (
 	PRIMARY KEY (iId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE users (
-	uUserName VARCHAR(20) NOT NULL,
-	uPassword VARCHAR(20) NOT NULL,
-	uEmail VARCHAR(40) NOT NULL,
-	uPrivilege VARCHAR(20) NOT NULL,
-	uStatus VARCHAR(12) NOT NULL DEFAULT 'Disconnected' ,
-	PRIMARY KEY (uUserName)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE TABLE costumers (
-  cId INT NOT NULL AUTO_INCREMENT,
-  uUserName VARCHAR(20) NOT NULL,
-  cCreditCard VARCHAR(16) NULL DEFAULT NULL,
-  cCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
-  cRefund FLOAT NOT NULL DEFAULT 0,
-  INDEX uUserName_idx (uUserName ASC),
-  PRIMARY KEY (uUserName),
-  UNIQUE INDEX cId_UNIQUE (cId ASC),
-  CONSTRAINT uUserName FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE reservations (
-  rId INT NOT NULL AUTO_INCREMENT,
-  cId INT NOT NULL,
+  rId INT AUTO_INCREMENT,
+  cId INT,
+  smId INT,
   rType VARCHAR(7) NULL DEFAULT 'Open',
-  rItems VARCHAR(100) NULL DEFAULT NULL,
+  rNumberOfItems INT NOT NULL DEFAULT 0,
   rPrice FLOAT NOT NULL DEFAULT 0,
-  rDeliveryDate DATE NOT NULL DEFAULT '0000-00-00',
-  rDeliveryType VARCHAR(9) NOT NULL DEFAULT 'Immediate',
   rBlessingCard VARCHAR(100) NULL DEFAULT NULL,
-  PRIMARY KEY (rId, cId),
-  INDEX cId_idx (cId ASC),
-  CONSTRAINT cId FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION
+  rDeliveryDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  rDeliveryType VARCHAR(9) NOT NULL DEFAULT 'None',
+  rDeliveryAddress VARCHAR(50) NULL DEFAULT NULL,
+  rDeliveryPhone VARCHAR(10) NULL DEFAULT NULL,
+  rDeliveryName VARCHAR(20) NULL DEFAULT NULL,
+  FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  PRIMARY KEY (rId, cId)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE items_in_reservation(
+  rId INT,
+  iId INT,
+  irQuentity INT NOT NULL DEFAULT 1,
+  irPrice FLOAT NOT NULL,
+  FOREIGN KEY (rId) REFERENCES reservations (rId) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (iId) REFERENCES items (iId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  PRIMARY KEY (rId, iId)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE items_in_shop(
+  smId INT,
+  iId INT,
+  isDiscountedPrice FLOAT NOT NULL,  
+  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
+  FOREIGN KEY (iId) REFERENCES items (iId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  PRIMARY KEY (smId, iId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE complaints (
@@ -56,21 +99,159 @@ CREATE TABLE complaints (
   coComplaint VARCHAR(200) NOT NULL,
   coSummary VARCHAR(200) NULL DEFAULT NULL,
   coOpened BIT(1) NOT NULL DEFAULT 1,
-  PRIMARY KEY (coId, cId),
   INDEX cId_idx (cId ASC),
-  CONSTRAINT cId FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION
+  FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  PRIMARY KEY (coId, cId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-LOCK TABLES items WRITE;
+CREATE TABLE surveys (
+  suId INT AUTO_INCREMENT,
+  suDate DATE NOT NULL DEFAULT '0000-00-00',
+  smId INT NOT NULL,
+  suAnswer1 INT NOT NULL DEFAULT 0,
+  suAnswer2 INT NOT NULL DEFAULT 0,
+  suAnswer3 INT NOT NULL DEFAULT 0,
+  suAnswer4 INT NOT NULL DEFAULT 0,
+  suAnswer5 INT NOT NULL DEFAULT 0,
+  suAnswer6 INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  PRIMARY KEY (suId)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
+CREATE TABLE complaints_reports (
+ smId INT NOT NULL,
+ crYear YEAR NOT NULL DEFAULT '0000', 
+ crQuarter INT NOT NULL DEFAULT 0,
+ crMonth1 INT NOT NULL DEFAULT 0,
+ crMonth2 INT NOT NULL DEFAULT 0,
+ crMonth3 INT NOT NULL DEFAULT 0,
+ FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ PRIMARY KEY(smId,crYear,crQuarter)
+);
+
+CREATE TABLE survey_reports (
+ smId INT NOT NULL,
+ srYear YEAR NOT NULL DEFAULT '0000', 
+ srQuarter FLOAT NOT NULL DEFAULT 0,
+ srAnswer1 FLOAT NOT NULL DEFAULT 0,
+ srAnswer2 FLOAT NOT NULL DEFAULT 0,
+ srAnswer3 FLOAT NOT NULL DEFAULT 0,
+ srAnswer4 FLOAT NOT NULL DEFAULT 0,
+ srAnswer5 FLOAT NOT NULL DEFAULT 0,
+ srAnswer6 FLOAT NOT NULL DEFAULT 0,
+ FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ PRIMARY KEY(smId,srYear,srQuarter)
+);
+
+CREATE TABLE incomes_reports (
+ smId INT NOT NULL,
+ irYear YEAR NOT NULL DEFAULT '0000', 
+ irQuarter INT NOT NULL DEFAULT 0,
+ irMonth1 FLOAT NOT NULL DEFAULT 0,
+ irMonth2 FLOAT NOT NULL DEFAULT 0,
+ irMonth3 FLOAT NOT NULL DEFAULT 0,
+ FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ PRIMARY KEY(smId,irYear,irQuarter)
+);
+
+CREATE TABLE reservation_reports (
+ smId INT NOT NULL,
+ rrYear YEAR NOT NULL DEFAULT '0000', 
+ rrQuarter INT NOT NULL DEFAULT 0,
+ rrMonth1_Flower INT NOT NULL DEFAULT 0,
+ rrMonth1_FlowerPot INT NOT NULL DEFAULT 0,
+ rrMonth1_FlowerArrangement INT NOT NULL DEFAULT 0,
+ rrMonth1_BridalBouquet INT NOT NULL DEFAULT 0,
+ rrMonth2_Flower INT NOT NULL DEFAULT 0,
+ rrMonth2_FlowerPot INT NOT NULL DEFAULT 0,
+ rrMonth2_FlowerArrangement INT NOT NULL DEFAULT 0,
+ rrMonth2_BridalBouquet INT NOT NULL DEFAULT 0,
+ rrMonth3_Flower INT NOT NULL DEFAULT 0,
+ rrMonth3_FlowerPot INT NOT NULL DEFAULT 0,
+ rrMonth3_FlowerArrangement INT NOT NULL DEFAULT 0,
+ rrMonth3_BridalBouquet INT NOT NULL DEFAULT 0,
+ 
+ FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ PRIMARY KEY(smId,rrYear,rrQuarter)
+); 
+--
+-- Create views:
+--
+
+CREATE VIEW not_removed_items AS
+SELECT iId, iName, iType, iPrice, iImage, iDomainColor 
+FROM items
+WHERE iDeleted = 0;
+
+--
+-- Create triggers and procedures:
+--
+
+DELIMITER //
+
+CREATE PROCEDURE getShopCatalog( shop_manager_id INT )
+BEGIN  
+	
+	(SELECT not_removed_items.iId, not_removed_items.iName, not_removed_items.iType,
+	not_removed_items.iPrice,discounted.isDiscountedPrice,	not_removed_items.iImage, not_removed_items.iDomainColor 
+	FROM not_removed_items , (SELECT * FROM items_in_shop where smId = shop_manager_id) AS discounted 
+	WHERE not_removed_items.iId = discounted.iId)
+	UNION
+	(SELECT not_removed_items.iId, not_removed_items.iName, not_removed_items.iType,
+	not_removed_items.iPrice, 0 , not_removed_items.iImage, not_removed_items.iDomainColor 
+	FROM not_removed_items WHERE not_removed_items.iId NOT IN 
+    (SELECT items_in_shop.iId FROM items_in_shop where smId = shop_manager_id))
+    ORDER BY iID;
+END; //
+
+CREATE PROCEDURE getShopSurveyAverage( shop_manager_id INT )
+BEGIN  
+	
+	SELECT smId, AVG(suAnswer1),AVG(suAnswer2),AVG(suAnswer3),
+		   AVG(suAnswer4) ,AVG(suAnswer5) ,AVG(suAnswer6)
+	FROM surveys WHERE smId = shop_manager_id; 
+END; //
+
+CREATE TRIGGER update_item_trigger
+AFTER UPDATE ON items FOR EACH ROW
+BEGIN
+
+   DELETE FROM items_in_shop WHERE items_in_shop.iId = NEW.iId AND items_in_shop.isDiscountedPrice > NEW.iPrice;
+	
+END; //
+
+CREATE TRIGGER insert_survey
+BEFORE INSERT ON surveys FOR EACH ROW
+BEGIN
+    IF (NEW.suDate = '0000-00-00') THEN 
+        SET NEW.suDate = now();
+    END IF;
+END; //
+
+CREATE TRIGGER insert_reservation
+BEFORE INSERT ON reservations FOR EACH ROW
+BEGIN
+    IF (NEW.rDeliveryDate = '0000-00-00 00:00:00') THEN 
+        SET NEW.rDeliveryDate = now();
+    END IF;
+END; //
+
+DELIMITER ;
+
+--
+-- Insert data to tables:
+--
+
+LOCK TABLES items WRITE;
 INSERT INTO items (iName,iType,iPrice,iDomainColor) VALUES 
-('Rose','Flower',1.0,'red'),
-('Sunflower','Flower',2.0,'yellow'),
+('Rose','Flower',9.0,'red'),
+('Sunflower','Flower',15.0,'yellow'),
 ('Lily','Flower',3.0,'white'),
-('Anemone','Flower',4.0,'red'),
-('Aconite','Flower',5.0, 'purple'),
-('Balloon Flower','Flower',6.0,'purple'),
-('Canterbury Bells','Flower',7.0,'pink'),
+('Anemone','Flower',12.0,'red'),
+('Aconite','Flower',16.0, 'purple'),
+('Balloon Flower','Flower',78.0,'purple'),
+('Canterbury Bells','Flower',12.0,'pink'),
 ('Dusty Miller','Flower',8.0,'white'),
 ('Epimedium','Flower',9.0,'yellow'),
 ('Fennel','Flower',10.0,'white'),
@@ -82,7 +263,6 @@ INSERT INTO items (iName,iType,iPrice,iDomainColor) VALUES
 ('Orchid','Flower',16.0,'pink');
 
 LOCK TABLES users WRITE;
-
 INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES 
 ('companyemployee','companyemployee','companyemployee@local','CompanyEmployee'),
 ('shopmanager','shopmanager','shopmanager@local','ShopManager'),
@@ -93,9 +273,33 @@ INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES
 ('costumer','costumer','costumer@local','Costumer'),
 ('servicespecialist','servicespecialist','servicespecialist@local','ServiceSpecialist');
 
-LOCK TABLES costumers WRITE;
+LOCK TABLES shop_managers WRITE;
+INSERT INTO shop_managers (uUserName) VALUES
+('shopmanager');
 
+LOCK TABLES shop_employees WRITE;
+INSERT INTO shop_employees (uUserName,smId) VALUES
+('shopemployee',1);
+
+LOCK TABLES items_in_shop WRITE;
+INSERT INTO items_in_shop (smId,iId,isDiscountedPrice) VALUES 
+(1,1,5),
+(1,2,5),
+(1,10,5);
+
+LOCK TABLES costumers WRITE;
 INSERT INTO costumers (uUserName) VALUES
 ('costumer');
+
+LOCK TABLES surveys WRITE;
+INSERT INTO surveys (smId,suAnswer1,suAnswer2,suAnswer3,suAnswer4,suAnswer5,suAnswer6) VALUES
+(1,1,2,3,4,5,6),
+(1,2,5,3,2,7,10),
+(1,5,6,3,2,4,7),
+(1,9,6,2,3,3,10);
+
+LOCK TABLES reservations WRITE;
+INSERT INTO reservations (cId, smId, rNumberOfItems, rPrice, rBlessingCard, rDeliveryType, rDeliveryAddress, rDeliveryPhone, rDeliveryName) VALUES 
+(1,1,2,10, 'Happy Birthday', 'Immediate','Ort Braude','049981111','Dolev');
 
 UNLOCK TABLES;         
