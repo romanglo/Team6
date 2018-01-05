@@ -22,30 +22,86 @@ public class ReservationEntity implements IEntity
 
 	private Integer m_id;
 
-	private Double m_totalPrice;
-
 	private CostumerEntity m_costumer;
+
+	private ShopManagerEntity m_shopManager;
 
 	private ReservationType m_reservationType;
 
-	private ArrayList<ItemEntity> m_reservationList;
+	private int m_quantityOfItems;
+
+	private Double m_totalPrice;
+
+	private String m_blessingCard;
 
 	private Date m_deliveryDate;
 
 	private ReservationDeliveryType m_deliveryType;
 
-	private String m_blessingCard;
+	private String m_deliveryAddress;
+
+	private String m_deliveryPhone;
+
+	private String m_deliveryName;
 
 	// end region -> Fields
 
 	// region Getters
 
+	// end region -> Getters
+
+	// region Setters
+
+	// end region -> Setters
+
+	// region Constructors
+
 	/**
-	 * @return An unique ID of the reservation.
+	 * @return The ID.
 	 */
 	public Integer getId()
 	{
 		return m_id;
+	}
+
+	/**
+	 * @return The costumer of the reservation.
+	 */
+	public CostumerEntity getCostumer()
+	{
+		return m_costumer;
+	}
+	
+	/**
+	 * @return The costumer ID.
+	 */
+	public int getCostumerId() 
+	{
+		return m_costumer.getId();
+	}
+
+	/**
+	 * @return The shop manager connected with the reservation.
+	 */
+	public ShopManagerEntity getShopManager()
+	{
+		return m_shopManager;
+	}
+
+	/**
+	 * @return The reservation type.
+	 */
+	public ReservationType getType()
+	{
+		return m_reservationType;
+	}
+
+	/**
+	 * @return The quantity of items in the reservation.
+	 */
+	public int getQuantityOfItems()
+	{
+		return m_quantityOfItems;
 	}
 
 	/**
@@ -57,39 +113,15 @@ public class ReservationEntity implements IEntity
 	}
 
 	/**
-	 * @return The costumer entity that is connected to the reservation.
+	 * @return The blessing card.
 	 */
-	public CostumerEntity getCostumer()
+	public String getBlessingCard()
 	{
-		return m_costumer;
+		return m_blessingCard;
 	}
 
 	/**
-	 * @return The costumer that the reservation is connected to.
-	 */
-	public Integer getCostumerId()
-	{
-		return m_costumer.getId();
-	}
-
-	/**
-	 * @return A enumerator which describes the reservation type.
-	 */
-	public ReservationType getType()
-	{
-		return m_reservationType;
-	}
-
-	/**
-	 * @return A reservation list.
-	 */
-	public ArrayList<ItemEntity> getReservationList()
-	{
-		return m_reservationList;
-	}
-
-	/**
-	 * @return Delivery date requested.
+	 * @return The delivery date.
 	 */
 	public Date getDeliveryDate()
 	{
@@ -97,7 +129,7 @@ public class ReservationEntity implements IEntity
 	}
 
 	/**
-	 * @return Delivery type.
+	 * @return The delivery type.
 	 */
 	public ReservationDeliveryType getDeliveryType()
 	{
@@ -105,130 +137,160 @@ public class ReservationEntity implements IEntity
 	}
 
 	/**
-	 * @return Blessing card string.
+	 * @return The delivery address.
 	 */
-	public String getBlessingCard()
+	public String getDeliveryAddress()
 	{
-		return m_blessingCard;
+		return m_deliveryAddress;
 	}
 
-	// end region -> Getters
-
-	// region Setters
+	/**
+	 * @return The delivery phone number.
+	 */
+	public String getDeliveryPhone()
+	{
+		return m_deliveryPhone;
+	}
 
 	/**
-	 * Upgrade the ID of the reservation.
+	 * @return The delivery name.
+	 */
+	public String getDeliveryName()
+	{
+		return m_deliveryName;
+	}
+
+	/**
+	 * Update the id of the reservation.
 	 *
-	 * @param id
+	 * @param m_id
 	 *            the m_id to set
 	 */
-	public void setId(Integer id)
+	public void setId(Integer m_id)
 	{
-		m_id = id;
+		this.m_id = m_id;
 	}
 
 	/**
-	 * Upgrade the total price of the reservation.
+	 * Update the costumer of the reservation.
 	 *
-	 * @param totalPrice
-	 *            the m_totalPrice to set
+	 * @param m_costumer
+	 *            the m_costumer to set
 	 */
-	public void setTotalPrice(Double totalPrice)
+	public void setCostumer(CostumerEntity m_costumer)
 	{
-		m_totalPrice = totalPrice;
+		this.m_costumer = m_costumer;
 	}
 
 	/**
-	 * Upgrade the connected costumer to the reservation.
+	 * Update the shop manager of the reservation.
 	 *
-	 * @param costumer
-	 *            the costumer id to set
+	 * @param m_shopManager
+	 *            the m_shopManager to set
 	 */
-	public void setCostumer(CostumerEntity costumer)
+	public void setShopManager(ShopManagerEntity m_shopManager)
 	{
-		m_costumer = costumer;
+		this.m_shopManager = m_shopManager;
 	}
 
 	/**
-	 * Upgrade the id of the connected costumer to the reservation.
+	 * Update the type of the reservation.
 	 *
-	 * @param costumerId
-	 *            the costumer id to set
-	 */
-	public void setCostumerId(Integer costumerId)
-	{
-		m_costumer.setId(costumerId);
-	}
-
-	/**
-	 * Upgrade the {@link ReservationType}.
-	 *
-	 * @param reservationType
+	 * @param m_reservationType
 	 *            the m_reservationType to set
 	 */
-	public void setType(ReservationType reservationType)
+	public void setType(ReservationType m_reservationType)
 	{
-		m_reservationType = reservationType;
+		this.m_reservationType = m_reservationType;
 	}
 
 	/**
-	 * Upgrade the {@link ItemEntity} list of the reservation.
+	 * Update the quantity of the reservation.
 	 *
-	 * @param reservationList
-	 *            the m_reservationList to set
+	 * @param m_quantityOfItems
+	 *            the m_quantityOfItems to set
 	 */
-	public void setReservationList(ArrayList<ItemEntity> reservationList)
+	public void setQuantityOfItems(int m_quantityOfItems)
 	{
-		m_reservationList = reservationList;
+		this.m_quantityOfItems = m_quantityOfItems;
 	}
 
 	/**
-	 * Add the {@link ItemEntity} to the list.
+	 * Update the price of the reservation.
 	 *
-	 * @param reservation
-	 *            the m_reservation to add.
+	 * @param m_totalPrice
+	 *            the m_totalPrice to set
 	 */
-	public void addReservation(ItemEntity reservation)
+	public void setTotalPrice(Double m_totalPrice)
 	{
-		m_reservationList.add(reservation);
+		this.m_totalPrice = m_totalPrice;
 	}
 
 	/**
-	 * Upgrade the {@link Date} of the delivery.
+	 * Update the blessing card of the reservation.
 	 *
-	 * @param deliveryDate
-	 *            The date of the delivery.
+	 * @param m_blessingCard
+	 *            the m_blessingCard to set
 	 */
-	public void setDeliveryDate(Date deliveryDate)
+	public void setBlessingCard(String m_blessingCard)
 	{
-		m_deliveryDate = deliveryDate;
+		this.m_blessingCard = m_blessingCard;
 	}
 
 	/**
-	 * Upgrade the {@link ReservationDeliveryType} of the delivery.
+	 * Update the delivery date of the reservation.
 	 *
-	 * @param deliveryType
-	 *            The delivery type.
+	 * @param m_deliveryDate
+	 *            the m_deliveryDate to set
 	 */
-	public void setDeliveryType(ReservationDeliveryType deliveryType)
+	public void setDeliveryDate(Date m_deliveryDate)
 	{
-		m_deliveryType = deliveryType;
+		this.m_deliveryDate = m_deliveryDate;
 	}
 
 	/**
-	 * Upgrade the blessing card of the reservation.
+	 * Update the delivery type of the reservation.
 	 *
-	 * @param blessing
-	 *            The blessing string.
+	 * @param m_deliveryType
+	 *            the m_deliveryType to set
 	 */
-	public void setBlessingCard(String blessing)
+	public void setDeliveryType(ReservationDeliveryType m_deliveryType)
 	{
-		m_blessingCard = blessing;
+		this.m_deliveryType = m_deliveryType;
 	}
 
-	// end region -> Setters
+	/**
+	 * Update the delivery address of the reservation.
+	 *
+	 * @param m_deliveryAddress
+	 *            the m_deliveryAddress to set
+	 */
+	public void setDeliveryAddress(String m_deliveryAddress)
+	{
+		this.m_deliveryAddress = m_deliveryAddress;
+	}
 
-	// region Constructors
+	/**
+	 * Update the delivery phone of the reservation.
+	 *
+	 * @param m_deliveryPhone
+	 *            the m_deliveryPhone to set
+	 */
+	public void setDeliveryPhone(String m_deliveryPhone)
+	{
+		this.m_deliveryPhone = m_deliveryPhone;
+	}
+
+	/**
+	 * Update the delivery name of the reservation.
+	 *
+	 * @param m_deliveryName
+	 *            the m_deliveryName to set
+	 */
+	public void setDeliveryName(String m_deliveryName)
+	{
+		this.m_deliveryName = m_deliveryName;
+	}
 
 	/**
 	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
@@ -240,8 +302,6 @@ public class ReservationEntity implements IEntity
 	 *            An enumerator which describes the reservation type.
 	 * @param costumerEntity
 	 *            The costumer entity that is connected to the reservation.
-	 * @param reservationList
-	 *            The reservation list.
 	 * @param total
 	 *            The total price of the reservation.
 	 * @param deliveryDate
@@ -251,14 +311,12 @@ public class ReservationEntity implements IEntity
 	 * @param blessingCard
 	 *            The blessing card in the reservation.
 	 */
-	public ReservationEntity(Integer id, ReservationType type, CostumerEntity costumerEntity,
-			ArrayList<ItemEntity> reservationList, Double total, Date deliveryDate,
-			ReservationDeliveryType deliveryType, String blessingCard)
+	public ReservationEntity(Integer id, ReservationType type, CostumerEntity costumerEntity, Double total,
+			Date deliveryDate, ReservationDeliveryType deliveryType, String blessingCard)
 	{
 		m_id = id;
 		m_reservationType = type;
 		m_costumer = costumerEntity;
-		m_reservationList = reservationList;
 		m_totalPrice = total;
 		m_deliveryDate = deliveryDate;
 		m_deliveryType = deliveryType;
@@ -277,9 +335,6 @@ public class ReservationEntity implements IEntity
 	 * 
 	 * @param costumerId
 	 *            The costumer id that is connected to the reservation.
-	 * 
-	 * @param reservationList
-	 *            The reservation list.
 	 * 
 	 * @param total
 	 *            The total price of the reservation.
@@ -293,13 +348,12 @@ public class ReservationEntity implements IEntity
 	 * @param blessingCard
 	 *            The blessing card in the reservation.
 	 */
-	public ReservationEntity(Integer id, ReservationType type, int costumerId, ArrayList<ItemEntity> reservationList,
-			Double total, Date deliveryDate, ReservationDeliveryType deliveryType, String blessingCard)
+	public ReservationEntity(Integer id, ReservationType type, int costumerId, Double total, Date deliveryDate,
+			ReservationDeliveryType deliveryType, String blessingCard)
 	{
 		m_id = id;
 		m_reservationType = type;
 		m_costumer = new CostumerEntity(costumerId);
-		m_reservationList = reservationList;
 		m_totalPrice = total;
 		m_deliveryDate = deliveryDate;
 		m_deliveryType = deliveryType;
@@ -316,8 +370,6 @@ public class ReservationEntity implements IEntity
 	 *            An enumerator which describes the reservation type.
 	 * @param costumerId
 	 *            The costumer id that is connected to the reservation.
-	 * @param reservationList
-	 *            The reservation list.
 	 * @param total
 	 *            The total price of the reservation.
 	 * @param deliveryDate
@@ -325,11 +377,10 @@ public class ReservationEntity implements IEntity
 	 * @param deliveryType
 	 *            The delivery type.
 	 */
-	public ReservationEntity(Integer id, ReservationType type, Integer costumerId,
-			ArrayList<ItemEntity> reservationList, Double total, Date deliveryDate,
+	public ReservationEntity(Integer id, ReservationType type, Integer costumerId, Double total, Date deliveryDate,
 			ReservationDeliveryType deliveryType)
 	{
-		this(id, type, new CostumerEntity(costumerId), reservationList, total, deliveryDate, deliveryType, "");
+		this(id, type, new CostumerEntity(costumerId), total, deliveryDate, deliveryType, "");
 
 	}
 
@@ -353,7 +404,7 @@ public class ReservationEntity implements IEntity
 	public ReservationEntity(Integer id, ReservationType type, Double total, Date deliveryDate,
 			ReservationDeliveryType deliveryType, String blessingCard)
 	{
-		this(id, type, null, new ArrayList<>(), total, deliveryDate, deliveryType, blessingCard);
+		this(id, type, null, total, deliveryDate, deliveryType, blessingCard);
 
 	}
 
@@ -367,15 +418,12 @@ public class ReservationEntity implements IEntity
 	 *            An enumerator which describes the reservation type.
 	 * @param costumerId
 	 *            The costumer id that is connected to the reservation.
-	 * @param reservationList
-	 *            The reservation list.
 	 * @param total
 	 *            The total price of the reservation.
 	 */
-	public ReservationEntity(Integer id, ReservationType type, Integer costumerId,
-			ArrayList<ItemEntity> reservationList, Double total)
+	public ReservationEntity(Integer id, ReservationType type, Integer costumerId, Double total)
 	{
-		this(id, type, costumerId, reservationList, total, null, null);
+		this(id, type, costumerId, total, null, null);
 	}
 
 	/**
@@ -389,7 +437,7 @@ public class ReservationEntity implements IEntity
 	 */
 	public ReservationEntity(Integer id, ReservationType reservationType)
 	{
-		this(id, reservationType, null, new ArrayList<>(), null);
+		this(id, reservationType, null, null);
 	}
 
 	/**
@@ -405,23 +453,7 @@ public class ReservationEntity implements IEntity
 	 */
 	public ReservationEntity(Integer id, ReservationType reservationType, Double total)
 	{
-		this(id, reservationType, null, new ArrayList<>(), total);
-	}
-
-	/**
-	 * Create instance of {@link ReservationEntity}. Dedicated for add or update
-	 * messages.
-	 * 
-	 * @param type
-	 *            An enumerator which describes the reservation type.
-	 * @param costumerId
-	 *            The costumer id that is connected to the reservation.
-	 * @param reservationList
-	 *            The reservation list.
-	 */
-	public ReservationEntity(ReservationType type, Integer costumerId, ArrayList<ItemEntity> reservationList)
-	{
-		this(null, type, costumerId, reservationList, 0.0);
+		this(id, reservationType, null, total);
 	}
 
 	/**
@@ -435,7 +467,7 @@ public class ReservationEntity implements IEntity
 	 */
 	public ReservationEntity(ReservationType type, Integer costumerId)
 	{
-		this(null, type, costumerId, new ArrayList<>(), 0.0);
+		this(null, type, costumerId, 0.0);
 	}
 
 	/**
@@ -449,7 +481,7 @@ public class ReservationEntity implements IEntity
 	 */
 	public ReservationEntity(ReservationType type, CostumerEntity costumer)
 	{
-		this(null, type, costumer.getId(), new ArrayList<>(), 0.0);
+		this(null, type, costumer.getId(), 0.0);
 		setCostumer(costumer);
 	}
 
@@ -483,13 +515,17 @@ public class ReservationEntity implements IEntity
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString()
 	{
-		return "ReservationEntity [ID=" + m_id + ", Total Price=" + m_totalPrice + ", Costumer=" + m_costumer
-				+ ", Reservation Type=" + m_reservationType + ", Reservation List=" + m_reservationList
-				+ ", Delivery Date=" + m_deliveryDate + ", Delivery Type=" + m_deliveryType + ", Blessing Card="
-				+ m_blessingCard + "]";
+		return "ReservationEntity [ID=" + m_id + ", Costumer=" + m_costumer + ", Shop Manager=" + m_shopManager
+				+ ", Reservation Type=" + m_reservationType + ", Quantity Of Items=" + m_quantityOfItems
+				+ ", Total Price=" + m_totalPrice + ", Blessing Card=" + m_blessingCard + ", Delivery Date="
+				+ m_deliveryDate + ", Delivery Type=" + m_deliveryType + ", Delivery Address=" + m_deliveryAddress
+				+ ", Delivery Phone=" + m_deliveryPhone + ", Delivery Name=" + m_deliveryName + "]";
 	}
 
 	// end region -> Override Object Methods

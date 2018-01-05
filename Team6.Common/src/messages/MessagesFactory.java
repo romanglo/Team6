@@ -118,32 +118,6 @@ public class MessagesFactory
 
 	/**
 	 * Create {@link Message} with a {@link IMessageData} of a
-	 * {@link EntitiesListData} with {@link EntityDataOperation#Get} operation.
-	 *
-	 * @param entity
-	 *            The entity to add to message.
-	 * @return An {@link Message}.
-	 */
-	public static Message createGetEntitiesMessage(ArrayList<IEntity> entity)
-	{
-		return createEntitiesListMessage(entity, EntityDataOperation.Get);
-	}
-
-	/**
-	 * Create {@link Message} with a {@link IMessageData} of a
-	 * {@link EntitiesListData} with {@link EntityDataOperation#Get} operation.
-	 *
-	 * @param entity
-	 *            The entity to add to message.
-	 * @return An {@link Message}.
-	 */
-	public static Message createGetAllEntitiesMessage(ArrayList<IEntity> entity)
-	{
-		return createEntitiesListMessage(entity, EntityDataOperation.GetALL);
-	}
-
-	/**
-	 * Create {@link Message} with a {@link IMessageData} of a
 	 * {@link EntitiesListData} with {@link EntityDataOperation#Remove} operation.
 	 *
 	 * @param entity

@@ -19,7 +19,7 @@ public class ItemEntity implements IEntity
 	 * Serial version unique ID, necessary due to the class implements
 	 * {@link Serializable}
 	 */
-	private static final long serialVersionUID = -1575231046663959076L;
+	private static final long serialVersionUID = -5354214821943123210L;
 
 	private Integer m_id;
 
@@ -32,6 +32,8 @@ public class ItemEntity implements IEntity
 	private SerializableImage m_itemImage;
 
 	private String m_domainColor;
+
+	private boolean m_isDeleted;
 
 	// end region -> Fields
 
@@ -97,6 +99,14 @@ public class ItemEntity implements IEntity
 	public String getColor()
 	{
 		return m_domainColor;
+	}
+
+	/**
+	 * @return Is the item deleted.
+	 */
+	public boolean gerIsDeleted()
+	{
+		return m_isDeleted;
 	}
 
 	// end region -> Getters
@@ -167,6 +177,17 @@ public class ItemEntity implements IEntity
 	public void setColor(String domainColor)
 	{
 		m_domainColor = domainColor;
+	}
+
+	/**
+	 * Upgrade if the item deleted or not.
+	 *
+	 * @param isDeleted
+	 *            The boolean to set if the item deleted.
+	 */
+	public void setIsDeleted(boolean isDeleted)
+	{
+		m_isDeleted = isDeleted;
 	}
 
 	// end region -> Setters
@@ -278,7 +299,7 @@ public class ItemEntity implements IEntity
 	{
 		this(id, name, itemType, itemPrice, null, itemImg);
 	}
-	
+
 	/**
 	 * Create instance of {@link ItemEntity}. Dedicated for add or update messages.
 	 * 
@@ -417,7 +438,7 @@ public class ItemEntity implements IEntity
 	// end region -> Constructors
 
 	// region Override Object Methods
-
+	
 	/**
 	 * {@inheritDoc}
 	 */

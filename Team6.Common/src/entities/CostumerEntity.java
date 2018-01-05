@@ -20,13 +20,13 @@ public class CostumerEntity implements IEntity
 
 	private Integer m_id;
 
+	private UserEntity m_user;
+
 	private String m_creditCard;
 
 	private CostumerSubscription m_subscription;
 
 	private Double m_refund;
-
-	private UserEntity m_user;
 
 	// end region -> Fields
 
