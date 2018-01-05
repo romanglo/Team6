@@ -1,3 +1,5 @@
+UNLOCK TABLES;         
+
 DROP SCHEMA IF EXISTS `zer-li`;
 
 CREATE SCHEMA `zer-li`;
@@ -18,9 +20,8 @@ CREATE TABLE costumers (
   uUserName VARCHAR(20),
   cCreditCard VARCHAR(16) NULL DEFAULT NULL,
   cCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
-  cRefund FLOAT NOT NULL DEFAULT 0,
-  PRIMARY KEY (uUserName,cId),
-  UNIQUE INDEX cId_UNIQUE (cId ASC),
+  cBalance FLOAT NOT NULL DEFAULT 0,
+  PRIMARY KEY (cId),
   UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
   FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -29,9 +30,8 @@ CREATE TABLE shop_managers (
   smId INT AUTO_INCREMENT,
   uUserName VARCHAR(20) NOT NULL,
   FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION,
-  UNIQUE INDEX smId_UNIQUE (smId ASC),
   UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
-  PRIMARY KEY (uUserName,smId)
+  PRIMARY KEY (smId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shop_employees (
@@ -40,9 +40,8 @@ CREATE TABLE shop_employees (
   smId INT,
   FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
-  UNIQUE INDEX seId_UNIQUE (seId ASC),
   UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
-  PRIMARY KEY (uUserName,seId,smId)
+  PRIMARY KEY (seId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE items (
@@ -71,20 +70,20 @@ CREATE TABLE reservations (
   rDeliveryName VARCHAR(20) NULL DEFAULT NULL,
   FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  PRIMARY KEY (rId, cId)
+  PRIMARY KEY (rId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE items_in_reservation(
+CREATE TABLE items_in_reservations(
   rId INT,
   iId INT,
-  irQuentity INT NOT NULL DEFAULT 1,
+  irQuantity INT NOT NULL DEFAULT 1,
   irPrice FLOAT NOT NULL,
   FOREIGN KEY (rId) REFERENCES reservations (rId) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (iId) REFERENCES items (iId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   PRIMARY KEY (rId, iId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE items_in_shop(
+CREATE TABLE items_in_shops(
   smId INT,
   iId INT,
   isDiscountedPrice FLOAT NOT NULL,  
@@ -96,12 +95,14 @@ CREATE TABLE items_in_shop(
 CREATE TABLE complaints (
   coId INT NOT NULL AUTO_INCREMENT,
   cId INT NOT NULL,
+  smId Int NOT NULL,
+  cDate DATE NOT NULL DEFAULT '0000-00-00',
   coComplaint VARCHAR(200) NOT NULL,
   coSummary VARCHAR(200) NULL DEFAULT NULL,
   coOpened BIT(1) NOT NULL DEFAULT 1,
-  INDEX cId_idx (cId ASC),
   FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  PRIMARY KEY (coId, cId)
+  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  PRIMARY KEY (coId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE surveys (
@@ -130,7 +131,7 @@ CREATE TABLE complaints_reports (
  PRIMARY KEY(smId,crYear,crQuarter)
 );
 
-CREATE TABLE survey_reports (
+CREATE TABLE surveys_reports (
  smId INT NOT NULL,
  srYear YEAR NOT NULL DEFAULT '0000', 
  srQuarter FLOAT NOT NULL DEFAULT 0,
@@ -155,7 +156,7 @@ CREATE TABLE incomes_reports (
  PRIMARY KEY(smId,irYear,irQuarter)
 );
 
-CREATE TABLE reservation_reports (
+CREATE TABLE reservations_reports (
  smId INT NOT NULL,
  rrYear YEAR NOT NULL DEFAULT '0000', 
  rrQuarter INT NOT NULL DEFAULT 0,
@@ -170,22 +171,22 @@ CREATE TABLE reservation_reports (
  rrMonth3_Flower INT NOT NULL DEFAULT 0,
  rrMonth3_FlowerPot INT NOT NULL DEFAULT 0,
  rrMonth3_FlowerArrangement INT NOT NULL DEFAULT 0,
- rrMonth3_BridalBouquet INT NOT NULL DEFAULT 0,
- 
+ rrMonth3_BridalBouquet INT NOT NULL DEFAULT 0, 
  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
  PRIMARY KEY(smId,rrYear,rrQuarter)
 ); 
+
 --
 -- Create views:
 --
 
-CREATE VIEW not_removed_items AS
+CREATE VIEW catalog AS
 SELECT iId, iName, iType, iPrice, iImage, iDomainColor 
 FROM items
 WHERE iDeleted = 0;
 
 --
--- Create triggers and procedures:
+-- Create procedures:
 --
 
 DELIMITER //
@@ -193,31 +194,229 @@ DELIMITER //
 CREATE PROCEDURE getShopCatalog( shop_manager_id INT )
 BEGIN  
 	
-	(SELECT not_removed_items.iId, not_removed_items.iName, not_removed_items.iType,
-	not_removed_items.iPrice,discounted.isDiscountedPrice,	not_removed_items.iImage, not_removed_items.iDomainColor 
-	FROM not_removed_items , (SELECT * FROM items_in_shop where smId = shop_manager_id) AS discounted 
-	WHERE not_removed_items.iId = discounted.iId)
+	(SELECT catalog.iId, catalog.iName, catalog.iType,
+	catalog.iPrice,discounted.isDiscountedPrice,	catalog.iImage, catalog.iDomainColor 
+	FROM catalog , (SELECT * FROM items_in_shops where smId = shop_manager_id) AS discounted 
+	WHERE catalog.iId = discounted.iId)
 	UNION
-	(SELECT not_removed_items.iId, not_removed_items.iName, not_removed_items.iType,
-	not_removed_items.iPrice, 0 , not_removed_items.iImage, not_removed_items.iDomainColor 
-	FROM not_removed_items WHERE not_removed_items.iId NOT IN 
-    (SELECT items_in_shop.iId FROM items_in_shop where smId = shop_manager_id))
+	(SELECT catalog.iId, catalog.iName, catalog.iType,
+	catalog.iPrice, 0 , catalog.iImage, catalog.iDomainColor 
+	FROM catalog WHERE catalog.iId NOT IN 
+    (SELECT items_in_shops.iId FROM items_in_shops where smId = shop_manager_id))
     ORDER BY iID;
 END; //
 
-CREATE PROCEDURE getShopSurveyAverage( shop_manager_id INT )
+CREATE PROCEDURE getShopSurveyAverage( shop_manager_id INT , in_year YEAR , quarter INT)
 BEGIN  
 	
-	SELECT smId, AVG(suAnswer1),AVG(suAnswer2),AVG(suAnswer3),
-		   AVG(suAnswer4) ,AVG(suAnswer5) ,AVG(suAnswer6)
-	FROM surveys WHERE smId = shop_manager_id; 
+	DECLARE start_month INT;
+	DECLARE end_month INT;
+   
+	IF (quarter = 1) THEN 
+		SET start_month = 1;
+		SET end_month = 3;
+	ELSEIF (quarter = 2) THEN
+	    SET start_month = 4;
+		SET end_month = 6;
+	ELSEIF (quarter = 3) THEN
+	    SET start_month = 7;
+		SET end_month = 9;
+	ELSE
+	    SET start_month = 10;
+		SET end_month = 12;
+	END IF;
+
+	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
+			AVG(suAnswer1) AS 'First Question Average',AVG(suAnswer2) AS 'Second Question Average', 
+			AVG(suAnswer3) AS 'Third Question Average',	AVG(suAnswer4) AS 'Fourth Question Average',
+			AVG(suAnswer5) AS 'Fifth Question Average',AVG(suAnswer6) AS 'Sixth Question Average'
+	FROM surveys WHERE 
+	            smId = shop_manager_id AND YEAR(suDate) = in_year AND
+	            MONTH(suDate) >= start_month AND MONTH(suDate) <= end_month;
 END; //
+
+CREATE PROCEDURE getShopNumberOfComplaints( shop_manager_id INT , in_year YEAR , quarter INT)
+BEGIN  
+	
+	DECLARE first_month INT;
+	DECLARE second_month INT;
+	DECLARE third_month INT;
+   
+	IF (quarter = 1) THEN 
+		SET first_month = 1;
+		SET second_month = 2;
+		SET third_month = 3;
+	ELSEIF (quarter = 2) THEN
+	    SET first_month = 4;
+	    SET second_month = 5;
+		SET third_month = 6;
+	ELSEIF (quarter = 3) THEN
+	    SET first_month = 7;
+	    SET second_month = 8;
+		SET third_month = 9;
+	ELSE
+	    SET first_month = 10;
+	    SET second_month = 11;
+		SET third_month = 12;
+	END IF;
+
+	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
+		   (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id 
+			AND YEAR(rDeliveryDate) = in_year AND MONTH(cDate) = first_month) AS 'First Month',
+           (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id
+			AND YEAR(rDeliveryDate) = in_year AND MONTH(cDate) = second_month) AS 'Second Month',
+           (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id
+			AND YEAR(rDeliveryDate) = in_year AND MONTH(cDate) = third_month) AS 'Third Month'
+           FROM complaints;
+		    		   
+END; //
+
+CREATE PROCEDURE getShopIncomes( shop_manager_id INT , in_year YEAR , quarter INT)
+BEGIN  
+	
+	DECLARE first_month INT;
+	DECLARE second_month INT;
+	DECLARE third_month INT;
+   
+	IF (quarter = 1) THEN 
+		SET first_month = 1;
+		SET second_month = 2;
+		SET third_month = 3;
+	ELSEIF (quarter = 2) THEN
+	    SET first_month = 4;
+	    SET second_month = 5;
+		SET third_month = 6;
+	ELSEIF (quarter = 3) THEN
+	    SET first_month = 7;
+	    SET second_month = 8;
+		SET third_month = 9;
+	ELSE
+	    SET first_month = 10;
+	    SET second_month = 11;
+		SET third_month = 12;
+	END IF;
+
+	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
+		   (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
+           rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = first_month) AS 'First Month',
+           (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
+           rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = second_month) AS 'Second Month',
+           (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
+           rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = third_month) AS 'Third Month'
+           FROM reservations;
+		    		   
+END; //
+
+CREATE PROCEDURE getShopReservations( shop_manager_id INT , in_year YEAR , quarter INT)
+BEGIN  
+	
+	DECLARE start_month INT;
+	DECLARE end_month INT;
+   
+	IF (quarter = 1) THEN 
+		SET start_month = 1;
+		SET end_month = 3;
+	ELSEIF (quarter = 2) THEN
+	    SET start_month = 4;
+		SET end_month = 6;
+	ELSEIF (quarter = 3) THEN
+	    SET start_month = 7;
+		SET end_month = 9;
+	ELSE
+	    SET start_month = 10;
+		SET end_month = 12;
+	END IF;
+
+	
+	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter', 
+		(
+			SELECT SUM(ItemsInShopReservation.irQuantity) 
+            FROM(
+				SELECT JoinedTables.irQuantity, JoinedTables.iType 
+                FROM(
+						SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
+                        FROM reservations 
+						INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
+						INNER JOIN items ON items_in_reservations.iId = items.iId
+					) AS JoinedTables 
+				WHERE 
+					JoinedTables.smId = shop_manager_id AND YEAR(JoinedTables.rDeliveryDate) = in_year AND
+                    JoinedTables.rType = 'Closed' AND
+					MONTH(JoinedTables.rDeliveryDate) >= start_month AND MONTH(JoinedTables.rDeliveryDate) <= end_month
+				) AS ItemsInShopReservation
+			WHERE ItemsInShopReservation.iType = 'Flower'
+		) AS 'Flowers',
+        (
+			SELECT SUM(ItemsInShopReservation.irQuantity) 
+            FROM(
+				SELECT JoinedTables.irQuantity, JoinedTables.iType 
+                FROM(
+						SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
+                        FROM reservations 
+						INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
+						INNER JOIN items ON items_in_reservations.iId = items.iId
+					) AS JoinedTables 
+				WHERE 
+					JoinedTables.smId = shop_manager_id AND YEAR(JoinedTables.rDeliveryDate) = in_year AND
+                    JoinedTables.rType = 'Closed' AND
+					MONTH(JoinedTables.rDeliveryDate) >= start_month AND MONTH(JoinedTables.rDeliveryDate) <= end_month
+				) AS ItemsInShopReservation
+			WHERE ItemsInShopReservation.iType = 'FlowerPot'
+		) AS 'FlowerPots',
+        (
+			SELECT SUM(ItemsInShopReservation.irQuantity) 
+            FROM(
+				SELECT JoinedTables.irQuantity, JoinedTables.iType 
+                FROM(
+						SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
+                        FROM reservations 
+						INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
+						INNER JOIN items ON items_in_reservations.iId = items.iId
+					) AS JoinedTables 
+				WHERE 
+					JoinedTables.smId = shop_manager_id AND YEAR(JoinedTables.rDeliveryDate) = in_year AND
+                    JoinedTables.rType = 'Closed' AND
+					MONTH(JoinedTables.rDeliveryDate) >= start_month AND MONTH(JoinedTables.rDeliveryDate) <= end_month
+				) AS ItemsInShopReservation
+			WHERE ItemsInShopReservation.iType = 'BridalBouquet'
+		) AS 'BridalBouquets',
+        (
+			SELECT SUM(ItemsInShopReservation.irQuantity) 
+            FROM(
+				SELECT JoinedTables.irQuantity, JoinedTables.iType 
+                FROM(
+						SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
+                        FROM reservations 
+						INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
+						INNER JOIN items ON items_in_reservations.iId = items.iId
+					) AS JoinedTables 
+				WHERE 
+					JoinedTables.smId = shop_manager_id AND YEAR(JoinedTables.rDeliveryDate) = in_year AND
+                    JoinedTables.rType = 'Closed' AND
+					MONTH(JoinedTables.rDeliveryDate) >= start_month AND MONTH(JoinedTables.rDeliveryDate) <= end_month
+				) AS ItemsInShopReservation
+			WHERE ItemsInShopReservation.iType = 'FlowerArrangement'
+		) AS 'FlowerArrangements'
+    	FROM items_in_reservations GROUP BY shop_manager_id;
+        
+END; //
+
+--
+-- Create triggers:
+--
 
 CREATE TRIGGER update_item_trigger
 AFTER UPDATE ON items FOR EACH ROW
 BEGIN
-
-   DELETE FROM items_in_shop WHERE items_in_shop.iId = NEW.iId AND items_in_shop.isDiscountedPrice > NEW.iPrice;
+	IF (NEW.iDeleted = 1) THEN
+	
+		DELETE FROM items_in_shops WHERE items_in_shops.iId = NEW.iId;
+	
+	ELSEIF (OLD.iPrice != NEW.iPrice) THEN 
+	
+		DELETE FROM items_in_shops WHERE items_in_shops.iId = NEW.iId AND items_in_shop.isDiscountedPrice > NEW.iPrice;
+	
+	END IF;
 	
 END; //
 
@@ -225,7 +424,15 @@ CREATE TRIGGER insert_survey
 BEFORE INSERT ON surveys FOR EACH ROW
 BEGIN
     IF (NEW.suDate = '0000-00-00') THEN 
-        SET NEW.suDate = now();
+        SET NEW.suDate = NOW();
+    END IF;
+END; //
+
+CREATE TRIGGER insert_complaint
+BEFORE INSERT ON complaints FOR EACH ROW
+BEGIN
+    IF (NEW.cDate = '0000-00-00') THEN 
+        SET NEW.cDate = NOW();
     END IF;
 END; //
 
@@ -233,7 +440,7 @@ CREATE TRIGGER insert_reservation
 BEFORE INSERT ON reservations FOR EACH ROW
 BEGIN
     IF (NEW.rDeliveryDate = '0000-00-00 00:00:00') THEN 
-        SET NEW.rDeliveryDate = now();
+        SET NEW.rDeliveryDate = DATE_ADD(NOW(), INTERVAL 3 HOUR);
     END IF;
 END; //
 
@@ -248,8 +455,8 @@ INSERT INTO items (iName,iType,iPrice,iDomainColor) VALUES
 ('Rose','Flower',9.0,'red'),
 ('Sunflower','Flower',15.0,'yellow'),
 ('Lily','Flower',3.0,'white'),
-('Anemone','Flower',12.0,'red'),
-('Aconite','Flower',16.0, 'purple'),
+('Anemone','Flower',5.0,'red'),
+('Aconite','Flower',5.0, 'purple'),
 ('Balloon Flower','Flower',78.0,'purple'),
 ('Canterbury Bells','Flower',12.0,'pink'),
 ('Dusty Miller','Flower',8.0,'white'),
@@ -281,8 +488,8 @@ LOCK TABLES shop_employees WRITE;
 INSERT INTO shop_employees (uUserName,smId) VALUES
 ('shopemployee',1);
 
-LOCK TABLES items_in_shop WRITE;
-INSERT INTO items_in_shop (smId,iId,isDiscountedPrice) VALUES 
+LOCK TABLES items_in_shops WRITE;
+INSERT INTO items_in_shops (smId,iId,isDiscountedPrice) VALUES 
 (1,1,5),
 (1,2,5),
 (1,10,5);
@@ -299,7 +506,16 @@ INSERT INTO surveys (smId,suAnswer1,suAnswer2,suAnswer3,suAnswer4,suAnswer5,suAn
 (1,9,6,2,3,3,10);
 
 LOCK TABLES reservations WRITE;
-INSERT INTO reservations (cId, smId, rNumberOfItems, rPrice, rBlessingCard, rDeliveryType, rDeliveryAddress, rDeliveryPhone, rDeliveryName) VALUES 
-(1,1,2,10, 'Happy Birthday', 'Immediate','Ort Braude','049981111','Dolev');
+INSERT INTO reservations (cId, smId, rType, rNumberOfItems, rPrice, rBlessingCard, rDeliveryType, rDeliveryAddress, rDeliveryPhone, rDeliveryName) VALUES 
+(1,1,'Closed',2,10, 'Happy Birthday', 'Immediate','Ort Braude','049981111','Dolev');
+
+LOCK TABLES items_in_reservations WRITE;
+INSERT INTO items_in_reservations (rId, iId, irQuantity, irPrice) VALUES 
+(1,4,1,5),
+(1,5,1,5);
+
+LOCK TABLES complaints WRITE;
+INSERT INTO complaints (cId,smId ,coComplaint ) VALUES 
+(1,1,'The received product is not as orders.');
 
 UNLOCK TABLES;         
