@@ -21,6 +21,8 @@ public class ItemInReservation implements IEntity
 
 	private int m_itemId;
 
+	private String m_itemName;
+
 	private int m_quantity;
 
 	private float m_price;
@@ -60,6 +62,23 @@ public class ItemInReservation implements IEntity
 	}
 
 	/**
+	 * @return the item name
+	 */
+	public String getItemName()
+	{
+		return m_itemName;
+	}
+
+	/**
+	 * @param name
+	 *            the item name to set
+	 */
+	public void setItemName(String name)
+	{
+		m_itemName = name;
+	}
+
+	/**
 	 * @return the quantity
 	 */
 	public int getQuantity()
@@ -79,7 +98,7 @@ public class ItemInReservation implements IEntity
 	/**
 	 * @return the price
 	 */
-	public double getPrice()
+	public float getPrice()
 	{
 		return m_price;
 	}
@@ -99,8 +118,8 @@ public class ItemInReservation implements IEntity
 	@Override
 	public String toString()
 	{
-		return "ItemInReservation [reservationId=" + m_reservationId + ", itemId=" + m_itemId + ", quantity="
-				+ m_quantity + ", price=" + m_price + "]";
+		return "ItemInReservation [reservationId=" + m_reservationId + ", itemId=" + m_itemId + ", name=" + m_itemName
+				+ ", quantity=" + m_quantity + ", price=" + m_price + "]";
 	}
 
 	/**

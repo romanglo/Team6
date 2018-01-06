@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.sun.istack.internal.NotNull;
 
-import newEntities.IEntity;
+import entities.IEntity;
 
 /**
  *
