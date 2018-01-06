@@ -432,8 +432,8 @@ END; //
 CREATE TRIGGER insert_complaint
 BEFORE INSERT ON complaints FOR EACH ROW
 BEGIN
-    IF (NEW.cDate = '0000-00-00') THEN 
-        SET NEW.cDate = NOW();
+    IF (NEW.coDate = '0000-00-00') THEN 
+        SET NEW.coDate = NOW();
     END IF;
 END; //
 
@@ -490,10 +490,10 @@ INSERT INTO shop_employees (uUserName,smId) VALUES
 ('shopemployee',1);
 
 LOCK TABLES items_in_shops WRITE;
-INSERT INTO items_in_shops (smId,iId,iName,isDiscountedPrice) VALUES 
-(1,1,'Rose',5),
-(1,2,'Sunflower',5),
-(1,10,'Aconite',5);
+INSERT INTO items_in_shops (smId,iId,isDiscountedPrice) VALUES 
+(1,1,5),
+(1,2,5),
+(1,10,5);
 
 LOCK TABLES costumers WRITE;
 INSERT INTO costumers (uUserName) VALUES
@@ -511,9 +511,9 @@ INSERT INTO reservations (cId, smId, rType, rNumberOfItems, rPrice, rBlessingCar
 (1,1,'Closed',2,10, 'Happy Birthday', 'Immediate','Ort Braude','049981111','Dolev');
 
 LOCK TABLES items_in_reservations WRITE;
-INSERT INTO items_in_reservations (rId, iId, irQuantity, irPrice) VALUES 
-(1,4,1,5),
-(1,5,1,5);
+INSERT INTO items_in_reservations (rId, iId, iName, irQuantity, irPrice) VALUES 
+(1,4,'Anemone',1,5),
+(1,5,'Aconite',1,5);
 
 LOCK TABLES complaints WRITE;
 INSERT INTO complaints (cId,smId ,coComplaint ) VALUES 
