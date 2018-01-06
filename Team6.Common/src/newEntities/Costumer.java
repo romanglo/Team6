@@ -77,8 +77,6 @@ public class Costumer extends User
 	}
 
 	/**
-	 * TODO Roman: Auto-generated comment stub - Change it!
-	 *
 	 * @return the balance
 	 */
 	public double getBalance()

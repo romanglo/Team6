@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 import com.sun.istack.internal.NotNull;
 
-import entities.IEntity;
+import newEntities.IEntity;
 
 /**
  *

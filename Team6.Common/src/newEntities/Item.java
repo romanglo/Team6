@@ -4,7 +4,6 @@ package newEntities;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 
 import javafx.scene.image.Image;
 import utilities.ImageUtilities;
