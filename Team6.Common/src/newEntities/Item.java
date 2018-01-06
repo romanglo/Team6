@@ -4,7 +4,6 @@ package newEntities;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Arrays;
 
 import javafx.scene.image.Image;
 import utilities.ImageUtilities;
@@ -29,7 +28,7 @@ public class Item implements IEntity
 
 	private EntitiesEnums.ProductType m_type;
 
-	private double m_price;
+	private float m_price;
 
 	private transient Image m_image;
 
@@ -91,7 +90,7 @@ public class Item implements IEntity
 	/**
 	 * @return the price
 	 */
-	public double getPrice()
+	public float getPrice()
 	{
 		return m_price;
 	}
@@ -100,7 +99,7 @@ public class Item implements IEntity
 	 * @param price
 	 *            the price to set
 	 */
-	public void setPrice(double price)
+	public void setPrice(float price)
 	{
 		m_price = price;
 	}

@@ -23,7 +23,7 @@ public class Costumer extends User
 
 	private EntitiesEnums.CostumerSubscription m_costumerSubscription;
 
-	private double m_balance;
+	private float m_balance;
 
 	/**
 	 * @return the id
@@ -81,7 +81,7 @@ public class Costumer extends User
 	 *
 	 * @return the balance
 	 */
-	public double getBalance()
+	public float getBalance()
 	{
 		return m_balance;
 	}
@@ -90,7 +90,7 @@ public class Costumer extends User
 	 * @param balance
 	 *            the balance to set
 	 */
-	public void setBalance(double balance)
+	public void setBalance(float balance)
 	{
 		m_balance = balance;
 	}

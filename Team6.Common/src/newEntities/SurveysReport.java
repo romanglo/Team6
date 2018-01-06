@@ -2,15 +2,16 @@
 package newEntities;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
  *
  * SurveysReport: A POJO to database 'surveys_reports' table.
  * 
+ * @see Report
+ * @see IEntity
+ * @see Serializable
  */
-public class SurveysReport implements IEntity
+public class SurveysReport extends Report
 {
 
 	/**
@@ -18,14 +19,6 @@ public class SurveysReport implements IEntity
 	 * {@link Serializable}
 	 */
 	private static final long serialVersionUID = 5765120908638121496L;
-
-	private static final DateFormat s_dateForamt = new SimpleDateFormat("yyyy");
-
-	private int m_shopManagerId;
-
-	private java.util.Date m_year;
-
-	private int m_quarter;
 
 	private float m_firstAnswerAverage;
 
@@ -38,57 +31,6 @@ public class SurveysReport implements IEntity
 	private float m_fifthAnswerAverage;
 
 	private float m_sixthAnswerAverage;
-
-	/**
-	 * @return the shopManagerId
-	 */
-	public int getShopManagerId()
-	{
-		return m_shopManagerId;
-	}
-
-	/**
-	 * @param shopManagerId
-	 *            the shopManagerId to set
-	 */
-	public void setShopManagerId(int shopManagerId)
-	{
-		m_shopManagerId = shopManagerId;
-	}
-
-	/**
-	 * @return the surveyDate
-	 */
-	public java.util.Date getSurveyDate()
-	{
-		return m_year;
-	}
-
-	/**
-	 * @param surveyDate
-	 *            the surveyDate to set
-	 */
-	public void setSurveyDate(java.util.Date surveyDate)
-	{
-		m_year = surveyDate;
-	}
-
-	/**
-	 * @return the quarter
-	 */
-	public int getQuarter()
-	{
-		return m_quarter;
-	}
-
-	/**
-	 * @param quarter
-	 *            the quarter to set
-	 */
-	public void setQuarter(int quarter)
-	{
-		m_quarter = quarter;
-	}
 
 	/**
 	 * @return the firstAnswerAverage
@@ -198,11 +140,10 @@ public class SurveysReport implements IEntity
 	@Override
 	public String toString()
 	{
-		return "SurveysReport [shopManagerId=" + m_shopManagerId + ", year=" + s_dateForamt.format(m_year) + ", quarter="
-				+ m_quarter + ", firstAnswerAverage=" + m_firstAnswerAverage + ", m_secondAnswerAverage="
-				+ m_secondAnswerAverage + ", thirdAnswerAverage=" + m_thirdAnswerAverage + ", fourthAnswerAverage="
-				+ m_fourthAnswerAverage + ", fifthAnswerAverage=" + m_fifthAnswerAverage + ", sixthAnswerAverage="
-				+ m_sixthAnswerAverage + "]";
+		return "SurveysReport [" + super.toString() + ", firstAnswerAverage=" + m_firstAnswerAverage
+				+ ", m_secondAnswerAverage=" + m_secondAnswerAverage + ", thirdAnswerAverage=" + m_thirdAnswerAverage
+				+ ", fourthAnswerAverage=" + m_fourthAnswerAverage + ", fifthAnswerAverage=" + m_fifthAnswerAverage
+				+ ", sixthAnswerAverage=" + m_sixthAnswerAverage + "]";
 	}
 
 	/**
@@ -211,12 +152,7 @@ public class SurveysReport implements IEntity
 	@Override
 	public int hashCode()
 	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + m_quarter;
-		result = prime * result + m_shopManagerId;
-		result = prime * result + ((m_year == null) ? 0 : s_dateForamt.format(m_year).hashCode());
-		return result;
+		return super.hashCode();
 	}
 
 	/**
@@ -235,21 +171,8 @@ public class SurveysReport implements IEntity
 			return false;
 		}
 		SurveysReport other = (SurveysReport) obj;
-		if (m_quarter != other.m_quarter) {
-			return false;
-		}
-		if (m_shopManagerId != other.m_shopManagerId) {
-			return false;
-		}
-		if (m_year == null) {
-			if (other.m_year != null) {
-				return false;
-			}
-		} else if (!s_dateForamt.format(m_year).equals(s_dateForamt.format(other.m_year))) {
-			return false;
-		}
-		return true;
-	}
 
+		return super.equals(other);
+	}
 
 }

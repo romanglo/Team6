@@ -17,7 +17,7 @@ public class Reservation implements IEntity
 	 * Serial version unique ID, necessary due to the class implements
 	 * {@link Serializable}
 	 */
-	private static final long serialVersionUID = -2724897814891611014L;
+	private static final long serialVersionUID = 7931281117302239308L;
 
 	private static final DateFormat s_dateForamt = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 
@@ -31,7 +31,7 @@ public class Reservation implements IEntity
 
 	private int m_numberOfItems;
 
-	private double m_price;
+	private float m_price;
 
 	private java.util.Date m_deliveryDate;
 
@@ -133,7 +133,7 @@ public class Reservation implements IEntity
 	/**
 	 * @return the price
 	 */
-	public double getPrice()
+	public float getPrice()
 	{
 		return m_price;
 	}
@@ -142,7 +142,7 @@ public class Reservation implements IEntity
 	 * @param price
 	 *            the price to set
 	 */
-	public void setPrice(double price)
+	public void setPrice(float price)
 	{
 		m_price = price;
 	}
