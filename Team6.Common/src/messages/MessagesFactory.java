@@ -3,7 +3,7 @@ package messages;
 
 import java.util.ArrayList;
 
-import entities.IEntity;
+import newEntities.IEntity;
 
 /**
  *
