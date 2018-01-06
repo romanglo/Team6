@@ -1,6 +1,7 @@
 package db;
 
 import java.io.InputStream;
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,6 +21,7 @@ import newEntities.ItemInReservation;
 import newEntities.ItemInShop;
 import newEntities.Reservation;
 import newEntities.ReservationsReport;
+import newEntities.ShopCatalogData;
 import newEntities.ShopEmployee;
 import newEntities.ShopManager;
 import newEntities.Survey;
@@ -54,8 +56,8 @@ public class MessagesResolver implements Server.MessagesHandler {
 	// region Constructors
 
 	/**
-	 * Create an instance of {@link MessagesResolver}, A logger will be created
-	 * by {@link LogManager}
+	 * Create an instance of {@link MessagesResolver}, A logger will be created by
+	 * {@link LogManager}
 	 *
 	 * @param dbController
 	 *            A connection with the DB.
@@ -172,6 +174,8 @@ public class MessagesResolver implements Server.MessagesHandler {
 			returnedMessageData = onEntitiesListDataReceived((EntitiesListData) messageData);
 		} else if (messageData instanceof EntityDataCollection) {
 			returnedMessageData = onEntityDataCollectionReceived((EntityDataCollection) messageData);
+		} else if (messageData instanceof ShopCatalogData) {
+			returnedMessageData = onShopCatalogDataReceived((ShopCatalogData) messageData);
 		}
 
 		if (returnedMessageData != null) {
@@ -183,6 +187,46 @@ public class MessagesResolver implements Server.MessagesHandler {
 	}
 
 	// end region -> Server.MessagesHandler Implementation
+
+	private IMessageData onShopCatalogDataReceived(ShopCatalogData shopCatalogData) {
+		int shopManagerId = shopCatalogData.getShopManagerId();
+		if (shopManagerId < 1) {
+			m_logger.warning("Received request for shop catalog with illegale shop manager ID: " + shopManagerId);
+			return new RespondMessageData(shopCatalogData, false);
+		}
+
+		ResultSet queryResult = null;
+		String getShopCatalogQuery = QueryGenerator.getShopCatalog(shopManagerId);
+
+		try {
+			CallableStatement callableStatement = m_dbController.getCallableStatement(getShopCatalogQuery);
+
+			queryResult = callableStatement.executeQuery();
+			if (queryResult == null) {
+				return null;
+			}
+			List<IEntity> itemEntities = EntitiesResolver.ResultSetToShopCatalog(queryResult);
+
+			if (itemEntities == null) {
+				return null;
+			}
+			return itemEntities.isEmpty() ? null : new EntitiesListData(EntityDataOperation.None, itemEntities);
+
+		} catch (Exception e) {
+			m_logger.warning("Failed on try to execute call procedure query! query: " + getShopCatalogQuery
+					+ ", exception: " + e.getMessage());
+		} finally {
+			if (queryResult != null) {
+				try {
+					queryResult.close();
+				} catch (SQLException e) {
+					m_logger.warning("Failed on try to close the ResultSet of the executed query:" + getShopCatalogQuery
+							+ ", exception: " + e.getMessage());
+				}
+			}
+		}
+		return null;
+	}
 
 	private IMessageData onLoginDataReceived(LoginData loginData) {
 		User user = new User();
@@ -536,6 +580,10 @@ public class MessagesResolver implements Server.MessagesHandler {
 			if (insertQuery != null) {
 				result = executeQuery(survey, insertQuery);
 			}
+			if (result) {
+				int lastInsertId = getLastInsertId();
+				survey.setId(lastInsertId);
+			}
 			break;
 
 		default:
@@ -563,18 +611,16 @@ public class MessagesResolver implements Server.MessagesHandler {
 			}
 			break;
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllComplaintsQuery();
+			String selectAllQuery = null;
+			if (complaint == null) {
+				selectAllQuery = QueryGenerator.selectAllComplaintsQuery();
+			} else {
+				selectAllQuery = QueryGenerator.selectComplaintQuery(complaint);
+			}
 			if (selectAllQuery != null) {
 				return executeSelectQuery(selectAllQuery, Complaint.class);
 			}
 			break;
-		case Update:
-			String updateQuery = QueryGenerator.updateComplaintQuery(complaint);
-			if (updateQuery != null) {
-				result = executeQuery(complaint, updateQuery);
-			}
-			break;
-
 		case Add:
 			String insertQuery = QueryGenerator.insertComplaintQuery(complaint);
 			if (insertQuery != null) {
@@ -604,8 +650,9 @@ public class MessagesResolver implements Server.MessagesHandler {
 	private IMessageData onItemInShopEntityReceived(ItemInShop itemInShop, EntityDataOperation operation) {
 		boolean result = false;
 		switch (operation) {
+		case Get:
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllItemsInShopsQuery();
+			String selectAllQuery = QueryGenerator.selectItemInShopsQuery(itemInShop);
 			if (selectAllQuery != null) {
 				return executeSelectQuery(selectAllQuery, ItemInShop.class);
 			}
@@ -622,14 +669,12 @@ public class MessagesResolver implements Server.MessagesHandler {
 				result = executeQuery(itemInShop, insertQuery);
 			}
 			break;
-
 		case Remove:
 			String removeQuery = QueryGenerator.removeItemInShopQuery(itemInShop);
 			if (removeQuery != null) {
 				result = executeQuery(itemInShop, removeQuery);
 			}
 			break;
-
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + itemInShop.toString()
 					+ ", Operation: " + operation.toString());
@@ -649,8 +694,9 @@ public class MessagesResolver implements Server.MessagesHandler {
 			EntityDataOperation operation) {
 		boolean result = false;
 		switch (operation) {
+		case Get:
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllIItemsInReservationQuery();
+			String selectAllQuery = QueryGenerator.selectItemsInReservationQuery(itemInReservation);
 			if (selectAllQuery != null) {
 				return executeSelectQuery(selectAllQuery, ItemInReservation.class);
 			}
@@ -686,7 +732,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			}
 			break;
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectShopEmployeesQuery();
+			String selectAllQuery = QueryGenerator.selectAllShopEmployeesQuery();
 			if (selectAllQuery != null) {
 				return executeSelectQuery(selectAllQuery, ShopEmployee.class);
 			}

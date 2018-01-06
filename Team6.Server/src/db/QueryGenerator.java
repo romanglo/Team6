@@ -50,6 +50,11 @@ public class QueryGenerator {
 	public static String getLastIdQuery() {
 		return "SELECT LAST_INSERT_ID();";
 	}
+
+	public static String getShopCatalog(int shopManagerId) {
+		return "CALL getShopCatalog(" + shopManagerId + ");";
+	}
+
 	// region Items Entity
 
 	public static String insertItemQuery(Item item) {
@@ -317,8 +322,34 @@ public class QueryGenerator {
 	// region Survey Entity
 
 	public static String insertSurveyQuery(Survey survey) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		int shopManagerId = survey.getShopManagerId();
+
+		if (shopManagerId < 1) {
+			loggerLazyLoading();
+			s_logger.warning(
+					"Received request to get reservation entity with impossiable shop manager ID:" + shopManagerId);
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(
+				"INSERT INTO surveys (smId,suDate,suAnswer1,suAnswer2,suAnswer3,suAnswer4,suAnswer5,suAnswer6,) VALUES (");
+		stringBuilder.append(shopManagerId);
+		stringBuilder.append(",'");
+		stringBuilder.append(s_dateFormat.format(survey.getSurveyDate()));
+		stringBuilder.append("',");
+		stringBuilder.append(survey.getFirstAnswer());
+		stringBuilder.append(",");
+		stringBuilder.append(survey.getSecondAnswer());
+		stringBuilder.append(",");
+		stringBuilder.append(survey.getThirdAnswer());
+		stringBuilder.append(",");
+		stringBuilder.append(survey.getFourthAnswer());
+		stringBuilder.append(",");
+		stringBuilder.append(survey.getFifthAnswer());
+		stringBuilder.append(",");
+		stringBuilder.append(survey.getSixthAnswer());
+		stringBuilder.append(");");
+		return stringBuilder.toString();
 	}
 
 	// end region -> Survey Entity
@@ -326,61 +357,200 @@ public class QueryGenerator {
 	// region Complaints Entity
 
 	public static String selectComplaintQuery(Complaint complaint) {
+		int id = complaint.getId();
+		if (id > 1) {
+			return "SELECT * FROM complaints WHERE coId = " + id + ';';
+		}
+		int costumerId = complaint.getCostumerId();
+		int shopManagerId = complaint.getShopManagerId();
+
+		if (costumerId > 0 && shopManagerId > 0) {
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND smId = " + shopManagerId + ';';
+		}
+
+		if (costumerId > 0) {
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + ';';
+		}
+
+		if (shopManagerId > 0) {
+			return "SELECT * FROM complaints WHERE smId = " + shopManagerId + ';';
+		}
+
+		loggerLazyLoading();
+		s_logger.warning("Received request to get reservation entity with impossiable ID's: complaint ID = " + id
+				+ "costumer ID = " + costumerId + ", shop manager ID=" + shopManagerId);
 		return null;
-		// TODO Roman: Auto-generated method stub
+
 	}
 
 	public static String selectAllComplaintsQuery() {
-		return null;
-		// TODO Roman: Auto-generated method stub
-	}
-
-	public static String updateComplaintQuery(Complaint complaint) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		return "SELECT * FROM complaints ;";
 	}
 
 	public static String insertComplaintQuery(Complaint complaint) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		int costumerId = complaint.getCostumerId();
+		int shopManagerId = complaint.getShopManagerId();
+
+		if (shopManagerId < 1 || costumerId < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get reservation entity with impossiable ID's: costumer ID = "
+					+ costumerId + ", shop manager ID=" + shopManagerId);
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("INSERT INTO complaints (cId,smId,coDate,coComplaint,coSummary,coOpened) VALUES (");
+		stringBuilder.append(costumerId);
+		stringBuilder.append(',');
+		stringBuilder.append(shopManagerId);
+		stringBuilder.append(",'");
+		stringBuilder.append(s_dateFormat.format(complaint.getCreationDate()));
+		stringBuilder.append("','");
+		stringBuilder.append(complaint.getComplaint());
+		stringBuilder.append("','");
+		stringBuilder.append(complaint.getSummary());
+		stringBuilder.append("',");
+		stringBuilder.append(complaint.isOpened() ? 1 : 0);
+		stringBuilder.append("');");
+		return stringBuilder.toString();
 	}
 
 	// end region -> Complaints Entity
 
 	// region ItemsInShops Entity
 
-	public static String selectAllItemsInShopsQuery() {
+	public static String selectItemInShopsQuery(ItemInShop itemInShop) {
+
+		int itemId = itemInShop.getItemId();
+		int shopManagerId = itemInShop.getShopManagerId();
+
+		if (itemId > 0 && shopManagerId > 0) {
+			return "SELECT * FROM items_in_shops WHERE iId = " + itemId + " AND smId = " + shopManagerId + ';';
+		}
+
+		if (itemId > 0) {
+			return "SELECT * FROM items_in_shops WHERE iId = " + itemId + ';';
+		}
+
+		if (shopManagerId > 0) {
+			return "SELECT * FROM items_in_shops WHERE smId = " + shopManagerId + ';';
+		}
+
+		loggerLazyLoading();
+		s_logger.warning("Received request to get reservation entity with impossiable ID's: item ID = " + itemId
+				+ ", shop manager ID=" + shopManagerId);
 		return null;
-		// TODO Roman: Auto-generated method stub
 	}
 
 	public static String updateItemInShopQuery(ItemInShop itemInShop) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		int itemId = itemInShop.getItemId();
+		int shopManagerId = itemInShop.getShopManagerId();
+
+		if (shopManagerId < 1 || itemId < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get reservation entity with impossiable ID's: item ID = " + itemId
+					+ ", shop manager ID=" + shopManagerId);
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("UPDATE items_in_shops SET ");
+		stringBuilder.append("isDiscountedPrice = ");
+		stringBuilder.append(itemInShop.getDiscountedPrice());
+		stringBuilder.append(" WHERE iId = ");
+		stringBuilder.append(itemInShop.getItemId());
+		stringBuilder.append(" AND smId = ");
+		stringBuilder.append(itemInShop.getShopManagerId());
+		stringBuilder.append(';');
+
+		return stringBuilder.toString();
+
 	}
 
 	public static String insertItemInShopQuery(ItemInShop itemInShop) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		int itemId = itemInShop.getItemId();
+		int shopManagerId = itemInShop.getShopManagerId();
+
+		if (shopManagerId < 1 || itemId < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get reservation entity with impossiable ID's: item ID = " + itemId
+					+ ", shop manager ID=" + shopManagerId);
+			return null;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("INSERT INTO items_in_shops (smId,iId,isDiscountedPrice) VALUES (");
+		stringBuilder.append(itemId);
+		stringBuilder.append(',');
+		stringBuilder.append(shopManagerId);
+		stringBuilder.append(',');
+		stringBuilder.append(itemInShop.getDiscountedPrice());
+		stringBuilder.append("');");
+		return stringBuilder.toString();
 	}
 
 	public static String removeItemInShopQuery(ItemInShop itemInShop) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+
+		int itemId = itemInShop.getItemId();
+		int shopManagerId = itemInShop.getShopManagerId();
+
+		if (shopManagerId < 1 || itemId < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get reservation entity with impossiable ID's: item ID = " + itemId
+					+ ", shop manager ID=" + shopManagerId);
+			return null;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("DELETE FROM items_in_shops WHERE");
+		stringBuilder.append(itemInShop.getItemId());
+		stringBuilder.append(" AND smId = ");
+		stringBuilder.append(itemInShop.getShopManagerId());
+		stringBuilder.append(';');
+		return stringBuilder.toString();
 	}
 
 	// end region -> ItemsInShops Entity
 
 	// region ItemInReservation Entity
 
-	public static String selectAllIItemsInReservationQuery() {
+	public static String selectItemsInReservationQuery(ItemInReservation itemInReservation) {
+		int itemId = itemInReservation.getItemId();
+		int reservationId = itemInReservation.getReservationId();
+		if (itemId > 0 && reservationId > 0) {
+			return "SELECT * FROM items_in_reservations WHERE iId = " + itemId + " AND rId = " + reservationId + ';';
+		}
+
+		if (itemId > 0) {
+			return "SELECT * FROM items_in_reservations WHERE iId = " + itemId + ';';
+		}
+
+		if (reservationId > 0) {
+			return "SELECT * FROM items_in_reservations WHERE rId = " + reservationId + ';';
+		}
+
+		loggerLazyLoading();
+		s_logger.warning("Received request to get reservation entity with impossiable ID's: item ID = " + itemId
+				+ ", reservation ID=" + reservationId);
 		return null;
-		// TODO Roman: Auto-generated method stub
 	}
 
 	public static String insertItemInReservationQuery(ItemInReservation itemInReservation) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		int itemId = itemInReservation.getItemId();
+		int reservationId = itemInReservation.getReservationId();
+		if (itemId < 1 || reservationId < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get reservation entity with impossiable ID's: item ID = " + itemId
+					+ ", reservation ID=" + reservationId);
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("INSERT INTO items_in_reservations (iName,irQuantity,irPrice) VALUES ('");
+		stringBuilder.append(itemInReservation.getItemName());
+		stringBuilder.append("',");
+		stringBuilder.append(itemInReservation.getQuantity());
+		stringBuilder.append(',');
+		stringBuilder.append(itemInReservation.getPrice());
+		stringBuilder.append(");");
+		return stringBuilder.toString();
 	}
 
 	// end region -> ItemInReservation Entity
@@ -388,13 +558,24 @@ public class QueryGenerator {
 	// region ShopEmployee Entity
 
 	public static String selectShopEmployeeQuery(ShopEmployee shopEmployee) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		String userName = shopEmployee.getUserName();
+		int shopEmployeeId = shopEmployee.getId();
+
+		String returningString = null;
+
+		if (shopEmployeeId > 0) {
+			returningString = "SELECT * FROM shop_employees WHERE seId = " + shopEmployeeId + ";";
+		} else if (!(userName != null && !userName.isEmpty())) {
+			returningString = "SELECT * FROM shop_employees WHERE uUserName = '" + userName + "';";
+		} else {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get costumer entity without any identification data.");
+		}
+		return returningString;
 	}
 
-	public static String selectShopEmployeesQuery() {
-		return null;
-		// TODO Roman: Auto-generated method stub
+	public static String selectAllShopEmployeesQuery() {
+		return "SELECT * FROM shop_employees ;";
 	}
 
 	// end region -> ShopEmployee Entity
@@ -402,13 +583,24 @@ public class QueryGenerator {
 	// region ShopManager Entity
 
 	public static String selectShopManagerQuery(ShopManager shopManager) {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		String userName = shopManager.getUserName();
+		int shopManagerId = shopManager.getId();
+
+		String returningString = null;
+
+		if (shopManagerId > 0) {
+			returningString = "SELECT * FROM shop_managers WHERE smId = " + shopManagerId + ";";
+		} else if (!(userName != null && !userName.isEmpty())) {
+			returningString = "SELECT * FROM shop_managers WHERE uUserName = '" + userName + "';";
+		} else {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get costumer entity without any identification data.");
+		}
+		return returningString;
 	}
 
 	public static String selectShopManagersQuery() {
-		return null;
-		// TODO Roman: Auto-generated method stub
+		return "SELECT * FROM shop_managers ;";
 	}
 
 	// end region -> ShopManager Entity
@@ -486,6 +678,5 @@ public class QueryGenerator {
 		return null;
 		// TODO Roman: Auto-generated method stub
 	}
-
 	// end region -> ComplaintsReport Entity
 }

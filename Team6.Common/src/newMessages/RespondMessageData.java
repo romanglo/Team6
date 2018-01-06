@@ -5,8 +5,6 @@ import java.io.Serializable;
 
 import com.sun.istack.internal.NotNull;
 
-import newEntities.IEntity;
-
 /**
  *
  * AddEntityData: Is a class that contains a respond to request, the class

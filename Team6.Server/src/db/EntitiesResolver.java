@@ -119,6 +119,54 @@ public class EntitiesResolver {
 
 	/**
 	 * The method received {@link ResultSet} and resolve it to {@link List} of
+	 * {@link Item} entity that describes a shop catalog.
+	 *
+	 * @param resultSet
+	 *            A {@link ResultSet} which will be resolved in it to {@link List}
+	 *            of {@link Item} entity.
+	 * @return An {@link List} of {@link Item} entity if the resolving succeed, and
+	 *         <code>null</code> if did not.
+	 */
+	public static List<IEntity> ResultSetToShopCatalog(ResultSet resultSet) {
+		ArrayList<IEntity> itemEntities = new ArrayList<>();
+		int failedResolve = 0;
+		try {
+			while (resultSet.next()) {
+				Item item = new Item();
+				try {
+					item.setId(resultSet.getInt(1));
+					item.setName(resultSet.getString(2));
+					item.setType(Enum.valueOf(ProductType.class, resultSet.getString(3)));
+					float originalPrice = resultSet.getFloat(4);
+					float discountedPrice = resultSet.getFloat(5);
+					item.setPrice(discountedPrice == 0 ? originalPrice : discountedPrice);
+					Blob blob = resultSet.getBlob(6);
+					if (blob != null) {
+						InputStream inputStream = blob.getBinaryStream();
+						item.setImage(inputStream);
+					}
+					item.setDomainColor(resultSet.getString(7));
+					itemEntities.add(item);
+				} catch (Exception ignored) {
+					failedResolve++;
+				}
+			}
+		} catch (SQLException e) {
+			s_logger.warning(
+					"Failed to resolve an ResultSet to Item entity of shop catalog, exception:" + e.getMessage());
+			return null;
+		}
+
+		if (failedResolve != 0) {
+			s_logger.warning("Failed to resolve " + failedResolve + " rows to Item entity of shop catalog.");
+		}
+
+		return itemEntities.isEmpty() ? null : itemEntities;
+
+	}
+
+	/**
+	 * The method received {@link ResultSet} and resolve it to {@link List} of
 	 * {@link SurveysReport} entity.
 	 *
 	 * @param resultSet
@@ -385,8 +433,9 @@ public class EntitiesResolver {
 				try {
 					itemInReservation.setReservationId(resultSet.getInt(1));
 					itemInReservation.setItemId(resultSet.getInt(2));
-					itemInReservation.setQuantity(resultSet.getInt(3));
-					itemInReservation.setPrice(resultSet.getFloat(4));
+					itemInReservation.setItemName(resultSet.getString(3));
+					itemInReservation.setQuantity(resultSet.getInt(4));
+					itemInReservation.setPrice(resultSet.getFloat(5));
 					itemInReservationEntities.add(itemInReservation);
 				} catch (Exception ignored) {
 					failedResolve++;
@@ -534,7 +583,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link Item} entity. if the resolving succeed, and
 	 *         <code>null</code> if did not.
 	 */
-	public static List<IEntity> ResultSetToItemEntities(ResultSet resultSet) {
+	private static List<IEntity> ResultSetToItemEntities(ResultSet resultSet) {
 
 		ArrayList<IEntity> itemEntities = new ArrayList<>();
 		int failedResolve = 0;
@@ -693,4 +742,5 @@ public class EntitiesResolver {
 		}
 		return reservationEntities.isEmpty() ? null : reservationEntities;
 	}
+
 }

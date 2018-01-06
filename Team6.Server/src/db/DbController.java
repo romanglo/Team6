@@ -1,5 +1,6 @@
 package db;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -211,7 +212,7 @@ public class DbController extends Startable {
 		try {
 			preparedStatement = m_connection.prepareStatement(sql);
 		} catch (SQLException e) {
-			m_Logger.warning("Failed on try to create prepere statement with the query: " + sql + ". Exception:"
+			m_Logger.warning("Failed on try to create prepere statement with the query: " + sql + ", exception:"
 					+ e.getMessage());
 		}
 		return preparedStatement;
@@ -234,6 +235,33 @@ public class DbController extends Startable {
 			m_Logger.warning("Failed on try to create statement, exception: " + ex);
 		}
 		return stmt;
+	}
+
+	/**
+	 * The method create a {@link CallableStatement} that related to the connection.
+	 *
+	 * @param sql
+	 *            An query that matching to {@link CallableStatement} rules.
+	 * @return A {@link CallableStatement} that related to the connected schema.
+	 */
+
+	public CallableStatement getCallableStatement(String sql) {
+		if (!isRunning()) {
+			throw new NotRunningException(this);
+		}
+
+		if (sql == null) {
+			return null;
+		}
+
+		CallableStatement callableStatement = null;
+		try {
+			callableStatement = m_connection.prepareCall(sql);
+		} catch (SQLException e) {
+			m_Logger.warning("Failed on try to create callable statement with the query: " + sql + ", exception:"
+					+ e.getMessage());
+		}
+		return callableStatement;
 	}
 
 	// end region -> Public Methods

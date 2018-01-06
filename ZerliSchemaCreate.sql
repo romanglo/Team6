@@ -76,6 +76,7 @@ CREATE TABLE reservations (
 CREATE TABLE items_in_reservations(
   rId INT,
   iId INT,
+  iName VARCHAR(20) NOT NULL,
   irQuantity INT NOT NULL DEFAULT 1,
   irPrice FLOAT NOT NULL,
   FOREIGN KEY (rId) REFERENCES reservations (rId) ON DELETE CASCADE ON UPDATE NO ACTION,
@@ -86,7 +87,6 @@ CREATE TABLE items_in_reservations(
 CREATE TABLE items_in_shops(
   smId INT,
   iId INT,
-  iName VARCHAR(20) NOT NULL,
   isDiscountedPrice FLOAT NOT NULL,  
   FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (iId) REFERENCES items (iId) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -97,7 +97,7 @@ CREATE TABLE complaints (
   coId INT NOT NULL AUTO_INCREMENT,
   cId INT NOT NULL,
   smId Int NOT NULL,
-  cDate DATE NOT NULL DEFAULT '0000-00-00',
+  coDate DATE NOT NULL DEFAULT '0000-00-00',
   coComplaint VARCHAR(200) NOT NULL,
   coSummary VARCHAR(200) NULL DEFAULT NULL,
   coOpened BIT(1) NOT NULL DEFAULT 1,
