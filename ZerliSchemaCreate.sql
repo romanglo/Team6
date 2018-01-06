@@ -86,6 +86,7 @@ CREATE TABLE items_in_reservations(
 CREATE TABLE items_in_shops(
   smId INT,
   iId INT,
+  iName VARCHAR(20) NOT NULL,
   isDiscountedPrice FLOAT NOT NULL,  
   FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (iId) REFERENCES items (iId) ON DELETE NO ACTION ON UPDATE NO ACTION,
@@ -489,10 +490,10 @@ INSERT INTO shop_employees (uUserName,smId) VALUES
 ('shopemployee',1);
 
 LOCK TABLES items_in_shops WRITE;
-INSERT INTO items_in_shops (smId,iId,isDiscountedPrice) VALUES 
-(1,1,5),
-(1,2,5),
-(1,10,5);
+INSERT INTO items_in_shops (smId,iId,iName,isDiscountedPrice) VALUES 
+(1,1,'Rose',5),
+(1,2,'Sunflower',5),
+(1,10,'Aconite',5);
 
 LOCK TABLES costumers WRITE;
 INSERT INTO costumers (uUserName) VALUES
