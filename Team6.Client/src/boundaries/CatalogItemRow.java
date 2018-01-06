@@ -24,7 +24,7 @@ public class CatalogItemRow
 
 	private String m_type;
 
-	private Double m_price;
+	private Float m_price;
 
 	private String m_domainColor;
 
@@ -46,7 +46,7 @@ public class CatalogItemRow
 	 * @param m_image
 	 *            Item image.
 	 */
-	public CatalogItemRow(Integer m_id, String m_name, String m_type, Double m_price, String domainColor, Image m_image)
+	public CatalogItemRow(Integer m_id, String m_name, String m_type, Float m_price, String domainColor, Image m_image)
 	{
 		super();
 		this.m_id = m_id;
@@ -71,7 +71,7 @@ public class CatalogItemRow
 	 * @param domainColor
 	 *            Item domain color.
 	 */
-	public CatalogItemRow(int m_id, String m_name, String m_type, double m_price, String domainColor)
+	public CatalogItemRow(int m_id, String m_name, String m_type, Float m_price, String domainColor)
 	{
 		super();
 		this.m_id = m_id;
@@ -98,7 +98,7 @@ public class CatalogItemRow
 	 * @param type
 	 *            Type of the item.
 	 */
-	public CatalogItemRow(int id, String name, double price, Image m_image, String domainColor, String type)
+	public CatalogItemRow(int id, String name, Float price, Image m_image, String domainColor, String type)
 	{
 		super();
 		this.m_id = id;
@@ -121,7 +121,7 @@ public class CatalogItemRow
 	 * @param type
 	 *            Type of the item.
 	 */
-	public CatalogItemRow(String name, String type, double price, String domainColor)
+	public CatalogItemRow(String name, String type, Float price, String domainColor)
 	{
 		super();
 		this.m_id = null;
@@ -146,7 +146,7 @@ public class CatalogItemRow
 	 * @param type
 	 *            Type of the item.
 	 */
-	public CatalogItemRow(String name, String type, double price, String domainColor, Image m_image)
+	public CatalogItemRow(String name, String type, Float price, String domainColor, Image m_image)
 	{
 		super();
 		this.m_id = null;
@@ -279,7 +279,7 @@ public class CatalogItemRow
 	/**
 	 * @return Item price.
 	 */
-	public Double getM_price()
+	public Float getM_price()
 	{
 		return m_price;
 	}
@@ -296,7 +296,7 @@ public class CatalogItemRow
 	 * @param m_price
 	 *            Item price to set.
 	 */
-	public void setM_price(Double m_price)
+	public void setM_price(Float m_price)
 	{
 		this.m_price = m_price;
 	}

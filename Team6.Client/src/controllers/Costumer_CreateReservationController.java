@@ -9,7 +9,6 @@ import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
-import entities.CostumerEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,8 +23,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.Message;
-import messages.MessagesFactory;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.Message;
+import newMessages.RespondMessageData;
 
 /**
  *
@@ -110,7 +111,7 @@ public class Costumer_CreateReservationController
 			alert.showAndWait();
 			return;
 		}
-		
+
 		Costumer_CreateReservationPaymentController.s_isCreateReservation = true;
 		openSelectedWindow(paymentEvent, "/boundaries/Costumer_CreateReservationPayment.fxml");
 	}
@@ -190,8 +191,17 @@ public class Costumer_CreateReservationController
 	 */
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
-	{
-		//Not needed on this screen.
+	{	
+		IMessageData entitiesListData = msg.getMessageData();
+		if (entitiesListData instanceof RespondMessageData) {
+			if (!((RespondMessageData) entitiesListData).isSucceed()) {
+				m_logger.warning("Failed when sending a message to the server.");
+			} else {
+				m_logger.warning(
+						"Received message data not of the type requested, requested: " + EntityData.class.getName());
+			}
+			return;
+		}
 	}
 
 	/**

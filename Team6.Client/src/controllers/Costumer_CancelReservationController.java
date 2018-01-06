@@ -11,9 +11,6 @@ import java.util.logging.Logger;
 import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
-import entities.IEntity;
-import entities.ReservationEntity;
-import entities.ReservationType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,10 +28,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.EntitiesListData;
-import messages.IMessageData;
-import messages.Message;
-import messages.MessagesFactory;
+import newEntities.IEntity;
+import newEntities.Reservation;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 /**
  *
@@ -57,7 +58,7 @@ public class Costumer_CancelReservationController
 	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_id;
 
 	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
-	
+
 	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_type;
 
 	// end region -> UI Binding Fields
@@ -70,7 +71,7 @@ public class Costumer_CancelReservationController
 
 	ObservableList<CatalogItemRow> reservationTableList = FXCollections.observableArrayList();
 
-	private ArrayList<ReservationEntity> m_reservationList;
+	private ArrayList<Reservation> m_reservationList;
 
 	/* End of --> Fields region */
 
@@ -109,20 +110,10 @@ public class Costumer_CancelReservationController
 
 	private void getReservationsList()
 	{
-		Message entityMessage = MessagesFactory.createGetAllEntityMessage(
-				new ReservationEntity(ReservationType.Open, Costumer_SavedData.getCostumerId()));
+		Reservation reservation = new Reservation();
+		reservation.setCostumerId(Costumer_SavedData.getCostumerId());
+		Message entityMessage = MessagesFactory.createGetAllEntityMessage(reservation);
 		m_client.sendMessageToServer(entityMessage);
-	}
-
-	private ReservationEntity getReservation(int id)
-	{
-		for (ReservationEntity entity : m_reservationList) {
-			if (entity.getId() == id) {
-				return entity;
-			}
-		}
-
-		return null;
 	}
 
 	// end region -> Private Methods
@@ -177,7 +168,7 @@ public class Costumer_CancelReservationController
 					if (!rowData.getM_type().equalsIgnoreCase("open")) {
 						return;
 					}
-					Costumer_CreateReservationPaymentController.s_reservationEntity = getReservation(rowData.getM_id());
+					Costumer_CreateReservationPaymentController.s_reservationId = rowData.getM_id();
 					Costumer_CreateReservationPaymentController.s_isCreateReservation = false;
 					openSelectedWindow(new ActionEvent(), "/boundaries/Costumer_CreateReservationPayment.fxml");
 				}
@@ -204,6 +195,15 @@ public class Costumer_CancelReservationController
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
 		IMessageData entitiesListData = msg.getMessageData();
+		if (entitiesListData instanceof RespondMessageData) {
+			if (!((RespondMessageData) entitiesListData).isSucceed()) {
+				m_logger.warning("Failed when sending a message to the server.");
+			} else {
+				m_logger.warning(
+						"Received message data not of the type requested, requested: " + EntityData.class.getName());
+			}
+			return;
+		}
 		if (!(entitiesListData instanceof EntitiesListData)) {
 			m_logger.warning("Received message data not of the type requested.");
 			return;
@@ -212,15 +212,15 @@ public class Costumer_CancelReservationController
 		List<IEntity> entityList = ((EntitiesListData) entitiesListData).getEntities();
 		m_reservationList = new ArrayList<>();
 		for (IEntity entity : entityList) {
-			if (!(entity instanceof ReservationEntity)) {
+			if (!(entity instanceof Reservation)) {
 				m_logger.warning("Received entity not of the type requested.");
 				return;
 			}
 
-			ReservationEntity reservation = (ReservationEntity) entity;
+			Reservation reservation = (Reservation) entity;
 			m_reservationList.add(reservation);
 			CatalogItemRow itemRow = new CatalogItemRow(reservation.getId(), null, reservation.getType().toString(),
-					reservation.getTotalPrice(), null, null);
+					reservation.getPrice(), null, null);
 			reservationTableList.add(itemRow);
 		}
 

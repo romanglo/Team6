@@ -6,7 +6,7 @@ import java.util.logging.Logger;
 
 import com.sun.istack.internal.Nullable;
 
-import messages.Message;
+import newMessages.Message;
 import ocsf.client.AbstractClient;
 
 /**

@@ -4,6 +4,10 @@ package newEntities;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import newEntities.EntitiesEnums.ReservationDeliveryType;
+import newEntities.EntitiesEnums.ReservationType;
 
 /**
  *
@@ -27,17 +31,17 @@ public class Reservation implements IEntity
 
 	private int m_shopManagerId;
 
-	private EntitiesEnums.ReservationType m_type;
+	private ReservationType m_type;
 
 	private int m_numberOfItems;
 
 	private float m_price;
 
-	private java.util.Date m_deliveryDate;
+	private Date m_deliveryDate;
 
 	private String m_blessingCard;
 
-	private EntitiesEnums.ReservationDeliveryType m_deliveryType;
+	private ReservationDeliveryType m_deliveryType;
 
 	private String m_deliveryAddress;
 
@@ -99,7 +103,7 @@ public class Reservation implements IEntity
 	/**
 	 * @return the type
 	 */
-	public EntitiesEnums.ReservationType getType()
+	public ReservationType getType()
 	{
 		return m_type;
 	}
@@ -108,7 +112,7 @@ public class Reservation implements IEntity
 	 * @param type
 	 *            the type to set
 	 */
-	public void setType(EntitiesEnums.ReservationType type)
+	public void setType(ReservationType type)
 	{
 		m_type = type;
 	}
@@ -167,7 +171,7 @@ public class Reservation implements IEntity
 	/**
 	 * @return the deliveryType
 	 */
-	public EntitiesEnums.ReservationDeliveryType getDeliveryType()
+	public ReservationDeliveryType getDeliveryType()
 	{
 		return m_deliveryType;
 	}
@@ -176,7 +180,7 @@ public class Reservation implements IEntity
 	 * @param deliveryType
 	 *            the deliveryType to set
 	 */
-	public void setDeliveryType(EntitiesEnums.ReservationDeliveryType deliveryType)
+	public void setDeliveryType(ReservationDeliveryType deliveryType)
 	{
 		m_deliveryType = deliveryType;
 	}
@@ -235,7 +239,7 @@ public class Reservation implements IEntity
 	/**
 	 * @return the deliveryDate
 	 */
-	public java.util.Date getDeliveryDate()
+	public Date getDeliveryDate()
 	{
 		return m_deliveryDate;
 	}
@@ -244,7 +248,7 @@ public class Reservation implements IEntity
 	 * @param deliveryDate
 	 *            the deliveryDate to set
 	 */
-	public void setDeliveryDate(java.util.Date deliveryDate)
+	public void setDeliveryDate(Date deliveryDate)
 	{
 		m_deliveryDate = deliveryDate;
 	}
@@ -257,9 +261,9 @@ public class Reservation implements IEntity
 	{
 		return "Reservation [id=" + m_id + ", costumerId=" + m_costumerId + ", shopManagerId=" + m_shopManagerId
 				+ ", type=" + m_type + ", numberOfItems=" + m_numberOfItems + ", price=" + m_price + ", deliveryDate="
-				+ s_dateForamt.format(m_deliveryDate) + ", blessingCard=" + m_blessingCard + ", deliveryType=" + m_deliveryType
-				+ ", deliveryAddress=" + m_deliveryAddress + ", deliveryPhone=" + m_deliveryPhone + ", deliveryName="
-				+ m_deliveryName + "]";
+				+ s_dateForamt.format(m_deliveryDate) + ", blessingCard=" + m_blessingCard + ", deliveryType="
+				+ m_deliveryType + ", deliveryAddress=" + m_deliveryAddress + ", deliveryPhone=" + m_deliveryPhone
+				+ ", deliveryName=" + m_deliveryName + "]";
 	}
 
 	/**

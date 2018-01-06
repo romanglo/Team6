@@ -10,9 +10,6 @@ import java.util.logging.Logger;
 import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
-import entities.IEntity;
-import entities.ItemEntity;
-import entities.ProductType;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,10 +27,16 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.EntitiesListData;
-import messages.IMessageData;
-import messages.Message;
-import messages.MessagesFactory;
+import newEntities.EntitiesEnums.ProductType;
+import newEntities.IEntity;
+import newEntities.Item;
+import newEntities.ItemInReservation;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 /**
  *
@@ -185,10 +188,12 @@ public class Costumer_CreateReservationCatalogController
 			tableRow.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
-					ItemEntity newItemEntity = new ItemEntity(rowData.getM_id(), rowData.getName(),
-							ParseStringToProductType(rowData.getType()), rowData.getM_price(),
-							rowData.getM_domainColor(), rowData.getM_image());
-					Costumer_SavedData.addReservation(newItemEntity);
+					ItemInReservation itemInReservation = new ItemInReservation();
+					itemInReservation.setItemId(rowData.getM_id());
+					itemInReservation.setQuantity(1);
+					itemInReservation.setPrice(Float.parseFloat(rowData.getPrice()));
+					/* TODO Yoni: Add id of the reservation. Roman thinks about it. */
+					Costumer_SavedData.addItemToReservation(itemInReservation);
 				}
 			});
 			return tableRow;
@@ -206,7 +211,8 @@ public class Costumer_CreateReservationCatalogController
 
 	private void getCatalogFromServer()
 	{
-		Message entityMessage = MessagesFactory.createGetAllEntityMessage(new ItemEntity(0));
+		Item item = new Item();
+		Message entityMessage = MessagesFactory.createGetAllEntityMessage(item);
 		m_client.sendMessageToServer(entityMessage);
 	}
 
@@ -221,6 +227,16 @@ public class Costumer_CreateReservationCatalogController
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
 		IMessageData entitiesListData = msg.getMessageData();
+		if (entitiesListData instanceof RespondMessageData) {
+			if (!((RespondMessageData) entitiesListData).isSucceed()) {
+				m_logger.warning("Failed when sending a message to the server.");
+			} else {
+				m_logger.warning(
+						"Received message data not of the type requested, requested: " + EntitiesListData.class.getName());
+			}
+			return;
+		}
+		
 		if (!(entitiesListData instanceof EntitiesListData)) {
 			m_logger.warning("Received message data not of the type requested.");
 			return;
@@ -228,14 +244,14 @@ public class Costumer_CreateReservationCatalogController
 
 		List<IEntity> entityList = ((EntitiesListData) entitiesListData).getEntities();
 		for (IEntity entity : entityList) {
-			if (!(entity instanceof ItemEntity)) {
+			if (!(entity instanceof Item)) {
 				m_logger.warning("Received entity not of the type requested.");
 				return;
 			}
 
-			ItemEntity item = (ItemEntity) entity;
-			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getItemPrice(),
-					item.getItemImage(), item.getColor(), item.getItemType().toString());
+			Item item = (Item) entity;
+			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getPrice(),
+					item.getImage(), item.getDomainColor(), item.getType().toString());
 			catalog.add(itemRow);
 		}
 

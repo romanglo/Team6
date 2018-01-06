@@ -3,58 +3,41 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.sql.Date;
-import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Observable;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
-import entities.CostumerSubscription;
-import entities.ItemEntity;
-import entities.ProductType;
-import entities.ReservationDeliveryType;
-import entities.ReservationEntity;
-import entities.ReservationType;
-import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.Message;
-import messages.MessagesFactory;
+import newEntities.EntitiesEnums.ReservationType;
+import newEntities.IEntity;
+import newEntities.ItemInReservation;
+import newEntities.Reservation;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 /**
  *
@@ -96,12 +79,14 @@ public class Costumer_CreateReservationPaymentController
 
 	ObservableList<CatalogItemRow> paymentBill = FXCollections.observableArrayList();
 
-	private Double m_discount;
+	private float m_discount;
+
+	private Reservation m_reservationEntity;
 
 	/**
 	 * When displaying the canceling reservation screen, manage the reservation.
 	 */
-	public static ReservationEntity s_reservationEntity = null;
+	public static int s_reservationId;
 
 	/**
 	 * Define whether the window is for the reservation creation or for canceling
@@ -131,146 +116,9 @@ public class Costumer_CreateReservationPaymentController
 
 	private void paymentButtonClick(ActionEvent paymentEvent)
 	{
-		Costumer_SavedData.setReservationList();
-		Costumer_SavedData.setTotalPrice(Double.parseDouble(total_price_label.getText()));
-		/* Check if the user want a blessing card and request a delivery date. */
-		confirmReservation();
-
-		if (Costumer_SavedData.getSubscription() == CostumerSubscription.None) {
-			Costumer_PaymentCreditCardController.m_discount = m_discount;
-			openSelectedWindow(paymentEvent, "/boundaries/Costumer_PaymentCreditCard.fxml");
-		} else {
-			Costumer_SavedData.setRefund(Costumer_SavedData.getCostumerRefund() - m_discount);
-
-			Message entityMessage = MessagesFactory.createAddEntityMessage(Costumer_SavedData.getReservationEntity());
-			m_client.sendMessageToServer(entityMessage);
-
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Reservation Completed");
-			alert.setHeaderText(null);
-			alert.setContentText("Reservation completed. Thanks for using our application.");
-			alert.showAndWait();
-			openSelectedWindow(paymentEvent, "/boundaries/Costumer_CreateReservation.fxml");
-		}
-	}
-
-	private void confirmReservation()
-	{
-		confirmBlessingCard();
-		confirmDelivery();
-	}
-
-	private void confirmDelivery()
-	{
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Add blessing card to reservation");
-		alert.setHeaderText("Please choose the delivery method");
-		// alert.setContentText(null);
-
-		RadioButton deliveryIgnore = new RadioButton("Self pickup");
-		RadioButton deliveryAccept = new RadioButton("Delivery");
-		CheckBox deliveryImmidiate = new CheckBox("Immidiate delivery");
-		DatePicker deliveryDate = new DatePicker(LocalDate.now());
-		ArrayList<Integer> values = new ArrayList<>();
-		for (int i = 1; i < 24; i++) {
-			values.add(i);
-		}
-		ObservableList<Integer> list = FXCollections.observableArrayList(values);
-		ComboBox<Integer> deliveryComboBox = new ComboBox<>();
-		deliveryComboBox.setItems(list);
-
-		deliveryAccept.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event)
-			{
-				deliveryIgnore.setSelected(false);
-			}
-		});
-		deliveryIgnore.setOnAction(new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event)
-			{
-				deliveryAccept.setSelected(false);
-			}
-		});
-
-		GridPane expContent = new GridPane();
-		expContent.setMaxWidth(Double.MAX_VALUE);
-		expContent.add(deliveryAccept, 0, 0);
-		expContent.add(deliveryDate, 2, 0);
-		expContent.add(deliveryComboBox, 2, 1);
-		expContent.add(deliveryIgnore, 0, 1);
-		expContent.add(deliveryImmidiate, 2, 2);
-
-		alert.getDialogPane().setExpandableContent(expContent);
-		alert.showAndWait();
-		
-		java.util.Date date;
-		if (deliveryIgnore.isSelected()) {
-			if (deliveryImmidiate.isSelected()) {
-				date = new java.util.Date();
-				Calendar cl = Calendar.getInstance();
-				cl.setTime(date);
-				cl.add(Calendar.HOUR, 3);
-				date = cl.getTime();
-			} else {
-				date = Date.valueOf(deliveryDate.getValue());
-				Calendar cl = Calendar.getInstance();
-				cl.setTime(date);
-				cl.set(Calendar.HOUR, Integer.valueOf(deliveryComboBox.getValue()));
-				date = cl.getTime();
-			}
-			Costumer_SavedData.setDeliveryType(ReservationDeliveryType.None);
-		} else {
-			if (deliveryImmidiate.isSelected()) {
-				date = new java.util.Date();
-				Calendar cl = Calendar.getInstance();
-				cl.setTime(date);
-				cl.add(Calendar.HOUR, 3);
-				date = cl.getTime();
-				Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Immidiate);
-			} else {
-				date = Date.valueOf(deliveryDate.getValue());
-				Calendar cl = Calendar.getInstance();
-				cl.setTime(date);
-				cl.set(Calendar.HOUR, Integer.valueOf(deliveryComboBox.getValue()));
-				date = cl.getTime();
-				Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Future);
-			}
-			Costumer_SavedData.setTotalPrice(Costumer_SavedData.getTotalPrice() + 30);
-		}
-		Costumer_SavedData.setDeliveryDate(date);
-	}
-
-	private void confirmBlessingCard()
-	{
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Blessing Card");
-		alert.setHeaderText("Add blessing card to reservation");
-		alert.setContentText(null);
-
-		CheckBox blessingCheckBox = new CheckBox("Add blessing card");
-		TextArea blessingTextArea = new TextArea();
-		blessingTextArea.setWrapText(true);
-
-		blessingTextArea.setMaxWidth(Double.MAX_VALUE);
-		blessingTextArea.setMaxHeight(Double.MAX_VALUE);
-		GridPane.setVgrow(blessingTextArea, Priority.ALWAYS);
-		GridPane.setHgrow(blessingTextArea, Priority.ALWAYS);
-
-		GridPane expContent = new GridPane();
-		expContent.setMaxWidth(Double.MAX_VALUE);
-		expContent.add(blessingCheckBox, 0, 0);
-		expContent.add(blessingTextArea, 0, 1);
-
-		alert.getDialogPane().setExpandableContent(expContent);
-		alert.showAndWait();
-
-		if (blessingCheckBox.isSelected()) {
-			Costumer_SavedData.setBlessingCard(blessingTextArea.getText());
-		}
+		Costumer_SavedData.setTotalPrice(Float.parseFloat(total_price_label.getText()));
+		Costumer_PaymentCreditCardController.m_discount = m_discount;
+		openSelectedWindow(paymentEvent, "/boundaries/Costumer_PaymentCreditCard.fxml");
 	}
 
 	/**
@@ -278,46 +126,47 @@ public class Costumer_CreateReservationPaymentController
 	 */
 	private void gatherReservationList()
 	{
-		ArrayList<ItemEntity> itemsList = new ArrayList<>();
-		double totalPrice = 0;
-		for (ItemEntity entity : Costumer_SavedData.getCostumerReservationList()) {
-			CatalogItemRow itemReserve = new CatalogItemRow(entity.getId(), entity.getName(), entity.getItemPrice(),
-					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
-			totalPrice += entity.getItemPrice();
-			itemsList.add(entity);
+		float totalPrice = 0;
+		for (IEntity entity : Costumer_SavedData.getCostumerReservationList()) {
+			ItemInReservation itemInReservation = (ItemInReservation) entity;
+			CatalogItemRow itemReserve = new CatalogItemRow(itemInReservation.getItemId(),
+					itemInReservation.getItemName(), itemInReservation.getPrice(), null, null, null);
+			totalPrice += itemInReservation.getPrice();
 			paymentBill.add(itemReserve);
 		}
 
-		m_discount = Costumer_SavedData.getCostumerRefund();
+		m_discount = Costumer_SavedData.getCostumerBalance();
 		if (m_discount > totalPrice) {
 			m_discount = totalPrice;
 		}
 
 		if (m_discount > 0.0) {
 			totalPrice -= m_discount;
-			CatalogItemRow item = new CatalogItemRow(99, "Discount", m_discount * -1.0, null, null, null);
+			CatalogItemRow item = new CatalogItemRow(99, "Discount", m_discount * -1, null, null, null);
 			paymentBill.add(item);
 		}
 
-		Costumer_SavedData.setReservationList(itemsList);
 		total_price_label.setText(String.format("%.2f", totalPrice));
 	}
 
 	private void addReservationList()
 	{
-		for (ItemEntity entity : s_reservationEntity.getReservationList()) {
-			CatalogItemRow item = new CatalogItemRow(entity.getId(), entity.getName(), entity.getItemPrice(),
-					entity.getItemImage(), entity.getColor(), entity.getItemType().toString());
-			paymentBill.add(item);
-		}
+		Reservation reservation = new Reservation();
+		reservation.setCostumerId(Costumer_SavedData.getCostumerId());
+		reservation.setId(s_reservationId);
+		Message message = MessagesFactory.createGetEntityMessage(reservation);
+		m_client.sendMessageToServer(message);
 
-		total_price_label.setText(String.format("%.2f", s_reservationEntity.getTotalPrice()));
+		ItemInReservation itemInReservation = new ItemInReservation();
+		itemInReservation.setReservationId(s_reservationId);
+		message = MessagesFactory.createGetAllEntityMessage(itemInReservation);
+		m_client.sendMessageToServer(itemInReservation);
 	}
 
 	private void cancelButtonClick(ActionEvent cancelEvent)
 	{
-		s_reservationEntity.setType(ReservationType.Canceled);
-		Message entityMessage = MessagesFactory.createUpdateEntityMessage(s_reservationEntity);
+		m_reservationEntity.setType(ReservationType.Canceled);
+		Message entityMessage = MessagesFactory.createUpdateEntityMessage(m_reservationEntity);
 		m_client.sendMessageToServer(entityMessage);
 		openSelectedWindow(cancelEvent, "/boundaries/Costumer_CancelReservation.fxml");
 	}
@@ -417,7 +266,45 @@ public class Costumer_CreateReservationPaymentController
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// Not needed on this screen.
+		IMessageData entitiesListData = msg.getMessageData();
+		if (entitiesListData instanceof RespondMessageData) {
+			if (!((RespondMessageData) entitiesListData).isSucceed()) {
+				m_logger.warning("Failed when sending a message to the server.");
+			} else {
+				m_logger.warning(
+						"Received message data not of the type requested, requested: " + EntityData.class.getName());
+			}
+			return;
+		}
+
+		if (entitiesListData instanceof EntityData) {
+			IEntity entity = ((EntityData) entitiesListData).getEntity();
+			if (!(entity instanceof Reservation)) {
+				m_logger.warning(
+						"Received entity not of the type requested, requested: " + Reservation.class.getName());
+				return;
+			}
+
+			m_reservationEntity = (Reservation) entity;
+		} else if (entitiesListData instanceof EntitiesListData) {
+			List<IEntity> entities = ((EntitiesListData) entitiesListData).getEntities();
+			for (IEntity iEntity : entities) {
+				if (!(iEntity instanceof ItemInReservation)) {
+					m_logger.warning("Received entity not of the type requested, requested: "
+							+ ItemInReservation.class.getName());
+					return;
+				}
+
+				ItemInReservation itemInReservation = (ItemInReservation) iEntity;
+				CatalogItemRow item = new CatalogItemRow(itemInReservation.getItemId(), itemInReservation.getItemName(),
+						itemInReservation.getPrice(), null, null, null);
+				paymentBill.add(item);
+			}
+
+			total_price_label.setText(String.format("%.2f", m_reservationEntity.getPrice()));
+		} else {
+			m_logger.warning("Received message data not of the type requested.");
+		}
 	}
 
 	/**

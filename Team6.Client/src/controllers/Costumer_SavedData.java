@@ -4,12 +4,14 @@ package controllers;
 import java.util.ArrayList;
 import java.util.Date;
 
-import entities.CostumerEntity;
-import entities.CostumerSubscription;
-import entities.ItemEntity;
-import entities.ReservationDeliveryType;
-import entities.ReservationEntity;
-import entities.ReservationType;
+import newEntities.Costumer;
+import newEntities.EntitiesEnums.CostumerSubscription;
+import newEntities.EntitiesEnums.ReservationDeliveryType;
+import newEntities.EntitiesEnums.ReservationType;
+import newEntities.IEntity;
+import newEntities.Item;
+import newEntities.ItemInReservation;
+import newEntities.Reservation;
 
 /**
  *
@@ -21,9 +23,11 @@ public class Costumer_SavedData
 {
 	// region Fields
 
-	private static ArrayList<ItemEntity> s_reservationList;
+	private static Reservation s_reservationEntity;
 
-	private static ReservationEntity s_reservationEntity;
+	private static Costumer s_costumer;
+
+	private static ArrayList<IEntity> s_itemsInReservation;
 
 	// end region -> Fields
 
@@ -32,17 +36,24 @@ public class Costumer_SavedData
 	/**
 	 * @return Reservation entity.
 	 */
-	public static ReservationEntity getReservationEntity()
+	public static Reservation getReservationEntity()
 	{
+		int quantity = 0;
+		for (IEntity entity : s_itemsInReservation) {
+			ItemInReservation item = (ItemInReservation) entity;
+			quantity += item.getQuantity();
+		}
+		s_reservationEntity.setNumberOfItems(quantity);
+
 		return s_reservationEntity;
 	}
 
 	/**
-	 * @return costumer entity.
+	 * @return Costumer.
 	 */
-	public static CostumerEntity getCostumer()
+	public static Costumer getCostumer()
 	{
-		return s_reservationEntity.getCostumer();
+		return s_costumer;
 	}
 
 	/**
@@ -50,7 +61,7 @@ public class Costumer_SavedData
 	 */
 	public static Integer getCostumerId()
 	{
-		return s_reservationEntity.getCostumerId();
+		return s_costumer.getId();
 	}
 
 	/**
@@ -58,15 +69,15 @@ public class Costumer_SavedData
 	 */
 	public static String getCreditCard()
 	{
-		return s_reservationEntity.getCostumer().getCreditCard();
+		return s_costumer.getCreditCard();
 	}
 
 	/**
 	 * @return Costumer reservation list.
 	 */
-	public static ArrayList<ItemEntity> getCostumerReservationList()
+	public static ArrayList<IEntity> getCostumerReservationList()
 	{
-		return s_reservationList;
+		return s_itemsInReservation;
 	}
 
 	/**
@@ -74,23 +85,23 @@ public class Costumer_SavedData
 	 */
 	public static CostumerSubscription getSubscription()
 	{
-		return s_reservationEntity.getCostumer().getSubscription();
+		return s_costumer.getCostumerSubscription();
 	}
 
 	/**
 	 * @return The refunds that the costumer has.
 	 */
-	public static Double getCostumerRefund()
+	public static float getCostumerBalance()
 	{
-		return s_reservationEntity.getCostumer().getCostumerRefunds();
+		return s_costumer.getBalance();
 	}
 
 	/**
 	 * @return The total price of the reservation.
 	 */
-	public static Double getTotalPrice()
+	public static float getTotalPrice()
 	{
-		return s_reservationEntity.getTotalPrice();
+		return s_reservationEntity.getPrice();
 	}
 
 	/**
@@ -100,7 +111,7 @@ public class Costumer_SavedData
 	{
 		return s_reservationEntity.getType();
 	}
-	
+
 	/**
 	 * @return Delivery date requested.
 	 */
@@ -124,7 +135,31 @@ public class Costumer_SavedData
 	{
 		return s_reservationEntity.getBlessingCard();
 	}
-	
+
+	/**
+	 * @return the deliveryAddress
+	 */
+	public static String getDeliveryAddress()
+	{
+		return s_reservationEntity.getDeliveryAddress();
+	}
+
+	/**
+	 * @return the deliveryPhone
+	 */
+	public static String getDeliveryPhone()
+	{
+		return s_reservationEntity.getDeliveryPhone();
+	}
+
+	/**
+	 * @return the deliveryName
+	 */
+	public static String getDeliveryName()
+	{
+		return s_reservationEntity.getDeliveryName();
+	}
+
 	// end region -> Getters
 
 	// region Setters
@@ -137,7 +172,7 @@ public class Costumer_SavedData
 	 */
 	public static void setId(Integer id)
 	{
-		s_reservationEntity.getCostumer().setId(id);
+		s_costumer.setId(id);
 	}
 
 	/**
@@ -148,7 +183,7 @@ public class Costumer_SavedData
 	 */
 	public static void setCreditCard(String creditCard)
 	{
-		s_reservationEntity.getCostumer().setCreditCard(creditCard);
+		s_costumer.setCreditCard(creditCard);
 	}
 
 	/**
@@ -159,39 +194,44 @@ public class Costumer_SavedData
 	 */
 	public static void setSubscription(CostumerSubscription subscription)
 	{
-		s_reservationEntity.getCostumer().setSubscription(subscription);
+		s_costumer.setCostumerSubscription(subscription);
 	}
 
 	/**
-	 * Upgrade the {@link ItemEntity} of the costumer.
+	 * Upgrade the {@link Item} of the costumer.
 	 *
 	 * @param reservationList
 	 *            the reservationList to set
 	 */
-	public static void setReservationList(ArrayList<ItemEntity> reservationList)
+	public static void setReservationList(ArrayList<IEntity> reservationList)
 	{
-		s_reservationList = reservationList;
+		s_itemsInReservation = reservationList;
 	}
 
 	/**
-	 * Upgrade the {@link ItemEntity} of the costumer.
-	 */
-	public static void setReservationList()
-	{
-		s_reservationEntity.setReservationList(s_reservationList);
-	}
-
-	/**
-	 * Add the {@link ItemEntity} to the reservation list of the costumer.
+	 * Add the {@link IEntity} to the reservation list of the costumer.
 	 *
-	 * @param reservation
-	 *            the reservation to add.
+	 * @param item
+	 *            the item to add.
 	 */
-	public static void addReservation(ItemEntity reservation)
+	public static void addItemToReservation(IEntity item)
 	{
-		if (s_reservationList != null) {
-			s_reservationList.add(reservation);
-			System.out.println(s_reservationList);
+		ItemInReservation recievedItem = (ItemInReservation) item;
+		if (s_itemsInReservation != null) {
+			for (IEntity entity : s_itemsInReservation) {
+				ItemInReservation itemInReservation = (ItemInReservation) entity;
+				if (recievedItem.equals(itemInReservation)) {
+					float price = itemInReservation.getPrice();
+					int quantity = itemInReservation.getQuantity();
+					price = price / quantity;
+					quantity++;
+					price = price * quantity;
+					itemInReservation.setPrice(price);
+					itemInReservation.setQuantity(quantity);
+					return;
+				}
+			}
+			s_itemsInReservation.add(item);
 		}
 	}
 
@@ -201,9 +241,9 @@ public class Costumer_SavedData
 	 * @param refund
 	 *            The refunds of the costumer.
 	 */
-	public static void setRefund(Double refund)
+	public static void setBalance(float refund)
 	{
-		s_reservationEntity.getCostumer().setRefund(refund);
+		s_costumer.setBalance(refund);
 	}
 
 	/**
@@ -212,9 +252,9 @@ public class Costumer_SavedData
 	 * @param price
 	 *            The total price of the reservation.
 	 */
-	public static void setTotalPrice(Double price)
+	public static void setTotalPrice(float price)
 	{
-		s_reservationEntity.setTotalPrice(price);
+		s_reservationEntity.setPrice(price);
 	}
 
 	/**
@@ -227,7 +267,7 @@ public class Costumer_SavedData
 	{
 		s_reservationEntity.setType(m_reservationType);
 	}
-	
+
 	/**
 	 * Upgrade the {@link Date} of the delivery.
 	 *
@@ -260,7 +300,34 @@ public class Costumer_SavedData
 	{
 		s_reservationEntity.setBlessingCard(blessing);
 	}
-	
+
+	/**
+	 * @param deliveryAddress
+	 *            the deliveryAddress to set
+	 */
+	public static void setDeliveryAddress(String deliveryAddress)
+	{
+		s_reservationEntity.setDeliveryAddress(deliveryAddress);
+	}
+
+	/**
+	 * @param deliveryPhone
+	 *            the deliveryPhone to set
+	 */
+	public static void setDeliveryPhone(String deliveryPhone)
+	{
+		s_reservationEntity.setDeliveryPhone(deliveryPhone);
+	}
+
+	/**
+	 * @param deliveryName
+	 *            the deliveryName to set
+	 */
+	public static void setDeliveryName(String deliveryName)
+	{
+		s_reservationEntity.setDeliveryName(deliveryName);
+	}
+
 	// end region -> Setters
 
 	// region Initializing methods
@@ -271,10 +338,14 @@ public class Costumer_SavedData
 	 * @param costumer
 	 *            The costumer connected to the system.
 	 */
-	public static void initializeSavedData(CostumerEntity costumer)
+	public static void initializeSavedData(Costumer costumer)
 	{
-		s_reservationEntity = new ReservationEntity(ReservationType.Open, costumer);
-		s_reservationList = new ArrayList<>();
+		s_costumer = costumer;
+		s_reservationEntity = new Reservation();
+		s_reservationEntity.setCostumerId(s_costumer.getId());
+		s_reservationEntity.setType(ReservationType.Open);
+
+		s_itemsInReservation = new ArrayList<>();
 	}
 
 	// end region -> Initializing methods
