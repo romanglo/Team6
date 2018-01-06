@@ -11,7 +11,7 @@ import com.sun.istack.internal.Nullable;
 
 import configurations.ServerConfiguration;
 import logger.LogManager;
-import messages.Message;
+import newMessages.Message;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 

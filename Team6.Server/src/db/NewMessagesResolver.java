@@ -580,6 +580,10 @@ public class NewMessagesResolver implements Server.MessagesHandler {
 			if (insertQuery != null) {
 				result = executeQuery(complaint, insertQuery);
 			}
+			if (result) {
+				int lastInsertId = getLastInsertId();
+				complaint.setId(lastInsertId);
+			}
 			break;
 
 		default:

@@ -1,6 +1,6 @@
 package connectivity;
 
-import messages.Message;
+import newMessages.Message;
 import ocsf.server.ConnectionToClient;
 
 class WaitingMessage {
