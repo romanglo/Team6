@@ -63,6 +63,14 @@ public class Costumer_SavedData
 	{
 		return s_costumer.getId();
 	}
+	
+	/**
+	 * @return the shopManagerId
+	 */
+	public static int getShopManagerId()
+	{
+		return s_reservationEntity.getShopManagerId();
+	}
 
 	/**
 	 * @return Costumer credit card number.
@@ -174,6 +182,16 @@ public class Costumer_SavedData
 	{
 		s_costumer.setId(id);
 	}
+	
+	/**
+	 * @param shopManagerId
+	 *            the shopManagerId to set
+	 */
+	public static void setShopManagerId(int shopManagerId)
+	{
+		s_reservationEntity.setShopManagerId(shopManagerId);
+	}
+
 
 	/**
 	 * Upgrade the credit card of the costumer.

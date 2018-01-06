@@ -3,12 +3,16 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,12 +20,14 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
+import newMessages.EntitiesListData;
 import newMessages.EntityData;
 import newMessages.IMessageData;
 import newMessages.Message;
@@ -29,6 +35,8 @@ import newMessages.MessagesFactory;
 import newMessages.RespondMessageData;
 import newEntities.Costumer;
 import newEntities.IEntity;
+import newEntities.Item;
+import newEntities.ShopManager;
 
 /**
  *
@@ -51,6 +59,8 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 
 	@FXML private Button cancel_reservation_button;
 
+	@FXML private ComboBox<Integer> combo_shop;
+
 	/* End of --> UI Binding Fields region */
 
 	/* Fields region */
@@ -60,6 +70,8 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 	private Client m_client;
 
 	private ClientConfiguration m_configuration;
+
+	private ObservableList<Integer> shops = FXCollections.observableArrayList();
 
 	/* End of --> Fields region */
 
@@ -73,6 +85,7 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 	@FXML
 	public void createReservationClick(ActionEvent createReservation)
 	{
+		Costumer_SavedData.setShopManagerId(combo_shop.getValue());
 		openSelectedWindow(createReservation, "/boundaries/Costumer_CreateReservation.fxml");
 	}
 
@@ -112,14 +125,6 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		}
 	}
 
-	private void initializeCostumerData()
-	{
-		Costumer costumer = new Costumer();
-		costumer.setUserName(ApplicationEntryPoint.ConnectedUser.getUserName());
-		Message entityMessage = MessagesFactory.createGetEntityMessage(costumer);
-		m_client.sendMessageToServer(entityMessage);
-	}
-
 	/* End of --> UI events region */
 
 	/* Initializing methods region */
@@ -134,6 +139,7 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		initializeImages();
 		initializeClientHandler();
 		initializeCostumerData();
+		initializeShopData();
 	}
 
 	private void initializeFields()
@@ -163,6 +169,21 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		m_client.setClientStatusHandler(this);
 	}
 
+	private void initializeCostumerData()
+	{
+		Costumer costumer = new Costumer();
+		costumer.setUserName(ApplicationEntryPoint.ConnectedUser.getUserName());
+		Message entityMessage = MessagesFactory.createGetEntityMessage(costumer);
+		m_client.sendMessageToServer(entityMessage);
+	}
+
+	private void initializeShopData()
+	{
+		ShopManager shopManager = new ShopManager();
+		Message message = MessagesFactory.createGetAllEntityMessage(shopManager);
+		m_client.sendMessageToServer(message);
+	}
+
 	/* End of --> Initializing methods region */
 
 	/* Client handlers implementation region */
@@ -184,20 +205,32 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 			return;
 		}
 
-		if (!(messageData instanceof EntityData)) {
-			m_logger.warning(
-					"Received message data not of the type requested, requested: " + EntityData.class.getName());
+		if (messageData instanceof EntityData) {
+			IEntity entity = ((EntityData) messageData).getEntity();
+			if (!(entity instanceof Costumer)) {
+				m_logger.warning("Received entity not of the type requested.");
+				return;
+			}
+
+			Costumer costumer = (Costumer) entity;
+			Costumer_SavedData.initializeSavedData(costumer);
+		} else if (messageData instanceof EntitiesListData) {
+			List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
+			for (IEntity entity : entities) {
+				if (!(entity instanceof ShopManager)) {
+					m_logger.warning("Received entity not of the type requested.");
+					return;
+				}
+				ShopManager shopManager = (ShopManager) entity;
+				shops.add(shopManager.getId());
+			}
+			
+			combo_shop.setItems(shops);
+		} else {
+			m_logger.warning("Received message data not of the type requested.");
 			return;
 		}
 
-		IEntity entity = ((EntityData) messageData).getEntity();
-		if (!(entity instanceof Costumer)) {
-			m_logger.warning("Received entity not of the type requested.");
-			return;
-		}
-
-		Costumer costumer = (Costumer) entity;
-		Costumer_SavedData.initializeSavedData(costumer);
 	}
 
 	/**
