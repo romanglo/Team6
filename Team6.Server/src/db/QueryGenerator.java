@@ -1,0 +1,491 @@
+package db;
+
+import java.util.logging.Logger;
+
+import logger.LogManager;
+import newEntities.Complaint;
+import newEntities.ComplaintsReport;
+import newEntities.Costumer;
+import newEntities.IEntity;
+import newEntities.IncomesReport;
+import newEntities.Item;
+import newEntities.ItemInReservation;
+import newEntities.ItemInShop;
+import newEntities.Reservation;
+import newEntities.ReservationsReport;
+import newEntities.ShopEmployee;
+import newEntities.ShopManager;
+import newEntities.Survey;
+import newEntities.SurveysReport;
+import newEntities.User;
+
+/**
+ *
+ * QueryGenerator: A factory of queries based on {@link IEntity}.
+ */
+@SuppressWarnings("javadoc")
+public class QueryGenerator {
+
+	/**
+	 * The constructor is empty to ensure that it will not be possible to create
+	 * instance of this class.
+	 */
+	private QueryGenerator() {
+
+	}
+
+	private final static java.text.SimpleDateFormat s_dateFormat = new java.text.SimpleDateFormat("yyyy-MM-dd");
+
+	private final static java.text.SimpleDateFormat s_dateTimeFormat = new java.text.SimpleDateFormat(
+			"yyyy-MM-dd hh:mm:ss");
+
+	private static Logger s_logger = null;
+
+	private static void loggerLazyLoading() {
+		if (s_logger == null) {
+			s_logger = LogManager.getLogger();
+		}
+	}
+
+	public static String getLastIdQuery() {
+		return "SELECT LAST_INSERT_ID();";
+	}
+	// region Items Entity
+
+	public static String insertItemQuery(Item item) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("INSERT INTO items (iName,iType,iPrice,iImage,iDomainColor) VALUES ('");
+		stringBuilder.append(item.getName().toLowerCase());
+		stringBuilder.append("','");
+		stringBuilder.append(item.getType().toString());
+		stringBuilder.append("',");
+		stringBuilder.append(item.getPrice());
+		stringBuilder.append(",'");
+		stringBuilder.append(item.getDomainColor().toLowerCase());
+		stringBuilder.append("', ? );");
+		return stringBuilder.toString();
+	}
+
+	public static String removeItemQuery(Item item) {
+
+		int id = item.getId();
+		if (id < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Could not generate remove Item query with impossiable id: " + id);
+			return "";
+		}
+
+		return "UPDATE items SET iDeleted = 1 WHERE iId = " + id + " ;";
+	}
+
+	public static String updateItemQuery(Item item) {
+
+		int id = item.getId();
+		if (id < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Could not generate update Item query with impossiable id: " + id);
+			return "";
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("UPDATE items SET");
+		stringBuilder.append(" iName = '");
+		stringBuilder.append(item.getName().toLowerCase());
+		stringBuilder.append("', iType = '");
+		stringBuilder.append(item.getType().toString());
+		stringBuilder.append("', iPrice = ");
+		stringBuilder.append(item.getPrice());
+		stringBuilder.append(", iDomainColor = '");
+		stringBuilder.append(item.getDomainColor());
+		stringBuilder.append("' , iImage WHERE = ? WHERE iId = ");
+		stringBuilder.append(item.getId());
+		stringBuilder.append(';');
+
+		return stringBuilder.toString();
+	}
+
+	public static String selectItemQuery(Item item) {
+
+		int id = item.getId();
+		if (id < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Could not generate select Item query with impossiable id: " + id);
+			return "";
+		}
+
+		return "SELECT * FROM catalog WHERE iId = " + id + " ;";
+	}
+
+	public static String selectAllItemsQuery() {
+		return "SELECT * FROM catalog;";
+	}
+
+	// End region -> Item Entity
+
+	// region -> User Entity
+
+	public static String selectAllUsersQuery() {
+		return "SELECT * FROM users;";
+	}
+
+	public static String selectUserQuery(User user) {
+		String userName = user.getUserName();
+		if (userName == null || userName.isEmpty()) {
+			loggerLazyLoading();
+			s_logger.warning("Could not generate select user query with null or empty username");
+			return null;
+		}
+
+		return "SELECT * FROM users WHERE uUserName = '" + userName + "';";
+	}
+
+	public static String updateUserQuery(User user) {
+		if (user == null) {
+			return null;
+		}
+
+		String userName = user.getUserName();
+		if (!(userName != null && !userName.isEmpty())) {
+			loggerLazyLoading();
+			s_logger.warning("Could not generate update user query with null or empty username");
+			return null;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("UPDATE users SET ");
+		stringBuilder.append("uPassword = '");
+		stringBuilder.append(user.getPassword());
+		stringBuilder.append("', uEmail = '");
+		stringBuilder.append(user.getEmail());
+		stringBuilder.append("', uPrivilege = '");
+		stringBuilder.append(user.getPrivilege());
+		stringBuilder.append("', uStatus = '");
+		stringBuilder.append(user.getStatus());
+		stringBuilder.append("', WHERE uUserName = '");
+		stringBuilder.append(user.getUserName());
+		stringBuilder.append("';");
+
+		return stringBuilder.toString();
+	}
+
+	// End region -> User Entity
+
+	// region Costumer Entity
+
+	public static String selectCostumerQuery(Costumer costumer) {
+		String userName = costumer.getUserName();
+		int costumerId = costumer.getId();
+
+		String returningString = null;
+
+		if (costumerId > 0) {
+			returningString = "SELECT * FROM costumers WHERE cid = " + costumerId + ";";
+		} else if (!(userName != null && !userName.isEmpty())) {
+			returningString = "SELECT * FROM costumers WHERE uUserName = '" + userName + "';";
+		} else {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get costumer entity without any identification data.");
+		}
+		return returningString;
+	}
+
+	public static String selectAllCostumersQuery() {
+		return "SELECT * FROM costumers;";
+	}
+
+	public static String updateCostumerQuery(Costumer costumer) {
+		String userName = costumer.getUserName();
+		int costumerId = costumer.getId();
+
+		if (!(costumerId > 0 && userName != null && !userName.isEmpty())) {
+			return null;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("UPDATE costumers SET ");
+		stringBuilder.append("cCreditCard = '");
+		stringBuilder.append(costumer.getCreditCard());
+		stringBuilder.append("', cCostumerSubscription = '");
+		stringBuilder.append(costumer.getCostumerSubscription());
+		stringBuilder.append("', cBalance = ");
+		stringBuilder.append(costumer.getBalance());
+		stringBuilder.append("WHERE ");
+		if (costumerId > 0) {
+			stringBuilder.append("cId = ");
+			stringBuilder.append(costumerId);
+		} else {
+			stringBuilder.append("uUserName = '");
+			stringBuilder.append(userName);
+			stringBuilder.append('\'');
+
+		}
+		stringBuilder.append(';');
+		return stringBuilder.toString();
+	}
+
+	// End region -> Costumer Entity
+
+	// region -> Reservation Entity
+
+	public static String selectReservationQuery(Reservation reservation) {
+		int id = reservation.getId();
+
+		if (id < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get reservation entity with impossiable id: " + id);
+			return null;
+		}
+		return "SELECT * FROM reservations WHERE rId = " + id + ';';
+	}
+
+	public static String selectAllReservationsQuery() {
+		return "SELECT * FROM reservations ;";
+
+	}
+
+	public static String updateReservationQuery(Reservation reservation) {
+		int reservationId = reservation.getId();
+		if (reservationId < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get reservation entity with impossiable ID: " + reservationId);
+			return null;
+		}
+
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("UPDATE reservations SET ");
+		stringBuilder.append("rType = '");
+		stringBuilder.append(reservation.getType());
+		stringBuilder.append("', rNumberOfItems = ");
+		stringBuilder.append(reservation.getNumberOfItems());
+		stringBuilder.append(", rPrice = ");
+		stringBuilder.append(reservation.getPrice());
+		stringBuilder.append(", rDeliveryDate = '");
+		stringBuilder.append(s_dateTimeFormat.format(reservation.getDeliveryDate()));
+		stringBuilder.append("', rDeliveryType = '");
+		stringBuilder.append(reservation.getDeliveryType());
+		stringBuilder.append("', rDeliveryAddress = '");
+		stringBuilder.append(reservation.getDeliveryAddress());
+		stringBuilder.append("', rDeliveryPhone = '");
+		stringBuilder.append(reservation.getDeliveryPhone());
+		stringBuilder.append("', rDeliveryName = '");
+		stringBuilder.append(reservation.getDeliveryName());
+		stringBuilder.append("' WHERE rId = ");
+		stringBuilder.append(reservationId);
+		stringBuilder.append(';');
+
+		return stringBuilder.toString();
+	}
+
+	public static String insertReservationQuery(Reservation reservation) {
+		int costumerId = reservation.getCostumerId();
+		int shopManagerId = reservation.getShopManagerId();
+
+		if (shopManagerId < 1 || costumerId < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get reservation entity with impossiable ID's: costumer ID = "
+					+ costumerId + ", shop manager ID=" + shopManagerId);
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(
+				"INSERT INTO reservations (cId,smId,rType,rNumberOfItems,rPrice,rBlessingCard,rDeliveryDate,rDeliveryType,rDeliveryAddress,rDeliveryPhone,rDeliveryName) VALUES (");
+		stringBuilder.append(costumerId);
+		stringBuilder.append(',');
+		stringBuilder.append(shopManagerId);
+		stringBuilder.append(",'");
+		stringBuilder.append(reservation.getType());
+		stringBuilder.append("',");
+		stringBuilder.append(reservation.getNumberOfItems());
+		stringBuilder.append(',');
+		stringBuilder.append(reservation.getPrice());
+		stringBuilder.append(",'");
+		stringBuilder.append(s_dateTimeFormat.format(reservation.getDeliveryDate()));
+		stringBuilder.append("','");
+		stringBuilder.append(reservation.getDeliveryType());
+		stringBuilder.append("','");
+		stringBuilder.append(reservation.getDeliveryAddress());
+		stringBuilder.append("','");
+		stringBuilder.append(reservation.getDeliveryPhone());
+		stringBuilder.append("','");
+		stringBuilder.append(reservation.getDeliveryName());
+		stringBuilder.append("');");
+		return stringBuilder.toString();
+	}
+
+	// end region -> Reservation Entity
+
+	// region Survey Entity
+
+	public static String insertSurveyQuery(Survey survey) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> Survey Entity
+
+	// region Complaints Entity
+
+	public static String selectComplaintQuery(Complaint complaint) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String selectAllComplaintsQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String updateComplaintQuery(Complaint complaint) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String insertComplaintQuery(Complaint complaint) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> Complaints Entity
+
+	// region ItemsInShops Entity
+
+	public static String selectAllItemsInShopsQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String updateItemInShopQuery(ItemInShop itemInShop) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String insertItemInShopQuery(ItemInShop itemInShop) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String removeItemInShopQuery(ItemInShop itemInShop) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> ItemsInShops Entity
+
+	// region ItemInReservation Entity
+
+	public static String selectAllIItemsInReservationQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String insertItemInReservationQuery(ItemInReservation itemInReservation) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> ItemInReservation Entity
+
+	// region ShopEmployee Entity
+
+	public static String selectShopEmployeeQuery(ShopEmployee shopEmployee) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String selectShopEmployeesQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> ShopEmployee Entity
+
+	// region ShopManager Entity
+
+	public static String selectShopManagerQuery(ShopManager shopManager) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String selectShopManagersQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> ShopManager Entity
+
+	// region ReservationsReport Entity
+
+	public static String selectReservationsReportQuery(ReservationsReport reservationsReport) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String selectReservationsReportsQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String insertReservationsReportQuery(ReservationsReport reservationsReport) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> ReservationsReport Entity
+
+	// region IncomesReport Entity
+
+	public static String selectIncomesReportQuery(IncomesReport incomesReport) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String selectIncomesReportQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String insertIncomesReportQuery(IncomesReport incomesReport) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> IncomesReport Entity
+
+	// region SurveysReport Entity
+
+	public static String selectSurveysReportQuery(SurveysReport surveysReport) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String selectSurveysReportQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String insertSurveysReportQuery(SurveysReport surveysReport) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> SurveysReport Entity
+
+	// region ComplaintsReport Entity
+
+	public static String selectComplaintsReporttQuery(ComplaintsReport complaintsReport) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String selectComplaintsReportQuery() {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	public static String insertComplaintsReportQuery(ComplaintsReport complaintsReport) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	// end region -> ComplaintsReport Entity
+}
