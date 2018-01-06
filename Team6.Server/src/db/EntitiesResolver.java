@@ -40,13 +40,13 @@ import newEntities.User;
  * instances of {@link IEntity} from received element.
  * 
  */
-public class NewEntitiesResolver {
+public class EntitiesResolver {
 
 	/**
 	 * The constructor is empty to ensure that it will not be possible to create
 	 * instance of this class.
 	 */
-	private NewEntitiesResolver() {
+	private EntitiesResolver() {
 
 	}
 

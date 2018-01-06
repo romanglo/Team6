@@ -17,7 +17,7 @@ import configurations.DbConfiguration;
 import configurations.ServerConfiguration;
 import connectivity.Server;
 import db.DbController;
-import db.NewMessagesResolver;
+import db.MessagesResolver;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -109,7 +109,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	private Logger m_logger;
 
-	private NewMessagesResolver m_messageResolver;
+	private MessagesResolver m_messageResolver;
 
 	private final static DateTimeFormatter s_dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -210,7 +210,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		m_server.setServerActionHandler(this);
 		m_server.setClientConnectionHandler(this);
 		
-		m_messageResolver = new NewMessagesResolver(m_dbContoller);
+		m_messageResolver = new MessagesResolver(m_dbContoller);
 
 		m_server.setMessagesHandler(m_messageResolver);
 	}

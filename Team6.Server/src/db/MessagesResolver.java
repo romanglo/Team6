@@ -41,7 +41,7 @@ import newMessages.RespondMessageData;
  * 
  * @see connectivity.Server.MessagesHandler
  */
-public class NewMessagesResolver implements Server.MessagesHandler {
+public class MessagesResolver implements Server.MessagesHandler {
 
 	// region Fields
 
@@ -54,26 +54,26 @@ public class NewMessagesResolver implements Server.MessagesHandler {
 	// region Constructors
 
 	/**
-	 * Create an instance of {@link NewMessagesResolver}, A logger will be created
+	 * Create an instance of {@link MessagesResolver}, A logger will be created
 	 * by {@link LogManager}
 	 *
 	 * @param dbController
 	 *            A connection with the DB.
 	 */
-	public NewMessagesResolver(DbController dbController) {
+	public MessagesResolver(DbController dbController) {
 		m_dbController = dbController;
 		m_logger = LogManager.getLogger();
 	}
 
 	/**
-	 * Create an instance of {@link NewMessagesResolver}.
+	 * Create an instance of {@link MessagesResolver}.
 	 *
 	 * @param logger
 	 *            A logger that the instance will log to it.
 	 * @param dbController
 	 *            A connection with the DB.
 	 */
-	public NewMessagesResolver(Logger logger, DbController dbController) {
+	public MessagesResolver(Logger logger, DbController dbController) {
 		m_dbController = dbController;
 		m_logger = logger;
 	}
@@ -89,7 +89,7 @@ public class NewMessagesResolver implements Server.MessagesHandler {
 			if (queryResult == null) {
 				return null;
 			}
-			List<IEntity> itemEntities = NewEntitiesResolver.ResultSetToEntity(queryResult, expectedType);
+			List<IEntity> itemEntities = EntitiesResolver.ResultSetToEntity(queryResult, expectedType);
 			if (itemEntities == null) {
 				return null;
 			}
