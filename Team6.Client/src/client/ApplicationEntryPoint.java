@@ -9,13 +9,12 @@ import com.sun.istack.internal.Nullable;
 
 import common.UncaughetExceptions;
 import controllers.LoginController;
-import entities.UserEntity;
+import newEntities.User;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import logger.LogManager;
 
 /**
@@ -42,7 +41,7 @@ public class ApplicationEntryPoint extends Application
 	/**
 	 * The connected user, can be <code>null</code> if no connected user exists.
 	 */
-	@Nullable public static UserEntity ConnectedUser = null;
+	@Nullable public static User ConnectedUser = null;
 
 	/* End of --> Fields region */
 

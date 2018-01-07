@@ -8,8 +8,8 @@ import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
-import entities.IEntity;
-import entities.UserEntity;
+import newEntities.IEntity;
+import newEntities.User;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -31,11 +31,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.EntityData;
-import messages.IMessageData;
-import messages.LoginData;
-import messages.Message;
-import messages.MessagesFactory;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.LoginData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
 
 /**
  *
@@ -223,14 +223,14 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 		IEntity entity = ((EntityData) messageData).getEntity();
 
-		if (!(entity instanceof UserEntity)) {
+		if (!(entity instanceof User)) {
 			m_logger.warning(
 					"Received not expected IEntity! Expected : UserEntity, received " + entity.getClass().getName());
 			return;
 		}
 
-		UserEntity userEntity = (UserEntity) entity;
-		switch (userEntity.getUserStatus()) {
+		User userEntity = (User) entity;
+		switch (userEntity.getStatus()) {
 			case Connected:
 				m_logger.info(
 						"The user is trying to connect while this user is already connected in other place! User details: "
@@ -308,11 +308,11 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		showInformationMessage("Login Failed! Reason:\n" + loginData.getMessage());
 	}
 
-	private void showUserWindow(UserEntity userEntity)
+	private void showUserWindow(User userEntity)
 	{
 		URL url = null;
 
-		switch (userEntity.getUserPrivilege()) {
+		switch (userEntity.getPrivilege()) {
 			case Administrator:
 				url = getClass().getResource("/boundaries/Administrator.FXML");
 			break;

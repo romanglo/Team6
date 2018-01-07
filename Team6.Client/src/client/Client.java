@@ -172,12 +172,16 @@ public class Client extends AbstractClient
 		}
 
 		if (!(msg instanceof Message)) {
-			m_logger.info("A message was received from the server, but the message type is not dirived from Message.");
+			m_logger.info("A message was received from the server, but the message type is not dirived from Message");
 			return;
 		}
 
-		m_logger.info("A message received from the server.");
-
+		
+		if(m_messageReceiveHandler== null) {
+			m_logger.info("A message received from the server, but does not registered a handler so the message is thrown out");
+		} else {
+			m_logger.info("A message received from the server.");
+		}
 		Message message = (Message) msg;
 		try {
 			m_messageReceiveHandler.onMessageReceived(message);
