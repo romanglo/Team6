@@ -25,8 +25,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.Message;
-
+import newMessages.Message;
 
 /**
  *
@@ -143,7 +142,6 @@ public class AdministratorController implements Initializable, Client.ClientStat
 		Stage primaryStage = new Stage();
 		FXMLLoader loader = new FXMLLoader();
 		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Update.fxml").openStream());
-		Administrator_StatusController Administrator_StatusController  = loader.getController();
 		
 		
 		Scene scene = new Scene(root);			
@@ -164,30 +162,6 @@ public class AdministratorController implements Initializable, Client.ClientStat
 	{
 		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
 	}
-	
-	/**
-	 * TODO раам: Auto-generated comment stub - Change it!
-	 *
-	 * @param e
-	 * @throws IOException
-	 */
-	/*@SuppressWarnings("javadoc") public void coordinatesUpdate (ActionEvent e) throws IOException
-	{
-		((Node)e.getSource()).getScene().getWindow().hide(); //hiding primary window
-		Stage primaryStage = new Stage();
-		FXMLLoader loader = new FXMLLoader();
-		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinates.fxml").openStream());
-		Administrator_CoordinatesController Administrator_CoordinatesController  = loader.getController();
-		
-		
-		Scene scene = new Scene(root);			
-		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
-		
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Change User Status & Privillige");
-		primaryStage.show();
-		
-	}*/
 
 	/**
 	 * {@inheritDoc}
