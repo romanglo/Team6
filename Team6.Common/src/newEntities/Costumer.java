@@ -19,10 +19,6 @@ public class Costumer extends User
 
 	private int m_id;
 
-	private String m_creditCard;
-
-	private EntitiesEnums.CostumerSubscription m_costumerSubscription;
-
 	private float m_balance;
 
 	/**
@@ -40,40 +36,6 @@ public class Costumer extends User
 	public void setId(int id)
 	{
 		m_id = id;
-	}
-
-	/**
-	 * @return the creditCard
-	 */
-	public String getCreditCard()
-	{
-		return m_creditCard;
-	}
-
-	/**
-	 * @param creditCard
-	 *            the creditCard to set
-	 */
-	public void setCreditCard(String creditCard)
-	{
-		m_creditCard = creditCard;
-	}
-
-	/**
-	 * @return the costumerSubscription
-	 */
-	public EntitiesEnums.CostumerSubscription getCostumerSubscription()
-	{
-		return m_costumerSubscription;
-	}
-
-	/**
-	 * @param costumerSubscription
-	 *            the costumerSubscription to set
-	 */
-	public void setCostumerSubscription(EntitiesEnums.CostumerSubscription costumerSubscription)
-	{
-		m_costumerSubscription = costumerSubscription;
 	}
 
 	/**
@@ -99,8 +61,7 @@ public class Costumer extends User
 	@Override
 	public String toString()
 	{
-		return "Costumer [id=" + m_id + ", creditCard=" + m_creditCard + ", costumerSubscription="
-				+ m_costumerSubscription + ", balance=" + m_balance + ", user=" + super.toString() + "]";
+		return "Costumer [id=" + m_id + ", balance=" + m_balance + ", user=" + super.toString() + "]";
 	}
 
 	/**

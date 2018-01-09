@@ -18,8 +18,6 @@ CREATE TABLE users (
 CREATE TABLE costumers (
   cId INT AUTO_INCREMENT,
   uUserName VARCHAR(20),
-  cCreditCard VARCHAR(16) NULL DEFAULT NULL,
-  cCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
   cBalance FLOAT NOT NULL DEFAULT 0,
   PRIMARY KEY (cId),
   UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
@@ -32,6 +30,15 @@ CREATE TABLE shop_managers (
   FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION,
   UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
   PRIMARY KEY (smId)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE costumers_in_shops (
+	cId INT NOT NULL,
+	smId INT NOT NULL,
+	csCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
+	FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE CASCADE ON UPDATE NO ACTION,
+	FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
+	PRIMARY KEY (cId,smId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE shop_employees (
@@ -59,6 +66,7 @@ CREATE TABLE reservations (
   rId INT AUTO_INCREMENT,
   cId INT,
   smId INT,
+  rCreditCard VARCHAR(16) NULL DEFAULT NULL,
   rType VARCHAR(7) NULL DEFAULT 'Open',
   rNumberOfItems INT NOT NULL DEFAULT 0,
   rPrice FLOAT NOT NULL DEFAULT 0,
@@ -108,16 +116,32 @@ CREATE TABLE complaints (
 
 CREATE TABLE surveys (
   suId INT AUTO_INCREMENT,
-  suDate DATE NOT NULL DEFAULT '0000-00-00',
-  smId INT NOT NULL,
-  suAnswer1 INT NOT NULL DEFAULT 0,
-  suAnswer2 INT NOT NULL DEFAULT 0,
-  suAnswer3 INT NOT NULL DEFAULT 0,
-  suAnswer4 INT NOT NULL DEFAULT 0,
-  suAnswer5 INT NOT NULL DEFAULT 0,
-  suAnswer6 INT NOT NULL DEFAULT 0,
-  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  suQuestion1 VARCHAR(50) NOT NULL,
+  suQuestion2 VARCHAR(50) NOT NULL,
+  suQuestion3 VARCHAR(50) NOT NULL,
+  suQuestion4 VARCHAR(50) NOT NULL,
+  suQuestion5 VARCHAR(50) NOT NULL,
+  suQuestion6 VARCHAR(50) NOT NULL,
   PRIMARY KEY (suId)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE surveys_in_shops (
+  ssId INT AUTO_INCREMENT,
+  suId INT NOT NULL,
+  smId INT NOT NULL,
+  saStartDate DATE NOT NULL DEFAULT '0000-00-00',
+  saAnswer1 INT NOT NULL DEFAULT 0,
+  saAnswer2 INT NOT NULL DEFAULT 0,
+  saAnswer3 INT NOT NULL DEFAULT 0,
+  saAnswer4 INT NOT NULL DEFAULT 0,
+  saAnswer5 INT NOT NULL DEFAULT 0,
+  saAnswer6 INT NOT NULL DEFAULT 0,
+  saNumberOfAnswers INT NOT NULL DEFAULT 0,
+  saSummary VARCHAR(500) NULL DEFAULT NULL, 
+  saClosed BIT(1) NOT NULL DEFAULT 0,
+  FOREIGN KEY (suId) REFERENCES surveys (suId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  PRIMARY KEY (ssId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -228,12 +252,15 @@ BEGIN
 	END IF;
 
 	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
-			AVG(suAnswer1) AS 'First Question Average',AVG(suAnswer2) AS 'Second Question Average', 
-			AVG(suAnswer3) AS 'Third Question Average',	AVG(suAnswer4) AS 'Fourth Question Average',
-			AVG(suAnswer5) AS 'Fifth Question Average',AVG(suAnswer6) AS 'Sixth Question Average'
-	FROM surveys WHERE 
-	            smId = shop_manager_id AND YEAR(suDate) = in_year AND
-	            MONTH(suDate) >= start_month AND MONTH(suDate) <= end_month;
+			saAnswer1 / saNumberOfAnswers AS 'First Question Average',
+			saAnswer2 / saNumberOfAnswers AS 'Second Question Average', 
+			saAnswer3 / saNumberOfAnswers AS 'Third Question Average',
+			saAnswer4 / saNumberOfAnswers AS 'Fourth Question Average',
+			saAnswer5 / saNumberOfAnswers AS 'Fifth Question Average', 
+			saAnswer6 / saNumberOfAnswers AS 'Sixth Question Average'
+	FROM surveys_in_shops WHERE 
+	            smId = shop_manager_id AND YEAR(saStartDate) = in_year AND
+	            MONTH(saStartDate) >= start_month AND MONTH(saStartDate) <= end_month;
 END; //
 
 CREATE PROCEDURE getShopNumberOfComplaints( shop_manager_id INT , in_year YEAR , quarter INT)
@@ -421,11 +448,19 @@ BEGIN
 	
 END; //
 
-CREATE TRIGGER insert_survey
-BEFORE INSERT ON surveys FOR EACH ROW
+CREATE TRIGGER insert_surveys_in_shops
+BEFORE INSERT ON surveys_in_shops FOR EACH ROW
 BEGIN
-    IF (NEW.suDate = '0000-00-00') THEN 
-        SET NEW.suDate = NOW();
+    IF (NEW.saStartDate = '0000-00-00') THEN 
+        SET NEW.saStartDate = NOW();
+    END IF;
+END; //
+
+CREATE TRIGGER update_surveys_in_shops
+BEFORE UPDATE ON surveys_in_shops FOR EACH ROW
+BEGIN
+    IF (NEW.saSummary != NULL AND NEW.saClosed = 0) THEN 
+        SET NEW.saClosed = 1;
     END IF;
 END; //
 
@@ -434,6 +469,14 @@ BEFORE INSERT ON complaints FOR EACH ROW
 BEGIN
     IF (NEW.coDate = '0000-00-00') THEN 
         SET NEW.coDate = NOW();
+    END IF;
+END; //
+
+CREATE TRIGGER update_complaint
+BEFORE INSERT ON complaints FOR EACH ROW
+BEGIN
+    IF (NEW.coSummary != NULL AND NEW.coOpened = 1) THEN 
+        SET NEW.coOpened = 0;
     END IF;
 END; //
 
@@ -499,16 +542,21 @@ LOCK TABLES costumers WRITE;
 INSERT INTO costumers (uUserName) VALUES
 ('costumer');
 
+LOCK TABLES costumers_in_shops WRITE;
+INSERT INTO costumers_in_shops (cId,smId) VALUES
+(1,1);
+
 LOCK TABLES surveys WRITE;
-INSERT INTO surveys (smId,suAnswer1,suAnswer2,suAnswer3,suAnswer4,suAnswer5,suAnswer6) VALUES
-(1,1,2,3,4,5,6),
-(1,2,5,3,2,7,10),
-(1,5,6,3,2,4,7),
-(1,9,6,2,3,3,10);
+INSERT INTO surveys (suQuestion1,suQuestion2,suQuestion3,suQuestion4,suQuestion5,suQuestion6) VALUES
+('Question 1','Question 2', 'Question 3', 'Question 4', 'Question 5', 'Question 6');
+
+LOCK TABLES surveys_in_shops WRITE;
+INSERT INTO surveys_in_shops (smId,suId,saAnswer1,saAnswer2,saAnswer3,saAnswer4,saAnswer5,saAnswer6,saNumberOfAnswers) VALUES
+(1,1,4,4,4,4,4,4,2);
 
 LOCK TABLES reservations WRITE;
-INSERT INTO reservations (cId, smId, rType, rNumberOfItems, rPrice, rBlessingCard, rDeliveryType, rDeliveryAddress, rDeliveryPhone, rDeliveryName) VALUES 
-(1,1,'Closed',2,10, 'Happy Birthday', 'Immediate','Ort Braude','049981111','Dolev');
+INSERT INTO reservations (cId, smId,rCreditCard, rType, rNumberOfItems, rPrice, rBlessingCard, rDeliveryType, rDeliveryAddress, rDeliveryPhone, rDeliveryName) VALUES 
+(1,1,'1234123412341234','Closed',2,10, 'Happy Birthday', 'Immediate','Ort Braude','049981111','Dolev');
 
 LOCK TABLES items_in_reservations WRITE;
 INSERT INTO items_in_reservations (rId, iId, iName, irQuantity, irPrice) VALUES 
