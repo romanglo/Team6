@@ -91,4 +91,24 @@ package newEntities;
 
 		Connected, Disconnected, Blocked
 	}
+	
+	/**
+	 *
+	 * ReportType: Enumeration of the report types.
+	 * 
+	 */
+	public enum ReportType {
+
+		Financial_Incomes_Report, Complaints_Report, Reservations_Report,Satisfaction_Report
+	}
+	
+	/**
+	 *
+	 * Quarter: Enumeration of the quarter.
+	 * 
+	 */
+	public enum Quarter {
+
+		Jan_Mar, Apr_Jun, Jul_Sep,Oct_Dec
+	}
 }
