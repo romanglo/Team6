@@ -22,8 +22,10 @@ import newEntities.ItemInShop;
 import newEntities.Reservation;
 import newEntities.ReservationsReport;
 import newEntities.ShopCatalogData;
+import newEntities.ShopCostumer;
 import newEntities.ShopEmployee;
 import newEntities.ShopManager;
+import newEntities.ShopSurvey;
 import newEntities.Survey;
 import newEntities.SurveysReport;
 import newEntities.User;
@@ -93,11 +95,11 @@ public class MessagesResolver implements Server.MessagesHandler {
 			if (queryResult == null) {
 				return null;
 			}
-			List<IEntity> itemEntities = EntitiesResolver.ResultSetToEntity(queryResult, expectedType);
-			if (itemEntities == null) {
+			List<IEntity> entities = EntitiesResolver.ResultSetToEntity(queryResult, expectedType);
+			if (entities == null) {
 				return null;
 			}
-			return itemEntities.isEmpty() ? null : new EntitiesListData(EntityDataOperation.None, itemEntities);
+			return entities.isEmpty() ? null : new EntitiesListData(EntityDataOperation.None, entities);
 
 		} catch (Exception e) {
 			m_logger.warning(
@@ -311,10 +313,13 @@ public class MessagesResolver implements Server.MessagesHandler {
 		}
 
 		IMessageData returnedMessageData = null;
-		if (receivedEntity instanceof User) {
-			returnedMessageData = onUserEntityReceived((User) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof Item) {
+		if (receivedEntity instanceof Item) {
 			returnedMessageData = onItemEntityReceived((Item) receivedEntity, entityData.getOperation());
+		} else if (receivedEntity instanceof ShopSurvey) {
+			returnedMessageData = onShopSurveyEntityReceived((ShopSurvey) receivedEntity, entityData.getOperation());
+		} else if (receivedEntity instanceof ShopCostumer) {
+			returnedMessageData = onShopCostumerEntityReceived((ShopCostumer) receivedEntity,
+					entityData.getOperation());
 		} else if (receivedEntity instanceof Costumer) {
 			returnedMessageData = onCostumerEntityReceived((Costumer) receivedEntity, entityData.getOperation());
 		} else if (receivedEntity instanceof Reservation) {
@@ -345,12 +350,24 @@ public class MessagesResolver implements Server.MessagesHandler {
 		} else if (receivedEntity instanceof ReservationsReport) {
 			returnedMessageData = onReservationsReportEntityReceived((ReservationsReport) receivedEntity,
 					entityData.getOperation());
+		} else if (receivedEntity instanceof User) {
+			returnedMessageData = onUserEntityReceived((User) receivedEntity, entityData.getOperation());
 		}
 		if (returnedMessageData != null && returnedMessageData instanceof RespondMessageData) {
 			((RespondMessageData) returnedMessageData).setMessageData(entityData);
 		}
 
 		return returnedMessageData;
+	}
+
+	private IMessageData onShopCostumerEntityReceived(ShopCostumer receivedEntity, EntityDataOperation operation) {
+		return null;
+		// TODO Roman: Auto-generated method stub
+	}
+
+	private IMessageData onShopSurveyEntityReceived(ShopSurvey receivedEntity, EntityDataOperation operation) {
+		return null;
+		// TODO Roman: Auto-generated method stub
 	}
 
 	// end region -> Server.MessagesHandler Implementation
@@ -640,12 +657,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			}
 			break;
 		case GetALL:
-			String selectAllQuery = null;
-			if (complaint == null) {
-				selectAllQuery = QueryGenerator.selectAllComplaintsQuery();
-			} else {
-				selectAllQuery = QueryGenerator.selectComplaintQuery(complaint);
-			}
+			String selectAllQuery = QueryGenerator.selectAllComplaintsQuery();
 			if (selectAllQuery != null) {
 				return executeSelectQuery(selectAllQuery, Complaint.class);
 			}
@@ -660,7 +672,13 @@ public class MessagesResolver implements Server.MessagesHandler {
 				complaint.setId(lastInsertId);
 			}
 			break;
-
+		case Update:
+			String updateQuery = QueryGenerator.updateComplaintQuery(complaint);
+			if (updateQuery != null) {
+				result = executeQuery(complaint, updateQuery);
+			}
+			break;
+			
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + complaint.toString()
 					+ ", Operation: " + operation.toString());

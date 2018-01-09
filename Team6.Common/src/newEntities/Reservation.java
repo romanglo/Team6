@@ -49,6 +49,8 @@ public class Reservation implements IEntity
 
 	private String m_deliveryName;
 
+	private String m_creditCard;
+
 	/**
 	 * @return the id
 	 */
@@ -254,16 +256,33 @@ public class Reservation implements IEntity
 	}
 
 	/**
+	 * @return the creditCard
+	 */
+	public String getCreditCard()
+	{
+		return m_creditCard;
+	}
+
+	/**
+	 * @param creditCard
+	 *            the creditCard to set
+	 */
+	public void setCreditCard(String creditCard)
+	{
+		m_creditCard = creditCard;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString()
 	{
 		return "Reservation [id=" + m_id + ", costumerId=" + m_costumerId + ", shopManagerId=" + m_shopManagerId
-				+ ", type=" + m_type + ", numberOfItems=" + m_numberOfItems + ", price=" + m_price + ", deliveryDate="
-				+ s_dateForamt.format(m_deliveryDate) + ", blessingCard=" + m_blessingCard + ", deliveryType="
-				+ m_deliveryType + ", deliveryAddress=" + m_deliveryAddress + ", deliveryPhone=" + m_deliveryPhone
-				+ ", deliveryName=" + m_deliveryName + "]";
+				+ ", creditCard=" + m_creditCard + ", type=" + m_type + ", numberOfItems=" + m_numberOfItems
+				+ ", price=" + m_price + ", deliveryDate=" + s_dateForamt.format(m_deliveryDate) + ", blessingCard="
+				+ m_blessingCard + ", deliveryType=" + m_deliveryType + ", deliveryAddress=" + m_deliveryAddress
+				+ ", deliveryPhone=" + m_deliveryPhone + ", deliveryName=" + m_deliveryName + "]";
 	}
 
 	/**
@@ -299,5 +318,4 @@ public class Reservation implements IEntity
 		}
 		return true;
 	}
-
 }

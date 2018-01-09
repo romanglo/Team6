@@ -28,8 +28,10 @@ import newEntities.ComplaintsReport;
 import newEntities.Costumer;
 import newEntities.Reservation;
 import newEntities.ReservationsReport;
+import newEntities.ShopCostumer;
 import newEntities.ShopEmployee;
 import newEntities.ShopManager;
+import newEntities.ShopSurvey;
 import newEntities.Survey;
 import newEntities.SurveysReport;
 import newEntities.User;
@@ -112,9 +114,101 @@ public class EntitiesResolver {
 			returningList = ResultSetToSurveyEntities(resultSet);
 		} else if (expectedType.equals(SurveysReport.class)) {
 			returningList = ResultSetToSurveysReportEntities(resultSet);
+		} else if (expectedType.equals(ShopSurvey.class)) {
+			returningList = ResultSetToShopSurveysEntities(resultSet);
+		} else if (expectedType.equals(ShopCostumer.class)) {
+			returningList = ResultSetToShopCostumersEntities(resultSet);
 		}
 
 		return returningList;
+	}
+
+	/**
+	 * The method received {@link ResultSet} and resolve it to {@link List} of
+	 * {@link ShopCostumer} entity that describes a shop catalog.
+	 *
+	 * @param resultSet
+	 *            A {@link ResultSet} which will be resolved in it to {@link List}
+	 *            of {@link ShopCostumer} entity.
+	 * @return An {@link List} of {@link ShopCostumer} entity if the resolving
+	 *         succeed, and <code>null</code> if did not.
+	 */
+
+	private static List<IEntity> ResultSetToShopCostumersEntities(ResultSet resultSet) {
+		ArrayList<IEntity> ShopCostumerEntities = new ArrayList<>();
+		int failedResolve = 0;
+		try {
+			while (resultSet.next()) {
+				ShopCostumer shopCostumer = new ShopCostumer();
+				try {
+					shopCostumer.setCostumerId(resultSet.getInt(1));
+					shopCostumer.setShopManagerId(resultSet.getInt(2));
+					shopCostumer
+							.setCostumerSubscription(Enum.valueOf(CostumerSubscription.class, resultSet.getString(3)));
+					ShopCostumerEntities.add(shopCostumer);
+				} catch (Exception ignored) {
+					failedResolve++;
+				}
+			}
+		} catch (SQLException e) {
+			s_logger.warning("Failed to resolve an ResultSet to Shop Costumer entity, exception:" + e.getMessage());
+			return null;
+		}
+
+		if (failedResolve != 0) {
+			s_logger.warning("Failed to resolve " + failedResolve + " rows to Shop Costumer entity.");
+		}
+
+		return ShopCostumerEntities.isEmpty() ? null : ShopCostumerEntities;
+	}
+
+	/**
+	 * The method received {@link ResultSet} and resolve it to {@link List} of
+	 * {@link ShopSurvey} entity that describes a shop catalog.
+	 *
+	 * @param resultSet
+	 *            A {@link ResultSet} which will be resolved in it to {@link List}
+	 *            of {@link ShopSurvey} entity.
+	 * @return An {@link List} of {@link ShopSurvey} entity if the resolving
+	 *         succeed, and <code>null</code> if did not.
+	 */
+	private static List<IEntity> ResultSetToShopSurveysEntities(ResultSet resultSet) {
+		ArrayList<IEntity> shopManagerEntities = new ArrayList<>();
+		int failedResolve = 0;
+		try {
+			while (resultSet.next()) {
+				ShopSurvey shopSurvey = new ShopSurvey();
+				try {
+					shopSurvey.setId(resultSet.getInt(1));
+					shopSurvey.setSurveyId(resultSet.getInt(2));
+					shopSurvey.setShopManagerId(resultSet.getInt(3));
+					Date sqlDate = resultSet.getDate(4);
+					java.util.Date javaData = new java.util.Date(sqlDate.getTime());
+					shopSurvey.setStartDate(javaData);
+					shopSurvey.setAnswer1(resultSet.getInt(5));
+					shopSurvey.setAnswer2(resultSet.getInt(6));
+					shopSurvey.setAnswer3(resultSet.getInt(7));
+					shopSurvey.setAnswer4(resultSet.getInt(8));
+					shopSurvey.setAnswer5(resultSet.getInt(9));
+					shopSurvey.setAnswer6(resultSet.getInt(10));
+					shopSurvey.setNumberOfAnswers(resultSet.getInt(11));
+					shopSurvey.setSummary(resultSet.getString(12));
+					shopSurvey.setClosed(resultSet.getInt(13) == 1 ? true : false);
+					shopManagerEntities.add(shopSurvey);
+				} catch (Exception ignored) {
+					failedResolve++;
+				}
+			}
+		} catch (SQLException e) {
+			s_logger.warning("Failed to resolve an ResultSet to Shop Survey entity, exception:" + e.getMessage());
+			return null;
+		}
+
+		if (failedResolve != 0) {
+			s_logger.warning("Failed to resolve " + failedResolve + " rows to Shop Survey entity.");
+		}
+
+		return shopManagerEntities.isEmpty() ? null : shopManagerEntities;
 	}
 
 	/**
@@ -226,16 +320,13 @@ public class EntitiesResolver {
 			while (resultSet.next()) {
 				Survey survey = new Survey();
 				try {
-					survey.setShopManagerId(resultSet.getInt(1));
-					Date mysqlDate = resultSet.getDate(2);
-					survey.setSurveyDate(new java.util.Date(mysqlDate.getTime()));
-					survey.setShopManagerId(resultSet.getInt(3));
-					survey.setFourthAnswer(resultSet.getInt(4));
-					survey.setSecondAnswer(resultSet.getInt(5));
-					survey.setThirdAnswer(resultSet.getInt(6));
-					survey.setFourthAnswer(resultSet.getInt(7));
-					survey.setFifthAnswer(resultSet.getInt(8));
-					survey.setSixthAnswer(resultSet.getInt(9));
+					survey.setId(resultSet.getInt(1));
+					survey.setFirstQuestion(resultSet.getString(2));
+					survey.setSecondQuestion(resultSet.getString(3));
+					survey.setThirdQuestion(resultSet.getString(4));
+					survey.setFourthQuestion(resultSet.getString(5));
+					survey.setFifthQuestion(resultSet.getString(6));
+					survey.setSixthQuestion(resultSet.getString(7));
 					surveyEntities.add(survey);
 				} catch (Exception ignored) {
 					failedResolve++;
@@ -638,9 +729,7 @@ public class EntitiesResolver {
 				try {
 					costumer.setId(resultSet.getInt(1));
 					costumer.setUserName(resultSet.getString(2));
-					costumer.setCreditCard(resultSet.getString(3));
-					costumer.setCostumerSubscription(CostumerSubscription.valueOf(resultSet.getString(4)));
-					costumer.setBalance(resultSet.getFloat(5));
+					costumer.setBalance(resultSet.getFloat(3));
 					costumerEntities.add(costumer);
 				} catch (Exception ignored) {
 					failedResolve++;
@@ -717,16 +806,17 @@ public class EntitiesResolver {
 					reservation.setId(resultSet.getInt(1));
 					reservation.setCostumerId(resultSet.getInt(2));
 					reservation.setShopManagerId(resultSet.getInt(3));
-					reservation.setType(Enum.valueOf(ReservationType.class, resultSet.getString(4)));
-					reservation.setNumberOfItems(resultSet.getInt(5));
-					reservation.setPrice(resultSet.getFloat(6));
-					reservation.setBlessingCard(resultSet.getString(7));
-					Date mysqlDate = resultSet.getDate(8);
+					reservation.setCreditCard(resultSet.getString(4));
+					reservation.setType(Enum.valueOf(ReservationType.class, resultSet.getString(5)));
+					reservation.setNumberOfItems(resultSet.getInt(6));
+					reservation.setPrice(resultSet.getFloat(7));
+					reservation.setBlessingCard(resultSet.getString(8));
+					Date mysqlDate = resultSet.getDate(9);
 					reservation.setDeliveryDate(new java.util.Date(mysqlDate.getTime()));
-					reservation.setDeliveryType(Enum.valueOf(ReservationDeliveryType.class, resultSet.getString(9)));
-					reservation.setDeliveryAddress(resultSet.getString(10));
-					reservation.setDeliveryPhone(resultSet.getString(11));
+					reservation.setDeliveryType(Enum.valueOf(ReservationDeliveryType.class, resultSet.getString(10)));
+					reservation.setDeliveryAddress(resultSet.getString(11));
 					reservation.setDeliveryPhone(resultSet.getString(12));
+					reservation.setDeliveryPhone(resultSet.getString(13));
 					reservationEntities.add(reservation);
 				} catch (Exception ignored) {
 					failedResolve++;

@@ -2,8 +2,6 @@
 package newEntities;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 /**
  *
@@ -19,25 +17,19 @@ public class Survey implements IEntity
 	 */
 	private static final long serialVersionUID = -2059679189113267694L;
 
-	private static final DateFormat s_dateForamt = new SimpleDateFormat("dd-MM-yyyy");
-
 	private int m_id;
 
-	private java.util.Date m_surveyDate;
+	private String m_firstQuestion;
 
-	private int m_shopManagerId;
+	private String m_secondQuestion;
 
-	private int m_firstAnswer;
+	private String m_thirdQuestion;
 
-	private int m_secondAnswer;
+	private String m_fourthQuestion;
 
-	private int m_thirdAnswer;
+	private String m_fifthQuestion;
 
-	private int m_fourthAnswer;
-
-	private int m_fifthAnswer;
-
-	private int m_sixthAnswer;
+	private String m_sixthQuestion;
 
 	/**
 	 * @return the Id
@@ -57,139 +49,105 @@ public class Survey implements IEntity
 	}
 
 	/**
-	 * @return the shopManagerId
+	 * @return the firstQuestion
 	 */
-	public int getShopManagerId()
+	public String getFirstQuestion()
 	{
-		return m_shopManagerId;
+		return m_firstQuestion;
 	}
 
 	/**
-	 * @param shopManagerId
-	 *            the shopManagerId to set
+	 * @param firstQuestion
+	 *            the firstQuestion to set
 	 */
-	public void setShopManagerId(int shopManagerId)
+	public void setFirstQuestion(String firstQuestion)
 	{
-		this.m_shopManagerId = shopManagerId;
+		m_firstQuestion = firstQuestion;
 	}
 
 	/**
-	 * @return the surveyDate
+	 * @return the secondQuestion
 	 */
-	public java.util.Date getSurveyDate()
+	public String getSecondQuestion()
 	{
-		return m_surveyDate;
+		return m_secondQuestion;
 	}
 
 	/**
-	 * @param surveyDate
-	 *            the surveyDate to set
+	 * @param secondQuestion
+	 *            the secondQuestion to set
 	 */
-	public void setSurveyDate(java.util.Date surveyDate)
+	public void setSecondQuestion(String secondQuestion)
 	{
-		m_surveyDate = surveyDate;
+		m_secondQuestion = secondQuestion;
 	}
 
 	/**
-	 * @return the firstAnswer
+	 * @return the thirdQuestion
 	 */
-	public int getFirstAnswer()
+	public String getThirdQuestion()
 	{
-		return m_firstAnswer;
+		return m_thirdQuestion;
 	}
 
 	/**
-	 * @param firstAnswer
-	 *            the firstAnswer to set
+	 * @param thirdQuestion
+	 *            the thirdQuestion to set
 	 */
-	public void setFirstAnswer(int firstAnswer)
+	public void setThirdQuestion(String thirdQuestion)
 	{
-		m_firstAnswer = firstAnswer;
+		m_thirdQuestion = thirdQuestion;
 	}
 
 	/**
-	 * @return the secondAnswer
+	 * @return the fourthQuestion
 	 */
-	public int getSecondAnswer()
+	public String getFourthQuestion()
 	{
-		return m_secondAnswer;
+		return m_fourthQuestion;
 	}
 
 	/**
-	 * @param secondAnswer
-	 *            the secondAnswer to set
+	 * @param fourthQuestion
+	 *            the fourthQuestion to set
 	 */
-	public void setSecondAnswer(int secondAnswer)
+	public void setFourthQuestion(String fourthQuestion)
 	{
-		m_secondAnswer = secondAnswer;
+		m_fourthQuestion = fourthQuestion;
 	}
 
 	/**
-	 * @return the thirdAnswer
+	 * @return the fifthQuestion
 	 */
-	public int getThirdAnswer()
+	public String getFifthQuestion()
 	{
-		return m_thirdAnswer;
+		return m_fifthQuestion;
 	}
 
 	/**
-	 * @param thirdAnswer
-	 *            the thirdAnswer to set
+	 * @param fifthQuestion
+	 *            the fifthQuestion to set
 	 */
-	public void setThirdAnswer(int thirdAnswer)
+	public void setFifthQuestion(String fifthQuestion)
 	{
-		m_thirdAnswer = thirdAnswer;
+		m_fifthQuestion = fifthQuestion;
 	}
 
 	/**
-	 * @return the fourthAnswer
+	 * @return the sixthQuestion
 	 */
-	public int getFourthAnswer()
+	public String getSixthQuestion()
 	{
-		return m_fourthAnswer;
+		return m_sixthQuestion;
 	}
 
 	/**
-	 * @param fourthAnswer
-	 *            the fourthAnswer to set
+	 * @param sixthQuestion
+	 *            the sixthQuestion to set
 	 */
-	public void setFourthAnswer(int fourthAnswer)
+	public void setSixthQuestion(String sixthQuestion)
 	{
-		m_fourthAnswer = fourthAnswer;
-	}
-
-	/**
-	 * @return the fifthAnswer
-	 */
-	public int getFifthAnswer()
-	{
-		return m_fifthAnswer;
-	}
-
-	/**
-	 * @param fifthAnswer
-	 *            the fifthAnswer to set
-	 */
-	public void setFifthAnswer(int fifthAnswer)
-	{
-		m_fifthAnswer = fifthAnswer;
-	}
-
-	/**
-	 * @return the sixthAnswer
-	 */
-	public int getSixthAnswer()
-	{
-		return m_sixthAnswer;
-	}
-
-	/**
-	 * @param sixthAnswer
-	 *            the sixthAnswer to set
-	 */
-	public void setSixthAnswer(int sixthAnswer)
-	{
-		m_sixthAnswer = sixthAnswer;
+		m_sixthQuestion = sixthQuestion;
 	}
 
 	/**
@@ -198,10 +156,9 @@ public class Survey implements IEntity
 	@Override
 	public String toString()
 	{
-		return "Survey [id=" + m_id + ", surveyDate=" + s_dateForamt.format(m_surveyDate) + ", shopManagerId="
-				+ m_shopManagerId + ", firstAnswer=" + m_firstAnswer + ", secondAnswer=" + m_secondAnswer
-				+ ", thirdAnswer=" + m_thirdAnswer + ", fourthAnswer=" + m_fourthAnswer + ", fifthAnswer="
-				+ m_fifthAnswer + ", sixthAnswer=" + m_sixthAnswer + "]";
+		return "Survey [id=" + m_id + "firstQuestion=" + m_firstQuestion + ", secondQuestion=" + m_secondQuestion
+				+ ", thirdQuestion=" + m_thirdQuestion + ", fourthQuestion=" + m_fourthQuestion + ", fifthQuestion="
+				+ m_fifthQuestion + ", sixthQuestion=" + m_sixthQuestion + "]";
 	}
 
 	/**

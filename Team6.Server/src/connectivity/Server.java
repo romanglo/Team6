@@ -309,7 +309,9 @@ public class Server extends AbstractServer {
 	 */
 	@Override
 	protected synchronized void clientDisconnected(ConnectionToClient client) {
-		int numberOfClients = getNumberOfClients();
+		int numberOfClients = getNumberOfClients() - 1; // Decreased because it happen only after this method in super
+														// class.
+
 		m_logger.info(
 				"The client connected: " + client.toString() + ", number of connected clients:" + numberOfClients);
 
