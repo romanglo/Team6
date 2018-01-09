@@ -214,6 +214,8 @@ public class CatalogItemRow
 	 */
 	public String getId()
 	{
+		if(m_id == null)
+			return " ";
 		return m_id.toString();
 	}
 
