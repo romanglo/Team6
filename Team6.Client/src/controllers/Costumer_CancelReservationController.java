@@ -57,7 +57,7 @@ public class Costumer_CancelReservationController
 
 	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_id;
 
-	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
+	@FXML private TableColumn<CatalogItemRow, Float> tablecolumn_price;
 
 	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_type;
 
@@ -177,7 +177,7 @@ public class Costumer_CancelReservationController
 		});
 
 		tablecolumn_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
-		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Double>("price"));
+		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
 		tablecolumn_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
 
 		catalog_table.setItems(reservationTableList);

@@ -12,6 +12,7 @@ import newEntities.IEntity;
 import newEntities.Item;
 import newEntities.ItemInReservation;
 import newEntities.Reservation;
+import newEntities.ShopCostumer;
 
 /**
  *
@@ -28,6 +29,8 @@ public class Costumer_SavedData
 	private static Costumer s_costumer;
 
 	private static ArrayList<IEntity> s_itemsInReservation;
+	
+	private static ShopCostumer s_shopCostumer;
 
 	// end region -> Fields
 
@@ -55,6 +58,14 @@ public class Costumer_SavedData
 	{
 		return s_costumer;
 	}
+	
+	/**
+	 * @return ShopCostumer.
+	 */
+	public static ShopCostumer getShopCostumer()
+	{
+		return s_shopCostumer;
+	}
 
 	/**
 	 * @return Costumer id.
@@ -77,7 +88,7 @@ public class Costumer_SavedData
 	 */
 	public static String getCreditCard()
 	{
-		return s_costumer.getCreditCard();
+		return s_reservationEntity.getCreditCard();
 	}
 
 	/**
@@ -93,7 +104,7 @@ public class Costumer_SavedData
 	 */
 	public static CostumerSubscription getSubscription()
 	{
-		return s_costumer.getCostumerSubscription();
+		return s_shopCostumer.getCostumerSubscription();
 	}
 
 	/**
@@ -184,12 +195,24 @@ public class Costumer_SavedData
 	}
 	
 	/**
+	 * Upgrade the shop of the costumer.
+	 *
+	 * @param shopCostumer
+	 *            the shopCostumer to set
+	 */
+	public static void setShopCostumer(ShopCostumer shopCostumer)
+	{
+		s_shopCostumer = shopCostumer;
+	}
+	
+	/**
 	 * @param shopManagerId
 	 *            the shopManagerId to set
 	 */
 	public static void setShopManagerId(int shopManagerId)
 	{
 		s_reservationEntity.setShopManagerId(shopManagerId);
+		s_shopCostumer.setShopManagerId(shopManagerId);
 	}
 
 
@@ -201,7 +224,7 @@ public class Costumer_SavedData
 	 */
 	public static void setCreditCard(String creditCard)
 	{
-		s_costumer.setCreditCard(creditCard);
+		s_reservationEntity.setCreditCard(creditCard);
 	}
 
 	/**
@@ -212,7 +235,7 @@ public class Costumer_SavedData
 	 */
 	public static void setSubscription(CostumerSubscription subscription)
 	{
-		s_costumer.setCostumerSubscription(subscription);
+		s_shopCostumer.setCostumerSubscription(subscription);
 	}
 
 	/**
@@ -362,6 +385,9 @@ public class Costumer_SavedData
 		s_reservationEntity = new Reservation();
 		s_reservationEntity.setCostumerId(s_costumer.getId());
 		s_reservationEntity.setType(ReservationType.Open);
+		
+		s_shopCostumer = new ShopCostumer();
+		s_shopCostumer.setCostumerId(s_costumer.getId());
 
 		s_itemsInReservation = new ArrayList<>();
 	}

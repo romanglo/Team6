@@ -230,7 +230,6 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 			m_logger.warning("Received message data not of the type requested.");
 			return;
 		}
-
 	}
 
 	/**

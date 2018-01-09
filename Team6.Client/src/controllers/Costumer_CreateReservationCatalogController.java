@@ -18,9 +18,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -31,6 +33,7 @@ import newEntities.EntitiesEnums.ProductType;
 import newEntities.IEntity;
 import newEntities.Item;
 import newEntities.ItemInReservation;
+import newEntities.ShopCatalogData;
 import newMessages.EntitiesListData;
 import newMessages.EntityData;
 import newMessages.IMessageData;
@@ -118,27 +121,6 @@ public class Costumer_CreateReservationCatalogController
 		}
 	}
 
-	/**
-	 * Parse string to the product type.
-	 * 
-	 * @param stringItemType
-	 *            Input string.
-	 * @return The product type.
-	 */
-	private ProductType ParseStringToProductType(String stringItemType)
-	{
-		if (stringItemType.equalsIgnoreCase("Flower")) {
-			return ProductType.Flower;
-		} else if (stringItemType.equalsIgnoreCase("FlowerPot")) {
-			return ProductType.FlowerPot;
-		} else if (stringItemType.equalsIgnoreCase("BridalBouquet")) {
-			return ProductType.BridalBouquet;
-		} else if (stringItemType.equalsIgnoreCase("FlowerArrangement")) {
-			return ProductType.FlowerArrangement;
-		}
-		return null;
-	}
-
 	// end region -> Private Methods
 
 	/* Initializing methods region */
@@ -192,8 +174,14 @@ public class Costumer_CreateReservationCatalogController
 					itemInReservation.setItemId(rowData.getM_id());
 					itemInReservation.setQuantity(1);
 					itemInReservation.setPrice(Float.parseFloat(rowData.getPrice()));
-					/* TODO Yoni: Add id of the reservation. Roman thinks about it. */
+					itemInReservation.setItemName(rowData.getM_name());
 					Costumer_SavedData.addItemToReservation(itemInReservation);
+					
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Item Added");
+					alert.setHeaderText(null);
+					alert.setContentText("The item was added to the reservation.");
+					alert.showAndWait();
 				}
 			});
 			return tableRow;
@@ -211,8 +199,8 @@ public class Costumer_CreateReservationCatalogController
 
 	private void getCatalogFromServer()
 	{
-		Item item = new Item();
-		Message entityMessage = MessagesFactory.createGetAllEntityMessage(item);
+		ShopCatalogData catalogData = new ShopCatalogData(Costumer_SavedData.getShopManagerId());
+		Message entityMessage = MessagesFactory.createIMessageDataMessage(catalogData);
 		m_client.sendMessageToServer(entityMessage);
 	}
 

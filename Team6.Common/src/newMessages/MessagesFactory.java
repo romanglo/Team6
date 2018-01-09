@@ -201,6 +201,17 @@ public class MessagesFactory
 		IMessageData data = new EntitiesListData(entityDataOperation, entity);
 		return new Message(data);
 	}
+	
+	/**
+	 * Create {@link Message} with a {@link IMessageData}.
+	 *
+	 * @param messageData
+	 *            The message data to add to message.
+	 * @return An {@link Message}.
+	 */
+	public static Message createIMessageDataMessage(IMessageData messageData) {
+		return new Message(messageData);
+	}
 
 	/**
 	 * Create {@link Message} with a {@link IMessageData} of a {@link LoginData}
