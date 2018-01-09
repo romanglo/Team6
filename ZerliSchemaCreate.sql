@@ -442,7 +442,7 @@ BEGIN
 	
 	ELSEIF (OLD.iPrice != NEW.iPrice) THEN 
 	
-		DELETE FROM items_in_shops WHERE items_in_shops.iId = NEW.iId AND items_in_shop.isDiscountedPrice > NEW.iPrice;
+		DELETE FROM items_in_shops WHERE items_in_shops.iId = NEW.iId AND items_in_shops.isDiscountedPrice > NEW.iPrice;
 	
 	END IF;
 	
@@ -457,10 +457,10 @@ BEGIN
 END; //
 
 CREATE TRIGGER update_surveys_in_shops
-BEFORE UPDATE ON surveys_in_shops FOR EACH ROW
-BEGIN
+AFTER UPDATE ON surveys_in_shops FOR EACH ROW
+BEGIN -- FIX IT!
     IF (NEW.saSummary != NULL AND NEW.saClosed = 0) THEN 
-        SET NEW.saClosed = 1;
+        UPDATE surveys_in_shops SET saClosed = 1 WHERE ssId = New.ssId;
     END IF;
 END; //
 
@@ -472,11 +472,12 @@ BEGIN
     END IF;
 END; //
 
+
 CREATE TRIGGER update_complaint
-BEFORE INSERT ON complaints FOR EACH ROW
-BEGIN
+AFTER UPDATE ON complaints FOR EACH ROW
+BEGIN -- FIX IT!
     IF (NEW.coSummary != NULL AND NEW.coOpened = 1) THEN 
-        SET NEW.coOpened = 0;
+        UPDATE complaints SET coOpened = 0 WHERE coId = New.coId;
     END IF;
 END; //
 

@@ -102,7 +102,7 @@ public class QueryGenerator {
 		stringBuilder.append(item.getPrice());
 		stringBuilder.append(", iDomainColor = '");
 		stringBuilder.append(item.getDomainColor());
-		stringBuilder.append("' , iImage WHERE = ? WHERE iId = ");
+		stringBuilder.append("' , iImage = ? WHERE iId = ");
 		stringBuilder.append(item.getId());
 		stringBuilder.append(';');
 
@@ -265,7 +265,9 @@ public class QueryGenerator {
 		stringBuilder.append(reservation.getNumberOfItems());
 		stringBuilder.append(", rPrice = ");
 		stringBuilder.append(reservation.getPrice());
-		stringBuilder.append(", rDeliveryDate = '");
+		stringBuilder.append(", rBlessingCard = '");
+		stringBuilder.append(reservation.getBlessingCard());
+		stringBuilder.append("', rDeliveryDate = '");
 		stringBuilder.append(s_dateTimeFormat.format(reservation.getDeliveryDate()));
 		stringBuilder.append("', rDeliveryType = '");
 		stringBuilder.append(reservation.getDeliveryType());
@@ -294,7 +296,7 @@ public class QueryGenerator {
 		}
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(
-				"INSERT INTO reservations (cId,smId,rCreditCatd,rType,rNumberOfItems,rPrice,rBlessingCard,rDeliveryDate,rDeliveryType,rDeliveryAddress,rDeliveryPhone,rDeliveryName) VALUES (");
+				"INSERT INTO reservations (cId,smId,rCreditCard,rType,rNumberOfItems,rPrice,rBlessingCard,rDeliveryDate,rDeliveryType,rDeliveryAddress,rDeliveryPhone,rDeliveryName) VALUES (");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
@@ -307,6 +309,8 @@ public class QueryGenerator {
 		stringBuilder.append(',');
 		stringBuilder.append(reservation.getPrice());
 		stringBuilder.append(",'");
+		stringBuilder.append(reservation.getBlessingCard());
+		stringBuilder.append("','");
 		stringBuilder.append(s_dateTimeFormat.format(reservation.getDeliveryDate()));
 		stringBuilder.append("','");
 		stringBuilder.append(reservation.getDeliveryType());
@@ -425,7 +429,7 @@ public class QueryGenerator {
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("UPDATE reservations SET coDate = '");
+		stringBuilder.append("UPDATE complaints SET coDate = '");
 		stringBuilder.append(s_dateFormat.format(complaint.getCreationDate()));
 		stringBuilder.append("', coComplaint = '");
 		stringBuilder.append(complaint.getComplaint());
@@ -568,7 +572,11 @@ public class QueryGenerator {
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO items_in_reservations (iName,irQuantity,irPrice) VALUES ('");
+		stringBuilder.append("INSERT INTO items_in_reservations (rId,iId,iName,irQuantity,irPrice) VALUES (");
+		stringBuilder.append(reservationId);
+		stringBuilder.append(',');
+		stringBuilder.append(itemId);
+		stringBuilder.append(",'");
 		stringBuilder.append(itemInReservation.getItemName());
 		stringBuilder.append("',");
 		stringBuilder.append(itemInReservation.getQuantity());

@@ -139,7 +139,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			queryResult = m_dbController.executeSelectQuery(lastIdQuery);
 			if (queryResult != null) {
 				queryResult.next();
-				returningValue = queryResult.getInt(0);
+				returningValue = queryResult.getInt(1);
 			}
 		} catch (Exception ex) {
 			m_logger.warning("Failed on try to execute query: " + lastIdQuery + ", exception: " + ex);
