@@ -238,12 +238,15 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 		if (userEntityData instanceof RespondMessageData) {
 			loginData.setMessage("The username does not exist.");
+			m_logger.info("Login attempted to a username that does not exist in the system! Login Data: " + loginData);
 			return loginData;
 		}
 
 		IEntity entity = ((EntityData) userEntityData).getEntity();
 		User userEntity = (User) entity;
 		if (!loginData.getPassword().equals(userEntity.getPassword())) {
+			m_logger.info("An attempt was made to connect to a user with wrong password! User Details: " + userEntity
+					+ ", Login Data: " + loginData);
 			loginData.setMessage("The password does not match!");
 			return loginData;
 		}
@@ -252,17 +255,28 @@ public class MessagesResolver implements Server.MessagesHandler {
 			if (userEntity.getStatus() == UserStatus.Connected) {
 				userEntity.setStatus(UserStatus.Disconnected);
 				onUserEntityReceived(userEntity, EntityDataOperation.Update);
+				m_logger.info("An user disconnected from the system! User Details: " + userEntity);
 			}
 			return null;
 		}
 
-		if (userEntity.getStatus() == UserStatus.Disconnected) {
-			// TODO ROMAN - uncomment it when disconnected message will arrive.
-			// userEntity.setUserStatus(UserStatus.Connected);
-			// onUserEntityReceived(userEntity, EntityDataOperation.Update);
-			// userEntity.setUserStatus(UserStatus.Disconnected);
+		// This is login message:
+
+		if (userEntity.getStatus() == UserStatus.Connected) {
+			loginData.setMessage("The user '" + userEntity.getUserName() + "' already connected to the system!");
+			m_logger.info(
+					"An attempt was made to connect to a user who is already logged on! User Details: " + userEntity);
+			return loginData;
 		}
 
+		if (userEntity.getStatus() == UserStatus.Blocked) {
+			loginData.setMessage("The user '" + userEntity.getUserName() + "' is blocked!");
+			m_logger.info("An attempt was made to connect to a user who is blocked! User Details: " + userEntity);
+			return loginData;
+		}
+		userEntity.setStatus(UserStatus.Connected);
+		onUserEntityReceived(userEntity, EntityDataOperation.Update);
+		m_logger.info("An user connected from the system! User Details: " + userEntity);
 		return userEntityData;
 	}
 

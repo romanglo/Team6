@@ -133,9 +133,11 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	/**
 	 * 
-	 * This method should be called by this stage creator! The method set listener to key events.. 
+	 * This method should be called by this stage creator! The method set listener
+	 * to key events..
 	 *
-	 * @param thisScene The scene of this stage.
+	 * @param thisScene
+	 *            The scene of this stage.
 	 */
 	public void intializeKeyHandler(Scene thisScene)
 	{
@@ -154,7 +156,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			}
 		});
 	}
-	
+
 	/* Initializing methods region */
 
 	/**
@@ -222,31 +224,15 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 
 		IEntity entity = ((EntityData) messageData).getEntity();
-
 		if (!(entity instanceof User)) {
 			m_logger.warning(
 					"Received not expected IEntity! Expected : UserEntity, received " + entity.getClass().getName());
 			return;
 		}
 
-		User userEntity = (User) entity;
-		switch (userEntity.getStatus()) {
-			case Connected:
-				m_logger.info(
-						"The user is trying to connect while this user is already connected in other place! User details: "
-								+ userEntity.toString());
-				showInformationMessage("This user already connected!");
-				return;
-
-			case Blocked:
-				m_logger.info("The user is trying to connect to blocked user! User details: " + userEntity.toString());
-				showInformationMessage("This user is blocked, please contanct chain support.");
-				return;
-			default:
-			break;
-		}
-
-		showUserWindow(userEntity);
+		User user = (User) entity;
+		m_logger.info("An user connected successfully! User details: " + user.toString());
+		showUserWindow(user);
 	}
 
 	/**
@@ -353,7 +339,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		m_client.setClientStatusHandler(null);
 		m_client.setMessagesHandler(null);
 		m_scene.setOnKeyPressed(null);
-		
+
 		ApplicationEntryPoint.ConnectedUser = userEntity;
 
 		Scene scene = null;

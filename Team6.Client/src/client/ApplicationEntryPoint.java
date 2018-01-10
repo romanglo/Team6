@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.soap.MessageFactory;
+
 import com.sun.istack.internal.Nullable;
 
 import common.UncaughetExceptions;
 import controllers.LoginController;
 import newEntities.User;
+import newMessages.Message;
+import newMessages.MessagesFactory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -116,8 +120,8 @@ public class ApplicationEntryPoint extends Application
 	{
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/Login.fxml"));
-			Parent root = (Parent)loader.load();
-			LoginController controller = (LoginController)loader.getController();
+			Parent root = (Parent) loader.load();
+			LoginController controller = (LoginController) loader.getController();
 			Scene scene = new Scene(root);
 			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 			primaryStage.setScene(scene);
@@ -154,7 +158,14 @@ public class ApplicationEntryPoint extends Application
 	@Override
 	public void stop() throws Exception
 	{
-		disposeConnection();
+		try {
+			disconnectUser();
+			disposeConnection();
+		}
+		catch (Exception e) {
+			s_logger.log(Level.SEVERE, "Stopping Failed! ", e);
+		}
+
 		super.stop();
 	}
 
@@ -175,5 +186,19 @@ public class ApplicationEntryPoint extends Application
 		Client = null;
 	}
 
+	private void disconnectUser()
+	{
+		if (ConnectedUser != null && Client != null) {
+			if (!Client.isConnected()) {
+				if (!Client.createConnectionWithServer()) {
+					s_logger.severe("Failed on try to create connection with server for send user log out message!");
+					return;
+				}
+			}
+			Message logoutMessage = MessagesFactory.createLogoutMessage(ConnectedUser.getUserName(),
+					ConnectedUser.getPassword());
+			Client.sendMessageToServer(logoutMessage);
+		}
+	}
 	/* End of --> Private disposing methods region */
 }
