@@ -34,12 +34,7 @@ public enum EntityDataOperation {
 	 * Get all specific {@link IEntity} operation.
 	 */
 	GetALL,
-	
-	/**
-	 * Update all specific {@link IEntity} operation.
-	 */
-	UpdateAll,
-	
+
 	/**
 	 * Without specific {@link IEntity} operation.
 	 */
