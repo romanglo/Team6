@@ -6,21 +6,30 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import com.sun.media.jfxmediaimpl.platform.Platform;
+
 import client.ApplicationEntryPoint;
 import client.Client;
 import newEntities.IEntity;
 import newEntities.User;
+import javafx.animation.RotateTransition;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -28,8 +37,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import logger.LogManager;
 import newMessages.EntityData;
 import newMessages.IMessageData;
@@ -71,6 +87,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	private Scene m_scene;
 
+	private Stage m_connectingStage;
+
+	private boolean m_canceled;
 	/* End of --> Fields region */
 
 	/* UI events region */
@@ -78,6 +97,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@FXML
 	private void onLoginButtonPressed(ActionEvent event)
 	{
+
 		String userName = textField_userName.getText().trim();
 		String pasword = passwordField_userPassword.getText();
 
@@ -101,7 +121,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			return;
 		}
 
-		// TODO ROMAN : show loading message.
+		displayConnectingWindow();
+
 	}
 
 	@FXML
@@ -165,7 +186,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public void initialize(URL url, ResourceBundle rb)
 	{
-
+		m_canceled = false;
 		m_logger = LogManager.getLogger();
 		m_client = ApplicationEntryPoint.Client;
 
@@ -210,6 +231,14 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
+		if (m_canceled) {
+			m_logger.info("Received response to login requset but the login progress canceled by the user.");
+			m_canceled = false;
+			return;
+		}
+		
+		javafx.application.Platform.runLater(() -> m_connectingStage.close());
+
 		IMessageData messageData = msg.getMessageData();
 
 		if (messageData instanceof LoginData) {
@@ -361,6 +390,40 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	}
 
+	private void displayConnectingWindow()
+	{
+		if (m_connectingStage == null) {
+			Stage currentStage = (Stage) btn_login.getScene().getWindow();
+
+			ProgressIndicator progressIndicator = new ProgressIndicator();
+			Label label = new Label("Trying to connect ...");
+
+			Button button = new Button();
+			button.setText("Cancel");
+			button.setOnAction(event -> {
+				m_canceled = true;
+				m_connectingStage.close();
+			});
+
+			VBox root = new VBox(10, label, progressIndicator, button);
+			root.setAlignment(Pos.BASELINE_CENTER);
+			Scene scene = new Scene(root, 300, 150);
+			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+			m_connectingStage = new Stage();
+			m_connectingStage.setScene(scene);
+			m_connectingStage.setTitle("Connecting");
+			m_connectingStage.setResizable(false);
+			m_connectingStage.initModality(Modality.WINDOW_MODAL);
+			m_connectingStage.initStyle(StageStyle.TRANSPARENT);
+			m_connectingStage.initOwner(currentStage);
+		}
+		m_connectingStage.showAndWait();
+	}
+	
+	/* End of --> Private methods region */
+
+	/* Nested classes region */
+
 	private class NextWindowLoader implements Runnable
 	{
 
@@ -396,5 +459,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			}
 		}
 	}
-	/* End of --> Private methods region */
+	
+	/* End of --> Nested classes region */
+
 }
