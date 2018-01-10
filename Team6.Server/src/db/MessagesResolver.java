@@ -47,8 +47,6 @@ import newMessages.RespondMessageData;
  */
 public class MessagesResolver implements Server.MessagesHandler {
 
-	// TODO ROMAN: ADD RESPOND TO SELECT AND SELECT ALL QUERY
-
 	// region Fields
 
 	private Logger m_logger;
@@ -155,6 +153,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 		}
 		return returningValue;
 	}
+
 	// end region -> private methods
 
 	// region Server.MessagesHandler Implementation
@@ -237,7 +236,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 		user.setUserName(loginData.getUserName());
 		IMessageData userEntityData = onUserEntityReceived(user, EntityDataOperation.Get);
 
-		if (userEntityData == null) {
+		if (userEntityData instanceof RespondMessageData) {
 			loginData.setMessage("The username does not exist.");
 			return loginData;
 		}
@@ -360,16 +359,6 @@ public class MessagesResolver implements Server.MessagesHandler {
 		return returnedMessageData;
 	}
 
-	private IMessageData onShopCostumerEntityReceived(ShopCostumer receivedEntity, EntityDataOperation operation) {
-		return null;
-		// TODO Roman: Auto-generated method stub
-	}
-
-	private IMessageData onShopSurveyEntityReceived(ShopSurvey receivedEntity, EntityDataOperation operation) {
-		return null;
-		// TODO Roman: Auto-generated method stub
-	}
-
 	// end region -> Server.MessagesHandler Implementation
 
 	// region Item Entity Operations
@@ -379,14 +368,23 @@ public class MessagesResolver implements Server.MessagesHandler {
 		switch (operation) {
 		case Get:
 			String selectQuery = QueryGenerator.selectItemQuery(item);
-			if (selectQuery != null) {
-				return executeSelectQuery(selectQuery, Item.class);
+			if (selectQuery == null) {
+				break;
 			}
-			break;
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, Item.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
 			String selectAllQuery = QueryGenerator.selectAllItemsQuery();
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, Item.class);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Item.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		case Update:
@@ -652,14 +650,23 @@ public class MessagesResolver implements Server.MessagesHandler {
 		switch (operation) {
 		case Get:
 			String selectQuery = QueryGenerator.selectComplaintQuery(complaint);
-			if (selectQuery != null) {
-				return executeSelectQuery(selectQuery, Complaint.class);
+			if (selectQuery == null) {
+				break;
 			}
-			break;
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, Complaint.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
 			String selectAllQuery = QueryGenerator.selectAllComplaintsQuery();
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, Complaint.class);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Complaint.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		case Add:
@@ -678,7 +685,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 				result = executeQuery(complaint, updateQuery);
 			}
 			break;
-			
+
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + complaint.toString()
 					+ ", Operation: " + operation.toString());
@@ -700,8 +707,12 @@ public class MessagesResolver implements Server.MessagesHandler {
 		case Get:
 		case GetALL:
 			String selectAllQuery = QueryGenerator.selectItemInShopsQuery(itemInShop);
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, ItemInShop.class);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ItemInShop.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		case Update:
@@ -744,8 +755,12 @@ public class MessagesResolver implements Server.MessagesHandler {
 		case Get:
 		case GetALL:
 			String selectAllQuery = QueryGenerator.selectItemsInReservationQuery(itemInReservation);
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, ItemInReservation.class);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ItemInReservation.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		case Add:
@@ -774,14 +789,23 @@ public class MessagesResolver implements Server.MessagesHandler {
 		switch (operation) {
 		case Get:
 			String selectQuery = QueryGenerator.selectShopEmployeeQuery(shopEmployee);
-			if (selectQuery != null) {
-				return executeSelectQuery(selectQuery, ShopEmployee.class);
+			if (selectQuery == null) {
+				break;
 			}
-			break;
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopEmployee.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
 			String selectAllQuery = QueryGenerator.selectAllShopEmployeesQuery();
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, ShopEmployee.class);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopEmployee.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		default:
@@ -803,14 +827,23 @@ public class MessagesResolver implements Server.MessagesHandler {
 		switch (operation) {
 		case Get:
 			String selectQuery = QueryGenerator.selectShopManagerQuery(shopManager);
-			if (selectQuery != null) {
-				return executeSelectQuery(selectQuery, ShopManager.class);
+			if (selectQuery == null) {
+				break;
 			}
-			break;
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopManager.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
 			String selectAllQuery = QueryGenerator.selectShopManagersQuery();
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, ShopManager.class);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopManager.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		default:
@@ -833,14 +866,23 @@ public class MessagesResolver implements Server.MessagesHandler {
 		switch (operation) {
 		case Get:
 			String selectQuery = QueryGenerator.selectReservationsReportQuery(reservationsReport);
-			if (selectQuery != null) {
-				return executeSelectQuery(selectQuery, ShopManager.class);
+			if (selectQuery == null) {
+				break;
 			}
-			break;
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ReservationsReport.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectReservationsReportsQuery();
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, ShopManager.class);
+			String selectAllQuery = QueryGenerator.selectAllReservationsReportsQuery(reservationsReport);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ReservationsReport.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		case Add:
@@ -868,14 +910,23 @@ public class MessagesResolver implements Server.MessagesHandler {
 		switch (operation) {
 		case Get:
 			String selectQuery = QueryGenerator.selectIncomesReportQuery(incomesReport);
-			if (selectQuery != null) {
-				return executeSelectQuery(selectQuery, IncomesReport.class);
+			if (selectQuery == null) {
+				break;
 			}
-			break;
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, IncomesReport.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectIncomesReportQuery();
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, IncomesReport.class);
+			String selectAllQuery = QueryGenerator.selectAllIncomesReportQuery(incomesReport);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, IncomesReport.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		case Add:
@@ -903,14 +954,23 @@ public class MessagesResolver implements Server.MessagesHandler {
 		switch (operation) {
 		case Get:
 			String selectQuery = QueryGenerator.selectSurveysReportQuery(surveysReport);
-			if (selectQuery != null) {
-				return executeSelectQuery(selectQuery, SurveysReport.class);
+			if (selectQuery == null) {
+				break;
 			}
-			break;
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, SurveysReport.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectSurveysReportQuery();
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, SurveysReport.class);
+			String selectAllQuery = QueryGenerator.selectAllSurveysReportQuery(surveysReport);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, SurveysReport.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		case Add:
@@ -938,15 +998,24 @@ public class MessagesResolver implements Server.MessagesHandler {
 		boolean result = false;
 		switch (operation) {
 		case Get:
-			String selectQuery = QueryGenerator.selectComplaintsReporttQuery(complaintsReport);
-			if (selectQuery != null) {
-				return executeSelectQuery(selectQuery, ComplaintsReport.class);
+			String selectQuery = QueryGenerator.selectComplaintsReportQuery(complaintsReport);
+			if (selectQuery == null) {
+				break;
 			}
-			break;
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ComplaintsReport.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectComplaintsReportQuery();
-			if (selectAllQuery != null) {
-				return executeSelectQuery(selectAllQuery, ComplaintsReport.class);
+			String selectAllQuery = QueryGenerator.selectAllComplaintsReportQuery(complaintsReport);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ComplaintsReport.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
 			}
 			break;
 		case Add:
@@ -967,4 +1036,112 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	// end region -> ComplaintsReport Entity Operations
 
+	// region ComplaintsReport Entity Operations
+
+	private IMessageData onShopCostumerEntityReceived(ShopCostumer shopCostumer, EntityDataOperation operation) {
+		boolean result = false;
+		switch (operation) {
+		case Get:
+			String selectQuery = QueryGenerator.selectShopCostumerQuery(shopCostumer);
+			if (selectQuery == null) {
+				break;
+			}
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopCostumer.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
+		case GetALL:
+			String selectAllQuery = QueryGenerator.selectAllShopCostumerReportQuery();
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopCostumer.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
+			}
+			break;
+		case Add:
+			String insertQuery = QueryGenerator.insertShopCostumerQuery(shopCostumer);
+			if (insertQuery != null) {
+				result = executeQuery(shopCostumer, insertQuery);
+			}
+			break;
+		case Update:
+			String updateQuery = QueryGenerator.updateShopCostumerQuery(shopCostumer);
+			if (updateQuery != null) {
+				result = executeQuery(shopCostumer, updateQuery);
+			}
+			break;
+		case Remove:
+			String removeQuery = QueryGenerator.removeShopCostumerQuery(shopCostumer);
+			if (removeQuery != null) {
+				result = executeQuery(shopCostumer, removeQuery);
+			}
+			break;
+		default:
+			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopCostumer.toString()
+					+ ", Operation: " + operation.toString());
+			break;
+		}
+		RespondMessageData respondMessageData = new RespondMessageData();
+		respondMessageData.setSucceed(result);
+		return respondMessageData;
+	}
+
+	// end region -> ComplaintsReport Entity Operations
+
+	// region ComplaintsReport Entity Operations
+
+	private IMessageData onShopSurveyEntityReceived(ShopSurvey shopSurvey, EntityDataOperation operation) {
+		boolean result = false;
+		switch (operation) {
+		case Get:
+			String selectQuery = QueryGenerator.selectShopSurveyQuery(shopSurvey);
+			if (selectQuery == null) {
+				break;
+			}
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopSurvey.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
+
+		case GetALL:
+			String selectAllQuery = QueryGenerator.selectAllShopSurveyQuery(shopSurvey);
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopSurvey.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
+			}
+			break;
+
+		case Add:
+			String insertQuery = QueryGenerator.insertShopSurveyQuery(shopSurvey);
+			if (insertQuery != null) {
+				result = executeQuery(shopSurvey, insertQuery);
+			}
+			break;
+
+		case Update:
+			String updateQuery = QueryGenerator.updateShopSurveyQuery(shopSurvey);
+			if (updateQuery != null) {
+				result = executeQuery(shopSurvey, updateQuery);
+			}
+			break;
+		default:
+			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopSurvey.toString()
+					+ ", Operation: " + operation.toString());
+			break;
+		}
+		RespondMessageData respondMessageData = new RespondMessageData();
+		respondMessageData.setSucceed(result);
+		return respondMessageData;
+	}
+
+	// end region -> ComplaintsReport Entity Operations
 }

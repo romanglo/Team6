@@ -129,16 +129,16 @@ CREATE TABLE surveys_in_shops (
   ssId INT AUTO_INCREMENT,
   suId INT NOT NULL,
   smId INT NOT NULL,
-  saStartDate DATE NOT NULL DEFAULT '0000-00-00',
-  saAnswer1 INT NOT NULL DEFAULT 0,
-  saAnswer2 INT NOT NULL DEFAULT 0,
-  saAnswer3 INT NOT NULL DEFAULT 0,
-  saAnswer4 INT NOT NULL DEFAULT 0,
-  saAnswer5 INT NOT NULL DEFAULT 0,
-  saAnswer6 INT NOT NULL DEFAULT 0,
-  saNumberOfAnswers INT NOT NULL DEFAULT 0,
-  saSummary VARCHAR(500) NULL DEFAULT NULL, 
-  saClosed BIT(1) NOT NULL DEFAULT 0,
+  ssStartDate DATE NOT NULL DEFAULT '0000-00-00',
+  ssAnswer1 INT NOT NULL DEFAULT 0,
+  ssAnswer2 INT NOT NULL DEFAULT 0,
+  ssAnswer3 INT NOT NULL DEFAULT 0,
+  ssAnswer4 INT NOT NULL DEFAULT 0,
+  ssAnswer5 INT NOT NULL DEFAULT 0,
+  ssAnswer6 INT NOT NULL DEFAULT 0,
+  ssNumberOfAnswers INT NOT NULL DEFAULT 0,
+  ssSummary VARCHAR(500) NULL DEFAULT NULL, 
+  ssClosed BIT(1) NOT NULL DEFAULT 0,
   FOREIGN KEY (suId) REFERENCES surveys (suId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   PRIMARY KEY (ssId)
@@ -252,15 +252,15 @@ BEGIN
 	END IF;
 
 	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
-			saAnswer1 / saNumberOfAnswers AS 'First Question Average',
-			saAnswer2 / saNumberOfAnswers AS 'Second Question Average', 
-			saAnswer3 / saNumberOfAnswers AS 'Third Question Average',
-			saAnswer4 / saNumberOfAnswers AS 'Fourth Question Average',
-			saAnswer5 / saNumberOfAnswers AS 'Fifth Question Average', 
-			saAnswer6 / saNumberOfAnswers AS 'Sixth Question Average'
+			ssAnswer1 / ssNumberOfAnswers AS 'First Question Average',
+			ssAnswer2 / ssNumberOfAnswers AS 'Second Question Average', 
+			ssAnswer3 / ssNumberOfAnswers AS 'Third Question Average',
+			ssAnswer4 / ssNumberOfAnswers AS 'Fourth Question Average',
+			ssAnswer5 / ssNumberOfAnswers AS 'Fifth Question Average', 
+			ssAnswer6 / ssNumberOfAnswers AS 'Sixth Question Average'
 	FROM surveys_in_shops WHERE 
-	            smId = shop_manager_id AND YEAR(saStartDate) = in_year AND
-	            MONTH(saStartDate) >= start_month AND MONTH(saStartDate) <= end_month;
+	            smId = shop_manager_id AND YEAR(ssStartDate) = in_year AND
+	            MONTH(ssStartDate) >= start_month AND MONTH(ssStartDate) <= end_month;
 END; //
 
 CREATE PROCEDURE getShopNumberOfComplaints( shop_manager_id INT , in_year YEAR , quarter INT)
@@ -451,16 +451,16 @@ END; //
 CREATE TRIGGER insert_surveys_in_shops
 BEFORE INSERT ON surveys_in_shops FOR EACH ROW
 BEGIN
-    IF (NEW.saStartDate = '0000-00-00') THEN 
-        SET NEW.saStartDate = NOW();
+    IF (NEW.ssStartDate = '0000-00-00') THEN 
+        SET NEW.ssStartDate = NOW();
     END IF;
 END; //
 
 CREATE TRIGGER update_surveys_in_shops
 AFTER UPDATE ON surveys_in_shops FOR EACH ROW
 BEGIN -- FIX IT!
-    IF (NEW.saSummary != NULL AND NEW.saClosed = 0) THEN 
-        UPDATE surveys_in_shops SET saClosed = 1 WHERE ssId = New.ssId;
+    IF (NEW.ssSummary != NULL AND NEW.ssClosed = 0) THEN 
+        UPDATE surveys_in_shops SET ssClosed = 1 WHERE ssId = New.ssId;
     END IF;
 END; //
 
@@ -552,7 +552,7 @@ INSERT INTO surveys (suQuestion1,suQuestion2,suQuestion3,suQuestion4,suQuestion5
 ('Question 1','Question 2', 'Question 3', 'Question 4', 'Question 5', 'Question 6');
 
 LOCK TABLES surveys_in_shops WRITE;
-INSERT INTO surveys_in_shops (smId,suId,saAnswer1,saAnswer2,saAnswer3,saAnswer4,saAnswer5,saAnswer6,saNumberOfAnswers) VALUES
+INSERT INTO surveys_in_shops (smId,suId,ssAnswer1,ssAnswer2,ssAnswer3,ssAnswer4,ssAnswer5,ssAnswer6,ssNumberOfAnswers) VALUES
 (1,1,4,4,4,4,4,4,2);
 
 LOCK TABLES reservations WRITE;
