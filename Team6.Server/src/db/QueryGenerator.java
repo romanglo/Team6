@@ -418,7 +418,7 @@ public class QueryGenerator {
 		stringBuilder.append(complaint.getSummary());
 		stringBuilder.append("',");
 		stringBuilder.append(complaint.isOpened() ? 1 : 0);
-		stringBuilder.append("');");
+		stringBuilder.append(");");
 		return stringBuilder.toString();
 	}
 
