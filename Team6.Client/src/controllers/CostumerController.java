@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -85,6 +86,9 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 	@FXML
 	public void createReservationClick(ActionEvent createReservation)
 	{
+		if (combo_shop.getValue() == null) {
+			return;
+		}
 		Costumer_SavedData.setShopManagerId(combo_shop.getValue());
 		openSelectedWindow(createReservation, "/boundaries/Costumer_CreateReservation.fxml");
 	}
@@ -226,6 +230,9 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 			}
 			
 			combo_shop.setItems(shops);
+			Platform.runLater(()->{
+				combo_shop.getSelectionModel().selectFirst();
+			});
 		} else {
 			m_logger.warning("Received message data not of the type requested.");
 			return;

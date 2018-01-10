@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -170,7 +171,29 @@ public class Costumer_CancelReservationController
 					}
 					Costumer_CreateReservationPaymentController.s_reservationId = rowData.getM_id();
 					Costumer_CreateReservationPaymentController.s_isCreateReservation = false;
-					openSelectedWindow(new ActionEvent(), "/boundaries/Costumer_CreateReservationPayment.fxml");
+					Platform.runLater(() -> {
+						try {
+							/* Clear client handlers. */
+							m_client.setClientStatusHandler(null);
+							m_client.setMessagesHandler(null);
+
+							/* Hide the current window. */
+							catalog_table.getScene().getWindow().hide();
+							Stage primaryStage = new Stage();
+							FXMLLoader loader = new FXMLLoader();
+							Pane root = loader.load(getClass().getResource("/boundaries/Costumer_CreateReservationPayment.fxml").openStream());
+
+							Scene scene = new Scene(root);
+							scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+
+							primaryStage.setScene(scene);
+							primaryStage.show();
+						}
+						catch (Exception e) {
+							String msg = "Failed to load the next window";
+							m_logger.severe(msg + ", excepion: " + e.getMessage());
+						}
+					});
 				}
 			});
 			return tableRow;

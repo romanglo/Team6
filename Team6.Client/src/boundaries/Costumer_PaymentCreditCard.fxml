@@ -31,7 +31,7 @@
 			<Separator layoutX="9.0" layoutY="256.0" prefHeight="5.0" prefWidth="373.0" AnchorPane.rightAnchor="7.800000000000011" />
 			<TextArea fx:id="blessing_text" layoutX="40.0" layoutY="291.0" prefHeight="55.0" prefWidth="310.0" AnchorPane.rightAnchor="40.0" />
 			<Label layoutX="40.0" layoutY="167.0" text="Address" AnchorPane.rightAnchor="307.2" />
-			<Label layoutX="40.0" layoutY="196.0" text="Phone Number" AnchorPane.rightAnchor="269.2" />
+			<Label layoutX="49.000000000000014" layoutY="196.0" text="Phone Number" AnchorPane.rightAnchor="260.2" />
 			<Label layoutX="40.0" layoutY="225.0" text="Name" AnchorPane.rightAnchor="318.0" />
 			<TextField fx:id="delivery_address" alignment="CENTER" layoutX="147.0" layoutY="163.0" prefHeight="25.0" prefWidth="203.0" AnchorPane.rightAnchor="39.80000000000001" />
 			<TextField fx:id="delivery_phone" alignment="CENTER" layoutX="147.0" layoutY="192.0" prefHeight="25.0" prefWidth="203.0" AnchorPane.rightAnchor="39.80000000000001" />

@@ -155,14 +155,17 @@ public class Costumer_PaymentCreditCardController
 				return;
 			}
 		}
-		if (date_pick.getValue().isBefore(LocalDate.now()) || (date_pick.getValue().isEqual(LocalDate.now())
-				&& Integer.parseInt(combo_hour.getValue()) < Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 3)) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Attention");
-			alert.setHeaderText(null);
-			alert.setContentText("The date and/or time you picked is invalid, please try again.");
-			alert.show();
-			return;
+		if (!immidiate_delivery.isSelected()) {
+			if (date_pick.getValue().isBefore(LocalDate.now())
+					|| (date_pick.getValue().isEqual(LocalDate.now()) && Integer
+							.parseInt(combo_hour.getValue()) < Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 3)) {
+				Alert alert = new Alert(AlertType.ERROR);
+				alert.setTitle("Attention");
+				alert.setHeaderText(null);
+				alert.setContentText("The date and/or time you picked is invalid, please try again.");
+				alert.show();
+				return;
+			}
 		}
 
 		updateFieldsWithData();
@@ -335,7 +338,7 @@ public class Costumer_PaymentCreditCardController
 		combo_hour.setValue("" + (hour < 10 ? "0" + hour : hour));
 		combo_minute.setValue("" + (minute < 10 ? "0" + minute : minute));
 
-		// TODO Yoni: pickupButtonClick(new ActionEvent());
+		delivery_radio.setSelected(true);
 		date_pick.setValue(LocalDate.now());
 		StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
 

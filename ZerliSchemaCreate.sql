@@ -67,7 +67,7 @@ CREATE TABLE reservations (
   cId INT,
   smId INT,
   rCreditCard VARCHAR(16) NULL DEFAULT NULL,
-  rType VARCHAR(7) NULL DEFAULT 'Open',
+  rType VARCHAR(8) NULL DEFAULT 'Open',
   rNumberOfItems INT NOT NULL DEFAULT 0,
   rPrice FLOAT NOT NULL DEFAULT 0,
   rBlessingCard VARCHAR(100) NULL DEFAULT NULL,
@@ -557,7 +557,7 @@ INSERT INTO surveys_in_shops (smId,suId,ssAnswer1,ssAnswer2,ssAnswer3,ssAnswer4,
 
 LOCK TABLES reservations WRITE;
 INSERT INTO reservations (cId, smId,rCreditCard, rType, rNumberOfItems, rPrice, rBlessingCard, rDeliveryType, rDeliveryAddress, rDeliveryPhone, rDeliveryName) VALUES 
-(1,1,'1234123412341234','Closed',2,10, 'Happy Birthday', 'Immediate','Ort Braude','049981111','Dolev');
+(1,1,'1234123412341234','Closed',2,10, 'Happy Birthday', 'Immidiate','Ort Braude','049981111','Dolev');
 
 LOCK TABLES items_in_reservations WRITE;
 INSERT INTO items_in_reservations (rId, iId, iName, irQuantity, irPrice) VALUES 
