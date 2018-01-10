@@ -14,7 +14,7 @@
             <Label layoutX="40.0" layoutY="35.0" text="Username" />
             <Label layoutX="40.0" layoutY="70.0" text="Email" />
             <Label layoutX="41.0" layoutY="105.0" text="Password" />
-            <TextField fx:id="customerId" layoutX="140" layoutY="35.0" />
+            <TextField fx:id="username" layoutX="140" layoutY="35.0" />
             <TextField fx:id="email" layoutX="140.0" layoutY="70.0" />
             <TextField fx:id="password" layoutX="140.0" layoutY="105.0" />
             <Button layoutX="112.0" layoutY="244.0" mnemonicParsing="false" text="Update" onAction="#updatebtn" />

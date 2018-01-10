@@ -6,6 +6,7 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.ResourceBundle;
@@ -13,6 +14,7 @@ import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -39,6 +41,10 @@ import javafx.util.StringConverter;
 import logger.LogManager;
 import newEntities.EntitiesEnums.CostumerSubscription;
 import newEntities.EntitiesEnums.ReservationDeliveryType;
+import newEntities.IEntity;
+import newEntities.ItemInReservation;
+import newEntities.Reservation;
+import newMessages.EntityData;
 import newMessages.IMessageData;
 import newMessages.Message;
 import newMessages.MessagesFactory;
@@ -98,6 +104,8 @@ public class Costumer_PaymentCreditCardController
 
 	ObservableList<String> minutesList = FXCollections.observableArrayList();
 
+	private boolean isWaiting;
+
 	/**
 	 * Manage discount according to the refund of the costumer.
 	 */
@@ -128,7 +136,7 @@ public class Costumer_PaymentCreditCardController
 	@FXML
 	private void finishButtonClick(ActionEvent finishEvent)
 	{
-		if (!credit_card_number.isDisabled() && credit_card_number.getText().equals("")) {
+		if (credit_card_number.isVisible() && credit_card_number.getText().equals("")) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Attention");
 			alert.setHeaderText(null);
@@ -152,11 +160,11 @@ public class Costumer_PaymentCreditCardController
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Attention");
 			alert.setHeaderText(null);
-			alert.setContentText("The date and/or hour you picked is invalid, please try again.");
+			alert.setContentText("The date and/or time you picked is invalid, please try again.");
 			alert.show();
 			return;
 		}
-		
+
 		updateFieldsWithData();
 
 		Message entityMessage = MessagesFactory.createUpdateEntityMessage(Costumer_SavedData.getCostumer());
@@ -164,23 +172,13 @@ public class Costumer_PaymentCreditCardController
 
 		entityMessage = MessagesFactory.createAddEntityMessage(Costumer_SavedData.getReservationEntity());
 		m_client.sendMessageToServer(entityMessage);
-
-		entityMessage = MessagesFactory.createAddEntitiesMessage(Costumer_SavedData.getCostumerReservationList());
-		m_client.sendMessageToServer(entityMessage);
-
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Reservation Completed");
-		alert.setHeaderText(null);
-		alert.setContentText("Reservation completed. Thanks for using our application.");
-		alert.showAndWait();
-		openSelectedWindow(finishEvent, "/boundaries/Costumer.fxml");
 	}
 
 	private void updateFieldsWithData()
 	{
 		Costumer_SavedData.setCreditCard(credit_card_number.getText());
 		Costumer_SavedData.setBalance(Costumer_SavedData.getCostumerBalance() - m_discount);
-		
+
 		Date date;
 		Calendar calendar = Calendar.getInstance();
 		if (immidiate_delivery.isSelected()) {
@@ -193,7 +191,7 @@ public class Costumer_PaymentCreditCardController
 			date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		}
 		Costumer_SavedData.setDeliveryDate(date);
-		
+
 		if (delivery_radio.isSelected()) {
 			if (immidiate_delivery.isSelected()) {
 				Costumer_SavedData.setDeliveryType(ReservationDeliveryType.Immidiate);
@@ -203,11 +201,11 @@ public class Costumer_PaymentCreditCardController
 		} else {
 			Costumer_SavedData.setDeliveryType(ReservationDeliveryType.None);
 		}
-		
+
 		Costumer_SavedData.setDeliveryAddress(delivery_address.getText());
 		Costumer_SavedData.setDeliveryPhone(delivery_phone.getText());
 		Costumer_SavedData.setDeliveryName(delivery_name.getText());
-		
+
 		if (blessing_card.isSelected()) {
 			Costumer_SavedData.setBlessingCard(blessing_text.getText());
 		} else {
@@ -278,6 +276,7 @@ public class Costumer_PaymentCreditCardController
 		initializeImages();
 		initializeClientHandler();
 		initializeUiFields();
+		isWaiting = true;
 	}
 
 	private void initializeFields()
@@ -336,7 +335,7 @@ public class Costumer_PaymentCreditCardController
 		combo_hour.setValue("" + (hour < 10 ? "0" + hour : hour));
 		combo_minute.setValue("" + (minute < 10 ? "0" + minute : minute));
 
-		pickup_radio.fire();
+		// TODO Yoni: pickupButtonClick(new ActionEvent());
 		date_pick.setValue(LocalDate.now());
 		StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
 
@@ -390,7 +389,65 @@ public class Costumer_PaymentCreditCardController
 			if (!((RespondMessageData) entitiesListData).isSucceed()) {
 				m_logger.warning("Failed when sending a message to the server.");
 			} else {
-				m_logger.info("Successfully delivered the message.");
+				IMessageData messageData = ((RespondMessageData) entitiesListData).getMessageData();
+				if (!(messageData instanceof EntityData)) {
+					m_logger.warning("Received message data not of the type requested, requested: "
+							+ EntityData.class.getName());
+					return;
+				}
+
+				IEntity entity = ((EntityData) messageData).getEntity();
+				if (entity instanceof Reservation) {
+					Reservation reservation = (Reservation) entity;
+					for (IEntity item : Costumer_SavedData.getCostumerReservationList()) {
+						ItemInReservation itemInReservation = (ItemInReservation) item;
+						itemInReservation.setReservationId(reservation.getId());
+					}
+					Message message = MessagesFactory
+							.createAddEntitiesMessage(Costumer_SavedData.getCostumerReservationList());
+					m_client.sendMessageToServer(message);
+
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run()
+						{
+							Alert alert = new Alert(AlertType.INFORMATION);
+							alert.setTitle("Reservation Completed");
+							alert.setHeaderText(null);
+							alert.setContentText("Reservation completed. Thanks for using our application.");
+							alert.showAndWait();
+
+							try {
+								/* Clear client handlers. */
+								m_client.setClientStatusHandler(null);
+								m_client.setMessagesHandler(null);
+
+								/* Hide the current window. */
+								delivery_radio.getScene().getWindow().hide();
+								Stage primaryStage = new Stage();
+								FXMLLoader loader = new FXMLLoader();
+								Pane root = loader
+										.load(getClass().getResource("/boundaries/Costumer.fxml").openStream());
+
+								Scene scene = new Scene(root);
+								scene.getStylesheets()
+										.add(getClass().getResource("/boundaries/application.css").toExternalForm());
+
+								primaryStage.setScene(scene);
+								primaryStage.show();
+							}
+							catch (Exception e) {
+								String msgPrint = "Failed to load the next window";
+								m_logger.severe(msgPrint + ", excepion: " + e.getMessage());
+							}
+
+						}
+					});
+				} else {
+					m_logger.warning(
+							"Received entity not of the type requested, requested: " + Reservation.class.getName());
+				}
 			}
 			return;
 		} else {

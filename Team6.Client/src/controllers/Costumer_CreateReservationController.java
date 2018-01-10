@@ -23,9 +23,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
+import newEntities.IEntity;
+import newEntities.ShopCostumer;
 import newMessages.EntityData;
 import newMessages.IMessageData;
 import newMessages.Message;
+import newMessages.MessagesFactory;
 import newMessages.RespondMessageData;
 
 /**
@@ -154,6 +157,7 @@ public class Costumer_CreateReservationController
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
+		initializeCostumer();
 	}
 
 	private void initializeFields()
@@ -182,6 +186,12 @@ public class Costumer_CreateReservationController
 		m_client.setClientStatusHandler(this);
 	}
 
+	private void initializeCostumer()
+	{
+		Message entityMessage = MessagesFactory.createGetEntityMessage(Costumer_SavedData.getShopCostumer());
+		m_client.sendMessageToServer(entityMessage);
+	}
+
 	/* End of --> Initializing methods region */
 
 	/* Client handlers implementation region */
@@ -191,17 +201,30 @@ public class Costumer_CreateReservationController
 	 */
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
-	{	
+	{
 		IMessageData entitiesListData = msg.getMessageData();
 		if (entitiesListData instanceof RespondMessageData) {
 			if (!((RespondMessageData) entitiesListData).isSucceed()) {
 				m_logger.warning("Failed when sending a message to the server.");
 			} else {
-				m_logger.warning(
-						"Received message data not of the type requested, requested: " + EntityData.class.getName());
+				m_logger.warning("Message successfully delivered.");
 			}
 			return;
 		}
+
+		if (!(entitiesListData instanceof EntityData)) {
+			m_logger.warning(
+					"Received message data not of the type requested, requested: " + EntityData.class.getName());
+			return;
+		}
+
+		IEntity entity = ((EntityData) entitiesListData).getEntity();
+		if (!(entity instanceof ShopCostumer)) {
+			m_logger.warning("Received entity not of the type requested, requested: " + ShopCostumer.class.getName());
+			return;
+		}
+
+		Costumer_SavedData.setShopCostumer((ShopCostumer) entity);
 	}
 
 	/**

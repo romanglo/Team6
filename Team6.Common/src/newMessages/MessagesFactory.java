@@ -92,20 +92,6 @@ public class MessagesFactory
 
 	/**
 	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
-	 * with {@link EntityDataOperation#Update} operation.
-	 *
-	 * @param entity
-	 *            The entity to add to message.
-	 * @return An {@link Message} if the creation succeed or <code>null</code> if
-	 *         failed.
-	 */
-	public static Message createUpdateAllEntityMessage(IEntity entity)
-	{
-		return createEntityMessage(entity, EntityDataOperation.UpdateAll);
-	}
-
-	/**
-	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
 	 * with {@link EntityDataOperation#Add} operation.
 	 *
 	 * @param entity
@@ -169,20 +155,6 @@ public class MessagesFactory
 
 	/**
 	 * Create {@link Message} with a {@link IMessageData} of a
-	 * {@link EntitiesListData} with {@link EntityDataOperation#Update} operation.
-	 *
-	 * @param entity
-	 *            The entity to add to message.
-	 * @return An {@link Message} if the creation succeed or <code>null</code> if
-	 *         failed.
-	 */
-	public static Message createUpdateAllEntitiesMessage(ArrayList<IEntity> entity)
-	{
-		return createEntitiesListMessage(entity, EntityDataOperation.UpdateAll);
-	}
-
-	/**
-	 * Create {@link Message} with a {@link IMessageData} of a
 	 * {@link EntitiesListData} with {@link EntityDataOperation#Add} operation.
 	 *
 	 * @param entity
@@ -201,6 +173,17 @@ public class MessagesFactory
 		}
 		IMessageData data = new EntitiesListData(entityDataOperation, entity);
 		return new Message(data);
+	}
+	
+	/**
+	 * Create {@link Message} with a {@link IMessageData}.
+	 *
+	 * @param messageData
+	 *            The message data to add to message.
+	 * @return An {@link Message}.
+	 */
+	public static Message createIMessageDataMessage(IMessageData messageData) {
+		return new Message(messageData);
 	}
 
 	/**

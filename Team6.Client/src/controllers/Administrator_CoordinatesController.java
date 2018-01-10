@@ -9,12 +9,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import entities.IEntity;
-import entities.UserEntity;
+import newEntities.IEntity;
+import newEntities.User;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -30,10 +29,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.EntitiesListData;
-import messages.EntityData;
-import messages.Message;
-import messages.MessagesFactory;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 
 
@@ -53,7 +54,7 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 
 	@FXML private ImageView imageview_title;
 	
-	@FXML private javafx.scene.control.TextField customerId;
+	@FXML private javafx.scene.control.TextField username;
 
 //	@FXML private TextField customerId;
 
@@ -77,11 +78,13 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 
 	private ClientConfiguration m_configuration;
 	
-	private UserEntity userEntity;
+	//private User userEntity;
 	
 	ArrayList<IEntity> arrlist;
 
-	UserEntity tempEntity;
+	User tempEntity;
+	
+	User userEntity;
 	/* End of --> Fields region */
 	
 	/* Private methods region*/
@@ -143,37 +146,33 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 		m_client.setClientStatusHandler(this);
 	}
 
-	/**
-	 * TODO раам: Auto-generated comment stub - Change it!
-	 * @param event 
-	 *
-	 * @param e
-	 * @throws IOException 
-	 */
+
 	/* End of --> Initializing methods region */
 
 	/* Client handlers implementation region */
+	/**
+	 * TODO раам: Auto-generated comment stub - Change it!
+	 *
+	 * @param event : get button pressed, send message to server to return user information
+	 */
 	public void getBtn(ActionEvent event)
 	{
-		String userName;
-		userName= customerId.getText();
-		UserEntity tempEntity = new UserEntity();
+		User tempEntity = new User();
 		Message msg= MessagesFactory.createGetAllEntityMessage(tempEntity);
 		m_client.sendMessageToServer(msg);
 	}
 	/**
 	 *
-	 * @param event
-	 * @throws IOException
+	 * @param event : back button pressed 
+	 * 
+	 * @throws IOException :
 	 */
 	public void backbtn (ActionEvent event) throws IOException
 	{
 		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
 		Stage primaryStage = new Stage();
 		FXMLLoader loader = new FXMLLoader();
-		Parent root = loader.load(getClass().getResource("/boundaries/Administrator.fxml").openStream());
-		AdministratorController AdministratorController  = loader.getController();
-		
+		Parent root = loader.load(getClass().getResource("/boundaries/Administrator.fxml").openStream());		
 		
 		Scene scene = new Scene(root);			
 		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
@@ -185,10 +184,9 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 	}
 	
 	/**
-	 * TODO раам: Auto-generated comment stub - Change it!
+	 * @param event : update button pressed
+	 * @throws IOException : 
 	 *
-	 * @param event
-	 * @throws IOException
 	 */
 	public void updatebtn (ActionEvent event) throws IOException
 	{
@@ -196,12 +194,12 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 			showInformationMessage("Please enter email.");
 		else if(password.getText().equals(""))
 			showInformationMessage("Please enter password.");
-		else if (customerId.getText().equals(""))
+		else if (username.getText().equals(""))
 			showInformationMessage("Please enter username to edit.");
 		else
 		{
-			tempEntity.setUserEmail(email.getText());
-			tempEntity.setUserPassword(password.getText());
+			tempEntity.setEmail(email.getText());
+			tempEntity.setPassword(password.getText());
 			Message entityMessage = MessagesFactory
 					.createUpdateEntityMessage(tempEntity);
 			m_client.sendMessageToServer(entityMessage);
@@ -218,24 +216,58 @@ public class Administrator_CoordinatesController implements Initializable, Clien
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		{
+			if(msg.getMessageData() instanceof EntitiesListData)
+			{
 			EntitiesListData entityListData=(EntitiesListData) msg.getMessageData();
 			arrlist = (ArrayList<IEntity>) entityListData.getEntities();
+			String name = username.getText();
+			if(name.equals("")) 
+			{
+				showInformationMessage("Please enter username");
+			}
 			for(int i=0;i<arrlist.size();i++)
 			{
-				String name = customerId.getText();
-				tempEntity = (UserEntity) arrlist.get(i);
+				tempEntity = (User) arrlist.get(i);
 				if(tempEntity.getUserName().equals(name))
+				{
+					userEntity=tempEntity;
 					break;
+				}
 					
 			}
-			if(tempEntity!=null) 
-			{
-				email.setText(tempEntity.getEmail());
-				password.setText(tempEntity.getPassword());	
+			if(userEntity!=null) 
+				{
+					email.setText(tempEntity.getEmail());
+					password.setText(tempEntity.getPassword());	
+				}
+			else if(!name.equals(""))
+				{
+					showInformationMessage("User not exist!");
+				}
 			}
-			
-		}
+			else 
+				if(msg.getMessageData() instanceof RespondMessageData)
+				{
+					RespondMessageData res = (RespondMessageData)msg.getMessageData();
+					if(res.isSucceed())
+					{
+						showInformationMessage("User update successed");
+					}
+					else if(!res.isSucceed())
+					{
+						showInformationMessage("User update faild please try again");
+						m_logger.warning("Failed when sending a message to the server.");
+					}else
+					{
+						m_logger.warning(
+								"Received message data not of the type requested, requested: " + EntitiesListData.class.getName());
+					}
+				}
+				else
+					{
+						m_logger.warning("Received message data not of the type requested.");
+						return;
+					}
 	}
 
 	/**

@@ -15,8 +15,8 @@ import javax.swing.JComboBox;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import entities.IEntity;
-import entities.UserEntity;
+import newEntities.IEntity;
+import newEntities.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -26,18 +26,21 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.EntitiesListData;
-import messages.Message;
-import messages.MessagesFactory;
+import newMessages.EntitiesListData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 
 /**
@@ -75,6 +78,8 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 
 	private ClientConfiguration m_configuration;
 	
+	User tempEntity;
+	
 	ObservableList<String> list;
 	
 	ArrayList<IEntity> arrlist;
@@ -106,34 +111,45 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 
 	private void initializeUsers()
 	{
-		UserEntity tempEntity = new UserEntity();
+		User tempEntity = new User();
 		Message msg= MessagesFactory.createGetAllEntityMessage(tempEntity);
 		m_client.sendMessageToServer(msg);
 	}
 
-	private void initializePrivillge()
+	/*private void initializePrivillge()
 	{
+		
 		ArrayList<String> al = new ArrayList<String>();	
-		al.add("CompanyEmployee");
-		al.add("ShopManager");
-		al.add("ChainManager");
-		al.add("Administrator");
-		al.add("ShopEmployee");
-		al.add("CostumerService");
-		al.add("Costumer");
-		al.add("ServiceSpecialist");
+		for(int i = 0 ; i < userNameArr.size();i++)
+		{
+			al.add(userNameArr.get(i));
+		}
 		list = FXCollections.observableArrayList(al);
 		cmb_privillge.setItems(list);
-	}
+	}*/
 
 	private void initializeStatus()
 	{
-		// TODO раам: Auto-generated method stub
 		ArrayList<String> al = new ArrayList<String>();	
 		al.add("Blocked");
 		al.add("Actived");
 		list = FXCollections.observableArrayList(al);
 		cmb_status.setItems(list);
+	}
+	
+	private void initializePrivillge()
+	{
+		ArrayList<String> al = new ArrayList<String>();	
+		al.add("administrator");
+		al.add("costumer");
+		al.add("shop employee");
+		al.add("chain manger");
+		al.add("shop manger");
+		al.add("service specialist");
+		al.add("company employee");
+		al.add("costumer service");
+		list = FXCollections.observableArrayList(al);
+		cmb_privillge.setItems(list);
 	}
 
 	private void initializeFields()
@@ -199,7 +215,7 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	 */
 	public void updatebtn(ActionEvent event) throws IOException
 	{
-		if(cmb_status.getValue()!=null&&cmb_privillge.getValue()!=null)
+		//if(cmb_status.getValue()!=null&&cmb_privillge.getValue()!=null)
 		{
 
 		}
@@ -217,7 +233,7 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	{
 		for(int i=0;i<arrlist.size();i++) 
 		{
-			UserEntity tempEntity = (UserEntity) arrlist.get(i);
+			User tempEntity = (User) arrlist.get(i);
 			if(tempEntity.getUserName().equals(cmb_user.getValue())) 
 			{
 				//	cmb_status.setSelectionModel();
@@ -238,21 +254,50 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	 */
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		//if(msg.getMessageData() instanceof ArrayList<?>)
 		{
-		EntitiesListData entityListData=(EntitiesListData) msg.getMessageData();
-		arrlist = (ArrayList<IEntity>) entityListData.getEntities();
-		for(int i=0;i<arrlist.size();i++)
-		{
-			UserEntity tempEntity = (UserEntity) arrlist.get(i);
-			userNameArr.add(tempEntity.getUserName());	
-		}
-		list = FXCollections.observableArrayList(userNameArr);
-		cmb_user.setItems(list);
+			if(msg.getMessageData() instanceof EntitiesListData)
+			{
+				EntitiesListData entityListData=(EntitiesListData) msg.getMessageData();
+				arrlist = (ArrayList<IEntity>) entityListData.getEntities();
+				for(int i=0;i<arrlist.size();i++)
+					{
+						User tempEntity = (User) arrlist.get(i);
+						userNameArr.add(tempEntity.getUserName());	
+					}
+				list = FXCollections.observableArrayList(userNameArr);
+				cmb_user.setItems(list);
+			}
+			else 
+				if(msg.getMessageData() instanceof RespondMessageData)
+				{
+					RespondMessageData res = (RespondMessageData)msg.getMessageData();
+					if(res.isSucceed())
+					{
+						showInformationMessage("User update successed");
+					}
+					else
+					{
+						showInformationMessage("User update faild please try again");
+					}
+				}
 		}
 		
 		
 	}
+
+	private void showInformationMessage(String message)
+		{
+			if (message == null || message.isEmpty()) {
+				return;
+			}
+			javafx.application.Platform.runLater(() -> {
+				Alert alert = new Alert(AlertType.INFORMATION);
+				alert.setTitle("Information Dialog");
+				alert.setHeaderText(null);
+				alert.setContentText(message);
+				alert.showAndWait();
+			});
+			}
 
 	/**
 	 * {@inheritDoc}

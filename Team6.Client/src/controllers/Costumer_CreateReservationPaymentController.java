@@ -3,8 +3,10 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import boundaries.CatalogItemRow;
@@ -28,6 +30,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
+import newEntities.Costumer;
 import newEntities.EntitiesEnums.ReservationType;
 import newEntities.IEntity;
 import newEntities.ItemInReservation;
@@ -168,7 +171,34 @@ public class Costumer_CreateReservationPaymentController
 		m_reservationEntity.setType(ReservationType.Canceled);
 		Message entityMessage = MessagesFactory.createUpdateEntityMessage(m_reservationEntity);
 		m_client.sendMessageToServer(entityMessage);
+
+		Costumer costumer = Costumer_SavedData.getCostumer();
+		float balance = calculateRefund() + costumer.getBalance();
+		costumer.setBalance(balance);
+		entityMessage = MessagesFactory.createUpdateEntityMessage(costumer);
+		m_client.sendMessageToServer(entityMessage);
+
 		openSelectedWindow(cancelEvent, "/boundaries/Costumer_CancelReservation.fxml");
+	}
+
+	private float calculateRefund()
+	{
+		Date firstDate = m_reservationEntity.getDeliveryDate();
+		Date secondDate = new Date();
+
+		long diffInMillies = Math.abs(firstDate.getTime() - secondDate.getTime());
+		long diff = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+		float returnValue;
+		if (diff >= 3) {
+			returnValue = m_reservationEntity.getPrice();
+		} else if (diff >= 1) {
+			returnValue = (float) (m_reservationEntity.getPrice() * 0.5);
+		} else {
+			returnValue = 0;
+		}
+
+		return returnValue;
 	}
 
 	private void openSelectedWindow(ActionEvent event, String fxmlPath)
