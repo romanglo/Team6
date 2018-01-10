@@ -12,13 +12,16 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import logger.LogManager;
-import messages.EntitiesListData;
-import messages.IMessageData;
-import messages.Message;
-import messages.MessagesFactory;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -26,11 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.imageio.ImageIO;
-
-import entities.IEntity;
-import entities.ItemEntity;
-import entities.ProductType;
+import newEntities.EntitiesEnums;
+import newEntities.IEntity;
+import newEntities.Item;
 import boundaries.CatalogItemRow;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -52,6 +55,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
@@ -71,6 +75,12 @@ public class CompanyEmployeeController
 
 	/* End of --> UI Binding Fields region */
 
+	/* Main AnchorPane declaration */
+
+	@FXML private AnchorPane anchorPane_mainStage;
+
+	/* End of --> Main AnchorPane declaration */
+
 	/* Fields */
 	private Logger m_logger;
 
@@ -88,7 +98,7 @@ public class CompanyEmployeeController
 
 	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_type;
 
-	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
+	@FXML private TableColumn<CatalogItemRow, Float> tablecolumn_price;
 
 	@FXML private TableColumn<CatalogItemRow, ImageView> tablecolumn_image;
 	/* End of --> Catalog table declaration */
@@ -106,11 +116,11 @@ public class CompanyEmployeeController
 	/* View and changes savers lists declaration */
 	ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
 
-	ArrayList<ItemEntity> itemAdded = new ArrayList<>();
+	ArrayList<Item> itemsAdded = new ArrayList<>();
 
-	ArrayList<ItemEntity> itemRemoved = new ArrayList<>();
+	ArrayList<Item> itemsRemoved = new ArrayList<>();
 
-	ArrayList<ItemEntity> itemChanged = new ArrayList<>();
+	ArrayList<Item> itemsChanged = new ArrayList<>();
 	/* End of --> View and changes savers lists declaration */
 
 	/* UI events region */
@@ -126,7 +136,7 @@ public class CompanyEmployeeController
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
-		catalogInit();
+		getCatalogFromServer();
 		initializeConfigurationTable();
 	}
 
@@ -162,16 +172,10 @@ public class CompanyEmployeeController
 	 * TODO Shimon456: Auto-generated comment stub - Change it!
 	 *
 	 */
-	private void catalogInit()
+	private void getCatalogFromServer()
 	{
-		Message entityMessage = MessagesFactory.createGetAllEntityMessage(new ItemEntity(0));
+		Message entityMessage = MessagesFactory.createGetAllEntityMessage(new Item());
 		m_client.sendMessageToServer(entityMessage);
-
-		// TODO : get item list from server
-		// catalog.add(new CatalogItemRow(1, "Rose", "Flower", 19.99, "White"));
-		// catalog.add(new CatalogItemRow(2, "Rose2", "Flower2", 29.99, "Red"));
-		// catalog.add(new CatalogItemRow(3, "Rose3", "Flower3", 39.99, "Green"));
-		// catalog.add(new CatalogItemRow(4, "Rose4", "Flower4", 49.99, "Blue"));
 	}
 
 	private void initializeConfigurationTable()
@@ -183,10 +187,15 @@ public class CompanyEmployeeController
 					Node selectedNode = event.getPickResult().getIntersectedNode();
 					String pickType;
 					CatalogItemRow rowData = tableRow.getItem();
+
+					if (rowData.getId() == " ") {
+						return;
+					}
 					if (selectedNode.getId() == null) {
 						pickType = selectedNode.toString();
 						pickType = pickType.substring(11, pickType.indexOf(',') - 1);
 
+						// Classification by selected node.
 						if (pickType.equals(rowData.getName())) pickType = "name";
 						else if (pickType.equals(rowData.getPrice())) pickType = "price";
 						else if (pickType.equals(rowData.getType())) pickType = "type";
@@ -215,11 +224,12 @@ public class CompanyEmployeeController
 								rowData.setM_name(resultString);
 							break;
 							case "type":
-								if (!(resultString.equals(ProductType.Flower.toString())
-										|| resultString.equals(ProductType.FlowerPot.toString())
-										|| resultString.equals(ProductType.BridalBouquet.toString())
-										|| resultString.equals(ProductType.FlowerArrangement.toString()))) {
-									ErrorMSG("The type you entered doesn't exist");
+								if (!(resultString.equals(EntitiesEnums.ProductType.Flower.toString())
+										|| resultString.equals(EntitiesEnums.ProductType.FlowerPot.toString())
+										|| resultString.equals(EntitiesEnums.ProductType.BridalBouquet.toString())
+										|| resultString
+												.equals(EntitiesEnums.ProductType.FlowerArrangement.toString()))) {
+									errorMSG("The type you entered doesn't exist");
 									m_logger.warning("Entered wrorg ProductType");
 									return;
 								} else {
@@ -227,9 +237,9 @@ public class CompanyEmployeeController
 								}
 							break;
 							case "price":
-								Double price = Double.parseDouble(resultString);
+								Float price = Float.parseFloat(resultString);
 								if (price <= 0) {
-									ErrorMSG("The price you entered lower then 0");
+									errorMSG("The price you entered lower then 0");
 									m_logger.warning("Entered zero or negative price");
 									return;
 								} else {
@@ -237,8 +247,8 @@ public class CompanyEmployeeController
 								}
 
 						}
-						AddEditedItemToArray(rowData);
-						CatalogChanged();
+						addEditedItemToArray(rowData);
+						catalogChanged();
 					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("image")) {
 
 						FileChooser fileChooser = new FileChooser();
@@ -249,14 +259,14 @@ public class CompanyEmployeeController
 							BufferedImage imageReader = ImageIO.read(selectedImage);
 							Image finalImage = SwingFXUtils.toFXImage(imageReader, null);
 							rowData.setM_image(finalImage);
-							AddEditedItemToArray(rowData);
+							addEditedItemToArray(rowData);
 						}
 						catch (Exception e) {
 						}
-						CatalogChanged();
+						catalogChanged();
 
 					}
-					DrawContantToTable();
+					drawContantToTable();
 				}
 			});
 			return tableRow;
@@ -265,9 +275,9 @@ public class CompanyEmployeeController
 		tablecolumn_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
 		tablecolumn_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
 		tablecolumn_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
-		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Double>("price"));
+		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
 		tablecolumn_image.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, ImageView>("image"));
-		DrawContantToTable();
+		drawContantToTable();
 	}
 
 	/**
@@ -277,10 +287,10 @@ public class CompanyEmployeeController
 	 *            Edited item.
 	 * @return The item index in array, return -1 if item doesn't exist.
 	 */
-	private int CheckIfItemAlreadyExistInArray(ItemEntity editedItem)
+	private int checkIfItemAlreadyExistInArray(Item editedItem)
 	{
-		for (ItemEntity entity : itemChanged) {
-			if (entity.getId() == editedItem.getId()) return itemChanged.indexOf(entity);
+		for (Item entity : itemsChanged) {
+			if (entity.getId() == editedItem.getId()) return itemsChanged.indexOf(entity);
 		}
 		return -1;
 	}
@@ -291,15 +301,19 @@ public class CompanyEmployeeController
 	 * @param rowData
 	 *            Table row with edited item data.
 	 */
-	private void AddEditedItemToArray(CatalogItemRow rowData)
+	private void addEditedItemToArray(CatalogItemRow rowData)
 	{
-		ItemEntity editedItem = new ItemEntity(rowData.getM_id(), rowData.getM_name(),
-				ParseStringToProductType(rowData.getM_type()), rowData.getM_price(), rowData.getM_domainColor(),
-				rowData.getM_image());
+		Item editedItem = new Item();
+		editedItem.setId(rowData.getM_id());
+		editedItem.setName(rowData.getM_name());
+		editedItem.setType(parseStringToProductType(rowData.getM_type()));
+		editedItem.setPrice(rowData.getM_price());
+		editedItem.setDomainColor(rowData.getM_domainColor());
+		if (rowData.getM_image() != null) editedItem.setImage(rowData.getM_image());
 		int indexOfExistItemEntityInArray;
-		if ((indexOfExistItemEntityInArray = CheckIfItemAlreadyExistInArray(editedItem)) != -1)
-			itemChanged.set(indexOfExistItemEntityInArray, editedItem);
-		else itemChanged.add(editedItem);
+		if ((indexOfExistItemEntityInArray = checkIfItemAlreadyExistInArray(editedItem)) != -1)
+			itemsChanged.set(indexOfExistItemEntityInArray, editedItem);
+		else itemsChanged.add(editedItem);
 	}
 
 	/**
@@ -309,17 +323,17 @@ public class CompanyEmployeeController
 	 *            Input string.
 	 * @return The product type.
 	 */
-	private ProductType ParseStringToProductType(String stringItemType)
+	private EntitiesEnums.ProductType parseStringToProductType(String stringItemType)
 	{
 		switch (stringItemType) {
 			case "Flower":
-				return ProductType.Flower;
+				return EntitiesEnums.ProductType.Flower;
 			case "FlowerPot":
-				return ProductType.FlowerPot;
+				return EntitiesEnums.ProductType.FlowerPot;
 			case "BridalBouquet":
-				return ProductType.BridalBouquet;
+				return EntitiesEnums.ProductType.BridalBouquet;
 			case "FlowerArrangement":
-				return ProductType.FlowerArrangement;
+				return EntitiesEnums.ProductType.FlowerArrangement;
 		}
 		return null;
 	}
@@ -328,7 +342,7 @@ public class CompanyEmployeeController
 	 * Insert data into table and show the updated table.
 	 * 
 	 */
-	private void DrawContantToTable()
+	private void drawContantToTable()
 	{
 		catalog_table.setItems(catalog);
 		catalog_table.refresh();
@@ -338,19 +352,21 @@ public class CompanyEmployeeController
 	 * Create error window for user.
 	 * 
 	 */
-	private void ErrorMSG(String errorType)
+	private void errorMSG(String errorType)
 	{
-		Alert errorMessage = new Alert(AlertType.ERROR);
-		errorMessage.setTitle("Error Message");
-		errorMessage.setContentText(errorType);
-		errorMessage.show();
+		Platform.runLater(() -> {
+			Alert errorMessage = new Alert(AlertType.ERROR);
+			errorMessage.setTitle("Error Message");
+			errorMessage.setContentText(errorType);
+			errorMessage.show();
+		});
 	}
 
 	/**
 	 * Check that all fields are filed and valid.
 	 * 
 	 */
-	private boolean CheckFields(TextField name, TextField price, TextField domainColor)
+	private boolean checkFields(TextField name, TextField price, TextField domainColor)
 	{
 		String inputedName, inputedPrice, inputedDomainColor;
 		inputedName = name.getText();
@@ -359,8 +375,8 @@ public class CompanyEmployeeController
 
 		if (inputedName == null || inputedPrice == null || inputedDomainColor == null) return false;
 		if (inputedName.isEmpty() || inputedPrice.isEmpty() || inputedDomainColor.isEmpty()) return false;
-		if (Double.parseDouble(inputedPrice) <= 0) {
-			ErrorMSG("The price you entered lower then 0");
+		if (Float.parseFloat(inputedPrice) <= 0) {
+			errorMSG("The price you entered lower then 0");
 			m_logger.warning("Entered zero or negative price");
 			return false;
 		}
@@ -371,7 +387,7 @@ public class CompanyEmployeeController
 	 * Able access to save\reset buttons.
 	 * 
 	 */
-	private void CatalogChanged()
+	private void catalogChanged()
 	{
 		button_save.setDisable(false);
 		button_reset.setDisable(false);
@@ -381,13 +397,13 @@ public class CompanyEmployeeController
 	 * Clean saved data arrays and disable access to save\reset button.
 	 * 
 	 */
-	private void CleanSavedDataArray()
+	private void cleanSavedDataArray()
 	{
 		button_reset.setDisable(true);
 		button_save.setDisable(true);
-		itemAdded.clear();
-		itemChanged.clear();
-		itemRemoved.clear();
+		itemsAdded.clear();
+		itemsChanged.clear();
+		itemsRemoved.clear();
 	}
 	/* End of --> Initializing methods region */
 
@@ -398,7 +414,7 @@ public class CompanyEmployeeController
 	 * 
 	 */
 	@FXML
-	private void RemoveItemFromCatalog(ActionEvent event)
+	private void removeItemFromCatalog(ActionEvent event)
 	{
 		TextInputDialog dialog = new TextInputDialog();
 		dialog.setTitle("Remove Item From Catalog");
@@ -410,27 +426,37 @@ public class CompanyEmployeeController
 		String resultString = result.get();
 
 		if (resultString == null || resultString.isEmpty()) {
-			ErrorMSG("Invalid Input");
+			errorMSG("Invalid Input");
 			return;
 		}
 
 		Integer idToRemove = Integer.parseInt(resultString);
+		if (idToRemove <= 0) {
+			errorMSG("Invalid ID");
+			return;
+		}
+
 		Integer idInTable;
 		int i;
 
 		for (i = 0; i < catalog.size(); i++) {
 			idInTable = catalog.get(i).getM_id();
 			if (idToRemove == idInTable) {
-				itemRemoved.add(new ItemEntity(idToRemove, catalog.get(i).getM_name(),
-						ParseStringToProductType(catalog.get(i).getM_type()), catalog.get(i).getM_price(),
-						catalog.get(i).getM_domainColor(), catalog.get(i).getM_image()));
+				Item itemToRemove = new Item();
+				itemToRemove.setId(idToRemove);
+				itemToRemove.setName(catalog.get(i).getM_name());
+				itemToRemove.setType(parseStringToProductType(catalog.get(i).getM_type()));
+				itemToRemove.setPrice(catalog.get(i).getM_price());
+				itemToRemove.setDomainColor(catalog.get(i).getM_domainColor());
+				if (catalog.get(i).getM_image() != null) itemToRemove.setImage(catalog.get(i).getM_image());
+				itemsRemoved.add(itemToRemove);
 				catalog.remove(i);
-				CatalogChanged();
-				DrawContantToTable();
+				catalogChanged();
+				drawContantToTable();
 				return;
 			}
 		}
-		ErrorMSG("Item ID doesn't exist");
+		errorMSG("Item ID doesn't exist");
 	}
 
 	/**
@@ -438,11 +464,10 @@ public class CompanyEmployeeController
 	 * 
 	 */
 	@FXML
-	private void ResetChanges(ActionEvent event)
+	private void resetChanges(ActionEvent event)
 	{
-		// TODO: get item list from server (re-init ObservableList)
-		catalogInit();
-		CleanSavedDataArray();
+		getCatalogFromServer();
+		cleanSavedDataArray();
 	}
 
 	/**
@@ -450,7 +475,7 @@ public class CompanyEmployeeController
 	 * 
 	 */
 	@FXML
-	private void AddItemToCatalog(ActionEvent event)
+	private void addItemToCatalog(ActionEvent event)
 	{
 		Dialog<CatalogItemRow> addDialog = new Dialog<>();
 		addDialog.setTitle("Add New Item Window");
@@ -496,10 +521,10 @@ public class CompanyEmployeeController
 			public CatalogItemRow call(ButtonType b)
 			{
 				if (b == buttonTypeOk) {
-					if(!(CheckFields(textFieldName, textFieldPrice, textFieldDomainColor)))
-					{
-						ErrorMSG("One or more of fields is empty");
+					if (!(checkFields(textFieldName, textFieldPrice, textFieldDomainColor))) {
+						errorMSG("One or more of fields is empty");
 						m_logger.warning("AddItem - One or more of fields is empty");
+						return null;
 					}
 					CatalogItemRow newItem;
 					Image newItemImage = null;
@@ -512,22 +537,25 @@ public class CompanyEmployeeController
 					catch (Exception e) {
 					}
 
+					Item itemToAdd = new Item();
 					if (newItemImage == null) {
 						newItem = new CatalogItemRow(textFieldName.getText(), comboBoxType.getValue(),
-								Double.parseDouble(textFieldPrice.getText()), textFieldDomainColor.getText());
+								Float.parseFloat(textFieldPrice.getText()), textFieldDomainColor.getText());
 					} else {
 						newItem = new CatalogItemRow(textFieldName.getText(), comboBoxType.getValue(),
-								Double.parseDouble(textFieldPrice.getText()), textFieldDomainColor.getText(),
+								Float.parseFloat(textFieldPrice.getText()), textFieldDomainColor.getText(),
 								newItemImage);
+						itemToAdd.setImage(newItem.getM_image());
 					}
 
-					itemAdded.add(
-							new ItemEntity(textFieldName.getText(), ParseStringToProductType(comboBoxType.getValue()),
-									Double.parseDouble(textFieldPrice.getText()), textFieldDomainColor.getText(),
-									newItem.getM_image()));
+					itemToAdd.setName(textFieldName.getText());
+					itemToAdd.setType(parseStringToProductType(comboBoxType.getValue()));
+					itemToAdd.setPrice(Float.parseFloat(textFieldPrice.getText()));
+					itemToAdd.setDomainColor(textFieldDomainColor.getText());
+					itemsAdded.add(itemToAdd);
 					catalog.add(newItem);
-					CatalogChanged();
-					DrawContantToTable();
+					catalogChanged();
+					drawContantToTable();
 				}
 				return null;
 			}
@@ -558,30 +586,42 @@ public class CompanyEmployeeController
 	 * 
 	 */
 	@FXML
-	private void SaveChanges(ActionEvent event)
+	private void saveChanges(ActionEvent event)
 	{
-		for (ItemEntity entity : itemRemoved) {
-			if (itemChanged.contains(entity)) itemChanged.remove(entity);
+		for (Item entity : itemsRemoved) {
+			if (itemsChanged.contains(entity)) itemsChanged.remove(entity);
 		}
 
 		Message entityMessage;
-//		for (ItemEntity entity : itemRemoved) {
-//			entityMessage = MessagesFactory.createRemoveEntityMessage((IEntity) entity);
-//			m_client.sendMessageToServer(entityMessage);
-//		}
-		
-		for (ItemEntity entity : itemChanged) {
-			entityMessage = MessagesFactory.createUpdateEntityMessage((IEntity) entity);
-			m_client.sendMessageToServer(entityMessage);
-		}
-		for (ItemEntity entity : itemAdded) {
-			entityMessage = MessagesFactory.createAddEntityMessage((IEntity) entity);
+		ArrayList<IEntity> transferedEntities = new ArrayList<>();
+		if (itemsRemoved.size() > 0) {
+			for (Item entity : itemsRemoved) {
+				transferedEntities.add(entity);
+			}
+			entityMessage = MessagesFactory.createRemoveEntitiesMessage(transferedEntities);
 			m_client.sendMessageToServer(entityMessage);
 		}
 
-		// TODO: Send saved changes to server and re-init catalog
-		catalogInit();
-		CleanSavedDataArray();
+		if (itemsChanged.size() > 0) {
+			transferedEntities.clear();
+			for (Item entity : itemsChanged) {
+				transferedEntities.add(entity);
+			}
+			entityMessage = MessagesFactory.createUpdateEntitiesMessage(transferedEntities);
+			m_client.sendMessageToServer(entityMessage);
+		}
+
+		if (itemsAdded.size() > 0) {
+			transferedEntities.clear();
+			for (Item entity : itemsAdded) {
+				transferedEntities.add(entity);
+			}
+			entityMessage = MessagesFactory.createAddEntitiesMessage(transferedEntities);
+			m_client.sendMessageToServer(entityMessage);
+		}
+
+		getCatalogFromServer();
+		cleanSavedDataArray();
 	}
 
 	/**
@@ -590,27 +630,35 @@ public class CompanyEmployeeController
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		IMessageData entitiesListData = msg.getMessageData();
-		if (!(entitiesListData instanceof EntitiesListData)) {
+		IMessageData messageData = msg.getMessageData();
+		if (!(messageData instanceof EntitiesListData) && !(messageData instanceof RespondMessageData)) {
 			m_logger.warning("Received message data not of the type requested.");
 			return;
 		}
-		catalog.clear();
 
-		List<IEntity> entityList = ((EntitiesListData) entitiesListData).getEntities();
-		for (IEntity entity : entityList) {
-			if (!(entity instanceof ItemEntity)) {
-				m_logger.warning("Received entity not of the type requested.");
-				return;
+		if (messageData instanceof EntitiesListData) {
+			catalog.clear();
+			List<IEntity> entityList = ((EntitiesListData) messageData).getEntities();
+			for (IEntity entity : entityList) {
+				if (!(entity instanceof Item)) {
+					m_logger.warning("Received entity not of the type requested.");
+					return;
+				}
+				Item item = (Item) entity;
+				CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getType().toString(),
+						item.getPrice(), item.getDomainColor(), item.getImage());
+				catalog.add(itemRow);
 			}
-
-			ItemEntity item = (ItemEntity) entity;
-			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getItemType().toString(),
-					item.getItemPrice(), item.getColor(), item.getItemImage());
-			catalog.add(itemRow);
+			drawContantToTable();
+		} else if (messageData instanceof RespondMessageData) {
+			RespondMessageData respondMessageData = (RespondMessageData) messageData;
+			boolean succeed = respondMessageData.isSucceed();
+			if (!succeed) {
+				IMessageData respondedMessageData = respondMessageData.getMessageData();
+				errorMSG("Roman gibur");
+			}
 		}
 
-		DrawContantToTable();
 	}
 
 	/**

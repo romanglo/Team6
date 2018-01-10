@@ -187,7 +187,7 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		// comboBox_selectionStore.setVisible(false);
 		// }
 	}
-	
+
 	private void initializeCompareReportVariables()
 	{
 		secondReportQuarter = new ComboBox<>(quarters);
@@ -249,6 +249,10 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		});
 	}
 
+	/**
+	 * Set new order and size for AnchorPane children accord to the new stage size
+	 * 
+	 */
 	private void mainStageSizeChanged_StageReorder()
 	{
 		if (!(pane_dataPane.getChildren().isEmpty())) {
@@ -267,6 +271,10 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		}
 	}
 
+	/**
+	 * Create error window for user.
+	 * 
+	 */
 	private void displayErrorMessage(String errorType)
 	{
 		Platform.runLater(() -> {
@@ -277,6 +285,13 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		});
 	}
 
+	/**
+	 * Parse string to the month number.
+	 * 
+	 * @param monthString
+	 *            Input string.
+	 * @return The month number.
+	 */
 	private int parseMonthToNum(String monthString)
 	{
 		switch (monthString) {
@@ -291,28 +306,35 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		}
 	}
 
+	/**
+	 * Create and initialize the compare report variables and insert them into main stage.
+	 * 
+	 */
 	private void compareReportsNewStage()
 	{
 		AnchorPane.setRightAnchor(((Node) pane_dataPane), 380.0);
 		AnchorPane.setTopAnchor(((Node) pane_dataPane), 75.0);
-		
-		initializeCompareReportVariables();
 
+		initializeCompareReportVariables();
+		
 		CategoryAxis xAxis = new CategoryAxis();
 		NumberAxis yAxis = new NumberAxis();
 		compareChart = new BarChart<String, Number>(xAxis, yAxis);
 		compareChart.setCategoryGap(2.5);
 
 		comparePane = new Pane(compareChart);
-
 		anchorPane_viewStage.getChildren().add(comparePane);
 		AnchorPane.setRightAnchor(((Node) comparePane), 15.0);
 		AnchorPane.setTopAnchor(((Node) comparePane), 75.0);
 		AnchorPane.setLeftAnchor(((Node) comparePane), 380.0);
 		AnchorPane.setBottomAnchor(((Node) comparePane), 35.0);
-
 	}
-
+	
+	/**
+	 * Activate when Compare Report button pressed.
+	 * Create and initialize compare report variables. 
+	 * 
+	 */
 	@FXML
 	private void compareReports(ActionEvent event)
 	{
@@ -323,6 +345,12 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		button_compare.setDisable(true);
 	}
 
+
+	/**
+	 * Activate when Report Type ComboBox value changed.
+	 * Set the Compare report type accord to the default report type.
+	 * 
+	 */
 	@FXML
 	private void reportTypeChanged(ActionEvent event)
 	{
@@ -379,7 +407,7 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 			default:
 				showSatisfactionReport(barToChange, selectionStore, Integer.toString(selectionYear), quarter);
 		}
-		
+
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
