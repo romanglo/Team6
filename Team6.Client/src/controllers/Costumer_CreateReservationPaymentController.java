@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import boundaries.CatalogItemRow;
 import client.ApplicationEntryPoint;
 import client.Client;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -104,7 +105,12 @@ public class Costumer_CreateReservationPaymentController
 	@FXML
 	private void backButtonClick(ActionEvent backEvent)
 	{
-		openSelectedWindow(backEvent, "/boundaries/Costumer_CreateReservation.fxml");
+		if (s_isCreateReservation) {
+			openSelectedWindow("/boundaries/Costumer_CreateReservation.fxml");
+		} else {
+			openSelectedWindow("/boundaries/Costumer_CancelReservation.fxml");
+		}
+
 	}
 
 	@FXML
@@ -121,7 +127,7 @@ public class Costumer_CreateReservationPaymentController
 	{
 		Costumer_SavedData.setTotalPrice(Float.parseFloat(total_price_label.getText()));
 		Costumer_PaymentCreditCardController.m_discount = m_discount;
-		openSelectedWindow(paymentEvent, "/boundaries/Costumer_PaymentCreditCard.fxml");
+		openSelectedWindow("/boundaries/Costumer_PaymentCreditCard.fxml");
 	}
 
 	/**
@@ -163,7 +169,7 @@ public class Costumer_CreateReservationPaymentController
 		ItemInReservation itemInReservation = new ItemInReservation();
 		itemInReservation.setReservationId(s_reservationId);
 		message = MessagesFactory.createGetAllEntityMessage(itemInReservation);
-		m_client.sendMessageToServer(itemInReservation);
+		m_client.sendMessageToServer(message);
 	}
 
 	private void cancelButtonClick(ActionEvent cancelEvent)
@@ -178,7 +184,8 @@ public class Costumer_CreateReservationPaymentController
 		entityMessage = MessagesFactory.createUpdateEntityMessage(costumer);
 		m_client.sendMessageToServer(entityMessage);
 
-		openSelectedWindow(cancelEvent, "/boundaries/Costumer_CancelReservation.fxml");
+		// TODO Yoni: openSelectedWindow(cancelEvent,
+		// "/boundaries/Costumer_CancelReservation.fxml");
 	}
 
 	private float calculateRefund()
@@ -201,7 +208,7 @@ public class Costumer_CreateReservationPaymentController
 		return returnValue;
 	}
 
-	private void openSelectedWindow(ActionEvent event, String fxmlPath)
+	private void openSelectedWindow(String fxmlPath)
 	{
 		try {
 			/* Clear client handlers. */
@@ -209,7 +216,7 @@ public class Costumer_CreateReservationPaymentController
 			m_client.setMessagesHandler(null);
 
 			/* Hide the current window. */
-			((Node) event.getSource()).getScene().getWindow().hide();
+			catalog_table.getScene().getWindow().hide();
 			Stage primaryStage = new Stage();
 			FXMLLoader loader = new FXMLLoader();
 			Pane root = loader.load(getClass().getResource(fxmlPath).openStream());
@@ -301,8 +308,18 @@ public class Costumer_CreateReservationPaymentController
 			if (!((RespondMessageData) entitiesListData).isSucceed()) {
 				m_logger.warning("Failed when sending a message to the server.");
 			} else {
-				m_logger.warning(
-						"Received message data not of the type requested, requested: " + EntityData.class.getName());
+				IMessageData messageData = ((RespondMessageData) entitiesListData).getMessageData();
+				if (messageData instanceof EntityData) {
+					IEntity entity = ((EntityData) messageData).getEntity();
+					if (entity instanceof Reservation) {
+						Platform.runLater(() -> {
+							openSelectedWindow("/boundaries/Costumer_CancelReservation.fxml");
+						});
+						return;
+					}
+				}
+				m_logger.info(
+						"Successfully delivered but received data not of the type requested.");
 			}
 			return;
 		}
@@ -330,8 +347,10 @@ public class Costumer_CreateReservationPaymentController
 						itemInReservation.getPrice(), null, null, null);
 				paymentBill.add(item);
 			}
-
-			total_price_label.setText(String.format("%.2f", m_reservationEntity.getPrice()));
+			Platform.runLater(() -> {
+				total_price_label.setText(String.format("%.2f", m_reservationEntity.getPrice()));
+				catalog_table.setItems(paymentBill);
+			});
 		} else {
 			m_logger.warning("Received message data not of the type requested.");
 		}

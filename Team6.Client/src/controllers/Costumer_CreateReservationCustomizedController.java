@@ -28,6 +28,7 @@ import newEntities.EntitiesEnums.ProductType;
 import newEntities.IEntity;
 import newEntities.Item;
 import newEntities.ItemInReservation;
+import newEntities.ShopCatalogData;
 import newMessages.EntitiesListData;
 import newMessages.EntityData;
 import newMessages.IMessageData;
@@ -151,7 +152,7 @@ public class Costumer_CreateReservationCustomizedController
 				itemInReservation.setItemId(entity.getId());
 				itemInReservation.setQuantity(Integer.parseInt(item_amount.getText()));
 				itemInReservation.setPrice((float) (Integer.parseInt(item_amount.getText()) * entity.getPrice()));
-				/* TODO Yoni: Add id of the reservation. Roman thinks about it. */
+				itemInReservation.setItemName(entity.getName());
 				
 				break;
 			}
@@ -159,6 +160,11 @@ public class Costumer_CreateReservationCustomizedController
 
 		if (itemInReservation != null) {
 			Costumer_SavedData.addItemToReservation(itemInReservation);
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Success");
+			alert.setHeaderText(null);
+			alert.setContentText("An item was added to the reservation list.");
+			alert.showAndWait();
 			backButtonClick(addEvent);
 		} else {
 			Alert alert = new Alert(AlertType.INFORMATION);
@@ -213,8 +219,8 @@ public class Costumer_CreateReservationCustomizedController
 
 	private void initializeCatalogList()
 	{
-		Item item = new Item();
-		Message entityMessage = MessagesFactory.createGetAllEntityMessage(item);
+		ShopCatalogData catalogData = new ShopCatalogData(Costumer_SavedData.getShopManagerId());
+		Message entityMessage = MessagesFactory.createIMessageDataMessage(catalogData);
 		m_client.sendMessageToServer(entityMessage);
 	}
 
