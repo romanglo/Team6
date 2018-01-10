@@ -816,7 +816,7 @@ public class EntitiesResolver {
 					reservation.setDeliveryType(Enum.valueOf(ReservationDeliveryType.class, resultSet.getString(10)));
 					reservation.setDeliveryAddress(resultSet.getString(11));
 					reservation.setDeliveryPhone(resultSet.getString(12));
-					reservation.setDeliveryPhone(resultSet.getString(13));
+					reservation.setDeliveryName(resultSet.getString(13));
 					reservationEntities.add(reservation);
 				} catch (Exception ignored) {
 					failedResolve++;
