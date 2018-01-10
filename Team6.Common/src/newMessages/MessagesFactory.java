@@ -2,6 +2,7 @@
 package newMessages;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import newEntities.IEntity;
 
@@ -199,6 +200,23 @@ public class MessagesFactory
 			return null;
 		}
 		IMessageData data = new EntitiesListData(entityDataOperation, entity);
+		return new Message(data);
+	}
+
+	/**
+	 * Create {@link Message} with a {@link IMessageData} of a
+	 * {@link EntityDataCollection} with {@link List} of {@link EntityData}.
+	 *
+	 * @param entitiesdata
+	 *            {@link List} of {@link EntityData}.
+	 * @return An {@link Message}.
+	 */
+	public static Message createEntitiesListMessage(List<EntityData> entitiesdata)
+	{
+		if (entitiesdata == null || entitiesdata.isEmpty()) {
+			return null;
+		}
+		IMessageData data = new EntityDataCollection(entitiesdata);
 		return new Message(data);
 	}
 
