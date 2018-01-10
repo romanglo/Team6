@@ -6,20 +6,13 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import com.sun.media.jfxmediaimpl.platform.Platform;
-
 import client.ApplicationEntryPoint;
 import client.Client;
-import newEntities.IEntity;
-import newEntities.User;
-import javafx.animation.RotateTransition;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -28,7 +21,6 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -38,15 +30,12 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import logger.LogManager;
+import newEntities.IEntity;
+import newEntities.User;
 import newMessages.EntityData;
 import newMessages.IMessageData;
 import newMessages.LoginData;
@@ -90,6 +79,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	private Stage m_connectingStage;
 
 	private boolean m_canceled;
+	
 	/* End of --> Fields region */
 
 	/* UI events region */

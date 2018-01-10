@@ -38,6 +38,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import logger.LogManager;
+import javafx.scene.control.Label;
 
 /**
  *
@@ -74,6 +75,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private Circle circle_connectivity_on;
 	@FXML
 	private Circle circle_connectivity_off;
+	@FXML
+	private Label label_numberOfConnectedUsers;
 
 	/* Log text view declaration */
 	@FXML
@@ -209,7 +212,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private void initializeServerLogic() {
 		m_server.setServerActionHandler(this);
 		m_server.setClientConnectionHandler(this);
-		
+
 		m_messageResolver = new MessagesResolver(m_dbContoller);
 
 		m_server.setMessagesHandler(m_messageResolver);
@@ -387,12 +390,16 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	@Override
 	public void onClientConnected(String clientDetails, int numberOfConnectedClients) {
+		javafx.application.Platform
+				.runLater(() -> label_numberOfConnectedUsers.setText(Integer.toString(numberOfConnectedClients)));
 		addMessageToLog(
 				"A client: " + clientDetails + " connected, number of connected clients: " + numberOfConnectedClients);
 	}
 
 	@Override
 	public void onClientDisconnected(String clientDetails, int numberOfConnectedClients) {
+		javafx.application.Platform
+				.runLater(() -> label_numberOfConnectedUsers.setText(Integer.toString(numberOfConnectedClients)));
 		addMessageToLog("A client: " + clientDetails + " disconnected, number of connected clients: "
 				+ numberOfConnectedClients);
 	}

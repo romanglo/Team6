@@ -4,7 +4,6 @@ package logger;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -74,12 +73,6 @@ public class LogManager
 			fileHandler.setLevel(Level.ALL);
 			fileHandler.setFormatter(formatter);
 			logger.addHandler(fileHandler);
-
-			// Creating consoleHandler and assign to logger
-			Handler consoleHandler = new ConsoleHandler();
-			consoleHandler.setLevel(Level.ALL);
-			consoleHandler.setFormatter(formatter);
-			logger.addHandler(consoleHandler);
 
 			// Setting levels to LOGGER
 			logger.setLevel(Level.ALL);
