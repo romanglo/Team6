@@ -18,6 +18,7 @@ import configurations.ServerConfiguration;
 import connectivity.Server;
 import db.DbController;
 import db.MessagesResolver;
+import db.QueryGenerator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -370,6 +371,27 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		circle_connectivity_off.setFill(Paint.valueOf("grey"));
 		addMessageToLog("TCP\\IP connection opened successfully");
 
+		try {
+			String updateAllUsersToDisconnectQuery = QueryGenerator.updateAllUsersToDisconnectQuery();
+			boolean executeQuery = m_dbContoller.executeQuery(updateAllUsersToDisconnectQuery); // TODO ROMAN -
+																								// returning false while
+																								// its work..
+			String msg;
+			if (executeQuery) {
+				msg = "All users status updated to 'Disconnected' successfully.";
+				m_logger.info(msg);
+			} else {
+				msg = "Failed on try to update all users to 'Disconnected' status, client connection problems may occur. See the log file for more information.";
+				m_logger.warning(msg);
+			}
+
+			addMessageToLog(msg);
+
+		} catch (Exception ex) {
+			m_logger.warning(
+					"Failed on try to update all users to 'Disconnected' status, client connection problems may occur. exception: "
+							+ ex.getMessage());
+		}
 	}
 
 	/**

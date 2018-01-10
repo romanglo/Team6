@@ -56,12 +56,14 @@ public class Server extends AbstractServer {
 	public interface ServerStatusHandler {
 
 		/**
-		 * Method called when the server starts listening for connections.
+		 * Method called when the server starts listening for connections, this method called from
+		 * exception unsafe scope.
 		 */
 		void onServerStarted();
 
 		/**
-		 * Method called when the server stops accepting connections.
+		 * Method called when the server stops accepting connections, this method called from
+		 * exception unsafe scope.
 		 */
 		void onServerStopped();
 
@@ -232,7 +234,7 @@ public class Server extends AbstractServer {
 			}
 			m_incomingMessages.put(receivedMessage);
 		} catch (Exception e) {
-			m_logger.warning("Some error occured in adding a new message from client to incoming queue, exception: "
+			m_logger.warning("Some error occurred in adding a new message from client to incoming queue, exception: "
 					+ e.getMessage());
 		}
 
@@ -247,7 +249,7 @@ public class Server extends AbstractServer {
 			try {
 				m_serverStatusHandler.onServerStarted();
 			} catch (RuntimeException e) {
-				m_logger.warning("An exception occured in server status handler, exception: " + e.getMessage());
+				m_logger.warning("An exception occurred in server status handler, exception: " + e.getMessage());
 			}
 		}
 
@@ -276,7 +278,7 @@ public class Server extends AbstractServer {
 			try {
 				m_serverStatusHandler.onServerStopped();
 			} catch (RuntimeException e) {
-				m_logger.warning("An exception occured in server status handler, exception: " + e.getMessage());
+				m_logger.warning("An exception occurred in server status handler, exception: " + e.getMessage());
 			}
 		}
 		m_logger.info("The server stopped listen");
@@ -392,7 +394,7 @@ public class Server extends AbstractServer {
 					m_logger.severe("Message consuming thread interrupted! Exception: " + e.getMessage());
 				} catch (Exception e) {
 					m_logger.warning(
-							"Some error occured in handeling an incoming message, exception: " + e.getMessage());
+							"Some error occurred in handling an incoming message, exception: " + e.getMessage());
 				}
 			}
 		}
@@ -444,7 +446,7 @@ public class Server extends AbstractServer {
 				} catch (InterruptedException e) {
 					m_logger.severe("Message consuming thread interrupted! Exception: " + e.getMessage());
 				} catch (IOException e) {
-					m_logger.warning("Some error occured in sending a message to client: " + clientDetails
+					m_logger.warning("Some error occurred in sending a message to client: " + clientDetails
 							+ ", exception: " + e.getMessage());
 				}
 			}

@@ -1,4 +1,6 @@
-UNLOCK TABLES;         
+UNLOCK TABLES;  
+       
+SET SQL_SAFE_UPDATES = 0;
 
 DROP SCHEMA IF EXISTS `zer-li`;
 

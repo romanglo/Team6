@@ -2,22 +2,16 @@
 package controllers;
 
 import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
-import client.ClientConfiguration;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -27,17 +21,15 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import logger.LogManager;
+import newEntities.Costumer;
+import newEntities.IEntity;
+import newEntities.ShopManager;
 import newMessages.EntitiesListData;
 import newMessages.EntityData;
 import newMessages.IMessageData;
 import newMessages.Message;
 import newMessages.MessagesFactory;
 import newMessages.RespondMessageData;
-import newEntities.Costumer;
-import newEntities.IEntity;
-import newEntities.Item;
-import newEntities.ShopManager;
 
 /**
  *
@@ -45,7 +37,7 @@ import newEntities.ShopManager;
  * costumer menu UI.
  * 
  */
-public class CostumerController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class CostumerController extends BaseController implements  Client.MessageReceiveHandler
 {
 	/* UI Binding Fields region */
 
@@ -65,12 +57,6 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 	/* End of --> UI Binding Fields region */
 
 	/* Fields region */
-
-	private Logger m_logger;
-
-	private Client m_client;
-
-	private ClientConfiguration m_configuration;
 
 	private ObservableList<Integer> shops = FXCollections.observableArrayList();
 
@@ -108,8 +94,8 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 	{
 		try {
 			/* Clear client handlers. */
-			m_client.setClientStatusHandler(null);
-			m_client.setMessagesHandler(null);
+			m_Client.setClientStatusHandler(null);
+			m_Client.setMessagesHandler(null);
 
 			/* Hide the current window. */
 			((Node) event.getSource()).getScene().getWindow().hide();
@@ -125,7 +111,7 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		}
 		catch (Exception e) {
 			String msg = "Failed to load the next window";
-			m_logger.severe(msg + ", excepion: " + e.getMessage());
+			m_Logger.severe(msg + ", excepion: " + e.getMessage());
 		}
 	}
 
@@ -133,24 +119,13 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 
 	/* Initializing methods region */
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
-	public void initialize(URL url, ResourceBundle rb)
+	protected void internalInitialize()
 	{
-		initializeFields();
 		initializeImages();
 		initializeClientHandler();
 		initializeCostumerData();
 		initializeShopData();
-	}
-
-	private void initializeFields()
-	{
-		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
-		m_client = ApplicationEntryPoint.Client;
 	}
 
 	private void initializeImages()
@@ -169,8 +144,8 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 
 	private void initializeClientHandler()
 	{
-		m_client.setMessagesHandler(this);
-		m_client.setClientStatusHandler(this);
+		m_Client.setMessagesHandler(this);
+		m_Client.setClientStatusHandler(this);
 	}
 
 	private void initializeCostumerData()
@@ -178,14 +153,14 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		Costumer costumer = new Costumer();
 		costumer.setUserName(ApplicationEntryPoint.ConnectedUser.getUserName());
 		Message entityMessage = MessagesFactory.createGetEntityMessage(costumer);
-		m_client.sendMessageToServer(entityMessage);
+		m_Client.sendMessageToServer(entityMessage);
 	}
 
 	private void initializeShopData()
 	{
 		ShopManager shopManager = new ShopManager();
 		Message message = MessagesFactory.createGetAllEntityMessage(shopManager);
-		m_client.sendMessageToServer(message);
+		m_Client.sendMessageToServer(message);
 	}
 
 	/* End of --> Initializing methods region */
@@ -201,9 +176,9 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		IMessageData messageData = msg.getMessageData();
 		if (messageData instanceof RespondMessageData) {
 			if (!((RespondMessageData) messageData).isSucceed()) {
-				m_logger.warning("Failed when sending a message to the server.");
+				m_Logger.warning("Failed when sending a message to the server.");
 			} else {
-				m_logger.warning(
+				m_Logger.warning(
 						"Received message data not of the type requested, requested: " + EntityData.class.getName());
 			}
 			return;
@@ -212,7 +187,7 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 		if (messageData instanceof EntityData) {
 			IEntity entity = ((EntityData) messageData).getEntity();
 			if (!(entity instanceof Costumer)) {
-				m_logger.warning("Received entity not of the type requested.");
+				m_Logger.warning("Received entity not of the type requested.");
 				return;
 			}
 
@@ -222,7 +197,7 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 			List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 			for (IEntity entity : entities) {
 				if (!(entity instanceof ShopManager)) {
-					m_logger.warning("Received entity not of the type requested.");
+					m_Logger.warning("Received entity not of the type requested.");
 					return;
 				}
 				ShopManager shopManager = (ShopManager) entity;
@@ -234,27 +209,9 @@ public class CostumerController implements Initializable, Client.ClientStatusHan
 				combo_shop.getSelectionModel().selectFirst();
 			});
 		} else {
-			m_logger.warning("Received message data not of the type requested.");
+			m_Logger.warning("Received message data not of the type requested.");
 			return;
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onClientConnected()
-	{
-		// TODO Shimon : Add event handling
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onClientDisconnected()
-	{
-		// TODO Yoni : Add implementation.
 	}
 
 	/* End of --> Client handlers implementation region */

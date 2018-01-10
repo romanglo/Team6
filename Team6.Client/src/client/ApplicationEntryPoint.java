@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.soap.MessageFactory;
-
 import com.sun.istack.internal.Nullable;
 
 import common.UncaughetExceptions;
@@ -180,6 +178,9 @@ public class ApplicationEntryPoint extends Application
 	private static void disposeConnection()
 	{
 		if (Client != null) {
+			Client.setClientStatusHandler(null);
+			Client.setMessagesHandler(null);
+			
 			Client.closeConnectionWithServer();
 			s_logger.info("Client disposed successfully");
 		}

@@ -51,13 +51,15 @@ public class Client extends AbstractClient
 	{
 
 		/**
-		 * Update the UI after the connection to the server.
+		 * Update the UI after the connection to the server, this method called from
+		 * exception unsafe scope.
 		 *
 		 */
 		void onClientConnected();
 
 		/**
-		 * Update the UI after the disconnection from the server.
+		 * Update the UI after the disconnection from the server, this method called
+		 * from exception unsafe scope.
 		 *
 		 */
 		void onClientDisconnected();
@@ -176,9 +178,9 @@ public class Client extends AbstractClient
 			return;
 		}
 
-		
-		if(m_messageReceiveHandler== null) {
-			m_logger.info("A message received from the server, but does not registered a handler so the message is thrown out");
+		if (m_messageReceiveHandler == null) {
+			m_logger.info(
+					"A message received from the server, but does not registered a handler so the message is thrown out");
 		} else {
 			m_logger.info("A message received from the server.");
 		}
@@ -194,7 +196,11 @@ public class Client extends AbstractClient
 	@Override
 	protected void connectionClosed()
 	{
-		m_clientStatusHandler.onClientDisconnected();
+		m_logger.info("The connection with the server closed");
+
+		if (m_clientStatusHandler != null) {
+			m_clientStatusHandler.onClientDisconnected();
+		}
 	}
 
 	@Override
@@ -217,7 +223,11 @@ public class Client extends AbstractClient
 	@Override
 	protected void connectionEstablished()
 	{
-		m_clientStatusHandler.onClientConnected();
+		m_logger.info("The connection with the server opened successfully.");
+
+		if (m_clientStatusHandler != null) {
+			m_clientStatusHandler.onClientConnected();
+		}
 	}
 
 	/**
