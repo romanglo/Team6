@@ -663,7 +663,7 @@ public class QueryGenerator {
 		stringBuilder.append("SELECT * FROM reservations_reports WHERE ");
 		stringBuilder.append("smId = ");
 		stringBuilder.append(shopManagerId);
-		stringBuilder.append("AND rrYear = '");
+		stringBuilder.append(" AND rrYear = '");
 		stringBuilder.append(s_yearFormat.format(year));
 		stringBuilder.append("' AND rrQuarter = ");
 		stringBuilder.append(quarter);
@@ -757,7 +757,7 @@ public class QueryGenerator {
 		stringBuilder.append("SELECT * FROM incomes_reports WHERE ");
 		stringBuilder.append("smId = ");
 		stringBuilder.append(shopManagerId);
-		stringBuilder.append("AND irYear = '");
+		stringBuilder.append(" AND irYear = '");
 		stringBuilder.append(s_yearFormat.format(year));
 		stringBuilder.append("' AND irQuarter = ");
 		stringBuilder.append(quarter);
@@ -829,7 +829,7 @@ public class QueryGenerator {
 		stringBuilder.append("SELECT * FROM surveys_reports WHERE ");
 		stringBuilder.append("smId = ");
 		stringBuilder.append(shopManagerId);
-		stringBuilder.append("AND srYear = '");
+		stringBuilder.append(" AND srYear = '");
 		stringBuilder.append(s_yearFormat.format(year));
 		stringBuilder.append("' AND srQuarter = ");
 		stringBuilder.append(quarter);
@@ -909,7 +909,7 @@ public class QueryGenerator {
 		stringBuilder.append("SELECT * FROM complaints_reports WHERE ");
 		stringBuilder.append("smId = ");
 		stringBuilder.append(shopManagerId);
-		stringBuilder.append("AND crYear = '");
+		stringBuilder.append(" AND crYear = '");
 		stringBuilder.append(s_yearFormat.format(year));
 		stringBuilder.append("' AND crQuarter = ");
 		stringBuilder.append(quarter);

@@ -520,6 +520,8 @@ LOCK TABLES users WRITE;
 INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES 
 ('companyemployee','companyemployee','companyemployee@local','CompanyEmployee'),
 ('shopmanager','shopmanager','shopmanager@local','ShopManager'),
+('shopmanager2','shopmanager2','shopmanager@local','ShopManager'),
+('shopmanager3','shopmanager3','shopmanager@local','ShopManager'),
 ('chainmanager','chainmanager','chainmanager@local','ChainManager'),
 ('administrator','administrator','administrator@local','Administrator'),
 ('shopemployee','shopemployee','shopemployee@local','ShopEmployee'),
@@ -527,9 +529,12 @@ INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES
 ('costumer','costumer','costumer@local','Costumer'),
 ('servicespecialist','servicespecialist','servicespecialist@local','ServiceSpecialist');
 
+
 LOCK TABLES shop_managers WRITE;
 INSERT INTO shop_managers (uUserName) VALUES
-('shopmanager');
+('shopmanager'),
+('shopmanager2'),
+('shopmanager3');
 
 LOCK TABLES shop_employees WRITE;
 INSERT INTO shop_employees (uUserName,smId) VALUES
@@ -570,4 +575,57 @@ LOCK TABLES complaints WRITE;
 INSERT INTO complaints (cId,smId ,coComplaint ) VALUES 
 (1,1,'The received product is not as orders.');
 
+LOCK TABLES complaints_reports WRITE;
+INSERT INTO complaints_reports (smId ,crYear, crQuarter, crMonth1, crMonth2, crMonth3) VALUES 
+(1,'2017',1,0,0,1),
+(1,'2018',1,1,2,3),
+(1,'2018',2,4,5,6),
+(1,'2018',3,7,8,9),
+(1,'2018',4,10,11,12),
+(2,'2017',1,1,1,0),
+(2,'2018',1,12,11,10),
+(2,'2018',2,9,8,7),
+(2,'2018',3,6,5,3),
+(2,'2018',4,3,2,1);
+
+LOCK TABLES surveys_reports WRITE;
+INSERT INTO surveys_reports (smId ,srYear, srQuarter, srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES 
+(1,'2017',1,0,0,1,1,1,1),
+(1,'2018',1,1,2,3,1,1,1),
+(1,'2018',2,4,5,6,1,1,1),
+(1,'2018',3,7,8,9,1,1,1),
+(1,'2018',4,10,11,12,1,1,1),
+(2,'2017',1,1,1,0,1,1,1),
+(2,'2018',1,12,11,10,1,1,1),
+(2,'2018',2,9,8,7,1,1,1),
+(2,'2018',3,6,5,3,1,1,1),
+(2,'2018',4,3,2,1,1,1,1);
+
+LOCK TABLES incomes_reports WRITE;
+INSERT INTO incomes_reports (smId ,irYear, irQuarter, irMonth1, irMonth2, irMonth3) VALUES 
+(1,'2017',1,0,0,1),
+(1,'2018',1,5246,2,3),
+(1,'2018',2,4,1341,6),
+(1,'2018',3,100,8,9),
+(1,'2018',4,10,11,12),
+(2,'2017',2,1,4124,0),
+(2,'2018',1,1768,11,10),
+(2,'2018',2,9,6363,7),
+(2,'2018',3,6,5,857875),
+(2,'2018',4,3,2,1);
+
+LOCK TABLES reservations_reports WRITE;
+INSERT INTO reservations_reports (smId ,rrYear, rrQuarter,rrMonth1_Flower, rrMonth1_FlowerPot, rrMonth1_FlowerArrangement,rrMonth1_BridalBouquet,rrMonth2_Flower,rrMonth2_FlowerPot,rrMonth2_FlowerArrangement,rrMonth2_BridalBouquet, rrMonth3_Flower, rrMonth3_FlowerPot ,rrMonth3_FlowerArrangement,rrMonth3_BridalBouquet) VALUES 
+(1,'2017',1,0,0,1,1,0,0,1,1,0,0,1,1),
+(1,'2018',1,1,2,3,1,1,1,0,0,1,1,0,0),
+(1,'2018',2,4,5,6,1,1,1,0,0,1,1,0,0),
+(1,'2018',3,7,8,9,1,1,1,0,0,1,1,0,0),
+(1,'2018',4,1,1,2,1,1,1,0,0,1,1,0,0),
+(2,'2017',1,1,1,0,1,1,1,0,0,1,1,0,0),
+(2,'2018',1,1,1,0,1,1,1,0,0,1,1,0,9),
+(2,'2018',2,9,8,7,1,1,1,0,0,1,1,0,0),
+(2,'2018',3,6,5,3,1,1,1,0,0,1,1,0,0),
+(2,'2018',4,3,2,1,1,1,1,0,0,1,1,0,0);
+
 UNLOCK TABLES;         
+

@@ -12,6 +12,7 @@ import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
 import javafx.fxml.Initializable;
+import javafx.stage.Stage;
 import logger.LogManager;
 
 /**
@@ -81,8 +82,8 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	}
 
 	/**
-	 * Hook method called when the controller initialized. The default
-	 * implementation does nothing, it may be overridden by extending class.
+	 * The method called when the controller initialized. The default implementation
+	 * does nothing, it may be overridden by extending class.
 	 */
 	protected abstract void internalInitialize() throws Exception;
 
@@ -182,4 +183,42 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	}
 
 	// end region -> Nested Classes
+
+	// region Methods
+
+	/**
+	 * 
+	 * {@link BaseController} dispose methods, should be called on {@link Stage}
+	 * closing sequence.
+	 *
+	 */
+	public final void dispose()
+	{
+
+		try {
+			if (m_Client != null) {
+				m_Client.setClientStatusHandler(null);
+			}
+			if (m_timer != null) {
+				m_timer.cancel();
+				m_timer = null;
+			}
+			internalDispose();
+			m_Logger.info("Base controller disposed successfully");
+		}
+		catch (Exception ex) {
+			m_Logger.info("Base controller failed on try to dispose! Exception: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * Hook method called when the controller has been disposed. The default
+	 * implementation does nothing, it may be overridden by extending class.
+	 */
+	protected void internalDispose()
+	{
+
+	}
+
+	// end region -> Public Methods
 }

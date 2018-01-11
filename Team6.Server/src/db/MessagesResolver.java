@@ -276,7 +276,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 		}
 		userEntity.setStatus(UserStatus.Connected);
 		onUserEntityReceived(userEntity, EntityDataOperation.Update);
-		m_logger.info("An user connected from the system! User Details: " + userEntity);
+		m_logger.info("An user connected to the system! User Details: " + userEntity);
 		return userEntityData;
 	}
 

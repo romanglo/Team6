@@ -204,9 +204,13 @@ public class CostumerController extends BaseController implements  Client.Messag
 				shops.add(shopManager.getId());
 			}
 			
-			combo_shop.setItems(shops);
 			Platform.runLater(()->{
-				combo_shop.getSelectionModel().selectFirst();
+				if (shops != null && !shops.isEmpty()) {
+					combo_shop.setItems(shops); 
+					combo_shop.getSelectionModel().selectFirst();
+				} else {
+					combo_shop.getItems().clear();
+				}
 			});
 		} else {
 			m_Logger.warning("Received message data not of the type requested.");

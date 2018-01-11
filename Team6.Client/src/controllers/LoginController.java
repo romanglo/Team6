@@ -6,6 +6,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import com.sun.istack.internal.Nullable;
+
 import client.ApplicationEntryPoint;
 import client.Client;
 import javafx.event.ActionEvent;
@@ -79,7 +81,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	private Stage m_connectingStage;
 
 	private boolean m_canceled;
-	
+
 	/* End of --> Fields region */
 
 	/* UI events region */
@@ -226,7 +228,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			m_canceled = false;
 			return;
 		}
-		
+
 		javafx.application.Platform.runLater(() -> m_connectingStage.close());
 
 		IMessageData messageData = msg.getMessageData();
@@ -322,10 +324,6 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				url = getClass().getResource("/boundaries/Administrator.FXML");
 			break;
 
-			case ChainManager:
-				url = getClass().getResource("/boundaries/ChainManager.FXML");
-			break;
-
 			case CompanyEmployee:
 				url = getClass().getResource("/boundaries/CompanyEmployee.FXML");
 			break;
@@ -346,6 +344,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				url = getClass().getResource("/boundaries/ShopEmployee.FXML");
 			break;
 
+			case ChainManager:
 			case ShopManager:
 				url = getClass().getResource("/boundaries/ShopManager.FXML");
 			break;
@@ -362,9 +361,14 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		ApplicationEntryPoint.ConnectedUser = userEntity;
 
 		Scene scene = null;
+		BaseController baseController = null;
 		try {
 			FXMLLoader fxmlLoader = new FXMLLoader(url);
 			Parent parent = (Parent) fxmlLoader.load();
+			Object controller = fxmlLoader.getController();
+			if (controller instanceof BaseController) {
+				baseController = (BaseController) controller;
+			}
 			scene = new Scene(parent);
 			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 		}
@@ -375,7 +379,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			return;
 		}
 		if (scene != null) {
-			javafx.application.Platform.runLater(new NextWindowLoader(scene));
+			javafx.application.Platform.runLater(new NextWindowLoader(scene,baseController));
 		}
 
 	}
@@ -409,7 +413,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 		m_connectingStage.showAndWait();
 	}
-	
+
 	/* End of --> Private methods region */
 
 	/* Nested classes region */
@@ -419,9 +423,12 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 		private Scene m_nextScene;
 
-		public NextWindowLoader(Scene nextScene)
+		private BaseController m_baseController;
+
+		public NextWindowLoader(Scene nextScene, @Nullable BaseController baseController)
 		{
 			m_nextScene = nextScene;
+			m_baseController = baseController;
 		}
 
 		@Override
@@ -432,6 +439,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				nextStage = new Stage();
 				nextStage.setScene(m_nextScene);
 				nextStage.setTitle("Zer-Li");
+				if (m_baseController != null) {
+					nextStage.setOnHidden(e -> m_baseController.dispose());
+				}
 				nextStage.show();
 			}
 			catch (Exception e) {
@@ -449,7 +459,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			}
 		}
 	}
-	
+
 	/* End of --> Nested classes region */
 
 }
