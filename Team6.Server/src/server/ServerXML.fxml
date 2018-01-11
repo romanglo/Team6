@@ -86,6 +86,15 @@
 										<DropShadow color="#00000084" />
 									</effect>
 								</Circle>
+								<Label layoutX="14.0" layoutY="176.0"
+									text="Number of connected users: " />
+								<Label fx:id="label_numberOfConnectedUsers" layoutX="308.0"
+									layoutY="175.0" text="0" />
+								<Label layoutX="14.0" layoutY="210.0" text="Log:" />
+								<Button fx:id="btn_run_logger_file" layoutX="313.0"
+									layoutY="201.0" mnemonicParsing="false" onAction="#runLoggerFile"
+									prefHeight="18.0" prefWidth="115.0" text="Open Log file"
+									AnchorPane.rightAnchor="10.0" />
 								<TextArea id="textarea_log" fx:id="textarea_log"
 									editable="false" layoutX="5.0" layoutY="232.0" prefHeight="149.0"
 									prefWidth="420.0" scrollLeft="1.0" AnchorPane.bottomAnchor="10.0"
@@ -95,11 +104,6 @@
 										<Insets />
 									</opaqueInsets>
 								</TextArea>
-								<Label layoutX="14.0" layoutY="212.0" text="Log:" />
-								<Label layoutX="14.0" layoutY="182.0"
-									text="Number of connected users: " />
-								<Label fx:id="label_numberOfConnectedUsers" layoutX="308.0"
-									layoutY="182.0" text="0" />
 							</children>
 						</AnchorPane>
 					</content>
@@ -126,7 +130,7 @@
 									</columnResizePolicy>
 								</TableView>
 								<Button fx:id="btn_update_settings" mnemonicParsing="false"
-									onAction="#updateSettingsFile" prefHeight="24.0" prefWidth="80.0"
+									onAction="#updateSettingsFile" prefHeight="20.0" prefWidth="80.0"
 									text="Update file" AnchorPane.bottomAnchor="11.0"
 									AnchorPane.rightAnchor="14.0" />
 							</children>

@@ -178,14 +178,10 @@ public class DbController extends Startable {
 			return false;
 		}
 
-		Statement stmt;
 		try {
-			stmt = m_connection.createStatement();
-			boolean result = stmt.executeUpdate(query) == 1;
-			if (!result) {
-				m_Logger.info("The query: \"" + query + "\" does not effect any row.");
-			}
-			return result;
+			Statement stmt = m_connection.createStatement();
+			stmt.executeUpdate(query);
+			return true;
 		} catch (SQLException ex) {
 			m_Logger.warning("Failed on try to execute the query: " + query + " , exception: " + ex);
 			return false;

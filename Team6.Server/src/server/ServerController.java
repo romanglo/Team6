@@ -1,5 +1,7 @@
 package server;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
@@ -100,6 +102,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private ImageView imageview_gif;
 	@FXML
 	private ImageView imageview_title;
+	@FXML
+	Button btn_run_logger_file;
 
 	// end region -> UI Elements
 
@@ -114,6 +118,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private Logger m_logger;
 
 	private MessagesResolver m_messageResolver;
+
+	private boolean m_resetUserStatus;
 
 	private final static DateTimeFormatter s_dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
 
@@ -224,6 +230,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		m_server = ApplicationEntryPoint.Server;
 		m_configuration = ServerConfiguration.getInstance();
 		m_logger = LogManager.getLogger();
+		m_resetUserStatus = false;
 	}
 
 	// end region -> Initializable Implementation
@@ -240,10 +247,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			btn_db_stop.setDisable(false);
 			circle_db_on.setFill(Paint.valueOf("green"));
 			circle_db_off.setFill(Paint.valueOf("grey"));
+
 		} catch (Exception e) {
 			addMessageToLog("Failed to disconnect from database, exception : " + e.getMessage());
 			m_logger.log(Level.SEVERE, "Failed to connect to database", event);
 			return;
+		}
+		if (m_resetUserStatus) {
+			resetUsersStatus();
 		}
 		addMessageToLog("Connected successfully to the database");
 	}
@@ -307,6 +318,42 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		btn_update_settings.setDisable(true);
 	}
 
+	@FXML
+	private void runLoggerFile(ActionEvent event) {
+		String loggerPath = LogManager.getLoggerPath();
+		if (!(loggerPath != null && !loggerPath.isEmpty())) {
+			m_logger.warning("'Show Text Log' button while the log path not initialized.");
+			showInformationMessage("Text log file did not initialized.");
+			return;
+		}
+
+		File file = new File(loggerPath);
+		if (!file.exists()) {
+			m_logger.warning("There is not a log in the receiving log path: " + loggerPath);
+			showInformationMessage("Text logger did not initialized.");
+			return;
+		}
+
+		// check if Desktop is supported by Platform or not
+		if (!Desktop.isDesktopSupported()) {
+			m_logger.info(
+					"'Desktop Platform' is not supported in this computer, so it is impossible to open text log file.");
+			showInformationMessage("Error:\nFiles opening platfron are not supported in this computer!\nLog path: \""
+					+ loggerPath + "\"");
+			return;
+
+		}
+
+		Desktop desktop = Desktop.getDesktop();
+
+		try {
+			desktop.open(file);
+		} catch (IOException ex) {
+			m_logger.severe("Failed on try to open the text logger file! Exception: " + ex.getMessage());
+			showInformationMessage(
+					"Some error occured on try to open the text log file!\nLog path: \"" + loggerPath + "\"");
+		}
+	}
 	// end region -> UI Methods
 
 	// region Private Methods
@@ -353,8 +400,35 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				textarea_log.appendText(time + " - " + msg + ".\n");
 			});
 		}
-
 	}
+
+	private void resetUsersStatus() {
+		if (!m_dbContoller.isRunning()) {
+			m_resetUserStatus = true;
+			m_logger.info("The request to reset all user status will happened when the DB connect.");
+			return;
+		}
+
+		try {
+			String updateAllUsersToDisconnectQuery = QueryGenerator.updateAllUsersToDisconnectQuery();
+			boolean executeQuery = m_dbContoller.executeQuery(updateAllUsersToDisconnectQuery);
+			String msg;
+			if (executeQuery) {
+				msg = "All users status updated to 'Disconnected' successfully.";
+				m_logger.info(msg);
+			} else {
+				msg = "Failed on try to update all users to 'Disconnected' status, client connection problems may occur. See the log file for more information.";
+				m_logger.warning(msg);
+			}
+			addMessageToLog(msg);
+			m_resetUserStatus = false;
+		} catch (Exception ex) {
+			m_logger.warning(
+					"Failed on try to update all users to 'Disconnected' status, client connection problems may occur. exception: "
+							+ ex.getMessage());
+		}
+	}
+
 	// end region -> Private Methods
 
 	// region Server Handlers Implementation
@@ -371,27 +445,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		circle_connectivity_off.setFill(Paint.valueOf("grey"));
 		addMessageToLog("TCP\\IP connection opened successfully");
 
-		try {
-			String updateAllUsersToDisconnectQuery = QueryGenerator.updateAllUsersToDisconnectQuery();
-			boolean executeQuery = m_dbContoller.executeQuery(updateAllUsersToDisconnectQuery); // TODO ROMAN -
-																								// returning false while
-																								// its work..
-			String msg;
-			if (executeQuery) {
-				msg = "All users status updated to 'Disconnected' successfully.";
-				m_logger.info(msg);
-			} else {
-				msg = "Failed on try to update all users to 'Disconnected' status, client connection problems may occur. See the log file for more information.";
-				m_logger.warning(msg);
-			}
-
-			addMessageToLog(msg);
-
-		} catch (Exception ex) {
-			m_logger.warning(
-					"Failed on try to update all users to 'Disconnected' status, client connection problems may occur. exception: "
-							+ ex.getMessage());
-		}
+		resetUsersStatus();
 	}
 
 	/**

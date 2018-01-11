@@ -179,7 +179,7 @@ public class QueryGenerator {
 	}
 
 	public static String updateAllUsersToDisconnectQuery() {
-		return "UPDATE users SET uStatus = 'Disconnected' ;";
+		return "UPDATE users SET uStatus = 'Disconnected' WHERE uStatus = 'Connected' ;";
 	}
 	// End region -> User Entity
 
