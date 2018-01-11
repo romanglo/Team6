@@ -24,15 +24,21 @@ class LogFormatter extends Formatter
 		Date date = new Date(record.getMillis());
 		String time = s_localDateFormat.format(date);
 
+		String recoredMessage = record.getMessage();
 		Throwable thrown = record.getThrown();
+
+		String endWiths = recoredMessage.endsWith(".") || recoredMessage.endsWith("!") ? "" : ".";
+
 		String msg;
 		if (thrown == null) {
-			msg = MessageFormat.format("{0} - {1}/{2}${3}: {4}.\n", time, record.getLevel(),
-					record.getSourceClassName(), record.getSourceMethodName(), record.getMessage());
+			msg = MessageFormat.format("{0} - {1}/{2}${3}: {4}{5}\n", time, record.getLevel(),
+					record.getSourceClassName(), record.getSourceMethodName(), recoredMessage, endWiths);
 		} else {
-			msg = MessageFormat.format("{0} - {1}/{2}${3}: {4}. Exception: {5}\n", time, record.getLevel(),
-					record.getSourceClassName(), record.getSourceMethodName(), record.getMessage(), thrown.toString());
+			msg = MessageFormat.format("{0} - {1}/{2}${3}: {4}{5} Exception: {6}\n", time, record.getLevel(),
+					record.getSourceClassName(), record.getSourceMethodName(), recoredMessage, endWiths,
+					thrown.toString());
 		}
+
 		return msg;
 	}
 }

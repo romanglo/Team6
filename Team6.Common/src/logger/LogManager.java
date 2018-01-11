@@ -17,7 +17,9 @@ import java.util.logging.Logger;
 public class LogManager
 {
 
-	private static Logger s_instance;
+	private static Logger s_instance = null;
+
+	private static String s_path = null;
 
 	/**
 	 * If it is the first call to the method, the method will create a log to the
@@ -45,6 +47,15 @@ public class LogManager
 			}
 		}
 		return s_instance;
+	}
+
+	/**
+	 * @return returns the {@link String} path of the current logger if it
+	 *         initialized and <code>null </code> if does not.
+	 */
+	public static String getLoggerPath()
+	{
+		return s_path;
 	}
 
 	/**
@@ -79,7 +90,7 @@ public class LogManager
 
 			File logPath = new File(logName);
 			logger.config("Log created successfully on 'All' Level. Log path: " + logPath.getAbsolutePath());
-
+			s_path = logPath.getPath();
 			return logger;
 		}
 		catch (Exception exception) {
