@@ -9,8 +9,6 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import entities.ComplaintEntity;
-import entities.SurveyEntity;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,8 +22,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.Message;
-import messages.MessagesFactory;
+import newMessages.Message;
 
 
 /**
@@ -116,6 +113,12 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 		}
 	}
 	
+	/**
+	 * The function opens treatment an open complaint window  
+	 *
+	 * @param event
+	 * 			treatment An Open Complain button clicked.
+	 */
 	@FXML
 	public void treatmentAnOpenComplain(ActionEvent event) 
 	{
@@ -240,7 +243,6 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 		
 	}
 
-	/* End of --> Client handlers implementation region */
 	
 	
 	

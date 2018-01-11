@@ -3,14 +3,16 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import entities.IEntity;
-import entities.SurveyEntity;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,14 +22,18 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.Message;
-import messages.MessagesFactory;
+import newEntities.IEntity;
+import newEntities.ShopSurvey;
+import newMessages.EntitiesListData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 
 /**
@@ -41,7 +47,7 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 {
 	/* UI Binding Fields region */
 
-	@FXML TextField textfield_surveyid;
+	@FXML ComboBox<Integer> combobox_id;
 	
 	@FXML TextArea textarea_analysis;
 	// Title images :
@@ -59,6 +65,12 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 	private Client m_client;
 
 	private ClientConfiguration m_configuration;
+	
+	private List<IEntity> m_surveys_array;
+	
+	private ArrayList<Integer> m_surveysid_array=new ArrayList<>();
+	
+	private ObservableList<Integer> list;
 	/* End of --> Fields region */
 
 	/* UI events region */
@@ -100,14 +112,21 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 	@FXML
 	public void saveButtonClick(ActionEvent event)
 	{
-		if(textfield_surveyid.getText().equals("")||textarea_analysis.getText().equals(""))
+		if(combobox_id.getValue()==null||textarea_analysis.getText().equals(""))
 		{
 		showInformationMessage("One or more of the fileds are empty");
 		}
 		else
 		{
-			SurveyEntity entity = new SurveyEntity(Integer.parseInt(textfield_surveyid.getText()));
-			Message msg= MessagesFactory.createGetEntityMessage(entity);
+			ShopSurvey entity=null;
+			for(int i=0;i<m_surveys_array.size();i++)
+			{
+				if(((ShopSurvey)m_surveys_array.get(i)).getId()==combobox_id.getValue())
+					entity=(ShopSurvey)m_surveys_array.get(i);
+			}
+			entity.setSummary(textarea_analysis.getText());
+			entity.setClosed(true);
+			Message msg= MessagesFactory.createUpdateEntityMessage(entity);
 			m_client.sendMessageToServer(msg);
 		}
 	}
@@ -142,6 +161,7 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
+		initializeSurveys();
 	}
 
 	private void initializeFields()
@@ -176,6 +196,12 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 		m_client.setMessagesHandler(this);
 		m_client.setClientStatusHandler(this);
 	}
+	private void initializeSurveys()
+	{
+		ShopSurvey entity= new ShopSurvey(); 
+		Message msg = MessagesFactory.createGetAllEntityMessage(entity);
+		m_client.sendMessageToServer(msg);
+	}
 
 	/* End of --> Initializing methods region */
 
@@ -187,14 +213,31 @@ public class CostumerServiceEmployee_AddSpecialistAnalysis implements Initializa
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		if(msg.getMessageData() instanceof IEntity)
+		if(msg.getMessageData() instanceof RespondMessageData)
 		{
-			SurveyEntity entity=(SurveyEntity)msg.getMessageData();
-			entity.setAnalysis(textarea_analysis.getText());
-			msg=MessagesFactory.createUpdateEntityMessage(entity);
-			m_client.sendMessageToServer(msg);
+			if(((RespondMessageData)msg.getMessageData()).isSucceed())
+			{
+				m_logger.severe("Update succssed");
+			}
+			else
+			{
+				m_logger.severe("Cant insert analysis");
+			}
+
 		}
-			
+		else if(msg.getMessageData() instanceof EntitiesListData)
+		{
+			m_surveys_array=((EntitiesListData)msg.getMessageData()).getEntities();
+			for(int i=0;i<m_surveys_array.size();i++)
+			{
+				if(!(((ShopSurvey)m_surveys_array.get(i)).isClosed()))
+				{
+				m_surveysid_array.add(((ShopSurvey)m_surveys_array.get(i)).getId());
+				}
+			}
+			list = FXCollections.observableArrayList(m_surveysid_array);
+			combobox_id.setItems(list);	
+		}	
 	}
 
 	/**

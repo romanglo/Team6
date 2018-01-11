@@ -4,16 +4,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import entities.ComplaintEntity;
-import entities.CostumerEntity;
-import entities.IEntity;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -30,12 +25,18 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.EntitiesListData;
-import messages.Message;
-import messages.MessagesFactory;
-import client.Client;
+import newEntities.Complaint;
+import newEntities.Costumer;
+import newEntities.IEntity;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 
 /**
@@ -64,6 +65,8 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 	
 	@FXML private TextArea textarea_summary;
 	
+	@FXML private AnchorPane ancorepane_root;
+	
 
 	/* End of --> UI Binding Fields region */
 
@@ -74,11 +77,13 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 
 	private ClientConfiguration m_configuration;
 	
-	private List<IEntity> m_complaint_array;
+	private List<newEntities.IEntity> m_complaint_array;
 	
-	private ArrayList<String> m_id_array;
+	private ArrayList<String> m_id_array=new ArrayList<>();
 	
 	private ObservableList<String> list;
+	
+	private Complaint complaint_fun;
 	/* End of --> Fields region */
 
 	/* UI events region */
@@ -133,12 +138,13 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 	
 	private void initializeComplaint()
 	{
-		ComplaintEntity entity= new ComplaintEntity(); 
+		Complaint entity= new Complaint(); 
 		Message msg = MessagesFactory.createGetAllEntityMessage(entity);
 		m_client.sendMessageToServer(msg);
 	}
 
 	/* End of --> Initializing methods region */
+	
 	
 	/* UI events region */
 	
@@ -195,51 +201,50 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 	@FXML
 	public void updateClick (ActionEvent event)
 	{
-		try {
-				int id=Integer.parseInt(combobox_id.getPromptText());
-				boolean flag=false;
-				int i=0;
-				while(!(m_complaint_array.isEmpty())||(flag==true))
-				{
-					ComplaintEntity temp=(ComplaintEntity) m_complaint_array.get(i);
-					if(temp.getId()==id)
-						flag=true;
-					i++;
-				}
-				i--;
-				ComplaintEntity temp =(ComplaintEntity)m_complaint_array.get(i);
-				if(textarea_summary.getText().equals(""))
-					showInformationMessage("Summary field is empty");
-				else
-				{
-					if(!(financial_compensation.isDisable()))
-					{
-						if(financial_compensation.getText().equals(""))
-							showInformationMessage("Financial compensation is empty");
-						else
-						{
-							temp.setSumerry(textarea_summary.getText());
-							temp.getCostumer().setRefund(temp.getCostumer().getCostumerRefunds()+Integer.parseInt(financial_compensation.getText()));
-							temp.setActive(false);
-						}
-					}
-					else
-					{
-						temp.setSumerry(textarea_summary.getText());
-						temp.setActive(false);
-					}
-				}
-				Message msg = MessagesFactory.createUpdateEntityMessage(temp); 
-				m_client.sendMessageToServer(msg);
-			}
-		catch (NumberFormatException e) {
-			System.out.println("Failed to parse string to integer. Invalid value");
+		int com_id=Integer.parseInt(combobox_id.getValue());
+		int i=0;
+		while(((Complaint)m_complaint_array.get(i)).getId()!=com_id)
+		{
+			i++;
 		}
-		catch (Exception ex) {
-			System.out.println("Error when sending data for update. Exception: " + ex.getMessage());
+		((Complaint)m_complaint_array.get(i)).setSummary(textarea_summary.getText());
+		if(!(financial_compensation.isDisable()))
+		{
+			complaint_fun=(Complaint)m_complaint_array.get(i);
+			complaint_fun.setComplaint(textarea_complaint.getText());
+			Costumer cos_entity=new Costumer();
+			cos_entity.setId(com_id);
+			Message msg=MessagesFactory.createGetEntityMessage(cos_entity);
+			m_client.sendMessageToServer(msg);
+		}
+		else
+		{
+		Message msgg=MessagesFactory.createUpdateEntityMessage(m_complaint_array.get(i));
+		m_client.sendMessageToServer(msgg);
+		ancorepane_root.setDisable(true);
 		}
 	}
 	
+	@FXML
+	public void setIdInCombobox()
+	{
+		list = FXCollections.observableArrayList(m_id_array);
+		combobox_id.setItems(list);	
+	}
+	
+	@FXML
+	public void chooseComplaint(ActionEvent event)
+	{
+		int id=Integer.parseInt(combobox_id.getValue());
+		Complaint comp=null;
+		for(int i=0;i<m_complaint_array.size();i++)
+		{
+			Complaint temp=(Complaint)m_complaint_array.get(i);
+			if(temp.getCostumerId()==id)
+				comp=(Complaint)m_complaint_array.get(i);
+		}
+		textarea_complaint.setText(comp.getComplaint());
+	}
 	/* End of --> UI events region */
 	
 	// region Private Methods
@@ -253,8 +258,8 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 		alert.setTitle("Information Dialog");
 		alert.setHeaderText(null);
 		alert.setContentText(message);
-
 		alert.showAndWait();
+		ancorepane_root.setDisable(false);
 	}
 	
 	/* End of --> Private Methods region */
@@ -267,19 +272,57 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 	@Override
 	public synchronized void onMessageReceived(Message msg) 
 	{
-		if(msg.getMessageData() instanceof EntitiesListData )
+		boolean flag=true;
+		IMessageData messageData = msg.getMessageData();
+		if(messageData instanceof EntitiesListData ) 				// Happens when initializeComplaint works fill m_complaint_array.  
 		{
 			EntitiesListData entitiesListData = (EntitiesListData)msg.getMessageData();
 			m_complaint_array = entitiesListData.getEntities();
 			for(int i=0;i<m_complaint_array.size();i++)
 			{
-				ComplaintEntity temp=(ComplaintEntity)(m_complaint_array.get(i));
-				m_id_array.add(Integer.toString(temp.getId()));
+				Complaint temp=(Complaint)(m_complaint_array.get(i));
+				String s=Integer.toString(temp.getId());
+				m_id_array.add(s);
 			}
-			 list = FXCollections.observableArrayList(m_id_array);
-			combobox_id.setItems(list);
-			
+			setIdInCombobox();
 		}
+		else 
+			if(messageData instanceof EntityData )						// Happens when it need to update refund.
+			{				
+				Costumer cos_entity= (Costumer)((EntityData)messageData).getEntity();
+				cos_entity.setBalance(cos_entity.getBalance()+Float.parseFloat(financial_compensation.getText()));
+				msg=MessagesFactory.createUpdateEntityMessage(cos_entity);
+				m_client.sendMessageToServer(msg);
+			}
+		else
+			if(msg.getMessageData() instanceof RespondMessageData)						// Respond from server
+			{
+				RespondMessageData res=(RespondMessageData)msg.getMessageData(); 
+				if(res.getMessageData() instanceof Costumer )							// Respond about costumer refund
+				{
+					if(!(res.isSucceed()))
+						flag=false;
+					else
+					{
+						complaint_fun.setOpened(false);
+						msg=MessagesFactory.createUpdateEntityMessage(complaint_fun);
+						m_client.sendMessageToServer(msg);
+					}
+				}
+				else
+				{
+					if(flag==false)
+					{
+						m_logger.severe("Can't Update complaint please try again");
+						ancorepane_root.setDisable(false);
+					}
+					else
+					{
+						m_logger.severe("Update succssed");
+						ancorepane_root.setDisable(false);
+					}
+				}
+			}
 	}
 		
 

@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import entities.AnswersEntity;
+import entities.Answers;
 import entities.IEntity;
 import entities.SurveyEntity;
 import javafx.collections.FXCollections;
@@ -128,7 +128,7 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 				int answer4=Integer.parseInt(combobox_answer4.getValue());
 				int answer5=Integer.parseInt(combobox_answer5.getValue());
 				int answer6=Integer.parseInt(combobox_answer6.getValue());
-				AnswersEntity answer_entity= new AnswersEntity(answer1, answer2, answer3, answer4, answer5, answer6);
+				Answers answer_entity= new Answers(answer1, answer2, answer3, answer4, answer5, answer6);
 				entity.AddAnswers(answer_entity);
 				Message msg= MessagesFactory.createUpdateEntityMessage(entity);
 				m_client.sendMessageToServer(msg);
@@ -148,8 +148,8 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 				questions[3]=textfiled_question4.getText();
 				questions[4]=textfiled_question5.getText();
 				questions[5]=textfiled_question6.getText();
-				AnswersEntity answer_entity= new AnswersEntity(answer1, answer2, answer3, answer4, answer5, answer6);
-				entity=new SurveyEntity(questions);
+				Answers answer_entity= new Answers(answer1, answer2, answer3, answer4, answer5, answer6);
+				//entity=new SurveyEntity(questions);
 				entity.AddAnswers(answer_entity);
 				Message msg =MessagesFactory.createEntityMessage(entity);
 				m_client.sendMessageToServer(msg);

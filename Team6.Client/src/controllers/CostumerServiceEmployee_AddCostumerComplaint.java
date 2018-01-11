@@ -3,15 +3,20 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import entities.ComplaintEntity;
-import entities.CostumerEntity;
-import entities.IEntity;
+import newEntities.Complaint;
+import newEntities.Costumer;
+import newEntities.IEntity;
+import newEntities.ShopManager;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -23,12 +28,17 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.Message;
-import messages.MessagesFactory;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 
 /**
@@ -55,6 +65,10 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	@FXML private TextField IDField;
 	
 	@FXML private TextArea textarea_costumercomplaint;
+	
+	@FXML private AnchorPane anchorpane_root;
+	
+	@FXML private ComboBox<Integer> combobox_shop;
 
 	/* End of --> UI Binding Fields region */
 
@@ -64,6 +78,14 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	private Client m_client;
 
 	private ClientConfiguration m_configuration;
+	
+	private List<newEntities.IEntity> m_shopmanager_array;
+	
+	private ArrayList<Integer> m_managerid_array=new ArrayList<>();
+	
+	private ObservableList<Integer> list;
+	
+	private List<IEntity> m_costumer_array;
 	/* End of --> Fields region */
 
 	/* UI events region */
@@ -114,8 +136,10 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 		else
 		{
 			int costumer_id=Integer.parseInt(IDField.getText());
-			CostumerEntity entity=new CostumerEntity(costumer_id);
+			Costumer entity=new Costumer();
+			entity.setId(costumer_id);
 			Message msg= MessagesFactory.createGetEntityMessage(entity);
+			m_client.sendMessageToServer(msg);
 		}
 	}
 	
@@ -150,6 +174,7 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
+		initializeShopCombobox();
 	}
 
 	private void initializeFields()
@@ -184,6 +209,13 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 		m_client.setMessagesHandler(this);
 		m_client.setClientStatusHandler(this);
 	}
+	
+	private void initializeShopCombobox()
+	{
+		ShopManager entity= new ShopManager();
+		Message msg=MessagesFactory.createGetAllEntityMessage(entity);
+		m_client.sendMessageToServer(msg);
+	}
 
 	/* End of --> Initializing methods region */
 
@@ -195,16 +227,48 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		if(msg.getMessageData() instanceof IEntity)
+		if(msg.getMessageData() instanceof EntityData)
 		{
-			CostumerEntity entity=(CostumerEntity) msg.getMessageData();
+			Costumer entity=(Costumer)((EntityData)msg.getMessageData()).getEntity();
 			int id=entity.getId();
 			String complaint=textarea_costumercomplaint.getText();
-			ComplaintEntity complaint_entity= new ComplaintEntity(id,complaint,entity);
-			msg=MessagesFactory.createEntityMessage(complaint_entity);
+			Complaint complaint_entity= new Complaint();
+			complaint_entity.setComplaint(complaint);
+			complaint_entity.setCostumerId(id);
+			complaint_entity.setShopManagerId(combobox_shop.getValue());
+			complaint_entity.setCreationDate(new Date());
+			complaint_entity.setOpened(true);
+			msg=MessagesFactory.createAddEntityMessage(complaint_entity);
 			m_client.sendMessageToServer(msg);
 		}
-	}
+		else if (msg.getMessageData() instanceof RespondMessageData)
+			{
+				if(((RespondMessageData)msg.getMessageData()).getMessageData() instanceof EntityData)
+				{
+					if(((EntityData)((RespondMessageData)msg.getMessageData()).getMessageData()).getEntity() instanceof Costumer)
+						{
+							m_logger.severe("The costumer didn't exist");
+						}
+				}
+				else
+				{
+					if(((RespondMessageData)msg.getMessageData()).isSucceed())
+					{
+						m_logger.severe("Successfully added complaint");
+					}
+				}
+			}
+			else if(msg.getMessageData() instanceof EntitiesListData)
+			{
+				m_shopmanager_array=((EntitiesListData)msg.getMessageData()).getEntities();
+				for(int i=0;i<m_shopmanager_array.size();i++)
+				{
+					m_managerid_array.add(((ShopManager)m_shopmanager_array.get(i)).getId());
+				}
+				list = FXCollections.observableArrayList(m_managerid_array);
+				combobox_shop.setItems(list);
+			}
+	}	 
 
 	/**
 	 * {@inheritDoc}
