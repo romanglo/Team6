@@ -363,6 +363,21 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
+	public static String selectSurveyQuery(Survey survey) {
+		int id = survey.getId();
+
+		if (id < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get survey entity with impossiable id: " + id);
+			return null;
+		}
+		return "SELECT * FROM surveys WHERE suId = " + id + ';';
+	}
+
+	public static String selectAllSurveysQuery() {
+		return "SELECT * FROM surveys ;";
+	}
+
 	// end region -> Survey Entity
 
 	// region Complaints Entity
@@ -1147,7 +1162,6 @@ public class QueryGenerator {
 		stringBuilder.append(" ;");
 		return stringBuilder.toString();
 	}
-
 	// end region -> ShopSurvey Entity
 
 }

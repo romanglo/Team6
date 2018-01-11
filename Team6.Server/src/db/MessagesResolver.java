@@ -633,6 +633,27 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 		boolean result = false;
 		switch (operation) {
+		case Get:
+			String selectQuery = QueryGenerator.selectSurveyQuery(survey);
+			if (selectQuery == null) {
+				break;
+			}
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, Survey.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
+		case GetALL:
+			String selectAllQuery = QueryGenerator.selectAllSurveysQuery();
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Reservation.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
+			}
+			break;
 		case Add:
 			String insertQuery = QueryGenerator.insertSurveyQuery(survey);
 			if (insertQuery != null) {
@@ -643,7 +664,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 				survey.setId(lastInsertId);
 			}
 			break;
-
+		
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + survey.toString()
 					+ ", Operation: " + operation.toString());
