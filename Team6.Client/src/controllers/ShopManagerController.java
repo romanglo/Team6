@@ -4,6 +4,8 @@ package controllers;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
@@ -33,8 +35,20 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.IMessageData;
 import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
+import newEntities.ComplaintsReport;
 import newEntities.EntitiesEnums;
+import newEntities.IEntity;
+import newEntities.IncomesReport;
+import newEntities.Report;
+import newEntities.ReservationsReport;
+import newEntities.ShopManager;
+import newEntities.SurveysReport;
 
 /**
  *
@@ -86,6 +100,13 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 	@FXML private Button secondSubmitButton;
 	/* End of --> Selection area declaration */
 
+	/* Charts declaration */
+	@FXML private BarChart<String, Number> barChart_currentChart;
+
+	@FXML private BarChart<String, Number> compareChart;
+
+	/* UI events region */
+
 	/* Fields */
 	private Logger m_logger;
 
@@ -93,6 +114,30 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 
 	private ClientConfiguration m_configuration;
 	/* End of --> Fields region */
+
+	/* Selection store reports */
+	private IncomesReport m_incomesReport;
+
+	private ReservationsReport m_reservationsReport;
+
+	private ComplaintsReport m_complaintsReport;
+
+	private SurveysReport m_surveyReport;
+
+	private IncomesReport m_compareIncomesReport;
+
+	private ReservationsReport m_compareReservationsReport;
+
+	private ComplaintsReport m_compareComplaintsReport;
+
+	private SurveysReport m_compareSurveyReport;
+	/* End of --> Selection store reports */
+
+	/* User ID (Only if User is ShopManager) */
+
+	private Integer m_shopManagerUserID;
+
+	/* End of --> User ID (Only if User is ShopManager) */
 
 	/* Selection report type ComboBox data lists declaration */
 	ObservableList<String> reportsType = FXCollections.observableArrayList(
@@ -105,19 +150,12 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 			EntitiesEnums.Quarter.Apr_Jun.toString(), EntitiesEnums.Quarter.Jul_Sep.toString(),
 			EntitiesEnums.Quarter.Oct_Dec.toString());
 
-	ObservableList<String> stores = FXCollections.observableArrayList("Roladin", "BP", "Amos", "Kinder");
+	ObservableList<String> stores = FXCollections.observableArrayList("1");
 	/* End of --> Selection report type ComboBox data lists declaration */
 
 	/* Month ArrayList */
 	final String[] month = { "", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 	/* End of --> Month ArrayList */
-
-	/* Charts declaration */
-	@FXML private BarChart<String, Number> barChart_currentChart;
-
-	@FXML private BarChart<String, Number> compareChart;
-
-	/* UI events region */
 
 	/* Initializing methods region */
 
@@ -130,7 +168,13 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
+
+		if (ApplicationEntryPoint.ConnectedUser.getPrivilege() == EntitiesEnums.UserPrivilege.ShopManager)
+			getShopManagerId();
+
+		getStoreIdListFromServer();
 		initializeSelection();
+		initializeStoreReportVariables();
 		initializeChartPane();
 	}
 
@@ -178,16 +222,26 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		comboBox_selectionStore.setItems(stores);
 		comboBox_selectionStore.setValue(stores.get(0));
 		textField_selectionYear.setText(Integer.toString(currentDate.get(Calendar.YEAR)));
-		// if(ApplicationEntryPoint.ConnectedUser.getPrivilege() ==
-		// EntitiesEnums.UserPrivilege.ShopManager)
-		// {
-		// comboBox_selectionQuarter.setVisible(false);
-		// textField_selectionYear.setVisible(false);
-		// button_compare.setVisible(false);
-		// comboBox_selectionStore.setVisible(false);
-		// }
+		if (ApplicationEntryPoint.ConnectedUser.getPrivilege() == EntitiesEnums.UserPrivilege.ShopManager) {
+			comboBox_selectionQuarter.setVisible(false);
+			textField_selectionYear.setVisible(false);
+			button_compare.setVisible(false);
+			comboBox_selectionStore.setVisible(false);
+		}
 	}
 
+	@SuppressWarnings("deprecation")
+	private void initializeStoreReportVariables()
+	{
+		int storeId = Integer.parseInt(comboBox_selectionStore.getValue());
+		int quarter = quarters.indexOf(comboBox_selectionQuarter.getValue());
+		int yearInt = Integer.parseInt(textField_selectionYear.getText()) - 1900;
+		Date year = new Date();
+		year.setYear(yearInt);
+		getStoreReportsFromServer(storeId, quarter, year);
+	}
+
+	@SuppressWarnings("deprecation") 
 	private void initializeCompareReportVariables()
 	{
 		secondReportQuarter = new ComboBox<>(quarters);
@@ -208,6 +262,11 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		secondSubmitButton.setPrefWidth(84);
 		secondSubmitButton.setPrefHeight(25);
 		secondSubmitButton.setOnAction(button_submit.getOnAction());
+		Date year = new Date();
+		year.setYear(Integer.parseInt(secondReportYear.getText()));
+		getStoreReportsFromServer(Integer.parseInt(stores.get(0)), quarters.indexOf(secondReportQuarter.getValue()), year);
+		
+		//TODO : FIX compare stage report view. problem with get report from server and show it.
 
 		anchorPane_viewStage.getChildren().addAll(secondReportQuarter, secondReportYear, secondReportType,
 				secondReportStore, secondSubmitButton);
@@ -222,6 +281,7 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		AnchorPane.setLeftAnchor(((Node) secondReportType), 187.0);
 		AnchorPane.setLeftAnchor(((Node) secondReportStore), 369.0);
 		AnchorPane.setLeftAnchor(((Node) secondSubmitButton), 466.0);
+		secondReportStore.setVisible(true);
 	}
 
 	private void initializeChartPane()
@@ -275,7 +335,7 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 	 * Create error window for user.
 	 * 
 	 */
-	private void displayErrorMessage(String errorType)
+	private void errorMSG(String errorType)
 	{
 		Platform.runLater(() -> {
 			Alert errorMessage = new Alert(AlertType.ERROR);
@@ -307,7 +367,8 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 	}
 
 	/**
-	 * Create and initialize the compare report variables and insert them into main stage.
+	 * Create and initialize the compare report variables and insert them into main
+	 * stage.
 	 * 
 	 */
 	private void compareReportsNewStage()
@@ -316,7 +377,7 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		AnchorPane.setTopAnchor(((Node) pane_dataPane), 75.0);
 
 		initializeCompareReportVariables();
-		
+
 		CategoryAxis xAxis = new CategoryAxis();
 		NumberAxis yAxis = new NumberAxis();
 		compareChart = new BarChart<String, Number>(xAxis, yAxis);
@@ -329,10 +390,10 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		AnchorPane.setLeftAnchor(((Node) comparePane), 380.0);
 		AnchorPane.setBottomAnchor(((Node) comparePane), 35.0);
 	}
-	
+
 	/**
-	 * Activate when Compare Report button pressed.
-	 * Create and initialize compare report variables. 
+	 * Activate when Compare Report button pressed. Create and initialize compare
+	 * report variables.
 	 * 
 	 */
 	@FXML
@@ -345,10 +406,9 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		button_compare.setDisable(true);
 	}
 
-
 	/**
-	 * Activate when Report Type ComboBox value changed.
-	 * Set the Compare report type accord to the default report type.
+	 * Activate when Report Type ComboBox value changed. Set the Compare report type
+	 * accord to the default report type.
 	 * 
 	 */
 	@FXML
@@ -358,12 +418,39 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		secondReportType.setText(comboBox_selectionReportType.getValue());
 	}
 
+	/**
+	 * Activate when Store ComboBox value changed. Ask report from server.
+	 * 
+	 */
+	@SuppressWarnings({ "unchecked", "deprecation" })
+	@FXML
+	private void selectionStoreChanged(ActionEvent event)
+	{
+		ComboBox<String> selectionComboBox = (ComboBox<String>) event.getSource();
+		int storeId = Integer.parseInt(selectionComboBox.getValue());
+		int quarter, yearInt;
+		java.util.Date year = new Date();
+		if (selectionComboBox.getItems().containsAll(secondReportStore.getItems())) {
+			yearInt = Integer.parseInt(textField_selectionYear.getText()) - 1900;
+			quarter = quarters.indexOf(comboBox_selectionQuarter.getValue());
+			year.setYear(yearInt);
+		} else {
+			yearInt = Integer.parseInt(secondReportYear.getText()) - 1900;
+			quarter = Integer.parseInt(comboBox_selectionQuarter.getValue());
+			year.setYear(yearInt);
+		}
+		getStoreReportsFromServer(storeId, quarter, year);
+	}
+
+	
+
 	@FXML
 	private void showSelectionReport(ActionEvent event)
 	{
 		BarChart<String, Number> barToChange;
 		String selectionStore, reportType, quarter;
 		int selectionYear;
+		Report[] reportData = new Report[4];
 		try {
 			if (event.getSource().equals(button_submit)) {
 				barToChange = barChart_currentChart;
@@ -371,21 +458,29 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 				selectionYear = Integer.parseInt(textField_selectionYear.getText());
 				reportType = comboBox_selectionReportType.getValue();
 				quarter = comboBox_selectionQuarter.getValue();
+				reportData[0] = m_incomesReport;
+				reportData[1] = m_complaintsReport;
+				reportData[2] = m_reservationsReport;
+				reportData[3] = m_surveyReport;
 			} else {
 				barToChange = compareChart;
 				selectionStore = secondReportStore.getValue();
 				selectionYear = Integer.parseInt(secondReportYear.getText());
 				reportType = secondReportType.getText();
 				quarter = secondReportQuarter.getValue();
+				reportData[0] = m_compareIncomesReport;
+				reportData[1] = m_compareComplaintsReport;
+				reportData[2] = m_compareReservationsReport;
+				reportData[3] = m_compareSurveyReport;
 			}
 		}
 		catch (NumberFormatException e) {
-			displayErrorMessage("The year you entered is invalid!");
+			errorMSG("The year you entered is invalid!");
 			m_logger.warning("Entered invalid year input");
 			return;
 		}
 		catch (Exception e) {
-			displayErrorMessage("Faild to read the inputed values");
+			errorMSG("Faild to read the inputed values");
 			m_logger.warning("Faild to read the inputed values");
 			return;
 		}
@@ -394,37 +489,58 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		switch (reportType) {
 			case "Financial_Incomes_Report":
 				showFinancialIncomesOrComplaintsReport("Financial Incomes", barToChange, selectionStore,
-						Integer.toString(selectionYear), quarter);
+						Integer.toString(selectionYear), quarter, reportData[0]);
 			break;
 			case "Complaints_Report":
 				showFinancialIncomesOrComplaintsReport("Complaints", barToChange, selectionStore,
-						Integer.toString(selectionYear), quarter);
+						Integer.toString(selectionYear), quarter, reportData[1]);
 			break;
 			case "Reservations_Report":
-				barToChange.setLegendVisible(false);
-				showReservationsReport(barToChange, selectionStore, Integer.toString(selectionYear), quarter);
+				barToChange.setLegendVisible(true);
+				showReservationsReport(barToChange, selectionStore, Integer.toString(selectionYear), quarter,
+						(ReservationsReport) reportData[2]);
 			break;
 			default:
-				showSatisfactionReport(barToChange, selectionStore, Integer.toString(selectionYear), quarter);
+				showSatisfactionReport(barToChange, selectionStore, Integer.toString(selectionYear), quarter,
+						(SurveysReport) reportData[3]);
 		}
 
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void showFinancialIncomesOrComplaintsReport(String reportTypeName, BarChart barToChange, String storeName,
-			String year, String quarter)
+	private void showFinancialIncomesOrComplaintsReport(String reportTypeName, BarChart barToChange, String storeId,
+			String year, String quarter, Report reportData)
 	{
 		int monthNum = parseMonthToNum(quarter.substring(0, 3));
 
 		// clear previous chart data and insert new values.
-		barToChange.getData().clear();
-		barToChange.setTitle(storeName + " " + reportTypeName + " Summary ");
-		barToChange.getXAxis().setLabel("Month " + year);
-		barToChange.getYAxis().setLabel(reportTypeName);
+		barChartAfterChangeInitialize(barToChange, storeId, reportTypeName, year, quarter);
 
+		// Chart data declaration.
 		XYChart.Series barDataSeries = new XYChart.Series();
-		XYChart.Data firstMonth = new XYChart.Data(month[monthNum], 10500);
-		XYChart.Data secondMonth = new XYChart.Data(month[monthNum + 1], 33211);
+		XYChart.Data firstMonth;
+		XYChart.Data secondMonth;
+		XYChart.Data thirdMonth;
+
+		// Set bars data accord to reportType.
+		switch (reportTypeName) {
+			case "Financial Incomes":
+				firstMonth = new XYChart.Data(month[monthNum], ((IncomesReport) reportData).getIncomesInFirstMonth());
+				secondMonth = new XYChart.Data(month[monthNum + 1],
+						((IncomesReport) reportData).getIncomesInSecondMonth());
+				thirdMonth = new XYChart.Data(month[monthNum + 2],
+						((IncomesReport) reportData).getIncomesInThirdMonth());
+			break;
+			default:
+				firstMonth = new XYChart.Data(month[monthNum],
+						((ComplaintsReport) reportData).getNumberOfComplaintsFirstMonth());
+				secondMonth = new XYChart.Data(month[monthNum + 1],
+						((ComplaintsReport) reportData).getNumberOfComplaintsSecondMonth());
+				thirdMonth = new XYChart.Data(month[monthNum + 2],
+						((ComplaintsReport) reportData).getNumberOfComplaintsThirdMonth());
+		}
+
+		// Color changing for the second and the third bars.
 		secondMonth.nodeProperty().addListener(new ChangeListener<Node>() {
 
 			@Override
@@ -435,8 +551,6 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 				}
 			}
 		});
-
-		XYChart.Data thirdMonth = new XYChart.Data(month[monthNum + 2], 25900);
 		thirdMonth.nodeProperty().addListener(new ChangeListener<Node>() {
 
 			@Override
@@ -448,67 +562,158 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 			}
 		});
 
+		// Add data bars to chart.
 		barDataSeries.getData().add(firstMonth);
 		barDataSeries.getData().add(secondMonth);
 		barDataSeries.getData().add(thirdMonth);
-
 		barToChange.getData().addAll(barDataSeries);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void showReservationsReport(BarChart barToChange, String storeName, String year, String quarter)
+	private void showReservationsReport(BarChart barToChange, String storeId, String year, String quarter,
+			ReservationsReport reportData)
 	{
 		int monthNum = parseMonthToNum(quarter.substring(0, 3));
 
 		// clear previous chart data and insert new values.
-		barToChange.getData().clear();
-		barToChange.setTitle(storeName + " Reservations Summary");
-		barToChange.getXAxis().setLabel("Month " + year);
-		barToChange.getYAxis().setLabel("Reservations");
+		barChartAfterChangeInitialize(barToChange, storeId, "Reservations", year, quarter);
 
-		XYChart.Series firstMonth = new XYChart.Series();
-		firstMonth.setName("Flower");
-		firstMonth.getData().add(new XYChart.Data(month[monthNum], 18));
-		firstMonth.getData().add(new XYChart.Data(month[monthNum + 1], 7));
-		firstMonth.getData().add(new XYChart.Data(month[monthNum + 2], 3));
+		// Set Flower reservation data.
+		XYChart.Series firstType = new XYChart.Series();
+		firstType.setName("Flower");
+		firstType.getData().add(new XYChart.Data(month[monthNum], reportData.getNumberOfOrderedFlowersInFirstMonth()));
+		firstType.getData()
+				.add(new XYChart.Data(month[monthNum + 1], reportData.getNumberOfOrderedFlowersInSecondMonth()));
+		firstType.getData()
+				.add(new XYChart.Data(month[monthNum + 2], reportData.getNumberOfOrderedFlowersInThirdMonth()));
 
-		XYChart.Series secondMonth = new XYChart.Series();
-		secondMonth.setName("FlowerPot");
-		secondMonth.getData().add(new XYChart.Data(month[monthNum], 10));
-		secondMonth.getData().add(new XYChart.Data(month[monthNum + 1], 6));
-		secondMonth.getData().add(new XYChart.Data(month[monthNum + 2], 15));
+		// Set FlowerPot reservation data.
+		XYChart.Series secondType = new XYChart.Series();
+		secondType.setName("FlowerPot");
+		secondType.getData()
+				.add(new XYChart.Data(month[monthNum], reportData.getNumberOfOrderedFlowerPotsInFirstMonth()));
+		secondType.getData()
+				.add(new XYChart.Data(month[monthNum + 1], reportData.getNumberOfOrderedFlowerPotsInSecondMonth()));
+		secondType.getData()
+				.add(new XYChart.Data(month[monthNum + 2], reportData.getNumberOfOrderedFlowerPotsInThirdMonth()));
 
-		XYChart.Series thirdMonth = new XYChart.Series();
-		thirdMonth.setName("BridalBucket");
-		thirdMonth.getData().add(new XYChart.Data(month[monthNum], 4));
-		thirdMonth.getData().add(new XYChart.Data(month[monthNum + 1], 9));
-		thirdMonth.getData().add(new XYChart.Data(month[monthNum + 2], 21));
+		// Set BridalBucket reservation data.
+		XYChart.Series thirdType = new XYChart.Series();
+		thirdType.setName("BridalBucket");
+		thirdType.getData()
+				.add(new XYChart.Data(month[monthNum], reportData.getNumberOfOrderedBridalBouquetsInFirstMonth()));
+		thirdType.getData()
+				.add(new XYChart.Data(month[monthNum + 1], reportData.getNumberOfOrderedBridalBouquetsInSecondMonth()));
+		thirdType.getData()
+				.add(new XYChart.Data(month[monthNum + 2], reportData.getNumberOfOrderedBridalBouquetsInThirdMonth()));
 
-		barToChange.getData().addAll(firstMonth, secondMonth, thirdMonth);
+		// Set FlowerArrangements reservation data.
+		XYChart.Series fourthType = new XYChart.Series();
+		fourthType.setName("FlowerArrangements");
+		fourthType.getData()
+				.add(new XYChart.Data(month[monthNum], reportData.getNumberOfOrderedFlowerArrangementsInFirstMonth()));
+		fourthType.getData().add(
+				new XYChart.Data(month[monthNum + 1], reportData.getNumberOfOrderedFlowerArrangementsInSecondMonth()));
+		fourthType.getData().add(
+				new XYChart.Data(month[monthNum + 2], reportData.getNumberOfOrderedFlowerArrangementsInThirdMonth()));
+
+		// Add data to chart.
+		barToChange.getData().addAll(firstType, secondType, thirdType, fourthType);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private void showSatisfactionReport(BarChart barToChange, String storeName, String year, String quarter)
+	private void showSatisfactionReport(BarChart barToChange, String storeId, String year, String quarter,
+			SurveysReport reportData)
 	{
-
 		// clear previous chart data and insert new values.
-		barToChange.getData().clear();
-		barToChange.setTitle(storeName + " Satisfaction Summary");
-		barToChange.getXAxis().setLabel(quarter + " " + year);
-		barToChange.getYAxis().setLabel("Satisfactions");
+		barChartAfterChangeInitialize(barToChange, storeId, "Satisfaction", year, quarter);
 
+		// Set survey result data.
 		XYChart.Series Question = new XYChart.Series();
-		Question.getData().add(new XYChart.Data("Question1", 6.4));
-		Question.getData().add(new XYChart.Data("Question2", 5.5));
-		Question.getData().add(new XYChart.Data("Question3", 4.2));
-		Question.getData().add(new XYChart.Data("Question4", 9.4));
-		Question.getData().add(new XYChart.Data("Question5", 4.4));
-		Question.getData().add(new XYChart.Data("Question6", 7.4));
+		Question.getData().add(new XYChart.Data("Question1", reportData.getFirstAnswerAverage()));
+		Question.getData().add(new XYChart.Data("Question2", reportData.getSecondAnswerAverage()));
+		Question.getData().add(new XYChart.Data("Question3", reportData.getThirdAnswerAverage()));
+		Question.getData().add(new XYChart.Data("Question4", reportData.getFourthAnswerAverage()));
+		Question.getData().add(new XYChart.Data("Question5", reportData.getFifthAnswerAverage()));
+		Question.getData().add(new XYChart.Data("Question6", reportData.getSixthAnswerAverage()));
 
+		// Add data to chart.
 		barToChange.getData().addAll(Question);
 	}
 
+	@SuppressWarnings("rawtypes")
+	private void barChartAfterChangeInitialize(BarChart barToInit, String storeId, String reportType, String year,
+			String quarter)
+	{
+		// clear previous chart data and insert new values.
+		barToInit.getData().clear();
+		barToInit.setTitle(reportType + " Summary. Store ID: " + storeId);
+		barToInit.getXAxis().setLabel(quarter + " " + year);
+		barToInit.getYAxis().setLabel(reportType);
+	}
+
 	/* End of --> Initializing methods region */
+
+	/* Sending message to server methods region */
+
+	private void getStoreIdListFromServer()
+	{
+		Message entityMessage;
+		entityMessage = MessagesFactory.createGetAllEntityMessage(new ShopManager());
+		m_client.sendMessageToServer(entityMessage);
+	}
+
+	private void getShopManagerId()
+	{
+		ShopManager shopManager = new ShopManager();
+		shopManager.setUserName(ApplicationEntryPoint.ConnectedUser.getUserName());
+		Message entityMessage = MessagesFactory.createGetEntityMessage(shopManager);
+		m_client.sendMessageToServer(entityMessage);
+	}
+
+	/**
+	 * Activate when Store ComboBox value changed. Send Get messages for all store
+	 * report.
+	 * 
+	 */
+	private void getStoreReportsFromServer(int store, int quarter, java.util.Date year)
+	{
+		Report report;
+		Message entityMessage;
+
+		// Ask from server for IncomesReport
+		report = new IncomesReport();
+		report.setShopManagerId(store);
+		report.setQuarter(quarter);
+		report.setYear(year);
+		entityMessage = MessagesFactory.createGetEntityMessage(report);
+		m_client.sendMessageToServer(entityMessage);
+
+		// Ask from server for ReservationsReport
+		report = new ReservationsReport();
+		report.setShopManagerId(store);
+		report.setQuarter(quarter);
+		report.setYear(year);
+		entityMessage = MessagesFactory.createGetEntityMessage(report);
+		m_client.sendMessageToServer(entityMessage);
+
+		// Ask from server for ComplaintsReport
+		report = new ComplaintsReport();
+		report.setShopManagerId(store);
+		report.setQuarter(quarter);
+		report.setYear(year);
+		entityMessage = MessagesFactory.createGetEntityMessage(report);
+		m_client.sendMessageToServer(entityMessage);
+
+		// Ask from server for SurveysReport
+		report = new SurveysReport();
+		report.setShopManagerId(store);
+		report.setQuarter(quarter);
+		report.setYear(year);
+		entityMessage = MessagesFactory.createGetEntityMessage(report);
+		m_client.sendMessageToServer(entityMessage);
+	}
+	/* End of --> Sending message to server methods region */
 
 	/* Client handlers implementation region */
 
@@ -518,7 +723,43 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Shimon : Add event handling
+		IMessageData messageData = msg.getMessageData();
+		if (!(messageData instanceof EntityData) && !(messageData instanceof RespondMessageData)
+				&& !(messageData instanceof EntitiesListData)) {
+			m_logger.warning("Received message data not of the type requested.");
+			return;
+		}
+
+		if (messageData instanceof EntityData) {
+			IEntity entity = ((EntityData) messageData).getEntity();
+			if (entity instanceof IncomesReport) m_incomesReport = (IncomesReport) entity;
+			else if (entity instanceof ReservationsReport) m_reservationsReport = (ReservationsReport) entity;
+			else if (entity instanceof ComplaintsReport) m_complaintsReport = (ComplaintsReport) entity;
+			else if (entity instanceof SurveysReport) m_surveyReport = (SurveysReport) entity;
+			else m_shopManagerUserID = ((ShopManager) entity).getId();
+		} // End of if (messageData instanceof EntityData)
+		else if (messageData instanceof EntitiesListData) {
+			List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
+			Integer shopManagerId;
+			stores.clear();
+			for (IEntity entity : entities) {
+				if (!(entity instanceof ShopManager)) {
+					m_logger.warning("Received entity not of the type requested.");
+					return;
+				}
+				shopManagerId = ((ShopManager) entity).getId();
+				stores.add(shopManagerId.toString());
+			}
+			comboBox_selectionStore.setValue(stores.get(0));
+
+		} // End of else if(messageData instanceof EntitiesListData)
+		else if (messageData instanceof RespondMessageData) {
+			RespondMessageData respondMessageData = (RespondMessageData) messageData;
+			boolean succeed = respondMessageData.isSucceed();
+			if (!succeed) {
+				errorMSG("There is no reports for the current store ID!");
+			}
+		} // End of else if (messageData instanceof EntitiesListData)
 	}
 
 	/**
