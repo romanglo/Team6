@@ -1024,12 +1024,16 @@ public class QueryGenerator {
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO costumers_in_shops (cId,smId,csCostumerSubscription) VALUES (");
+		stringBuilder.append("INSERT INTO costumers_in_shops (cId,smId,csCostumerSubscription,csCreditCard,csStartSubscriptionDate) VALUES (");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
 		stringBuilder.append(",'");
 		stringBuilder.append(shopCostumer.getCostumerSubscription());
+		stringBuilder.append("','");
+		stringBuilder.append(shopCostumer.getCreditCard());
+		stringBuilder.append("','");
+		stringBuilder.append(s_dateFormat.format(shopCostumer.getSubscriptionStartDate()));
 		stringBuilder.append("');");
 		return stringBuilder.toString();
 	}
@@ -1047,6 +1051,10 @@ public class QueryGenerator {
 		stringBuilder.append("UPDATE costumers_in_shops SET ");
 		stringBuilder.append("csCostumerSubscription = '");
 		stringBuilder.append(shopCostumer.getCostumerSubscription());
+		stringBuilder.append("' , csCreditCard = '");
+		stringBuilder.append(shopCostumer.getCreditCard());
+		stringBuilder.append("' , csStartSubscriptionDate = '");
+		stringBuilder.append(s_dateFormat.format(shopCostumer.getSubscriptionStartDate()));
 		stringBuilder.append("' WHERE cId = ");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(" AND smId = ");

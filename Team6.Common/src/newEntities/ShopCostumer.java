@@ -2,6 +2,8 @@
 package newEntities;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  *
@@ -17,12 +19,17 @@ public class ShopCostumer implements IEntity
 	 */
 	private static final long serialVersionUID = -196650145665452647L;
 
+	private static SimpleDateFormat s_simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+	
 	private int m_costumerId;
 
 	private int m_shopManagerId;
 
 	private EntitiesEnums.CostumerSubscription m_costumerSubscription;
 
+	private Date m_subscriptionStartDate;
+	
+	private String m_creditCard;
 	/**
 	 * @return the costumerId
 	 */
@@ -74,6 +81,46 @@ public class ShopCostumer implements IEntity
 		m_costumerSubscription = costumerSubscription;
 	}
 
+	
+	/**
+	 * @return the subscriptionStartDate
+	 */
+	public Date getSubscriptionStartDate()
+	{
+		return m_subscriptionStartDate;
+	}
+	
+
+	
+	/**
+	 * @param subscriptionStartDate the subscriptionStartDate to set
+	 */
+	public void setSubscriptionStartDate(Date subscriptionStartDate)
+	{
+		m_subscriptionStartDate = subscriptionStartDate;
+	}
+	
+
+	
+	/**
+	 * @return the creditCard
+	 */
+	public String getCreditCard()
+	{
+		return m_creditCard;
+	}
+	
+
+	
+	/**
+	 * @param creditCard the creditCard to set
+	 */
+	public void setCreditCard(String creditCard)
+	{
+		m_creditCard = creditCard;
+	}
+	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -118,8 +165,8 @@ public class ShopCostumer implements IEntity
 	@Override
 	public String toString()
 	{
-		return "ShopCostumer [costumerId=" + m_costumerId + ", shopManagerId=" + m_shopManagerId
-				+ ", costumerSubscription=" + m_costumerSubscription + "]";
+		return "ShopCostumer [CostumerId=" + m_costumerId + ", ShopManagerId=" + m_shopManagerId
+				+ ", CostumerSubscription=" + m_costumerSubscription + ", SubscriptionStartDate="
+				+ s_simpleDateFormat.format(m_subscriptionStartDate) + ", CreditCard=" + m_creditCard + "]";
 	}
-
 }

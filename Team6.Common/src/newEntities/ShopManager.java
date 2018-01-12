@@ -19,6 +19,8 @@ public class ShopManager extends User
 
 	private int m_id;
 
+	private String m_name;
+
 	/**
 	 * @return the id
 	 */
@@ -37,12 +39,29 @@ public class ShopManager extends User
 	}
 
 	/**
+	 * @return the name
+	 */
+	public String getName()
+	{
+		return m_name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name)
+	{
+		m_name = name;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString()
 	{
-		return "ShopManager [m_id=" + m_id + ", user=" + super.toString() + "]";
+		return "ShopManager [id=" + m_id + ", name=" + m_name + ", " + super.toString() + "]";
 	}
 
 	/**

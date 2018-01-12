@@ -26,7 +26,7 @@
 }
 .tab-pane .tab
 {
-    -fx-background-color: #9fa4a0;
+    -fx-background-color: #e9e7e7;
 }
 
 .tab-pane .tab:selected
@@ -37,7 +37,8 @@
 
 .tab-content-area 
 {
-	-fx-background-color: rgb(218.0,218.0,218.0);
+	
+	-fx-background-color: linear-gradient(#e9e7e7,#9fa4a0);
 }
 
 .tab .tab-label 

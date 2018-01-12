@@ -29,6 +29,7 @@ CREATE TABLE costumers (
 CREATE TABLE shop_managers (
   smId INT AUTO_INCREMENT,
   uUserName VARCHAR(20) NOT NULL,
+  smName VARCHAR(20) NULL DEFAULT NULL,
   FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION,
   UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
   PRIMARY KEY (smId)
@@ -38,6 +39,8 @@ CREATE TABLE costumers_in_shops (
 	cId INT NOT NULL,
 	smId INT NOT NULL,
 	csCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
+	csCreditCard VARCHAR(16) NULL DEFAULT NULL,
+	csStartSubscriptionDate DATE NOT NULL DEFAULT '0000-00-00',
 	FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE CASCADE ON UPDATE NO ACTION,
 	FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
 	PRIMARY KEY (cId,smId)
@@ -435,7 +438,34 @@ END; //
 -- Create triggers:
 --
 
-CREATE TRIGGER update_item_trigger
+--- CREATE TRIGGER insert_item_trigger
+--- BEFORE INSERT ON items FOR EACH ROW
+--- BEGIN
+--- 	IF (NEW.iImage = NULL) THEN
+--- 	
+--- 		SET NEW.iImage = '\״\\0C\0		\n\r\Z\Z $.\' \",#(7),01444\'9=82<.342\\0C			\r\r2!!22222222222222222222222222222222222222222222222222ְ\0\0P\0P\"\0\"\0\ִ\0\0\0\0\0\0\0\0\0\0\0	\n\ִ\0µ\0\0\0}\0!1AQa\"q2‘¡#B±ֱR\ׁנ$3br‚	\n\Z%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰’“”•–—˜™¢£₪¥¦§¨©×²³´µ¶·¸¹÷\ֲ\ֳ\ִ\ֵ\ֶ\ַ\ָ\ֹ\ֺ\ׂ\׃\װ\ױ\ײ\׳\״\\\ב\ג\ד\ה\ו\ז\ח\ט\י\ךסעףפץצקרשת\ִ\0\0\0\0\0\0\0\0	\n\ִ\0µ\0\0w\0!1AQaq\"2B‘¡±ֱ	#3Rנbr\ׁ\n$4\ב%ס\Z&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰’“”•–—˜™¢£₪¥¦§¨©×²³´µ¶·¸¹÷\ֲ\ֳ\ִ\ֵ\ֶ\ַ\ָ\ֹ\ֺ\ׂ\׃\װ\ױ\ײ\׳\״\\\ג\ד\ה\ו\ז\ח\ט\י\ךעףפץצקרשת\\0\0\0\0?\0קת(×—w~Oָ˜.G‎ף@\0ET\׃\\\ַ\<€u×2j27¡=ת¦I$’rORj\ִRL¡‰\n‡¿ZQEF\׳3±ֹ•\0\זu9¿\גsW†›\חr}°(:lX;]ֱקֱ (¨c\װd^Cפ5z˜\ח‡‘\װµ5„±ע¿:u×°$Aֱ (­ת*¥¥ע>\0}U÷QEEs7‘	~§ ץI$’rORj\ז£&\י•>Qתע)–ש“\מ?u9{P0¢*axJ\ן\2*k;¯!¶?ת²*׃–%2:פ>†±e‰ב£ת\׀EV\ם\זU§¦hתE¥¼r\ֽeq5”“\\ָNI‘»²ƒ\־\ׂA¿\ֲyf₪}2%נצ£§\ך\Z—\"‘§E»]80\הf)(”\r×\אy ®\ַQ^U/-×]s\ַסץ\ךkd–+Xco:eEY%·{\ֻ`t\ֹ\ח-\0QE`A׀¶›ֿ„?C׀z־¿‡ֻp¯\ֿ\ד§I¶fCCץ\ה\׀0¢*¦\u!?\\ַ\ו\ֵ]\׃Ty.\\ֻc‏uJ\יv]H3sשףU<?\ג¨iק\ֿoe1’ף¡¾Sq\—=7lg\״פ4\0QE/ץ+½ֱקקצy71y{hlfE‚\טMs\ִ”³kvW2\ֶgk\י-´‡`‹ף‰De¨]ס·L‘»“:\כ½F\ַPM6\׀Z¥: ףUd”עUC™ `”\0rֲ¡׃®פֻ­r\ג\-2(ex.|<\יvS‚*“G=pp(¢\גץ/\ֻe¥h»ן¡‚\ך\ג\׀\\\ֻ$ˆ[q\״6©US€\ּzס€­k¡·ס÷\הGe~צ¶\יd/]¡E–\זpw-T†\0©_›†$9¥\ׁuK\ri,₪±\׃\־K«7”m\n>Hd„8³ַ \ג©ר‚m\"\ֲ\y¦AvKH\י—`0^W½\'I´(¢’\rzRkk;\ֽF\גH’\ג;¶µµ†	\ZX\ּ#,“\ה.€z€p:\ם7\ֿ‏ֿ‹\ם?jףy\צ¯/\ּ\ךzש_\'ON\״\ֿ9®KZװ´(l#:—v³+ָcAjF¹V“\0\הl\בGa[Z±§\Ceo§Yky£¸tDR*°2₪|‚₪ƒ@‚(­IG’Cc‏UJױ¶]FGק±שסT¼_\ג\ׁ~\ַ\\ײV¸\\א½\ֲB\0M£«	ש\ַ\ױ&‹;\\ֵkq$>CIף„ףA †Sƒ‘ƒַ­\n(¢¥ס%„—¶Rֱ\0gk„עּ¡w;ס‘\ֹ{u¬‎+D·׃µ{+‹K‹ˆRhZ\'•¥V€ֲ\ה\ל\ֳ*®:`u7‰\בd=zƒ\טk‚¬Tph\0¢)t\ֿֵ₪\\\\ZL¾d\ֺR\װ<¶\ױ3”pJ\ןv8\ָ\א(ם‚\ֱv:|:h°¸÷†k	\דw™\הV\ם \״Nׁ¼\ֹP0N}«b\־נ8\ָ~n€ץvQ\\]¯‚56\ֻM‹Lס\f³†XZo±+שעo¬\״ ~U+xR\ט\ֺo5]V[ש\ׂ?-^\0צ¥F\ג\ּHGֱ\'\ו\0pƒ\כ]}\0QE\חֻ jV¢\׳3[Zש\ׁ\ִ\f‘²‡{\ם\\0>€t\ַ7\ם\'y½´\F¿%¥\״i\\גi-R_1¥([ֲ \ּ`€\ֿvצ\װ\ִ\ֶD»=‡נ\ױx\ו’,\לb¹8 aEV£₪ksµ¡$\0LµYck°§\ןֺm\־6{\ײן‡­na·Qyuצ¹\ד4\Xq$\ד\ו)€` d“[Vנˆ!Tz“\ךh\0¢*Z«wh&׃‰‏=V¨ AEV)S†\״ױˆo¥ˆ8ui\ֻsy\לGQTd\׃\\d\ֶב‡¡\א\׀0¢*Eװ£#חצ\ז†װ£ה‰ק\ג×5ֲ˜\ֿ\אsB\\0ָˆ‏<PES¦½–PW…S\״w×ך¥OaWc\׃\\\א\ָ\ב}‡&¯Ep‘y\מOS@QP\ZFק\זC\0ױ×( AEW\';
+--- 
+--- 	END IF;
+--- 	
+--- END; //
+ 
+ 
+--- CREATE TRIGGER before_update_item_trigger
+--- BEFORE UPDATE ON items FOR EACH ROW
+--- BEGIN
+--- 	IF (NEW.iDeleted = 1) THEN
+--- 	
+--- 		SET NEW.iImage = NULL;
+--- 	
+--- 	ELSEIF (NEW.iImage = NULL) THEN 
+--- 	
+--- 		SET NEW.iImage = '\״\\0C\0		\n\r\Z\Z $.\' \",#(7),01444\'9=82<.342\\0C			\r\r2!!22222222222222222222222222222222222222222222222222ְ\0\0P\0P\"\0\"\0\ִ\0\0\0\0\0\0\0\0\0\0\0	\n\ִ\0µ\0\0\0}\0!1AQa\"q2‘¡#B±ֱR\ׁנ$3br‚	\n\Z%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰’“”•–—˜™¢£₪¥¦§¨©×²³´µ¶·¸¹÷\ֲ\ֳ\ִ\ֵ\ֶ\ַ\ָ\ֹ\ֺ\ׂ\׃\װ\ױ\ײ\׳\״\\\ב\ג\ד\ה\ו\ז\ח\ט\י\ךסעףפץצקרשת\ִ\0\0\0\0\0\0\0\0	\n\ִ\0µ\0\0w\0!1AQaq\"2B‘¡±ֱ	#3Rנbr\ׁ\n$4\ב%ס\Z&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰’“”•–—˜™¢£₪¥¦§¨©×²³´µ¶·¸¹÷\ֲ\ֳ\ִ\ֵ\ֶ\ַ\ָ\ֹ\ֺ\ׂ\׃\װ\ױ\ײ\׳\״\\\ג\ד\ה\ו\ז\ח\ט\י\ךעףפץצקרשת\\0\0\0\0?\0קת(×—w~Oָ˜.G‎ף@\0ET\׃\\\ַ\<€u×2j27¡=ת¦I$’rORj\ִRL¡‰\n‡¿ZQEF\׳3±ֹ•\0\זu9¿\גsW†›\חr}°(:lX;]ֱקֱ (¨c\װd^Cפ5z˜\ח‡‘\װµ5„±ע¿:u×°$Aֱ (­ת*¥¥ע>\0}U÷QEEs7‘	~§ ץI$’rORj\ז£&\י•>Qתע)–ש“\מ?u9{P0¢*axJ\ן\2*k;¯!¶?ת²*׃–%2:פ>†±e‰ב£ת\׀EV\ם\זU§¦hתE¥¼r\ֽeq5”“\\ָNI‘»²ƒ\־\ׂA¿\ֲyf₪}2%נצ£§\ך\Z—\"‘§E»]80\הf)(”\r×\אy ®\ַQ^U/-×]s\ַסץ\ךkd–+Xco:eEY%·{\ֻ`t\ֹ\ח-\0QE`A׀¶›ֿ„?C׀z־¿‡ֻp¯\ֿ\ד§I¶fCCץ\ה\׀0¢*¦\u!?\\ַ\ו\ֵ]\׃Ty.\\ֻc‏uJ\יv]H3sשףU<?\ג¨iק\ֿoe1’ף¡¾Sq\—=7lg\״פ4\0QE/ץ+½ֱקקצy71y{hlfE‚\טMs\ִ”³kvW2\ֶgk\י-´‡`‹ף‰De¨]ס·L‘»“:\כ½F\ַPM6\׀Z¥: ףUd”עUC™ `”\0rֲ¡׃®פֻ­r\ג\-2(ex.|<\יvS‚*“G=pp(¢\גץ/\ֻe¥h»ן¡‚\ך\ג\׀\\\ֻ$ˆ[q\״6©US€\ּzס€­k¡·ס÷\הGe~צ¶\יd/]¡E–\זpw-T†\0©_›†$9¥\ׁuK\ri,₪±\׃\־K«7”m\n>Hd„8³ַ \ג©ר‚m\"\ֲ\y¦AvKH\י—`0^W½\'I´(¢’\rzRkk;\ֽF\גH’\ג;¶µµ†	\ZX\ּ#,“\ה.€z€p:\ם7\ֿ‏ֿ‹\ם?jףy\צ¯/\ּ\ךzש_\'ON\״\ֿ9®KZװ´(l#:—v³+ָcAjF¹V“\0\הl\בGa[Z±§\Ceo§Yky£¸tDR*°2₪|‚₪ƒ@‚(­IG’Cc‏UJױ¶]FGק±שסT¼_\ג\ׁ~\ַ\\ײV¸\\א½\ֲB\0M£«	ש\ַ\ױ&‹;\\ֵkq$>CIף„ףA †Sƒ‘ƒַ­\n(¢¥ס%„—¶Rֱ\0gk„עּ¡w;ס‘\ֹ{u¬‎+D·׃µ{+‹K‹ˆRhZ\'•¥V€ֲ\ה\ל\ֳ*®:`u7‰\בd=zƒ\טk‚¬Tph\0¢)t\ֿֵ₪\\\\ZL¾d\ֺR\װ<¶\ױ3”pJ\ןv8\ָ\א(ם‚\ֱv:|:h°¸÷†k	\דw™\הV\ם \״Nׁ¼\ֹP0N}«b\־נ8\ָ~n€ץvQ\\]¯‚56\ֻM‹Lס\f³†XZo±+שעo¬\״ ~U+xR\ט\ֺo5]V[ש\ׂ?-^\0צ¥F\ג\ּHGֱ\'\ו\0pƒ\כ]}\0QE\חֻ jV¢\׳3[Zש\ׁ\ִ\f‘²‡{\ם\\0>€t\ַ7\ם\'y½´\F¿%¥\״i\\גi-R_1¥([ֲ \ּ`€\ֿvצ\װ\ִ\ֶD»=‡נ\ױx\ו’,\לb¹8 aEV£₪ksµ¡$\0LµYck°§\ןֺm\־6{\ײן‡­na·Qyuצ¹\ד4\Xq$\ד\ו)€` d“[Vנˆ!Tz“\ךh\0¢*Z«wh&׃‰‏=V¨ AEV)S†\״ױˆo¥ˆ8ui\ֻsy\לGQTd\׃\\d\ֶב‡¡\א\׀0¢*Eװ£#חצ\ז†װ£ה‰ק\ג×5ֲ˜\ֿ\אsB\\0ָˆ‏<PES¦½–PW…S\״w×ך¥OaWc\׃\\\א\ָ\ב}‡&¯Ep‘y\מOS@QP\ZFק\זC\0ױ×( AEW\';
+--- 	
+--- 	END IF;
+--- 	
+--- END; //
+
+CREATE TRIGGER after_update_item_trigger
 AFTER UPDATE ON items FOR EACH ROW
 BEGIN
 	IF (NEW.iDeleted = 1) THEN
@@ -450,7 +480,49 @@ BEGIN
 	
 END; //
 
-CREATE TRIGGER insert_surveys_in_shops
+CREATE TRIGGER insert_costumers_in_shops_trigger
+BEFORE INSERT ON costumers_in_shops FOR EACH ROW
+BEGIN
+    IF (NEW.csCostumerSubscription != 'None') THEN 
+        
+        IF (NEW.csCreditCard IS NULL) THEN
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Costumer credit card could not be null when subscription exist.';
+        END IF;
+        
+        IF (NEW.csStartSubscriptionDate = '0000-00-00') THEN
+			SET NEW.csStartSubscriptionDate = NOW();
+        END IF;
+        
+	ELSE
+    
+		SET NEW.csCreditCard = NULL;
+		SET NEW.csStartSubscriptionDate = '0000-00-00';
+        
+    END IF;
+END; //
+
+CREATE TRIGGER update_costumers_in_shops_trigger
+BEFORE UPDATE ON costumers_in_shops FOR EACH ROW
+BEGIN
+    IF (NEW.csCostumerSubscription != 'None') THEN 
+        
+        IF (NEW.csCreditCard IS NULL) THEN
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Costumer credit card could not be null when subscription exist.';
+        END IF;
+        
+        IF (NEW.csStartSubscriptionDate = '0000-00-00') THEN
+			SET NEW.csStartSubscriptionDate = NOW();
+        END IF;
+        
+	ELSE
+    
+		SET NEW.csCreditCard = NULL;
+		SET NEW.csStartSubscriptionDate = '0000-00-00';
+        
+    END IF;
+END; //
+
+CREATE TRIGGER insert_surveys_in_shops_trigger
 BEFORE INSERT ON surveys_in_shops FOR EACH ROW
 BEGIN
     IF (NEW.ssStartDate = '0000-00-00') THEN 
@@ -458,15 +530,15 @@ BEGIN
     END IF;
 END; //
 
-CREATE TRIGGER update_surveys_in_shops
-AFTER UPDATE ON surveys_in_shops FOR EACH ROW
-BEGIN -- FIX IT!
-    IF (NEW.ssSummary != NULL AND NEW.ssClosed = 0) THEN 
-        UPDATE surveys_in_shops SET ssClosed = 1 WHERE ssId = New.ssId;
+CREATE TRIGGER update_surveys_in_shops_trigger
+BEFORE UPDATE ON surveys_in_shops FOR EACH ROW
+BEGIN 
+    IF ( NEW.ssSummary IS NOT NULL AND NEW.ssClosed = 0) THEN 
+		SET NEW.ssClosed = 1;
     END IF;
 END; //
 
-CREATE TRIGGER insert_complaint
+CREATE TRIGGER insert_complaint_trigger
 BEFORE INSERT ON complaints FOR EACH ROW
 BEGIN
     IF (NEW.coDate = '0000-00-00') THEN 
@@ -474,20 +546,55 @@ BEGIN
     END IF;
 END; //
 
-
-CREATE TRIGGER update_complaint
+CREATE TRIGGER update_complaint_trigger
 AFTER UPDATE ON complaints FOR EACH ROW
-BEGIN -- FIX IT!
-    IF (NEW.coSummary != NULL AND NEW.coOpened = 1) THEN 
+BEGIN 
+    IF (NEW.coSummary IS NOT NULL AND NEW.coOpened = 1) THEN 
         UPDATE complaints SET coOpened = 0 WHERE coId = New.coId;
     END IF;
 END; //
 
-CREATE TRIGGER insert_reservation
+CREATE TRIGGER insert_reservation_trigger
 BEFORE INSERT ON reservations FOR EACH ROW
 BEGIN
     IF (NEW.rDeliveryDate = '0000-00-00 00:00:00') THEN 
         SET NEW.rDeliveryDate = DATE_ADD(NOW(), INTERVAL 3 HOUR);
+    END IF;
+END; //
+
+CREATE TRIGGER insert_users_trigger
+AFTER INSERT ON users FOR EACH ROW
+BEGIN
+    IF (NEW.uPrivilege = 'Costumer') THEN 
+        INSERT INTO costumers (uUserName) VALUES (NEW.uUserName);
+	ELSEIF (NEW.uPrivilege = 'ShopEmployee') THEN
+        INSERT INTO shop_employees (uUserName) VALUES (NEW.uUserName);
+	ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
+        INSERT INTO shop_managers (uUserName) VALUES (NEW.uUserName);
+    END IF;
+END; //
+	
+CREATE TRIGGER update_users_trigger
+AFTER UPDATE ON users FOR EACH ROW
+BEGIN
+	IF(OLD.uPrivilege != NEW.uPrivilege) THEN
+	
+		IF(OLD.uPrivilege = 'Costumer') THEN
+			DELETE FROM costumers WHERE costumers.uUserName = NEW.uUserName;
+		ELSEIF (OLD.uPrivilege = 'ShopEmployee') THEN
+			DELETE FROM shop_employees WHERE shop_employees.uUserName = NEW.uUserName;
+		ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
+			DELETE FROM shop_managers WHERE shop_managers.uUserName = NEW.uUserName;
+		END IF;
+		
+		IF (NEW.uPrivilege = 'Costumer') THEN 
+			INSERT INTO costumers (uUserName) VALUES (NEW.uUserName);
+		ELSEIF (NEW.uPrivilege = 'ShopEmployee') THEN
+			INSERT INTO shop_employees (uUserName) VALUES (NEW.uUserName);
+		ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
+			INSERT INTO shop_managers (uUserName) VALUES (NEW.uUserName);
+		END IF;
+	
     END IF;
 END; //
 
@@ -496,6 +603,26 @@ DELIMITER ;
 --
 -- Insert data to tables:
 --
+
+
+LOCK TABLES shop_managers WRITE;
+
+LOCK TABLES shop_employees WRITE;
+
+LOCK TABLES users WRITE;
+INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES 
+('companyemployee','companyemployee','companyemployee@local','CompanyEmployee'),
+('shopmanager','shopmanager','shopmanager@local','ShopManager'),
+('shopmanager2','shopmanager2','shopmanager@local','ShopManager'),
+('shopmanager3','shopmanager3','shopmanager@local','ShopManager'),
+('chainmanager','chainmanager','chainmanager@local','ChainManager'),
+('administrator','administrator','administrator@local','Administrator'),
+('shopemployee','shopemployee','shopemployee@local','ShopEmployee'),
+('costumerservice','costumerservice','costumerservice@local','CostumerService'),
+('costumer','costumer','costumer@local','Costumer'),
+('servicespecialist','servicespecialist','servicespecialist@local','ServiceSpecialist');
+
+UPDATE shop_employees SET  smId = 1 WHERE uUserName = 'shopemployee';
 
 LOCK TABLES items WRITE;
 INSERT INTO items (iName,iType,iPrice,iDomainColor) VALUES 
@@ -516,39 +643,11 @@ INSERT INTO items (iName,iType,iPrice,iDomainColor) VALUES
 ('Marigold','Flower',15.0,'orange'),
 ('Orchid','Flower',16.0,'pink');
 
-LOCK TABLES users WRITE;
-INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES 
-('companyemployee','companyemployee','companyemployee@local','CompanyEmployee'),
-('shopmanager','shopmanager','shopmanager@local','ShopManager'),
-('shopmanager2','shopmanager2','shopmanager@local','ShopManager'),
-('shopmanager3','shopmanager3','shopmanager@local','ShopManager'),
-('chainmanager','chainmanager','chainmanager@local','ChainManager'),
-('administrator','administrator','administrator@local','Administrator'),
-('shopemployee','shopemployee','shopemployee@local','ShopEmployee'),
-('costumerservice','costumerservice','costumerservice@local','CostumerService'),
-('costumer','costumer','costumer@local','Costumer'),
-('servicespecialist','servicespecialist','servicespecialist@local','ServiceSpecialist');
-
-
-LOCK TABLES shop_managers WRITE;
-INSERT INTO shop_managers (uUserName) VALUES
-('shopmanager'),
-('shopmanager2'),
-('shopmanager3');
-
-LOCK TABLES shop_employees WRITE;
-INSERT INTO shop_employees (uUserName,smId) VALUES
-('shopemployee',1);
-
 LOCK TABLES items_in_shops WRITE;
 INSERT INTO items_in_shops (smId,iId,isDiscountedPrice) VALUES 
 (1,1,5),
 (1,2,5),
 (1,10,5);
-
-LOCK TABLES costumers WRITE;
-INSERT INTO costumers (uUserName) VALUES
-('costumer');
 
 LOCK TABLES costumers_in_shops WRITE;
 INSERT INTO costumers_in_shops (cId,smId) VALUES

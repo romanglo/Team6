@@ -145,6 +145,9 @@ public class EntitiesResolver {
 					shopCostumer.setShopManagerId(resultSet.getInt(2));
 					shopCostumer
 							.setCostumerSubscription(Enum.valueOf(CostumerSubscription.class, resultSet.getString(3)));
+					shopCostumer.setCreditCard(resultSet.getString(4));
+					Date sqlDate = resultSet.getDate(5);
+					shopCostumer.setSubscriptionStartDate(new java.util.Date(sqlDate.getTime()));
 					ShopCostumerEntities.add(shopCostumer);
 				} catch (Exception ignored) {
 					failedResolve++;
@@ -363,6 +366,7 @@ public class EntitiesResolver {
 				try {
 					shopManager.setId(resultSet.getInt(1));
 					shopManager.setUserName(resultSet.getString(2));
+					shopManager.setName(resultSet.getString(3));
 					shopManagerEntities.add(shopManager);
 				} catch (Exception ignored) {
 					failedResolve++;
