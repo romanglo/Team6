@@ -10,6 +10,8 @@ import com.sun.istack.internal.Nullable;
 
 import client.ApplicationEntryPoint;
 import client.Client;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -185,6 +187,36 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		initializeImages();
 
 		initializeClientHandler();
+
+		initializeTextFields();
+	}
+
+	private void initializeTextFields()
+	{
+		textField_userName.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(final ObservableValue<? extends String> ov, final String oldValue,
+					final String newValue)
+			{
+				if (textField_userName.getText().length() > 20) {
+					String s = textField_userName.getText().substring(0, 20);
+					textField_userName.setText(s);
+				}
+			}
+		});
+
+		passwordField_userPassword.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(final ObservableValue<? extends String> ov, final String oldValue,
+					final String newValue)
+			{
+				if (passwordField_userPassword.getText().length() > 20) {
+					String s = passwordField_userPassword.getText().substring(0, 20);
+					passwordField_userPassword.setText(s);
+				}
+			}
+		});
 	}
 
 	private void initializeImages()
@@ -379,7 +411,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			return;
 		}
 		if (scene != null) {
-			javafx.application.Platform.runLater(new NextWindowLoader(scene,baseController));
+			javafx.application.Platform.runLater(new NextWindowLoader(scene, baseController));
 		}
 
 	}
