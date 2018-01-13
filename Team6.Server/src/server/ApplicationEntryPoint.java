@@ -35,7 +35,7 @@ public class ApplicationEntryPoint extends Application {
 
 	/**
 	 * 
-	 * The main method of the application, the method ensure only one instance of
+	 * The main method of the application, the method ensure only one running instance of
 	 * the application, using file lock pattern.
 	 *
 	 * @param args
@@ -77,7 +77,7 @@ public class ApplicationEntryPoint extends Application {
 							s_file.delete();
 						}
 					} catch (IOException e) {
-						System.err.println("An error occured on try to release and delete instance locks, exception: "
+						System.err.println("An error occurred on try to release and delete instance locks, exception: "
 								+ e.getMessage());
 					}
 				}
@@ -88,7 +88,7 @@ public class ApplicationEntryPoint extends Application {
 			// Launch the application
 			launch(args);
 		} catch (IOException e) {
-			System.err.println("An error occured on try to start 'Server' process, exception: " + e.getMessage());
+			System.err.println("An error occurred on try to start 'Server' process, exception: " + e.getMessage());
 			System.exit(1);
 		}
 	}

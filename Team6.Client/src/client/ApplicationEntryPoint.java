@@ -1,7 +1,14 @@
 
 package client;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,6 +33,79 @@ import logger.LogManager;
  */
 public class ApplicationEntryPoint extends Application
 {
+
+	private final static String s_lockFilePath = "ClientLockFile.lock";
+
+	private static File s_file;
+
+	private static FileChannel s_fileChannel;
+
+	private static FileLock s_lockFile;
+
+	/**
+	 * The main method of the application, the method ensure only one running instance of
+	 * the application, using file lock pattern. *
+	 * 
+	 * @param args
+	 *            Application arguments.
+	 */
+	@SuppressWarnings("resource")
+	public static void main(String[] args)
+	{
+		try {
+			s_file = new File(s_lockFilePath);
+
+			// Delete the lock file if it exist.
+			if (s_file.exists()) {
+				s_file.delete();
+			}
+
+			// Try to get the file lock
+			s_fileChannel = new RandomAccessFile(s_file, "rw").getChannel();
+
+			// Set to lock file hidden attribute
+			Files.setAttribute(Paths.get(s_lockFilePath), "dos:hidden", true, LinkOption.NOFOLLOW_LINKS);
+
+			// Try to get the file lock
+			s_lockFile = s_fileChannel.tryLock();
+			if (s_lockFile == null) {
+				// File is locked by other application
+				s_fileChannel.close();
+				System.out.println("Only one instance of Server can run at the same time.");
+				System.exit(1);
+			}
+
+			// Add shutdown hook to release lock when application shutdown
+			Thread shutdownHook = new Thread(new Runnable() {
+
+				@Override
+				public void run()
+				{
+					try {
+						if (s_lockFile != null) {
+							s_lockFile.release();
+							s_fileChannel.close();
+							s_file.delete();
+						}
+					}
+					catch (IOException e) {
+						System.err.println("An error occurred on try to release and delete instance locks, exception: "
+								+ e.getMessage());
+					}
+				}
+			});
+
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+			// Launch the application
+			launch(args);
+		}
+		catch (IOException e) {
+			System.err.println("An error occurred on try to start 'Server' process, exception: " + e.getMessage());
+			System.exit(1);
+		}
+	}
+
 	/* Fields region */
 
 	private static Logger s_logger = null;
@@ -46,17 +126,6 @@ public class ApplicationEntryPoint extends Application
 	@Nullable public static User ConnectedUser = null;
 
 	/* End of --> Fields region */
-
-	/**
-	 * Client application entry point
-	 *
-	 * @param args
-	 *            - Application arguments
-	 */
-	public static void main(String[] args)
-	{
-		launch(args);
-	}
 
 	/* Initializing methods region */
 
@@ -180,7 +249,7 @@ public class ApplicationEntryPoint extends Application
 		if (Client != null) {
 			Client.setClientStatusHandler(null);
 			Client.setMessagesHandler(null);
-			
+
 			Client.closeConnectionWithServer();
 			s_logger.info("Client disposed successfully");
 		}
