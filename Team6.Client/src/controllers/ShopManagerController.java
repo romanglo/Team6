@@ -219,6 +219,7 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		comboBox_selectionReportType.setValue(reportsType.get(0));
 		comboBox_selectionQuarter.setItems(quarters);
 		comboBox_selectionQuarter.setValue(quarters.get(currentQuarter - 1));
+		;
 		comboBox_selectionStore.setItems(stores);
 		comboBox_selectionStore.setValue(stores.get(0));
 		textField_selectionYear.setText(Integer.toString(currentDate.get(Calendar.YEAR)));
@@ -241,7 +242,7 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		getStoreReportsFromServer(storeId, quarter, year);
 	}
 
-	@SuppressWarnings("deprecation") 
+	@SuppressWarnings("deprecation")
 	private void initializeCompareReportVariables()
 	{
 		secondReportQuarter = new ComboBox<>(quarters);
@@ -264,9 +265,6 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		secondSubmitButton.setOnAction(button_submit.getOnAction());
 		Date year = new Date();
 		year.setYear(Integer.parseInt(secondReportYear.getText()));
-		getStoreReportsFromServer(Integer.parseInt(stores.get(0)), quarters.indexOf(secondReportQuarter.getValue()), year);
-		
-		//TODO : FIX compare stage report view. problem with get report from server and show it.
 
 		anchorPane_viewStage.getChildren().addAll(secondReportQuarter, secondReportYear, secondReportType,
 				secondReportStore, secondSubmitButton);
@@ -441,8 +439,6 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 		}
 		getStoreReportsFromServer(storeId, quarter, year);
 	}
-
-	
 
 	@FXML
 	private void showSelectionReport(ActionEvent event)
@@ -667,6 +663,8 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 	{
 		ShopManager shopManager = new ShopManager();
 		shopManager.setUserName(ApplicationEntryPoint.ConnectedUser.getUserName());
+		shopManager.setPrivilege(ApplicationEntryPoint.ConnectedUser.getPrivilege());
+		shopManager.setEmail(ApplicationEntryPoint.ConnectedUser.getEmail());
 		Message entityMessage = MessagesFactory.createGetEntityMessage(shopManager);
 		m_client.sendMessageToServer(entityMessage);
 	}
@@ -732,11 +730,60 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 
 		if (messageData instanceof EntityData) {
 			IEntity entity = ((EntityData) messageData).getEntity();
-			if (entity instanceof IncomesReport) m_incomesReport = (IncomesReport) entity;
-			else if (entity instanceof ReservationsReport) m_reservationsReport = (ReservationsReport) entity;
-			else if (entity instanceof ComplaintsReport) m_complaintsReport = (ComplaintsReport) entity;
-			else if (entity instanceof SurveysReport) m_surveyReport = (SurveysReport) entity;
-			else m_shopManagerUserID = ((ShopManager) entity).getId();
+			if (entity instanceof IncomesReport) {
+				IncomesReport report = (IncomesReport) entity;
+				if (m_compareIncomesReport != null) {
+					if (report.getQuarter() == quarters.indexOf(comboBox_selectionQuarter.getValue())
+							&& report.getYear().getYear() == Integer.parseInt(textField_selectionYear.getText())
+							&& report.getShopManagerId() == Integer.parseInt(comboBox_selectionStore.getValue()))
+						m_incomesReport = report;
+					else m_compareIncomesReport = report;
+				} // End of if(m_compareIncomesReport != null).
+				else {
+					m_incomesReport = report;
+					m_compareIncomesReport = m_incomesReport;
+				} // End of else -> if(m_compareIncomesReport != null).
+			} // End of if (entity instanceof IncomesReport).
+			else if (entity instanceof ReservationsReport) {
+				ReservationsReport report = (ReservationsReport) entity;
+				if (m_compareReservationsReport != null) {
+					if (report.getQuarter() == quarters.indexOf(comboBox_selectionQuarter.getValue())
+							&& report.getYear().getYear() == Integer.parseInt(textField_selectionYear.getText())
+							&& report.getShopManagerId() == Integer.parseInt(comboBox_selectionStore.getValue()))
+						m_reservationsReport = report;
+					else m_compareReservationsReport = report;
+				} // End of if(m_compareReservationsReport != null).
+				else {
+					m_reservationsReport = report;
+					m_compareReservationsReport = m_reservationsReport;
+				} // End of else -> if(m_compareReservationsReport != null).
+			} else if (entity instanceof ComplaintsReport) {
+				ComplaintsReport report = (ComplaintsReport) entity;
+				if (m_compareComplaintsReport != null) {
+					if (report.getQuarter() == quarters.indexOf(comboBox_selectionQuarter.getValue())
+							&& report.getYear().getYear() == Integer.parseInt(textField_selectionYear.getText())
+							&& report.getShopManagerId() == Integer.parseInt(comboBox_selectionStore.getValue()))
+						m_complaintsReport = report;
+					else m_compareComplaintsReport = report;
+				} // End of if(m_compareComplaintsReport != null).
+				else {
+					m_complaintsReport = report;
+					m_compareComplaintsReport = m_complaintsReport;
+				} // End of else -> if(m_compareComplaintsReport != null).
+			} else if (entity instanceof SurveysReport) {
+				SurveysReport report = (SurveysReport) entity;
+				if (m_compareSurveyReport != null) {
+					if (report.getQuarter() == quarters.indexOf(comboBox_selectionQuarter.getValue())
+							&& report.getYear().getYear() == Integer.parseInt(textField_selectionYear.getText())
+							&& report.getShopManagerId() == Integer.parseInt(comboBox_selectionStore.getValue()))
+						m_surveyReport = report;
+					else m_compareSurveyReport = report;
+				} // End of if(m_compareSurveyReport != null).
+				else {
+					m_surveyReport = report;
+					m_compareSurveyReport = m_surveyReport;
+				} // End of else -> if(m_compareSurveyReport != null).
+			} else m_shopManagerUserID = ((ShopManager) entity).getId();
 		} // End of if (messageData instanceof EntityData)
 		else if (messageData instanceof EntitiesListData) {
 			List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
@@ -751,7 +798,6 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 				stores.add(shopManagerId.toString());
 			}
 			comboBox_selectionStore.setValue(stores.get(0));
-
 		} // End of else if(messageData instanceof EntitiesListData)
 		else if (messageData instanceof RespondMessageData) {
 			RespondMessageData respondMessageData = (RespondMessageData) messageData;
