@@ -29,7 +29,7 @@ CREATE TABLE costumers (
 CREATE TABLE shop_managers (
   smId INT AUTO_INCREMENT,
   uUserName VARCHAR(20) NOT NULL,
-  smName VARCHAR(20) NULL DEFAULT NULL,
+  smName VARCHAR(20) NULL DEFAULT 'Zer-Li',
   FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION,
   UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
   PRIMARY KEY (smId)
@@ -40,7 +40,7 @@ CREATE TABLE costumers_in_shops (
 	smId INT NOT NULL,
 	csCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
 	csCreditCard VARCHAR(16) NULL DEFAULT NULL,
-	csStartSubscriptionDate DATE NOT NULL DEFAULT '0000-00-00',
+	csStartSubscriptionDate DATE NULL DEFAULT NULL,
 	FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE CASCADE ON UPDATE NO ACTION,
 	FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
 	PRIMARY KEY (cId,smId)
@@ -76,7 +76,7 @@ CREATE TABLE reservations (
   rNumberOfItems INT NOT NULL DEFAULT 0,
   rPrice FLOAT NOT NULL DEFAULT 0,
   rBlessingCard VARCHAR(100) NULL DEFAULT NULL,
-  rDeliveryDate DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
+  rDeliveryDate DATETIME NULL DEFAULT NULL,
   rDeliveryType VARCHAR(9) NOT NULL DEFAULT 'None',
   rDeliveryAddress VARCHAR(50) NULL DEFAULT NULL,
   rDeliveryPhone VARCHAR(10) NULL DEFAULT NULL,
@@ -110,7 +110,7 @@ CREATE TABLE complaints (
   coId INT NOT NULL AUTO_INCREMENT,
   cId INT NOT NULL,
   smId Int NOT NULL,
-  coDate DATE NOT NULL DEFAULT '0000-00-00',
+  coDate DATE  NULL DEFAULT NULL,
   coComplaint VARCHAR(200) NOT NULL,
   coSummary VARCHAR(200) NULL DEFAULT NULL,
   coOpened BIT(1) NOT NULL DEFAULT 1,
@@ -134,7 +134,7 @@ CREATE TABLE surveys_in_shops (
   ssId INT AUTO_INCREMENT,
   suId INT NOT NULL,
   smId INT NOT NULL,
-  ssStartDate DATE NOT NULL DEFAULT '0000-00-00',
+  ssStartDate DATE NULL DEFAULT NULL,
   ssAnswer1 INT NOT NULL DEFAULT 0,
   ssAnswer2 INT NOT NULL DEFAULT 0,
   ssAnswer3 INT NOT NULL DEFAULT 0,
@@ -152,7 +152,7 @@ CREATE TABLE surveys_in_shops (
 
 CREATE TABLE complaints_reports (
  smId INT NOT NULL,
- crYear YEAR NOT NULL DEFAULT '0000', 
+ crYear YEAR, 
  crQuarter INT NOT NULL DEFAULT 0,
  crMonth1 INT NOT NULL DEFAULT 0,
  crMonth2 INT NOT NULL DEFAULT 0,
@@ -163,7 +163,7 @@ CREATE TABLE complaints_reports (
 
 CREATE TABLE surveys_reports (
  smId INT NOT NULL,
- srYear YEAR NOT NULL DEFAULT '0000', 
+ srYear YEAR, 
  srQuarter FLOAT NOT NULL DEFAULT 0,
  srAnswer1 FLOAT NOT NULL DEFAULT 0,
  srAnswer2 FLOAT NOT NULL DEFAULT 0,
@@ -177,7 +177,7 @@ CREATE TABLE surveys_reports (
 
 CREATE TABLE incomes_reports (
  smId INT NOT NULL,
- irYear YEAR NOT NULL DEFAULT '0000', 
+ irYear YEAR, 
  irQuarter INT NOT NULL DEFAULT 0,
  irMonth1 FLOAT NOT NULL DEFAULT 0,
  irMonth2 FLOAT NOT NULL DEFAULT 0,
@@ -188,7 +188,7 @@ CREATE TABLE incomes_reports (
 
 CREATE TABLE reservations_reports (
  smId INT NOT NULL,
- rrYear YEAR NOT NULL DEFAULT '0000', 
+ rrYear YEAR , 
  rrQuarter INT NOT NULL DEFAULT 0,
  rrMonth1_Flower INT NOT NULL DEFAULT 0,
  rrMonth1_FlowerPot INT NOT NULL DEFAULT 0,
@@ -489,14 +489,14 @@ BEGIN
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Costumer credit card could not be null when subscription exist.';
         END IF;
         
-        IF (NEW.csStartSubscriptionDate = '0000-00-00') THEN
+        IF (NEW.csStartSubscriptionDate = '0000-00-00' OR NEW.csStartSubscriptionDate IS NULL) THEN
 			SET NEW.csStartSubscriptionDate = NOW();
         END IF;
         
 	ELSE
     
 		SET NEW.csCreditCard = NULL;
-		SET NEW.csStartSubscriptionDate = '0000-00-00';
+		SET NEW.csStartSubscriptionDate = NULL;
         
     END IF;
 END; //
@@ -510,14 +510,14 @@ BEGIN
 			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Costumer credit card could not be null when subscription exist.';
         END IF;
         
-        IF (NEW.csStartSubscriptionDate = '0000-00-00') THEN
+        IF (NEW.csStartSubscriptionDate = '0000-00-00' OR NEW.csStartSubscriptionDate IS NULL) THEN
 			SET NEW.csStartSubscriptionDate = NOW();
         END IF;
         
 	ELSE
     
 		SET NEW.csCreditCard = NULL;
-		SET NEW.csStartSubscriptionDate = '0000-00-00';
+		SET NEW.csStartSubscriptionDate = NULL;
         
     END IF;
 END; //
@@ -525,7 +525,7 @@ END; //
 CREATE TRIGGER insert_surveys_in_shops_trigger
 BEFORE INSERT ON surveys_in_shops FOR EACH ROW
 BEGIN
-    IF (NEW.ssStartDate = '0000-00-00') THEN 
+    IF (NEW.ssStartDate = '0000-00-00' OR NEW.ssStartDate IS NULL) THEN 
         SET NEW.ssStartDate = NOW();
     END IF;
 END; //
@@ -541,7 +541,7 @@ END; //
 CREATE TRIGGER insert_complaint_trigger
 BEFORE INSERT ON complaints FOR EACH ROW
 BEGIN
-    IF (NEW.coDate = '0000-00-00') THEN 
+    IF (NEW.coDate = '0000-00-00' OR NEW.coDate IS NULL) THEN 
         SET NEW.coDate = NOW();
     END IF;
 END; //
@@ -557,7 +557,7 @@ END; //
 CREATE TRIGGER insert_reservation_trigger
 BEFORE INSERT ON reservations FOR EACH ROW
 BEGIN
-    IF (NEW.rDeliveryDate = '0000-00-00 00:00:00') THEN 
+    IF (NEW.rDeliveryDate = '0000-00-00 00:00:00'  OR NEW.rDeliveryDate IS NULL) THEN 
         SET NEW.rDeliveryDate = DATE_ADD(NOW(), INTERVAL 3 HOUR);
     END IF;
 END; //
@@ -622,7 +622,10 @@ INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES
 ('costumer','costumer','costumer@local','Costumer'),
 ('servicespecialist','servicespecialist','servicespecialist@local','ServiceSpecialist');
 
-UPDATE shop_employees SET  smId = 1 WHERE uUserName = 'shopemployee';
+UPDATE shop_employees SET smId = 1 WHERE uUserName = 'shopemployee';
+UPDATE shop_managers SET smName = 'Haifa' WHERE  smId = 1;
+UPDATE shop_managers SET smName = 'Kramiel' WHERE smId = 2;
+UPDATE shop_managers SET smName = 'Akko' WHERE smId = 3;
 
 LOCK TABLES items WRITE;
 INSERT INTO items (iName,iType,iPrice,iDomainColor) VALUES 

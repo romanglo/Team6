@@ -218,8 +218,8 @@ public class Server extends AbstractServer {
 		}
 		if (!(obj instanceof Message)) {
 			m_logger.info(
-					"A message has been received from client, but the message type is not dirived from Message. The Client: "
-							+ clientDetails);
+					"A message has been received from client, but the message type is not inherit from Message. Message type: " 
+					+ obj.getClass().getName() + "The Client: " + clientDetails);
 			return;
 		}
 
@@ -228,7 +228,7 @@ public class Server extends AbstractServer {
 			WaitingMessage receivedMessage = new WaitingMessage(client, msg);
 
 			if (m_incomingMessages.remainingCapacity() == 0) {
-				WaitingMessage removedMessage = m_outgoingMessages.poll();
+				WaitingMessage removedMessage = m_incomingMessages.poll();
 				m_logger.warning("The message: " + removedMessage.getMessage() + ", from client: "
 						+ removedMessage.getSender() + " removed because the incoming queue is full");
 			}

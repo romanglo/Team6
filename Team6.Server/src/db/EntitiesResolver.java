@@ -147,7 +147,11 @@ public class EntitiesResolver {
 							.setCostumerSubscription(Enum.valueOf(CostumerSubscription.class, resultSet.getString(3)));
 					shopCostumer.setCreditCard(resultSet.getString(4));
 					Date sqlDate = resultSet.getDate(5);
-					shopCostumer.setSubscriptionStartDate(new java.util.Date(sqlDate.getTime()));
+					if (sqlDate != null) {
+						shopCostumer.setSubscriptionStartDate(new java.util.Date(sqlDate.getTime()));
+					} else {
+						shopCostumer.setSubscriptionStartDate(null);
+					}
 					ShopCostumerEntities.add(shopCostumer);
 				} catch (Exception ignored) {
 					failedResolve++;
@@ -186,8 +190,11 @@ public class EntitiesResolver {
 					shopSurvey.setSurveyId(resultSet.getInt(2));
 					shopSurvey.setShopManagerId(resultSet.getInt(3));
 					Date sqlDate = resultSet.getDate(4);
-					java.util.Date javaData = new java.util.Date(sqlDate.getTime());
-					shopSurvey.setStartDate(javaData);
+					if (sqlDate != null) {
+						shopSurvey.setStartDate(new java.util.Date(sqlDate.getTime()));
+					} else {
+						shopSurvey.setStartDate(null);
+					}
 					shopSurvey.setAnswer1(resultSet.getInt(5));
 					shopSurvey.setAnswer2(resultSet.getInt(6));
 					shopSurvey.setAnswer3(resultSet.getInt(7));
@@ -281,7 +288,11 @@ public class EntitiesResolver {
 				try {
 					surveyReport.setShopManagerId(resultSet.getInt(1));
 					Date mysqlDate = resultSet.getDate(2);
-					surveyReport.setYear(new java.util.Date(mysqlDate.getTime()));
+					if (mysqlDate != null) {
+						surveyReport.setYear(new java.util.Date(mysqlDate.getTime()));
+					} else {
+						surveyReport.setYear(null);
+					}
 					surveyReport.setQuarter(resultSet.getInt(3));
 					surveyReport.setFirstAnswerAverage(resultSet.getFloat(4));
 					surveyReport.setSecondAnswerAverage(resultSet.getFloat(5));
@@ -438,7 +449,11 @@ public class EntitiesResolver {
 				try {
 					reservationsReport.setShopManagerId(resultSet.getInt(1));
 					Date mysqlDate = resultSet.getDate(2);
-					reservationsReport.setYear(new java.util.Date(mysqlDate.getTime()));
+					if (mysqlDate != null) {
+						reservationsReport.setYear(new java.util.Date(mysqlDate.getTime()));
+					} else {
+						reservationsReport.setYear(null);
+					}
 					reservationsReport.setQuarter(resultSet.getInt(3));
 
 					reservationsReport.setNumberOfOrderedFlowerPotsInFirstMonth(resultSet.getInt(4));
@@ -566,7 +581,11 @@ public class EntitiesResolver {
 				try {
 					incomesReport.setShopManagerId(resultSet.getInt(1));
 					Date mysqlDate = resultSet.getDate(2);
-					incomesReport.setYear(new java.util.Date(mysqlDate.getTime()));
+					if (mysqlDate != null) {
+						incomesReport.setYear(new java.util.Date(mysqlDate.getTime()));
+					} else {
+						incomesReport.setYear(null);
+					}
 					incomesReport.setQuarter(resultSet.getInt(3));
 					incomesReport.setIncomesInFirstMonth(resultSet.getFloat(4));
 					incomesReport.setIncomesInSecondMonth(resultSet.getFloat(5));
@@ -606,7 +625,11 @@ public class EntitiesResolver {
 				try {
 					complaintReport.setShopManagerId(resultSet.getInt(1));
 					Date mysqlDate = resultSet.getDate(2);
-					complaintReport.setYear(new java.util.Date(mysqlDate.getTime()));
+					if(mysqlDate != null) {
+					complaintReport.setYear(new java.util.Date(mysqlDate.getTime()));}
+					else {
+						complaintReport.setYear(null);
+					}
 					complaintReport.setQuarter(resultSet.getInt(3));
 					complaintReport.setNumberOfComplaintsFirstMonth(resultSet.getInt(4));
 					complaintReport.setNumberOfComplaintsSecondMonth(resultSet.getInt(5));
@@ -648,7 +671,11 @@ public class EntitiesResolver {
 					complaint.setCostumerId(resultSet.getInt(2));
 					complaint.setShopManagerId(resultSet.getInt(3));
 					Date mysqlDate = resultSet.getDate(4);
-					complaint.setCreationDate(new java.util.Date(mysqlDate.getTime()));
+					if(mysqlDate!= null) {
+					complaint.setCreationDate(new java.util.Date(mysqlDate.getTime()));}
+					else {
+						complaint.setCreationDate(null);
+					}
 					complaint.setComplaint(resultSet.getString(5));
 					complaint.setSummary(resultSet.getString(6));
 					complaint.setOpened(resultSet.getString(7).equals("0") ? false : true);
@@ -816,7 +843,11 @@ public class EntitiesResolver {
 					reservation.setPrice(resultSet.getFloat(7));
 					reservation.setBlessingCard(resultSet.getString(8));
 					Date mysqlDate = resultSet.getDate(9);
-					reservation.setDeliveryDate(new java.util.Date(mysqlDate.getTime()));
+					if(mysqlDate != null) {
+					reservation.setDeliveryDate(new java.util.Date(mysqlDate.getTime()));}
+					else {
+						reservation.setDeliveryDate(null);
+					}
 					reservation.setDeliveryType(Enum.valueOf(ReservationDeliveryType.class, resultSet.getString(10)));
 					reservation.setDeliveryAddress(resultSet.getString(11));
 					reservation.setDeliveryPhone(resultSet.getString(12));
