@@ -93,12 +93,12 @@ public class CostumerServiceEmployeeController implements Initializable, Client.
 	 * 			Add specialist analysis button clicked.
 	 */
 	@FXML
-	public void addSpecialistAnalysisClick(ActionEvent event) 
+	public void addNewSurveyClick(ActionEvent event) 
 	{
 		try {
 		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
 		Stage primaryStage = new Stage();
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/CostumerServiceEmployee_AddSpecialistAnalysis.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/CostumerServiceEmployee_AddNewSurvey.fxml"));
 		Parent root = loader.load();
 		Scene scene = new Scene(root);			
 		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());

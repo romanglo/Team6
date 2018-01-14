@@ -77,7 +77,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 
 	private ClientConfiguration m_configuration;
 	
-	private List<newEntities.IEntity> m_complaint_array;
+	private List<IEntity> m_complaint_array;
 	
 	private ArrayList<String> m_id_array=new ArrayList<>();
 	
@@ -211,14 +211,15 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 		if(!(financial_compensation.isDisable()))
 		{
 			complaint_fun=(Complaint)m_complaint_array.get(i);
-			complaint_fun.setComplaint(textarea_complaint.getText());
+			complaint_fun.setSummary(textarea_summary.getText());
 			Costumer cos_entity=new Costumer();
-			cos_entity.setId(com_id);
+			cos_entity.setId(complaint_fun.getCostumerId());
 			Message msg=MessagesFactory.createGetEntityMessage(cos_entity);
 			m_client.sendMessageToServer(msg);
 		}
 		else
 		{
+		((Complaint)m_complaint_array.get(i)).setOpened(false);	
 		Message msgg=MessagesFactory.createUpdateEntityMessage(m_complaint_array.get(i));
 		m_client.sendMessageToServer(msgg);
 		ancorepane_root.setDisable(true);
@@ -240,7 +241,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 		for(int i=0;i<m_complaint_array.size();i++)
 		{
 			Complaint temp=(Complaint)m_complaint_array.get(i);
-			if(temp.getCostumerId()==id)
+			if(temp.getId()==id)
 				comp=(Complaint)m_complaint_array.get(i);
 		}
 		textarea_complaint.setText(comp.getComplaint());
@@ -281,8 +282,11 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 			for(int i=0;i<m_complaint_array.size();i++)
 			{
 				Complaint temp=(Complaint)(m_complaint_array.get(i));
+				if(temp.isOpened())
+				{
 				String s=Integer.toString(temp.getId());
 				m_id_array.add(s);
+				}
 			}
 			setIdInCombobox();
 		}
@@ -298,7 +302,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 			if(msg.getMessageData() instanceof RespondMessageData)						// Respond from server
 			{
 				RespondMessageData res=(RespondMessageData)msg.getMessageData(); 
-				if(res.getMessageData() instanceof Costumer )							// Respond about costumer refund
+				if(((EntityData)(res.getMessageData())).getEntity() instanceof Costumer )							// Respond about costumer refund
 				{
 					if(!(res.isSucceed()))
 						flag=false;
@@ -319,8 +323,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint implements Initiali
 					else
 					{
 						m_logger.severe("Update succssed");
-						ancorepane_root.setDisable(false);
-					}
+						ancorepane_root.setDisable(false);					}
 				}
 			}
 	}

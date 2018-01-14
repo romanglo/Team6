@@ -4,15 +4,13 @@ package controllers;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
-import entities.Answers;
-import entities.IEntity;
-import entities.SurveyEntity;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,8 +29,16 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import logger.LogManager;
-import messages.Message;
-import messages.MessagesFactory;
+import newEntities.IEntity;
+import newEntities.ShopEmployee;
+import newEntities.ShopSurvey;
+import newEntities.Survey;
+import newMessages.EntitiesListData;
+import newMessages.EntityData;
+import newMessages.IMessageData;
+import newMessages.Message;
+import newMessages.MessagesFactory;
+import newMessages.RespondMessageData;
 
 
 /**
@@ -67,19 +73,19 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 	
 	@FXML private TextField textfiled_question6;
 	
-	@FXML private ComboBox<String> combobox_answer1;
+	@FXML private ComboBox<Integer> combobox_answer1;
 	
-	@FXML private ComboBox<String> combobox_answer2;
+	@FXML private ComboBox<Integer> combobox_answer2;
 	
-	@FXML private ComboBox<String> combobox_answer3;
+	@FXML private ComboBox<Integer> combobox_answer3;
 	
-	@FXML private ComboBox<String> combobox_answer4;
+	@FXML private ComboBox<Integer> combobox_answer4;
 	
-	@FXML private ComboBox<String> combobox_answer5;
+	@FXML private ComboBox<Integer> combobox_answer5;
 	
-	@FXML private ComboBox<String> combobox_answer6;
+	@FXML private ComboBox<Integer> combobox_answer6;
 	
-	@FXML private Button button_checkifexistenc;
+	@FXML private ComboBox<Integer> combobox_surveyida;
 	
 
 	/* End of --> UI Binding Fields region */
@@ -91,9 +97,17 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 
 	private ClientConfiguration m_configuration;
 	
-	private ObservableList<String> list;
+	private ObservableList<Integer> list;
 	
-	private SurveyEntity entity;
+	private ShopSurvey entity;
+	
+	private List<IEntity> m_surveys_array;
+	
+	private ArrayList<Integer> m_surveysid_array= new ArrayList();
+;
+	
+	private int m_shop;
+	
 	/* End of --> Fields region */
 
 	/* UI events region */
@@ -106,81 +120,60 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 			else
 		{
 			int id=Integer.parseInt(textfiled_id.getText());
-			SurveyEntity entity= new SurveyEntity(id);
+			Survey entity= new Survey();//id
 			Message msg = MessagesFactory.createGetEntityMessage(entity);
 			m_client.sendMessageToServer(msg);
 		}
+	}
+	@FXML
+	public void selectSurvey(ActionEvent event)
+	{	
+		int surveyid=combobox_surveyida.getValue();
+		for(int i=0;i<m_surveys_array.size();i++)
+		{
+			if(((ShopSurvey)m_surveys_array.get(i)).getId()==surveyid)
+			{
+				entity=((ShopSurvey)m_surveys_array.get(i));
+			}
+		}
+		Survey survey_entity=new Survey();
+		survey_entity.setId(entity.getSurveyId());
+		Message msg=MessagesFactory.createGetEntityMessage(survey_entity);
+		m_client.sendMessageToServer(msg);
+	}
+	
+	@FXML
+	public void clear(ActionEvent event)
+	{
+		
 	}
 	
 	@FXML
 	public void addSurvey(ActionEvent event)
 	{
-		
-		if(!checkFileds())
-			showInformationMessage("One or more of the fileds are empty");
+		if(checkFileds())
+		{
+		ShopSurvey cur_shopservey=null;
+		int surv_id=combobox_surveyida.getValue();
+		for(int i=0;i<m_surveys_array.size();i++)
+		{
+			if(((ShopSurvey)m_surveys_array.get(i)).getId()==surv_id)
+				cur_shopservey =(ShopSurvey)m_surveys_array.get(i);
+		}
+		cur_shopservey.setAnswer1(cur_shopservey.getAnswer1()+combobox_answer1.getValue());
+		cur_shopservey.setAnswer2(cur_shopservey.getAnswer2()+combobox_answer2.getValue());
+		cur_shopservey.setAnswer3(cur_shopservey.getAnswer3()+combobox_answer3.getValue());
+		cur_shopservey.setAnswer4(cur_shopservey.getAnswer4()+combobox_answer4.getValue());
+		cur_shopservey.setAnswer5(cur_shopservey.getAnswer5()+combobox_answer5.getValue());
+		cur_shopservey.setAnswer6(cur_shopservey.getAnswer6()+combobox_answer6.getValue());
+		cur_shopservey.setNumberOfAnswers(cur_shopservey.getNumberOfAnswers()+1);
+		Message msg=MessagesFactory.createUpdateEntityMessage(cur_shopservey);
+		m_client.sendMessageToServer(msg);
+		}
 		else
 		{
-			if(textfiled_id.isDisable())		// There is existing survey.
-			{
-				int answer1=Integer.parseInt(combobox_answer1.getValue());
-				int answer2=Integer.parseInt(combobox_answer2.getValue());
-				int answer3=Integer.parseInt(combobox_answer3.getValue());
-				int answer4=Integer.parseInt(combobox_answer4.getValue());
-				int answer5=Integer.parseInt(combobox_answer5.getValue());
-				int answer6=Integer.parseInt(combobox_answer6.getValue());
-				Answers answer_entity= new Answers(answer1, answer2, answer3, answer4, answer5, answer6);
-				entity.AddAnswers(answer_entity);
-				Message msg= MessagesFactory.createUpdateEntityMessage(entity);
-				m_client.sendMessageToServer(msg);
-			}
-			else								// There isn't existing survey
-			{
-				int answer1=Integer.parseInt(combobox_answer1.getValue());
-				int answer2=Integer.parseInt(combobox_answer2.getValue());
-				int answer3=Integer.parseInt(combobox_answer3.getValue());
-				int answer4=Integer.parseInt(combobox_answer4.getValue());
-				int answer5=Integer.parseInt(combobox_answer5.getValue());
-				int answer6=Integer.parseInt(combobox_answer6.getValue());
-				String[]questions=new String[6];
-				questions[0]=textfiled_question1.getText();
-				questions[1]=textfiled_question2.getText();
-				questions[2]=textfiled_question3.getText();
-				questions[3]=textfiled_question4.getText();
-				questions[4]=textfiled_question5.getText();
-				questions[5]=textfiled_question6.getText();
-				Answers answer_entity= new Answers(answer1, answer2, answer3, answer4, answer5, answer6);
-				//entity=new SurveyEntity(questions);
-				entity.AddAnswers(answer_entity);
-				Message msg =MessagesFactory.createEntityMessage(entity);
-				m_client.sendMessageToServer(msg);
-			}
+			showInformationMessage("One or more of the fileds is empty");
 		}
-	}
-	
-	@FXML
-	public void clearFileds(ActionEvent event)
-	{
-		button_checkifexistenc.setDisable(false);
-		textfiled_id.setText("");
-		textfiled_id.setDisable(false);
-		textfiled_question1.setText("");
-		textfiled_question1.setDisable(false);
-		textfiled_question2.setText("");
-		textfiled_question2.setDisable(false);
-		textfiled_question3.setText("");
-		textfiled_question3.setDisable(false);
-		textfiled_question4.setText("");
-		textfiled_question4.setDisable(false);
-		textfiled_question5.setText("");
-		textfiled_question5.setDisable(false);
-		textfiled_question6.setText("");
-		textfiled_question6.setDisable(false);
-		combobox_answer1.setValue(null);
-		combobox_answer2.setValue(null);
-		combobox_answer3.setValue(null);
-		combobox_answer4.setValue(null);
-		combobox_answer5.setValue(null);
-		combobox_answer6.setValue(null);
 	}
 		
 	/* private methods region */
@@ -219,6 +212,7 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 		initializeImages();
 		initializeClientHandler();
 		answersinitialize();
+		initializeshop();
 	}
 
 	private void initializeFields()
@@ -256,10 +250,10 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 	
 	private void answersinitialize()
 	{
-		ArrayList<String> answers = new ArrayList<String>();
+		ArrayList<Integer> answers = new ArrayList<Integer>();
 		for(int i=1;i<11;i++)
 		{
-			answers.add(Integer.toString(i));
+			answers.add(i);
 		}
 		 list = FXCollections.observableArrayList(answers);
 		 combobox_answer1.setItems(list);
@@ -268,7 +262,21 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 		 combobox_answer4.setItems(list);
 		 combobox_answer5.setItems(list);
 		 combobox_answer6.setItems(list);
-		
+	}
+	private void initializeSurveys()
+	{
+		ShopSurvey sur_entity= new ShopSurvey();
+		sur_entity.setShopManagerId(m_shop);
+		Message msg=MessagesFactory.createGetAllEntityMessage(sur_entity);
+		m_client.sendMessageToServer(msg);
+	}
+	
+	private void initializeshop()
+	{
+		ShopEmployee shopemp=new ShopEmployee();
+		shopemp.setUserName(ApplicationEntryPoint.ConnectedUser.getUserName());
+		Message msg=MessagesFactory.createGetEntityMessage(shopemp);
+		m_client.sendMessageToServer(msg);
 	}
 
 	/* End of --> Initializing methods region */
@@ -281,27 +289,50 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 	@Override
 	public synchronized void onMessageReceived(Message msg) throws Exception
 	{
-		if(msg.getMessageData() instanceof IEntity)
+		if(msg.getMessageData() instanceof EntityData)
 		{
-			entity= (SurveyEntity)msg.getMessageData();
-			// TODO Check The option that survey not exist.
-			textfiled_id.setDisable(true);
-			button_checkifexistenc.setDisable(true);
-			String[] question= entity.getQuestion();
-			textfiled_question1.setText(question[1]);
-			textfiled_question2.setText(question[2]);
-			textfiled_question3.setText(question[3]);
-			textfiled_question4.setText(question[4]);
-			textfiled_question5.setText(question[5]);
-			textfiled_question6.setText(question[6]);
-			textfiled_question1.setDisable(true);
-			textfiled_question2.setDisable(true);
-			textfiled_question3.setDisable(true);
-			textfiled_question4.setDisable(true);
-			textfiled_question5.setDisable(true);
-			textfiled_question6.setDisable(true);
+			if(((EntityData)msg.getMessageData()).getEntity() instanceof ShopEmployee)
+			{
+				ShopEmployee s=(ShopEmployee) ((EntityData)msg.getMessageData()).getEntity();
+				m_shop=s.getShopManagerId();
+				initializeSurveys();
+			}
+			else if(((EntityData)msg.getMessageData()).getEntity() instanceof Survey)
+				{
+					Survey s=(Survey) ((EntityData)msg.getMessageData()).getEntity();
+					textfiled_question1.setText(s.getFirstQuestion());
+					textfiled_question2.setText(s.getSecondQuestion());
+					textfiled_question3.setText(s.getThirdQuestion());
+					textfiled_question4.setText(s.getFourthQuestion());
+					textfiled_question5.setText(s.getFifthQuestion());
+					textfiled_question6.setText(s.getSixthQuestion());
+				}
 		}
+		else
+		{
+			if (msg.getMessageData() instanceof EntitiesListData)
+			{
+				EntitiesListData entitiesListData = (EntitiesListData)msg.getMessageData();
+				m_surveys_array = entitiesListData.getEntities();
+				for(int i=0;i<m_surveys_array.size();i++)
+				{
+						m_surveysid_array.add(((ShopSurvey)m_surveys_array.get(i)).getId());
+				}
+			list = FXCollections.observableArrayList(m_surveysid_array);
+			combobox_surveyida.setItems(list);	
+			}
+			else if(msg.getMessageData() instanceof RespondMessageData)
+			{
+				if(((RespondMessageData)msg.getMessageData()).isSucceed())
+				{
+					m_logger.severe("Update sucssed");
+				}
+				else
+					m_logger.severe("Update faild");
+			}
+		}	
 	}
+		
 
 	/**
 	 * {@inheritDoc}
