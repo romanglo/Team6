@@ -60,7 +60,7 @@ public class ItemInShop implements IEntity
 	/**
 	 * @return the discountedPrice
 	 */
-	public double getDiscountedPrice()
+	public float getDiscountedPrice()
 	{
 		return m_discountedPrice;
 	}

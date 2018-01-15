@@ -156,6 +156,23 @@ public class CatalogItemRow
 		this.m_domainColor = domainColor;
 		this.m_image = ResizeImage(m_image);
 	}
+	
+	/**
+	 * Constructor for ItemInShop view in discounted shop catalog table.
+	 * 
+	 * @param id
+	 *            Unique item ID.
+	 *            
+	 * @param price
+	 *            Discounted price.
+	 *            
+	 */
+	public CatalogItemRow(Integer id, Float price)
+	{
+		super();
+		m_id = id;
+		m_price = price;
+	}
 
 	/**
 	 * Scale image to defined size.
