@@ -40,8 +40,8 @@
             <TextField fx:id="textfield_answer6" layoutX="312.0" layoutY="249.0" prefHeight="25.0" prefWidth="68.0" />
             <Label layoutX="128.0" layoutY="277.0" prefHeight="17.0" prefWidth="184.0" text="Specialist analysis:" />
             <TextArea fx:id="textarea_analysis" layoutY="302.0" prefHeight="71.0" prefWidth="390.0" />
-            <Button layoutX="80.0" layoutY="381.0" mnemonicParsing="false" onAction="#saveAnalysis" prefHeight="25.0" prefWidth="84.0" text="Save" />
-            <Button layoutX="216.0" layoutY="381.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="84.0" text="Back" />
+            <Button layoutX="80.0" layoutY="381.0" mnemonicParsing="false" onAction="#saveAnalysis" prefHeight="25.0" prefWidth="225.0" text="Save" />
+            <Label layoutX="29.0" layoutY="30.0" prefHeight="17.0" prefWidth="154.0" text="Survey id:" />
          </children></AnchorPane>
 
 		<!--  Title: -->

@@ -24,7 +24,7 @@
             <TextField fx:id="textfield_question5" layoutX="159.0" layoutY="187.0" />
             <TextField fx:id="textfield_question6" layoutX="159.0" layoutY="220.0" />
             <Button layoutX="83.0" layoutY="256.0" mnemonicParsing="false" onAction="#addNewSurvey" prefHeight="25.0" prefWidth="92.0" text="Save" />
-            <Button layoutX="195.0" layoutY="256.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="92.0" text="Back" />
+            <Button layoutX="195.0" layoutY="256.0" mnemonicParsing="false" onAction="#backButtonClick" prefHeight="25.0" prefWidth="92.0" text="Back" />
             <ImageView fx:id="imageview_headline" fitHeight="48.0" fitWidth="390.0" pickOnBounds="true" preserveRatio="true" />
          </children></AnchorPane>
 

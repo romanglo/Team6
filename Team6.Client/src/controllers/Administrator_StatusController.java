@@ -63,11 +63,11 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	
 	@FXML private Button back_btn;
 	
-	@FXML private ChoiceBox<String> cmb_user;
+	@FXML private ComboBox<String> cmb_user;
 	
-	@FXML private ChoiceBox<String> cmb_status;
+	@FXML private ComboBox<String> cmb_status;
 	
-	@FXML private ChoiceBox<String> cmb_privillge;
+	@FXML private ComboBox<String> cmb_privillge;
 
 	/* End of --> UI Binding Fields region */
 
@@ -85,6 +85,8 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	ArrayList<IEntity> arrlist;
 	
 	ArrayList<String> userNameArr= new ArrayList<String>();
+	
+	private User selected_user;
 
 
 	
@@ -229,22 +231,16 @@ public class Administrator_StatusController implements Initializable, Client.Cli
 	 */
 	
 	@FXML
-	public void checkBoxSelected(ActionEvent event) throws IOException
+	public void userSelected(ActionEvent event) throws IOException
 	{
-		for(int i=0;i<arrlist.size();i++) 
-		{
-			User tempEntity = (User) arrlist.get(i);
-			if(tempEntity.getUserName().equals(cmb_user.getValue())) 
+			String username=cmb_user.getValue();
+			for(int i=0;i<arrlist.size();i++)
 			{
-				//	cmb_status.setSelectionModel();
-				//for(int j=0 ; j<8 ; j++) 
-				//{
-				//	if(tempEntity.getUserPrivilege().equals(((List<String>) cmb_privillge).get(j)))
-				//		cmb_status.setAccessibleText(tempEntity.getUserPrivilege().toString());
-				//}
+				if(((User)arrlist.get(i)).getUserName().equals(username))
+					selected_user=(User)arrlist.get(i);
 			}
-		} 
-		
+			cmb_privillge.setValue((selected_user.getPrivilege().toString()));
+			cmb_status.setValue(selected_user.getStatus().toString());
 	}
 	
 	

@@ -19,7 +19,7 @@
             <ComboBox fx:id="combobox_id" layoutX="129.0" layoutY="60.0" onAction="#chooseComplaint" prefWidth="150.0" />
             <TextArea fx:id="textarea_complaint" layoutX="6.0" layoutY="117.0" prefHeight="93.0" prefWidth="180.0" />
             <Button layoutX="78.0" layoutY="257.0" mnemonicParsing="false" onAction="#updateClick" prefHeight="25.0" prefWidth="78.0" text="Update" />
-            <CheckBox layoutX="23.0" layoutY="222.0" mnemonicParsing="false" onAction="#financialCompensation" text="Financial compensation" />
+            <CheckBox fx:id="checkbox_financial" layoutX="23.0" layoutY="222.0" mnemonicParsing="false" onAction="#financialCompensation" text="Financial compensation" />
             <TextField fx:id="financial_compensation" disable="true" layoutX="176.0" layoutY="218.0" />
             <Button layoutX="193.0" layoutY="257.0" mnemonicParsing="false" onAction="#backButtonClick" prefHeight="25.0" prefWidth="78.0" text="Back" />
             <Label layoutX="16.0" layoutY="95.0" prefHeight="17.0" prefWidth="180.0" text="Costumer complaint:" />

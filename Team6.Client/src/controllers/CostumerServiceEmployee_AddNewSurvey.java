@@ -11,12 +11,17 @@ import client.Client;
 import client.ClientConfiguration;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.Stage;
 import logger.LogManager;
 import newEntities.Survey;
 import newMessages.IMessageData;
@@ -133,18 +138,37 @@ public class CostumerServiceEmployee_AddNewSurvey implements Initializable, Clie
 		}
 	}
 	
-	private void showInformationMessage(String message)
+	/**
+	 * The function back to costumer service employee main window.
+	 *
+	 * @param event
+	 * 			Back button clicked
+	 */
+	@FXML
+	public void backButtonClick(ActionEvent event) 
 	{
-		if (message == null || message.isEmpty()) {
-			return;
+		try 
+		{
+		((Node) event.getSource()).getScene().getWindow().hide(); //hiding primary window
+		Stage primaryStage = new Stage();
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/CostumerServiceEmployee.fxml"));
+		Parent root = loader.load();
+		Scene scene = new Scene(root);			
+		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+		primaryStage.setScene(scene);		
+		primaryStage.show();
 		}
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-
-		alert.showAndWait();
+		catch(Exception e)
+		{
+			String msg = "Failed on try to load the next window";
+			m_logger.severe(msg + ", excepion: " + e.getMessage());
+			showInformationMessage(msg);
+		}
 	}
+	
+	
+	
+
 	
 	/* End of --> UI events region */
 
@@ -159,6 +183,19 @@ public class CostumerServiceEmployee_AddNewSurvey implements Initializable, Clie
 					return false;
 				}
 		return true;
+	}
+	
+	private void showInformationMessage(String message)
+	{
+		if (message == null || message.isEmpty()) {
+			return;
+		}
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Information Dialog");
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+
+		alert.showAndWait();
 	}
 	
 	/* End of --> Private methods */

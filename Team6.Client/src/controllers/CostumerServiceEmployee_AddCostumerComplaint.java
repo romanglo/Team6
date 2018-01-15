@@ -86,6 +86,8 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	private ObservableList<Integer> list;
 	
 	private List<IEntity> m_costumer_array;
+	
+	private Complaint selected_complaint;
 	/* End of --> Fields region */
 
 	/* UI events region */
@@ -135,11 +137,22 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 		}
 		else
 		{
+			selected_complaint= new Complaint();
+			selected_complaint.setShopManagerId(combobox_shop.getValue());
+			selected_complaint.setComplaint(textarea_costumercomplaint.getText());
 			int costumer_id=Integer.parseInt(IDField.getText());
 			Costumer entity=new Costumer();
 			entity.setId(costumer_id);
 			Message msg= MessagesFactory.createGetEntityMessage(entity);
 			m_client.sendMessageToServer(msg);
+			combobox_shop.setDisable(true);
+			combobox_shop.getItems().clear();
+			m_shopmanager_array.clear();
+			m_managerid_array.clear();
+			initializeShopCombobox();
+			combobox_shop.setDisable(false);
+			textarea_costumercomplaint.clear();
+			IDField.clear();
 		}
 	}
 	
@@ -231,14 +244,10 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 		{
 			Costumer entity=(Costumer)((EntityData)msg.getMessageData()).getEntity();
 			int id=entity.getId();
-			String complaint=textarea_costumercomplaint.getText();
-			Complaint complaint_entity= new Complaint();
-			complaint_entity.setComplaint(complaint);
-			complaint_entity.setCostumerId(id);
-			complaint_entity.setShopManagerId(combobox_shop.getValue());
-			complaint_entity.setCreationDate(new Date());
-			complaint_entity.setOpened(true);
-			msg=MessagesFactory.createAddEntityMessage(complaint_entity);
+			selected_complaint.setCostumerId(id);
+			selected_complaint.setCreationDate(new Date());
+			selected_complaint.setOpened(true);
+			msg=MessagesFactory.createAddEntityMessage(selected_complaint);
 			m_client.sendMessageToServer(msg);
 		}
 		else if (msg.getMessageData() instanceof RespondMessageData)
