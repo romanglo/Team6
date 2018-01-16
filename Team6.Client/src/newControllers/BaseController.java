@@ -51,7 +51,7 @@ import newMessages.MessagesFactory;
  * @see client.Client.ClientStatusHandler
  * 
  */
-public abstract class BaseController implements Initializable, Client.ClientStatusHandler
+public abstract class BaseController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
 
 	// region UI Fields
@@ -133,6 +133,7 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 		m_ConnectedUser = ApplicationEntryPoint.ConnectedUser;
 
 		m_Client.setClientStatusHandler(this);
+		m_Client.setMessagesHandler(this);
 		if (!m_Client.isConnected()) {
 			onClientDisconnected();
 		}

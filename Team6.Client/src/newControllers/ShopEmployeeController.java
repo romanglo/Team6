@@ -11,7 +11,7 @@ import newMessages.Message;
  * 
  * 
  */
-public class CostumerController extends BaseController
+public class ShopEmployeeController extends BaseController
 {
 
 	// region Fields

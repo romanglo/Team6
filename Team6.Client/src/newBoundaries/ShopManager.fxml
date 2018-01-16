@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="newControllers.ShopManagerController">
+	<top>
+		<BorderPane fx:id="borderpain_main_top" styleClass="header-section">
+			<left>
+				<Label text="Zer-Li">
+					<font>
+						<Font name="Britannic Bold" size="52" />
+					</font>
+				</Label>
+			</left>
+			<right>
+				<VBox>
+					<Button onAction="#onLogoutButtonPressed" text="Logout">
+						<graphic>
+							<ImageView fx:id="imageview_logout_button" fitHeight="24"
+								fitWidth="24" pickOnBounds="true" preserveRatio="true" />
+						</graphic>
+					</Button>
+					<Button onAction="#onAccountButtonPressed" text="Account">
+						<graphic>
+							<ImageView fx:id="imageview_account_button" fitHeight="24"
+								fitWidth="24" pickOnBounds="true" preserveRatio="true" />
+						</graphic>
+					</Button>
+				</VBox>
+			</right>
+		</BorderPane>
+	</top>
+	<left>
+		<VBox fx:id="vbox_sidebar" styleClass="sidebar-section" />
+	</left>
+	<center>
+		<AnchorPane styleClass="center-section"
+			BorderPane.alignment="TOP_LEFT">
+			<children>
+				<AnchorPane fx:id="anchorpane_welcome">
+					<ImageView fx:id="imageview_welcome" fitHeight="300"
+						pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0"
+						AnchorPane.leftAnchor="210.0" AnchorPane.rightAnchor="0.0" />
+					<VBox styleClass="content-section-label" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+						<Label text="Welcome">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="52" />
+							</font>
+						</Label>
+						<Label  text="Back,">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="52" />
+							</font>
+						</Label>
+						<Label fx:id="label_username">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="52" />
+							</font>
+						</Label>
+					</VBox>
+				</AnchorPane>
+				<AnchorPane fx:id="anchorpane_option1" visible="false">
+					<children>
+						<Label text="Option 1">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="36" />
+							</font>
+						</Label>
+					</children>
+				</AnchorPane>
+				<AnchorPane fx:id="anchorpane_option21" visible="falseS">
+					<children>
+						<Label text="Option 2">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="36" />
+							</font>
+						</Label>
+					</children>
+				</AnchorPane>
+			</children>
+			<BorderPane.margin>
+				<Insets left="5.0" top="5.0" />
+			</BorderPane.margin>
+		</AnchorPane>
+	</center>
+	<bottom>
+		<BorderPane styleClass="footer-section">
+			<center>
+				<Label text="© 2018 Group 6">
+					<BorderPane.margin>
+						<Insets />
+					</BorderPane.margin>
+				</Label>
+			</center>
+			<right>
+				<Circle fx:id="circle_connection_status" fill="GREY" radius="12"
+					stroke="BLACK" strokeType="INSIDE">
+					<effect>
+						<DropShadow color="#00000084" />
+					</effect>
+					<BorderPane.margin>
+						<Insets right="5.0" top="1.0" />
+					</BorderPane.margin>
+				</Circle>
+			</right>
+		</BorderPane>
+	</bottom>
+</BorderPane>
