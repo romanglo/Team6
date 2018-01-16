@@ -93,15 +93,13 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	@FXML
 	private TableColumn<SettingsRow, String> tablecolumn_value;
 	@FXML
-	private TableColumn<SettingsRow, String> tablecolumn_type;
+	private TableColumn<SettingsRow, String> tablecolumn_region;
 	@FXML
 	private Button btn_update_settings;
 
 	/* Title images */
 	@FXML
 	private ImageView imageview_gif;
-	@FXML
-	private ImageView imageview_title;
 	@FXML
 	Button btn_run_logger_file;
 
@@ -146,11 +144,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		if (serverGif != null) {
 			Image image = new Image(serverGif);
 			imageview_gif.setImage(image);
-		}
-		InputStream title = getClass().getResourceAsStream("Zerli_Headline.jpg");
-		if (title != null) {
-			Image image = new Image(title);
-			imageview_title.setImage(image);
 		}
 	}
 
@@ -207,7 +200,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			});
 			return tableRow;
 		});
-		tablecolumn_type.setCellValueFactory(new PropertyValueFactory<>("type"));
+		tablecolumn_region.setCellValueFactory(new PropertyValueFactory<>("type"));
 		tablecolumn_setting.setCellValueFactory(new PropertyValueFactory<>("setting"));
 		tablecolumn_value.setCellValueFactory(new PropertyValueFactory<>("value"));
 

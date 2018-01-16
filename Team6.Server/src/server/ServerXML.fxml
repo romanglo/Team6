@@ -13,18 +13,32 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.BorderPane?>
 
 <AnchorPane minHeight="500.0" minWidth="450.0"
 	nodeOrientation="LEFT_TO_RIGHT" prefHeight="500.0" prefWidth="450.0"
 	xmlns="http://javafx.com/javafx/8.0.152" xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="server.ServerController">
 	<children>
+		<BorderPane styleClass="header-section">
+			<left>
+				<Label layoutX="5.0" layoutY="5.0" prefHeight="50" prefWidth="343.0"
+					text="Zer-Li Server">
+					<font>
+						<Font name="Berlin Sans FB Demi Bold" size="48.0" />
+					</font>
+				</Label>
+			</left>
+		</BorderPane>
+		<ImageView fx:id="imageview_gif" fitHeight="71.0" fitWidth="69.0"
+			pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="5.0"
+			AnchorPane.topAnchor="5.0" />
 		<TabPane fx:id="tabpane" layoutY="79.0" prefHeight="171.0"
 			prefWidth="450.0" tabClosingPolicy="UNAVAILABLE"
 			AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
 			AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
 			<tabs>
-				<Tab closable="false" text="Server Status">
+				<Tab closable="false" text="Status">
 					<content>
 						<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="189.0"
 							prefWidth="450.0">
@@ -114,12 +128,12 @@
 							prefWidth="200.0">
 							<children>
 								<TableView fx:id="setting_table" editable="true"
-									layoutX="20.0" layoutY="18.0" AnchorPane.bottomAnchor="45.0"
-									AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-									AnchorPane.topAnchor="0.0">
+									layoutX="20.0" layoutY="18.0" AnchorPane.bottomAnchor="40.0"
+									AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+									AnchorPane.topAnchor="5.0">
 									<columns>
-										<TableColumn fx:id="tablecolumn_type" minWidth="140.0"
-											prefWidth="-1.0" sortable="false" text="Types" />
+										<TableColumn fx:id="tablecolumn_region" minWidth="140.0"
+											prefWidth="-1.0" sortable="false" text="Region" />
 										<TableColumn fx:id="tablecolumn_setting" editable="false"
 											minWidth="140.0" prefWidth="-1.0" sortable="false" text="Settings" />
 										<TableColumn fx:id="tablecolumn_value" minWidth="140.0"
@@ -131,21 +145,14 @@
 								</TableView>
 								<Button fx:id="btn_update_settings" mnemonicParsing="false"
 									onAction="#updateSettingsFile" prefHeight="20.0" prefWidth="80.0"
-									text="Update file" AnchorPane.bottomAnchor="11.0"
-									AnchorPane.rightAnchor="14.0" />
+									text="Update file" AnchorPane.bottomAnchor="5"
+									AnchorPane.rightAnchor="10.0" />
 							</children>
 						</AnchorPane>
 					</content>
 				</Tab>
 			</tabs>
 		</TabPane>
-		<ImageView fx:id="imageview_gif" fitHeight="71.0" fitWidth="69.0"
-			layoutX="336.0" layoutY="2.0" pickOnBounds="true" preserveRatio="true"
-			AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
 
-		<ImageView fx:id="imageview_title" fitHeight="43.0"
-			fitWidth="198.0" layoutX="14.0" layoutY="16.0" pickOnBounds="true"
-			preserveRatio="true" AnchorPane.leftAnchor="14.0"
-			AnchorPane.topAnchor="14.0" />
 	</children>
 </AnchorPane>

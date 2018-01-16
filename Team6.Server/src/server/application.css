@@ -26,40 +26,65 @@
 }
 .tab-pane .tab
 {
-    -fx-background-color: #e9e7e7;
+    -fx-background-color: #5490ff;
 }
 
 .tab-pane .tab:selected
 {
-    -fx-background-color: #5490ff;
+    
+    -fx-background-color: #e9e7e7;
 }
 
-
 .tab-content-area 
-{
-	
+{	
 	-fx-background-color: linear-gradient(#e9e7e7,#9fa4a0);
+}
+
+.tab-content-area .label 
+{	
+	-fx-text-fill: #5490ff;
+    -fx-font-weight: bold;
+    -fx-font-size: 16.0px;
 }
 
 .tab .tab-label 
 { 
 	-fx-alignment: center-right;
-    -fx-text-fill: black;
-    -fx-font-size: 12.0px;
-    -fx-font-weight: bold; 
+    -fx-text-fill: WHITE;
+    -fx-font-size: 16.0px;
 }
 
 .tab:selected .tab-label 
 { 
     -fx-alignment: CENTER;
-    -fx-text-fill: white;
-}
-.label
-{
     -fx-text-fill: #5490ff;
-    -fx-font-weight: bold;
-    -fx-font-size: 16.0px;
 }
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+      -fx-shape: "M300,290 L310,168 L410,168 L421,290 L300,290 z";
+}
+
+.tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
+    -fx-shape: "M300,290 L310,168 L410,168 L421,290 L300,290 z";
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}  
+
+.header-section {
+    -fx-padding: 10.0px;
+    -fx-font-size: 20.0px;
+}
+
+.header-section .label .text {
+    -fx-fill: #ffffff;
+    -fx-stroke: #5490ff;
+    -fx-stroke-width: 2.0px;
+}
+
+.header-section .label { 
+    -fx-padding: 10.0px;
+}
+
 .root
 {
 	-fx-background-color: white;
