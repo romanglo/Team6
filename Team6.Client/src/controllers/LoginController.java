@@ -110,13 +110,15 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			return;
 		}
 
+		m_client.setMessagesHandler(this);
+		m_client.setClientStatusHandler(this);
+
 		if (!m_client.isConnected() && !m_client.createConnectionWithServer()) {
 			showInformationMessage("Failed to connect to server! Please check the settings and try again..");
 			return;
 		}
 
 		displayConnectingWindow();
-
 	}
 
 	@FXML
@@ -138,7 +140,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			nextStage.showAndWait();
 		}
 		catch (Exception e) {
-			m_logger.severe("Failed on try to load the settings window" + ", excepion: " + e.getMessage());
+			m_logger.severe("Failed on try to load the settings window, excepion: " + e.getMessage());
 			showInformationMessage("The settings can not be changed at this time..");
 			return;
 		}
@@ -186,8 +188,6 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 		initializeImages();
 
-		initializeClientHandler();
-
 		initializeTextFields();
 	}
 
@@ -207,6 +207,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		});
 
 		passwordField_userPassword.textProperty().addListener(new ChangeListener<String>() {
+
 			@Override
 			public void changed(final ObservableValue<? extends String> ov, final String oldValue,
 					final String newValue)
@@ -236,13 +237,6 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			Image image = new Image(settingsImage);
 			btn_imageview_settings.setImage(image);
 		}
-	}
-
-	private void initializeClientHandler()
-	{
-		m_client.setMessagesHandler(this);
-		m_client.setClientStatusHandler(this);
-
 	}
 
 	/* End of --> Initializing methods region */
