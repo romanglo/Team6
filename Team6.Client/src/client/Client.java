@@ -232,7 +232,7 @@ public class Client extends AbstractClient
 	 *            - Information sent from the UI.
 	 * @return true if the sending succeed and false if does not.
 	 */
-	public boolean sendMessageToServer(Object data)
+	public boolean sendMessageToServer(Message data)
 	{
 		boolean returningValue = true;
 		try {
@@ -248,7 +248,7 @@ public class Client extends AbstractClient
 	// end region -> Public Methods
 
 	// region Protected Methods
-	
+
 	@Override
 	protected void connectionEstablished()
 	{
@@ -260,10 +260,9 @@ public class Client extends AbstractClient
 		if (m_clientStatusHandler != null) {
 			m_clientStatusHandler.onClientConnected();
 		}
-		
-		
+
 	}
-	
+
 	@Override
 	protected void connectionClosed()
 	{
@@ -272,7 +271,7 @@ public class Client extends AbstractClient
 		if (m_incomingMessagesConsumingTask != null) {
 			m_incomingMessagesConsumingTask.stopTask();
 		}
-		
+
 		if (m_clientStatusHandler != null) {
 			m_clientStatusHandler.onClientDisconnected();
 		}
@@ -296,7 +295,7 @@ public class Client extends AbstractClient
 	}
 
 	// end region -> Protected Methods
-	
+
 	// region Nested Classes
 
 	/**
