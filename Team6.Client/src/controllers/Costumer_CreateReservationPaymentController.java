@@ -19,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -32,6 +33,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import logger.LogManager;
 import newEntities.Costumer;
+import newEntities.EntitiesEnums.CostumerSubscription;
+import newEntities.EntitiesEnums.CostumerSubscription.*;
 import newEntities.EntitiesEnums.ReservationType;
 import newEntities.IEntity;
 import newEntities.ItemInReservation;
@@ -144,6 +147,19 @@ public class Costumer_CreateReservationPaymentController
 			paymentBill.add(itemReserve);
 		}
 
+		/* Check for subscription. */
+		float discount = 0;
+		if (Costumer_SavedData.getSubscription() == CostumerSubscription.Monthly) {
+			discount = (float) (totalPrice * 0.1);
+		} else if (Costumer_SavedData.getSubscription() == CostumerSubscription.Yearly) {
+			discount = (float) (totalPrice * 0.35);
+		}
+		if (discount != 0) {
+			CatalogItemRow newItem = new CatalogItemRow(98, "Subscription Discount", discount * -1, null, null, null);
+			paymentBill.add(newItem);
+		}
+		totalPrice -= discount;
+
 		m_discount = Costumer_SavedData.getCostumerBalance();
 		if (m_discount > totalPrice) {
 			m_discount = totalPrice;
@@ -174,18 +190,15 @@ public class Costumer_CreateReservationPaymentController
 
 	private void cancelButtonClick(ActionEvent cancelEvent)
 	{
-		m_reservationEntity.setType(ReservationType.Canceled);
-		Message entityMessage = MessagesFactory.createUpdateEntityMessage(m_reservationEntity);
-		m_client.sendMessageToServer(entityMessage);
-
 		Costumer costumer = Costumer_SavedData.getCostumer();
 		float balance = calculateRefund() + costumer.getBalance();
 		costumer.setBalance(balance);
-		entityMessage = MessagesFactory.createUpdateEntityMessage(costumer);
+		Message entityMessage = MessagesFactory.createUpdateEntityMessage(costumer);
 		m_client.sendMessageToServer(entityMessage);
-
-		// TODO Yoni: openSelectedWindow(cancelEvent,
-		// "/boundaries/Costumer_CancelReservation.fxml");
+		
+		m_reservationEntity.setType(ReservationType.Canceled);
+		entityMessage = MessagesFactory.createUpdateEntityMessage(m_reservationEntity);
+		m_client.sendMessageToServer(entityMessage);
 	}
 
 	private float calculateRefund()
@@ -318,8 +331,7 @@ public class Costumer_CreateReservationPaymentController
 						return;
 					}
 				}
-				m_logger.info(
-						"Successfully delivered but received data not of the type requested.");
+				m_logger.info("Successfully delivered but received data not of the type requested.");
 			}
 			return;
 		}

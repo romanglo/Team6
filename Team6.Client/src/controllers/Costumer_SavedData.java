@@ -76,6 +76,14 @@ public class Costumer_SavedData
 	}
 	
 	/**
+	 * @return the cumulative price
+	 */
+	public static float getCumulativePrice()
+	{
+		return s_shopCostumer.getCumulativePrice();
+	}
+	
+	/**
 	 * @return the shopManagerId
 	 */
 	public static int getShopManagerId()
@@ -192,6 +200,15 @@ public class Costumer_SavedData
 	public static void setId(Integer id)
 	{
 		s_costumer.setId(id);
+	}
+	
+	/**
+	 * @param cumulativePrice
+	 *            the cumulative price to set
+	 */
+	public static void setCumulativePrice(float cumulativePrice)
+	{
+		s_shopCostumer.setCumulativePrice(cumulativePrice);
 	}
 	
 	/**

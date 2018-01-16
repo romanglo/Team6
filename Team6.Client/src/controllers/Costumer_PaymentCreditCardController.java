@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -25,6 +26,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DateCell;
@@ -104,7 +106,7 @@ public class Costumer_PaymentCreditCardController
 
 	ObservableList<String> minutesList = FXCollections.observableArrayList();
 
-	private boolean isWaiting;
+	private boolean m_useSubscription;
 
 	/**
 	 * Manage discount according to the refund of the costumer.
@@ -136,15 +138,14 @@ public class Costumer_PaymentCreditCardController
 	@FXML
 	private void finishButtonClick(ActionEvent finishEvent)
 	{
-		if (credit_card_number.isVisible() && credit_card_number.getText().equals("")) {
+		if (!m_useSubscription && credit_card_number.getText().equals("")) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Attention");
 			alert.setHeaderText(null);
 			alert.setContentText("You left empty fields.");
 			alert.show();
 			return;
-		}
-		if (delivery_radio.isSelected()) {
+		} else if (delivery_radio.isSelected()) {
 			if (delivery_address.getText().equals("") || delivery_name.getText().equals("")
 					|| delivery_phone.getText().equals("")) {
 				Alert alert = new Alert(AlertType.ERROR);
@@ -169,8 +170,14 @@ public class Costumer_PaymentCreditCardController
 		}
 
 		updateFieldsWithData();
+		
+		Message entityMessage;
+		if (m_useSubscription) {
+			entityMessage = MessagesFactory.createUpdateEntityMessage(Costumer_SavedData.getShopCostumer());
+			m_client.sendMessageToServer(entityMessage);
+		}
 
-		Message entityMessage = MessagesFactory.createUpdateEntityMessage(Costumer_SavedData.getCostumer());
+		entityMessage = MessagesFactory.createUpdateEntityMessage(Costumer_SavedData.getCostumer());
 		m_client.sendMessageToServer(entityMessage);
 
 		entityMessage = MessagesFactory.createAddEntityMessage(Costumer_SavedData.getReservationEntity());
@@ -179,8 +186,11 @@ public class Costumer_PaymentCreditCardController
 
 	private void updateFieldsWithData()
 	{
-		Costumer_SavedData.setCreditCard(credit_card_number.getText());
+		Costumer_SavedData.setCreditCard(m_useSubscription ? "" : credit_card_number.getText());
 		Costumer_SavedData.setBalance(Costumer_SavedData.getCostumerBalance() - m_discount);
+		float cumulativePrice = Costumer_SavedData.getCumulativePrice();
+		Costumer_SavedData
+				.setCumulativePrice(cumulativePrice + (m_useSubscription ? Costumer_SavedData.getTotalPrice() : 0));
 
 		Date date;
 		Calendar calendar = Calendar.getInstance();
@@ -279,7 +289,6 @@ public class Costumer_PaymentCreditCardController
 		initializeImages();
 		initializeClientHandler();
 		initializeUiFields();
-		isWaiting = true;
 	}
 
 	private void initializeFields()
@@ -311,8 +320,16 @@ public class Costumer_PaymentCreditCardController
 	private void initializeUiFields()
 	{
 		if (Costumer_SavedData.getSubscription() != CostumerSubscription.None) {
-			credit_card_number.setVisible(false);
-			credit_card_label.setVisible(false);
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Attention");
+			alert.setHeaderText(null);
+			alert.setContentText("Do you want to use your subscription?");
+			Optional<ButtonType> result = alert.showAndWait();
+			m_useSubscription = result.get() == ButtonType.OK;
+			if (m_useSubscription) {
+				credit_card_label.setVisible(false);
+				credit_card_number.setVisible(false);
+			}
 		}
 
 		for (int i = 0; i < 24; i++) {
