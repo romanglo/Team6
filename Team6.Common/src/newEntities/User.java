@@ -111,6 +111,23 @@ public class User implements IEntity
 	{
 		m_status = status;
 	}
+	
+	/**
+	 *
+	 * @param user 
+	 * 			set user data.
+	 */
+	public void setUser(User user) {
+		if(user == null) {
+			return;
+		}
+		
+		m_userName = user.getUserName();
+		m_password = user.getPassword();
+		m_privilege = user.getPrivilege();
+		m_email = user.getEmail();
+		m_status = user.getStatus();
+	}
 
 	/**
 	 * {@inheritDoc}
