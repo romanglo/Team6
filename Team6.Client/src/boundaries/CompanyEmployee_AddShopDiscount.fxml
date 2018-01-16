@@ -16,9 +16,9 @@
 				<TableColumn fx:id="tablecolumn_discountedPrice" minWidth="190.0" prefWidth="-1.0" text="Price" />
 			</columns>
 		</TableView>
-		<Button fx:id="button_save" disable="true" layoutX="334.0" layoutY="320.0" mnemonicParsing="false" text="Save changes" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="15.0" />
+		<Button fx:id="button_save" disable="true" layoutX="334.0" layoutY="320.0" mnemonicParsing="false" onAction="#saveChanges" text="Save changes" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="15.0" />
 		<Button fx:id="button_reset" disable="true" layoutX="198.0" layoutY="320.0" mnemonicParsing="false" onAction="#resetChanges" text="Reset changes" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="110.0" />
-		<ComboBox fx:id="comboBox_storeList" layoutX="14.0" layoutY="320.0" prefWidth="150.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="15.0" />
+		<ComboBox fx:id="comboBox_storeList" layoutX="14.0" layoutY="320.0" onAction="#selectShop" prefWidth="150.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="15.0" />
 		<Label layoutX="15.0" layoutY="9.0" text="Shop ID:" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="9.0">
 			<font>
 				<Font size="14.0" />

@@ -357,7 +357,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			break;
 
 			case CompanyEmployee:
-				url = getClass().getResource("/boundaries/CompanyEmployee.FXML");
+				url = getClass().getResource("/boundaries/CompanyEmployee_AddShopDiscount.FXML");
 			break;
 
 			case Costumer:

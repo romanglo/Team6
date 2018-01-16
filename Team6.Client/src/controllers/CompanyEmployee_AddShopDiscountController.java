@@ -13,6 +13,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import logger.LogManager;
 import newMessages.EntitiesListData;
+import newMessages.EntityData;
 import newMessages.IMessageData;
 import newMessages.Message;
 import newMessages.MessagesFactory;
@@ -99,6 +100,17 @@ public class CompanyEmployee_AddShopDiscountController
 	/* End of --> View and changes savers lists declaration */
 
 	/* UI events region */
+	
+	@FXML
+	private void selectShop(ActionEvent event)
+	{
+		int shop_number=comboBox_storeList.getValue();
+		getCatalogFromServer(shop_number);
+		ItemInShop entity=new ItemInShop();
+		entity.setShopManagerId(shop_number);
+		Message msg=MessagesFactory.createGetAllEntityMessage(entity);
+		m_client.sendMessageToServer(msg);
+	}
 
 	/* Initializing methods region */
 
@@ -111,7 +123,6 @@ public class CompanyEmployee_AddShopDiscountController
 		initializeFields();
 		initializeClientHandler();
 		getStoreList();
-		getCatalogFromServer();
 		initializeConfigurationTable();
 	}
 
@@ -139,12 +150,13 @@ public class CompanyEmployee_AddShopDiscountController
 	 * TODO Shimon456: Auto-generated comment stub - Change it!
 	 *
 	 */
-	private void getCatalogFromServer()
+	private void getCatalogFromServer(int shopID)
 	{
 		ItemInShop item = new ItemInShop();
-		item.setShopManagerId(1);
+		item.setShopManagerId(shopID);
 		Message entityMessage = MessagesFactory.createGetAllEntityMessage(item);
 		m_client.sendMessageToServer(entityMessage);
+		label_shopID.setText(Integer.toString(shopID));
 	}
 
 	private void initializeConfigurationTable()
@@ -395,9 +407,10 @@ public class CompanyEmployee_AddShopDiscountController
 	@FXML
 	private void resetChanges(ActionEvent event)
 	{
-		getCatalogFromServer();
+		int shopID = comboBox_storeList.getValue();
+		getCatalogFromServer(shopID);
 		cleanSavedDataArray();
-		label_shopID.setText("1");
+		label_shopID.setText("shopID");
 	}
 
 	/**
@@ -433,6 +446,7 @@ public class CompanyEmployee_AddShopDiscountController
 					ItemInShop itemToAdd = new ItemInShop();
 					newItem = new CatalogItemRow(Integer.parseInt(textFieldID.getText()), Float.parseFloat(textFieldDiscountedPrice.getText()));
 
+					itemToAdd.setShopManagerId(comboBox_storeList.getValue());
 					itemToAdd.setItemId(Integer.parseInt(textFieldID.getText()));
 					itemToAdd.setDiscountedPrice(Float.parseFloat(textFieldDiscountedPrice.getText()));
 					itemsAdded.add(itemToAdd);
@@ -495,8 +509,22 @@ public class CompanyEmployee_AddShopDiscountController
 			m_client.sendMessageToServer(entityMessage);
 		}
 
-		getCatalogFromServer();
+		int shopID = comboBox_storeList.getValue();
+		getCatalogFromServer(shopID);
 		cleanSavedDataArray();
+	}
+	
+	private void showInformationMessage(String message)
+	{
+		if (message == null || message.isEmpty()) {
+			return;
+		}
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Information Dialog");
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+
+		alert.showAndWait();
 	}
 
 	/**
@@ -528,7 +556,6 @@ public class CompanyEmployee_AddShopDiscountController
 					stores.add(shopID.getId());
 				}
 				comboBox_storeList.setItems(stores);
-				comboBox_storeList.setValue(stores.get(0));
 			}
 			else {
 				catalog.clear();
@@ -546,9 +573,18 @@ public class CompanyEmployee_AddShopDiscountController
 		} else if (messageData instanceof RespondMessageData) {
 			RespondMessageData respondMessageData = (RespondMessageData) messageData;
 			boolean succeed = respondMessageData.isSucceed();
+			if(respondMessageData.getMessageData() instanceof EntityData)
+			{
+				if(((EntityData)respondMessageData.getMessageData()).getEntity() instanceof ItemInShop)
+			{
 			if (!succeed) {
-				IMessageData respondedMessageData = respondMessageData.getMessageData();
-				errorMSG("Roman gibur");
+				Platform.runLater (() ->{
+						showInformationMessage("There are no discaonts for this shop");
+				});
+				catalog.clear();
+				drawContantToTable();
+			}
+			}
 			}
 		}
 
