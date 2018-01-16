@@ -1,0 +1,75 @@
+
+#tf_enterItemId {
+	-fx-text-alignment: center ;
+}
+
+ .button
+{
+	-fx-background-color: #5490ff;
+	-fx-text-fill: white;
+	-fx-padding: 6 6 6 6;
+	-fx-border-radius: 8;
+}
+.button:hover 
+{
+    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+}
+
+.tab-pane .tab-header-area .tab-header-background 
+{
+    -fx-opacity: 0;
+}
+
+.tab-pane
+{
+    -fx-tab-min-width:90px;
+    /*-fx-background-color: lightgrey;*/
+}
+
+.tab
+{
+    -fx-background-insets: 0 1 0 1,0,0;
+}
+.tab-pane .tab
+{
+    -fx-background-color: #9fa4a0;
+}
+
+.tab-pane .tab:selected
+{
+    -fx-background-color: #5490ff;
+}
+
+
+.tab-content-area 
+{
+-fx-background-color: rgb(218,218,218);
+/*-fx-padding: 1px; 
+-fx-border-color: white; 
+-fx-border-width: 3px;*/
+/* -fx-opacity: -fx-disabled-opacity;*/
+}
+
+.tab .tab-label 
+{ 
+	-fx-alignment: center-right  ;
+    -fx-text-fill: black;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold; 
+}
+
+.tab:selected .tab-label 
+{ 
+    -fx-alignment: CENTER;
+    -fx-text-fill: white;
+}
+.label
+{
+    -fx-text-fill: #5490ff;
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+}
+.root
+{
+	-fx-background-color: white;
+}

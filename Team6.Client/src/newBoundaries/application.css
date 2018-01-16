@@ -1,0 +1,93 @@
+.root {
+    -fx-background-color: #ffffff;
+    -fx-font-family: Ariel;
+    -fx-font-size: 16.0px;
+}
+
+.header-section {
+    -fx-padding: 10.0px;
+    -fx-font-size: 20.0px;
+    -fx-background-color: linear-gradient(teal,#ffffff);
+}
+
+.header-section .label { 
+    -fx-padding: 10.0px;
+}
+
+.header-section .label .text {
+    -fx-fill: #ffffff;
+    -fx-stroke: #000000;
+    -fx-stroke-width: 2.0px;
+}
+
+
+.header-section .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #000000;
+    -fx-font-size: 16.0px;
+    -fx-cursor: hand;
+}
+
+.sidebar-section {
+    -fx-min-width: 200.0px;
+    -fx-pref-width: 200.0px;
+    -fx-max-width: 200.0px;
+    -fx-border-width: 1.0;
+    -fx-border-color: transparent #E8E8E8 transparent transparent;
+}
+
+
+.sidebar-section ToggleButton {
+    -fx-font-size: 20.0px;
+    -fx-padding: 10.0 15.0 10.0 15.0;
+    -fx-border-width: 1.0;
+    -fx-border-color: transparent transparent #E8E8E8 transparent;
+    -fx-min-width: 200.0px;
+    -fx-pref-width: 200.0px;
+    -fx-max-width: 200.0px;
+    -fx-background-color: transparent;
+    -fx-font-family: Berlin Sans FB Demi;
+}
+
+.sidebar-section ToggleButton:hover 
+{
+    -fx-background-color: linear-gradient(#ffffff, #61a2b1);
+}
+
+.sidebar-section ToggleButton:selected {
+     -fx-font-weight: bold;
+}
+
+.content-section {
+    -fx-padding: 10.0 20.0 10.0 20.0;
+    -fx-wrap-text: true;
+    -fx-font-size: 16.0px;
+}
+
+.content-section-label .label .text{
+    -fx-fill: #ffffff;
+    -fx-stroke: #000000;
+    -fx-stroke-width: 2.0px;
+}
+
+.footer-section {
+    -fx-alignment: center;
+    -fx-padding: 10.0 10.0 10.0 10.0;
+    -fx-border-width: 1.0;
+    -fx-border-color: #E8E8E8 transparent transparent transparent;
+}
+
+.user-details {
+    -fx-background-color: linear-gradient(#ffffff,#cccccc);
+}
+
+.user-details .button {
+	-fx-background-color: #5490ff;
+	-fx-text-fill: white;
+	-fx-padding: 6.0 6.0 6.0 6.0;
+	-fx-border-radius: 8.0;
+}
+
+.user-details .button:hover {
+    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+}
