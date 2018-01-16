@@ -535,7 +535,7 @@ public class QueryGenerator {
 		stringBuilder.append(shopManagerId);
 		stringBuilder.append(',');
 		stringBuilder.append(itemInShop.getDiscountedPrice());
-		stringBuilder.append("');");
+		stringBuilder.append(");");
 		return stringBuilder.toString();
 	}
 
