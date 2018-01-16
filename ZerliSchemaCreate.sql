@@ -41,6 +41,7 @@ CREATE TABLE costumers_in_shops (
 	csCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
 	csCreditCard VARCHAR(16) NULL DEFAULT NULL,
 	csStartSubscriptionDate DATE NULL DEFAULT NULL,
+	csCumulativePrice INT NOT NULL DEFAULT 0,
 	FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE CASCADE ON UPDATE NO ACTION,
 	FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
 	PRIMARY KEY (cId,smId)
@@ -487,11 +488,15 @@ BEGIN
 			SET NEW.csStartSubscriptionDate = NOW();
         END IF;
         
+		IF (NEW.csCumulativePrice != 0) THEN 
+			SET NEW.csCumulativePrice = 0;
+		END IF; 
 	ELSE
     
 		SET NEW.csCreditCard = NULL;
 		SET NEW.csStartSubscriptionDate = NULL;
-        
+        SET NEW.csCumulativePrice = 0;
+		
     END IF;
 END; //
 
@@ -508,11 +513,16 @@ BEGIN
 			SET NEW.csStartSubscriptionDate = NOW();
         END IF;
         
+		IF (OLD.csCumulativePrice > NEW.csCumulativePrice) THEN
+			SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'The new cumulative price could not be lowest the old one.';
+		END IF;
+		
 	ELSE
     
 		SET NEW.csCreditCard = NULL;
 		SET NEW.csStartSubscriptionDate = NULL;
-        
+        SET NEW.csCumulativePrice = 0;
+		
     END IF;
 END; //
 

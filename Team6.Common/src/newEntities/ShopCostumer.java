@@ -135,6 +135,7 @@ public class ShopCostumer implements IEntity
 		m_cumulativePrice = cumulativePrice;
 	}
 
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -144,11 +145,7 @@ public class ShopCostumer implements IEntity
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + m_costumerId;
-		result = prime * result + ((m_costumerSubscription == null) ? 0 : m_costumerSubscription.hashCode());
-		result = prime * result + ((m_creditCard == null) ? 0 : m_creditCard.hashCode());
-		result = prime * result + Float.floatToIntBits(m_cumulativePrice);
 		result = prime * result + m_shopManagerId;
-		result = prime * result + ((m_subscriptionStartDate == null) ? 0 : m_subscriptionStartDate.hashCode());
 		return result;
 	}
 
@@ -158,20 +155,22 @@ public class ShopCostumer implements IEntity
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof ShopCostumer)) {
+			return false;
+		}
 		ShopCostumer other = (ShopCostumer) obj;
-		if (m_costumerId != other.m_costumerId) return false;
-		if (m_costumerSubscription != other.m_costumerSubscription) return false;
-		if (m_creditCard == null) {
-			if (other.m_creditCard != null) return false;
-		} else if (!m_creditCard.equals(other.m_creditCard)) return false;
-		if (Float.floatToIntBits(m_cumulativePrice) != Float.floatToIntBits(other.m_cumulativePrice)) return false;
-		if (m_shopManagerId != other.m_shopManagerId) return false;
-		if (m_subscriptionStartDate == null) {
-			if (other.m_subscriptionStartDate != null) return false;
-		} else if (!m_subscriptionStartDate.equals(other.m_subscriptionStartDate)) return false;
+		if (m_costumerId != other.m_costumerId) {
+			return false;
+		}
+		if (m_shopManagerId != other.m_shopManagerId) {
+			return false;
+		}
 		return true;
 	}
 
@@ -183,7 +182,7 @@ public class ShopCostumer implements IEntity
 	{
 		return "ShopCostumer [CostumerId=" + m_costumerId + ", ShopManagerId=" + m_shopManagerId
 				+ ", CostumerSubscription=" + m_costumerSubscription + ", SubscriptionStartDate="
-				+ m_subscriptionStartDate + ", CreditCard=" + m_creditCard + ", CumulativePrice=" + m_cumulativePrice
+				+ s_simpleDateFormat.format(m_subscriptionStartDate) + ", CreditCard=" + m_creditCard + ", CumulativePrice=" + m_cumulativePrice
 				+ "]";
 	}
 }

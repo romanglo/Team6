@@ -1044,11 +1044,13 @@ public class QueryGenerator {
 		stringBuilder.append("UPDATE costumers_in_shops SET ");
 		stringBuilder.append("csCostumerSubscription = '");
 		stringBuilder.append(shopCostumer.getCostumerSubscription());
-		stringBuilder.append("' , csCreditCard = '");
+		stringBuilder.append("', csCreditCard = '");
 		stringBuilder.append(shopCostumer.getCreditCard());
-		stringBuilder.append("' , csStartSubscriptionDate = '");
+		stringBuilder.append("', csStartSubscriptionDate = '");
 		stringBuilder.append(s_dateFormat.format(shopCostumer.getSubscriptionStartDate()));
-		stringBuilder.append("' WHERE cId = ");
+		stringBuilder.append("', csCumulativePrice = ");
+		stringBuilder.append(shopCostumer.getCumulativePrice());
+		stringBuilder.append(" WHERE cId = ");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(" AND smId = ");
 		stringBuilder.append(shopManagerId);

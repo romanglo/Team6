@@ -152,6 +152,7 @@ public class EntitiesResolver {
 					} else {
 						shopCostumer.setSubscriptionStartDate(null);
 					}
+					shopCostumer.setCumulativePrice(resultSet.getFloat(6));
 					ShopCostumerEntities.add(shopCostumer);
 				} catch (Exception ignored) {
 					failedResolve++;
