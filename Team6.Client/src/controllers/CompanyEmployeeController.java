@@ -17,7 +17,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import logger.LogManager;
 import newMessages.EntitiesListData;
-import newMessages.EntityData;
 import newMessages.IMessageData;
 import newMessages.Message;
 import newMessages.MessagesFactory;
@@ -55,7 +54,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.Callback;
 
 /**
