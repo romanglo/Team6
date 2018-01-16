@@ -8,6 +8,9 @@
 # BlueJ files
 *.ctxt
 
+# Lock files
+*.lock
+
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 

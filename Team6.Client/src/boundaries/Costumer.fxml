@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="372.0" maxWidth="400.0" minHeight="372.0" minWidth="400.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="372.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CostumerController">
+	<children>
+
+		<AnchorPane fx:id="costumer_anchor" layoutY="79.0" prefHeight="368.0" prefWidth="450.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
+			<children>
+				<Button fx:id="create_reservation_button" layoutX="126.0" layoutY="83.0" mnemonicParsing="false" onAction="#createReservationClick" prefHeight="25.0" prefWidth="154.0" text="Create New Reservation" />
+				<Button fx:id="cancel_reservation_button" layoutX="126.0" layoutY="120.0" mnemonicParsing="false" onAction="#secondButtonClick" prefHeight="25.0" prefWidth="154.0" text="Cancel Reservation" />
+            <ComboBox fx:id="combo_shop" layoutX="125.0" layoutY="48.0" prefHeight="25.0" prefWidth="154.0" AnchorPane.bottomAnchor="218.8" AnchorPane.rightAnchor="111.0" />
+			</children>
+		</AnchorPane>
+
+		<!-- Title: -->
+		<ImageView fx:id="imageview_gif" fitHeight="84.0" fitWidth="59.0" layoutX="336.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="6.0" />
+		<ImageView fx:id="imageview_title" fitHeight="48.0" fitWidth="154.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="6.0" />
+	</children>
+</AnchorPane>

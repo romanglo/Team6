@@ -1,7 +1,9 @@
 package db;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,6 +15,8 @@ import common.IStartable;
 import common.NotRunningException;
 import common.Startable;
 import configurations.DbConfiguration;
+import configurations.ServerConfiguration;
+import logger.LogManager;
 
 /**
  *
@@ -58,6 +62,18 @@ public class DbController extends Startable {
 		super(true, logger);
 		m_dbConfiguration = dbConfiguration;
 		m_connection = null;
+	}
+
+	/**
+	 * 
+	 * Create a instance which communicates with the database, you must
+	 * {@link IStartable#Start()} the class before using it. The instance get logger
+	 * from {@link LogManager#getLogger()} and get the configuration from
+	 * {@link ServerConfiguration#getInstance()}.
+	 * 
+	 */
+	public DbController() {
+		this(LogManager.getLogger(), ServerConfiguration.getInstance().getDbConfiguration());
 	}
 
 	// end region -> Constructors
@@ -118,34 +134,6 @@ public class DbController extends Startable {
 
 	/**
 	 * 
-	 * The method prints all the rows in product table.
-	 *
-	 * @throws NotRunningException
-	 *             if the method called when the state is not Running.
-	 * 
-	 */
-	public void printAllProducts() throws NotRunningException {
-		if (!isRunning()) {
-			throw new NotRunningException(this);
-		}
-
-		Statement stmt;
-		try {
-			stmt = m_connection.createStatement();
-			ResultSet resultSet = stmt.executeQuery("SELECT * FROM product;");
-			while (resultSet.next()) {
-				// Print out the values
-				System.out.println("ID: " + resultSet.getString(1) + ", Name: " + resultSet.getString(2) + ", Type: "
-						+ resultSet.getString(3));
-			}
-			resultSet.close();
-		} catch (SQLException ex) {
-			System.out.println("Failed to print all the products! Exception: " + ex.getMessage());
-		}
-	}
-
-	/**
-	 * 
 	 * The method execute select query.
 	 *
 	 * @param query
@@ -165,9 +153,7 @@ public class DbController extends Startable {
 		Statement stmt;
 		try {
 			stmt = m_connection.createStatement();
-			ResultSet queryReuslt = stmt.executeQuery(query);
-			m_Logger.info("A select query executed seccessfully! The query: " + query);
-			return queryReuslt;
+			return stmt.executeQuery(query);
 		} catch (SQLException ex) {
 			m_Logger.warning("Failed on try to execute the query: " + query + " , exception: " + ex);
 			return null;
@@ -175,8 +161,8 @@ public class DbController extends Startable {
 	}
 
 	/**
-	 * 
-	 * The method execute update query.
+	 * Executes the given SQL query, which may be an INSERT, UPDATE, or DELETE
+	 * statement or an SQL statement that returns nothing.
 	 *
 	 * @param query
 	 *            The query to execute.
@@ -184,7 +170,7 @@ public class DbController extends Startable {
 	 * @throws NotRunningException
 	 *             if the method called when the state is not Running.
 	 */
-	public boolean executeUpdateQuery(String query) throws NotRunningException {
+	public boolean executeQuery(String query) throws NotRunningException {
 		if (!isRunning()) {
 			throw new NotRunningException(this);
 		}
@@ -192,22 +178,87 @@ public class DbController extends Startable {
 			return false;
 		}
 
-		Statement stmt;
 		try {
-			stmt = m_connection.createStatement();
-			boolean result = stmt.executeUpdate(query) == 1;
-			if (result) {
-				m_Logger.info("A update query executed seccessfully! The query: " + query);
-			} else {
-				m_Logger.warning("Failed on try to execute the update query: " + query);
-			}
-			return result;
+			Statement stmt = m_connection.createStatement();
+			stmt.executeUpdate(query);
+			return true;
 		} catch (SQLException ex) {
 			m_Logger.warning("Failed on try to execute the query: " + query + " , exception: " + ex);
 			return false;
 		}
 	}
 
-	// end region -> Public Methods
+	/**
+	 * The method create a {@link PreparedStatement} that related to the connection.
+	 *
+	 * @param sql
+	 *            An query that matching to {@link PreparedStatement} rules.
+	 * @return A {@link PreparedStatement} that related to the connected schema.
+	 */
+	public PreparedStatement getPreparedStatement(String sql) {
+		if (!isRunning()) {
+			throw new NotRunningException(this);
+		}
 
+		if (sql == null) {
+			return null;
+		}
+
+		PreparedStatement preparedStatement = null;
+		try {
+			preparedStatement = m_connection.prepareStatement(sql);
+		} catch (SQLException e) {
+			m_Logger.warning("Failed on try to create prepere statement with the query: " + sql + ", exception:"
+					+ e.getMessage());
+		}
+		return preparedStatement;
+	}
+
+	/**
+	 * The method create a {@link Statement} that related to the connection.
+	 *
+	 * @return A {@link Statement} that related to the connected schema.
+	 */
+	public Statement getStatement() {
+		if (!isRunning()) {
+			throw new NotRunningException(this);
+		}
+
+		Statement stmt = null;
+		try {
+			stmt = m_connection.createStatement();
+		} catch (SQLException ex) {
+			m_Logger.warning("Failed on try to create statement, exception: " + ex);
+		}
+		return stmt;
+	}
+
+	/**
+	 * The method create a {@link CallableStatement} that related to the connection.
+	 *
+	 * @param sql
+	 *            An query that matching to {@link CallableStatement} rules.
+	 * @return A {@link CallableStatement} that related to the connected schema.
+	 */
+
+	public CallableStatement getCallableStatement(String sql) {
+		if (!isRunning()) {
+			throw new NotRunningException(this);
+		}
+
+		if (sql == null) {
+			return null;
+		}
+
+		CallableStatement callableStatement = null;
+		try {
+			callableStatement = m_connection.prepareCall(sql);
+		} catch (SQLException e) {
+			m_Logger.warning("Failed on try to create callable statement with the query: " + sql + ", exception:"
+					+ e.getMessage());
+		}
+		return callableStatement;
+	}
+
+	// end region -> Public Methods
 }

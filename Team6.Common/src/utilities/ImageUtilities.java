@@ -5,8 +5,14 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
+
+import com.sun.istack.internal.Nullable;
+
+import javafx.scene.image.Image;
 
 /**
  *
@@ -18,22 +24,62 @@ public class ImageUtilities
 
 	/**
 	 * 
-	 * A method which generate a byte array from BufferedImage instance.
+	 * A method which generate a {@link InputStream} from {@link Image} instance.
 	 *
 	 * @param image
-	 *            BufferedImage instance that will be generated to byte array.
+	 *            Image instance that will be generated to {@link InputStream}.
 	 * @param imageType
 	 *            The image file extension, for example: "jpg", "jpeg", "png", etc.
-	 * @return A byte array if the generation succeed, null if did not.
-	 * @throws Exception
-	 *             if the parsing process failed!
+	 * @param logger
+	 *            An optional logger, will be used if the parsing process failed.
+	 * @return A {@link InputStream} if the parsing succeed, <code>null</code> if
+	 *         the parsing process failed.
 	 * @throws NullPointerException
-	 *             if one of the parameters is null (or the String is empty).
+	 *             if one of the parameters is <code>null</code> (or the String is
+	 *             empty).
 	 */
-	public static byte[] ImageToByteArray(BufferedImage image, String imageType) throws Exception
+	public static InputStream ImageToInputStream(Image image, String imageType, @Nullable Logger logger)
+			throws NullPointerException
+	{
+
+		byte[] imageInByte = ImageToByteArray(image, imageType, logger);
+		if (imageInByte == null) {
+			return null;
+		}
+		InputStream returningInputStram = null;
+		try {
+			returningInputStram = new ByteArrayInputStream(imageInByte);
+		}
+		catch (Exception e) {
+			if (logger != null && logger.isLoggable(Level.WARNING)) {
+				logger.warning("Failed on try to create InputStream from javafx.scene.image.Image, exception: "
+						+ e.getMessage());
+			}
+		}
+		return returningInputStram;
+	}
+
+	/**
+	 * 
+	 * A method which generate a {@link InputStream} from {@link Image} instance.
+	 *
+	 * @param image
+	 *            Image instance that will be generated to {@link InputStream}.
+	 * @param imageType
+	 *            The image file extension, for example: "jpg", "jpeg", "png", etc.
+	 * @param logger
+	 *            An optional logger, will be used if the parsing process failed.
+	 * @return A byte array if the parsing succeed, <code>null</code> if the parsing
+	 *         process failed.
+	 * @throws NullPointerException
+	 *             if one of the parameters is <code>null</code> (or the String is
+	 *             empty).
+	 */
+	public static byte[] ImageToByteArray(Image image, String imageType, @Nullable Logger logger)
+			throws NullPointerException
 	{
 		if (image == null) {
-			throw new NullPointerException("BufferedImage parameter is null!");
+			throw new NullPointerException("Image parameter is null!");
 		}
 
 		if (imageType == null || imageType.isEmpty()) {
@@ -41,40 +87,93 @@ public class ImageUtilities
 		}
 
 		byte[] imageInByte = null;
+		try {
+			BufferedImage fromFXImage = javafx.embed.swing.SwingFXUtils.fromFXImage(image, null);
 
-		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-		ImageIO.write(image, imageType, byteArrayOutputStream);
-		byteArrayOutputStream.flush();
-		imageInByte = byteArrayOutputStream.toByteArray();
-		byteArrayOutputStream.close();
-
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+			ImageIO.write(fromFXImage, imageType, byteArrayOutputStream);
+			byteArrayOutputStream.flush();
+			imageInByte = byteArrayOutputStream.toByteArray();
+			byteArrayOutputStream.close();
+		}
+		catch (Exception e) {
+			if (logger != null && logger.isLoggable(Level.WARNING)) {
+				logger.warning("Failed on try to create InputStream from javafx.scene.image.Image, exception: "
+						+ e.getMessage());
+			}
+		}
 		return imageInByte;
 	}
 
 	/**
 	 * 
-	 * A method which generate a BufferedImage instance from byte array.
+	 * A method which generate a {@link Image} instance from {@link InputStream}.
 	 *
-	 * @param imageInByteArray
-	 *            byte array that will be generated to BufferedImage instance.
-	 * @return A BufferedImage instance if the generation succeed, null if did not.
-	 * @throws Exception
-	 *             if the parsing process failed!
+	 * @param inputStream
+	 *            {@link InputStream} which will be parsed to {@link Image}
+	 *            instance.
+	 * @param logger
+	 *            An optional logger, will be used if the parsing process failed.
+	 * @return A {@link Image} if the parsing succeed, <code>null</code> if the
+	 *         parsing process failed.
 	 * @throws NullPointerException
-	 *             if one of the parameter is null.
+	 *             if one of the received parameter is null.
 	 */
-	public static BufferedImage ByteArrayToBufferedImage(byte[] imageInByteArray) throws Exception
+	public static Image InputStreamToImage(InputStream inputStream, @Nullable Logger logger) throws NullPointerException
 	{
 
-		if (imageInByteArray == null) {
-			throw new NullPointerException("Byte[] parameter is null!");
+		if (inputStream == null) {
+			throw new NullPointerException("InputStream parameter is null!");
 		}
 
-		BufferedImage bufferedImage = null;
+		Image returnedImage = null;
+		try {
+			BufferedImage bufferedImage = ImageIO.read(inputStream);
 
-		InputStream in = new ByteArrayInputStream(imageInByteArray);
-		bufferedImage = ImageIO.read(in);
+			returnedImage = javafx.embed.swing.SwingFXUtils.toFXImage(bufferedImage, null);
+		}
+		catch (Exception e) {
+			if (logger != null && logger.isLoggable(Level.WARNING)) {
+				logger.warning("Failed on try to create javafx.scene.image.Image from InputStream , exception: "
+						+ e.getMessage());
+			}
+		}
 
-		return bufferedImage;
+		return returnedImage;
+	}
+
+	/**
+	 * 
+	 * A method which generate a {@link Image} instance from byte array.
+	 *
+	 * @param bytes
+	 *            byte array which will be parsed to {@link Image} instance.
+	 * @param logger
+	 *            An optional logger, will be used if the parsing process failed.
+	 * @return A {@link Image} if the parsing succeed, <code>null</code> if the
+	 *         parsing process failed.
+	 * @throws NullPointerException
+	 *             if one of the received parameter is null.
+	 */
+	public static Image ByteArrayToImage(byte[] bytes, @Nullable Logger logger) throws NullPointerException
+	{
+
+		if (bytes == null) {
+			throw new NullPointerException("byte array parameter is null!");
+		}
+
+		Image returnedImage = null;
+		try {
+			InputStream inputStream = new ByteArrayInputStream(bytes);
+			returnedImage = InputStreamToImage(inputStream, logger);
+		}
+		catch (Exception e) {
+			if (logger != null && logger.isLoggable(Level.WARNING)) {
+				logger.warning("Failed on try to create javafx.scene.image.Image from InputStream , exception: "
+						+ e.getMessage());
+			}
+		}
+
+		return returnedImage;
 	}
 }

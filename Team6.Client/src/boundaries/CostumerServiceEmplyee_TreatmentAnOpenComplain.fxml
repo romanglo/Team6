@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane minHeight="285.0" minWidth="380.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="372.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CostumerSeviceEmployee_TreatmentAnOpenComplaint">
+	<children>
+
+		<AnchorPane fx:id="ancorepane_root" layoutY="79.0" prefHeight="368.0" prefWidth="450.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
+         <children>
+            <ImageView fx:id="imageview_subtitle" fitHeight="48.0" fitWidth="390.0" layoutX="-1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
+            <Label layoutX="73.0" layoutY="64.0" prefHeight="17.0" prefWidth="107.0" text="Id:" />
+            <ComboBox fx:id="combobox_id" layoutX="129.0" layoutY="60.0" onAction="#chooseComplaint" prefWidth="150.0" />
+            <TextArea fx:id="textarea_complaint" layoutX="6.0" layoutY="117.0" prefHeight="93.0" prefWidth="180.0" />
+            <Button layoutX="78.0" layoutY="257.0" mnemonicParsing="false" onAction="#updateClick" prefHeight="25.0" prefWidth="78.0" text="Update" />
+            <CheckBox fx:id="checkbox_financial" layoutX="23.0" layoutY="222.0" mnemonicParsing="false" onAction="#financialCompensation" text="Financial compensation" />
+            <TextField fx:id="financial_compensation" disable="true" layoutX="176.0" layoutY="218.0" />
+            <Button layoutX="193.0" layoutY="257.0" mnemonicParsing="false" onAction="#backButtonClick" prefHeight="25.0" prefWidth="78.0" text="Back" />
+            <Label layoutX="16.0" layoutY="95.0" prefHeight="17.0" prefWidth="180.0" text="Costumer complaint:" />
+            <Label layoutX="214.0" layoutY="95.0" prefHeight="17.0" prefWidth="167.0" text="Complaint summary:" />
+            <TextArea fx:id="textarea_summary" layoutX="202.0" layoutY="117.0" prefHeight="93.0" prefWidth="180.0" />
+         </children></AnchorPane>
+
+		<!--  Title: -->
+		<ImageView fx:id="imageview_gif" fitHeight="84.0" fitWidth="59.0" layoutX="336.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="6.0" />
+		<ImageView fx:id="imageview_title" fitHeight="48.0" fitWidth="154.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="6.0" />
+	</children>
+</AnchorPane>

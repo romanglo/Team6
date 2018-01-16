@@ -1,13 +1,24 @@
 
 package client;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.istack.internal.Nullable;
+
 import common.UncaughetExceptions;
-import configurations.ClientConfiguration;
-import connectivity.Client;
+import controllers.LoginController;
+import newEntities.User;
+import newMessages.Message;
+import newMessages.MessagesFactory;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -22,6 +33,79 @@ import logger.LogManager;
  */
 public class ApplicationEntryPoint extends Application
 {
+
+	private final static String s_lockFilePath = "ClientLockFile.lock";
+
+	private static File s_file;
+
+	private static FileChannel s_fileChannel;
+
+	private static FileLock s_lockFile;
+
+	/**
+	 * The main method of the application, the method ensure only one running instance of
+	 * the application, using file lock pattern. *
+	 * 
+	 * @param args
+	 *            Application arguments.
+	 */
+	@SuppressWarnings("resource")
+	public static void main(String[] args)
+	{
+		try {
+			s_file = new File(s_lockFilePath);
+
+			// Delete the lock file if it exist.
+			if (s_file.exists()) {
+				s_file.delete();
+			}
+
+			// Try to get the file lock
+			s_fileChannel = new RandomAccessFile(s_file, "rw").getChannel();
+
+			// Set to lock file hidden attribute
+			Files.setAttribute(Paths.get(s_lockFilePath), "dos:hidden", true, LinkOption.NOFOLLOW_LINKS);
+
+			// Try to get the file lock
+			s_lockFile = s_fileChannel.tryLock();
+			if (s_lockFile == null) {
+				// File is locked by other application
+				s_fileChannel.close();
+				System.out.println("Only one instance of Server can run at the same time.");
+				System.exit(1);
+			}
+
+			// Add shutdown hook to release lock when application shutdown
+			Thread shutdownHook = new Thread(new Runnable() {
+
+				@Override
+				public void run()
+				{
+					try {
+						if (s_lockFile != null) {
+							s_lockFile.release();
+							s_fileChannel.close();
+							s_file.delete();
+						}
+					}
+					catch (IOException e) {
+						System.err.println("An error occurred on try to release and delete instance locks, exception: "
+								+ e.getMessage());
+					}
+				}
+			});
+
+			Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+			// Launch the application
+			launch(args);
+		}
+		catch (IOException e) {
+			System.err.println("An error occurred on try to start 'Server' process, exception: " + e.getMessage());
+			System.exit(1);
+		}
+	}
+
 	/* Fields region */
 
 	private static Logger s_logger = null;
@@ -29,25 +113,19 @@ public class ApplicationEntryPoint extends Application
 	/**
 	 * Client connection configuration.
 	 */
-	public static ClientConfiguration s_clientConfiguration;
+	public static ClientConfiguration ClientConfiguration;
 
 	/**
 	 * Client connection management instance.
 	 */
-	public static Client clientController;
-
-	/* End of --> Fields region */
+	public static Client Client;
 
 	/**
-	 * Client application entry point
-	 *
-	 * @param args
-	 *            - Application arguments
+	 * The connected user, can be <code>null</code> if no connected user exists.
 	 */
-	public static void main(String[] args)
-	{
-		launch(args);
-	}
+	@Nullable public static User ConnectedUser = null;
+
+	/* End of --> Fields region */
 
 	/* Initializing methods region */
 
@@ -61,7 +139,7 @@ public class ApplicationEntryPoint extends Application
 	 */
 	public static void initializeConnection() throws IOException, NumberFormatException
 	{
-		clientController = new Client(s_logger, s_clientConfiguration.getIp(), s_clientConfiguration.getPort());
+		Client = new Client(s_logger, ClientConfiguration.getIp(), ClientConfiguration.getPort());
 		s_logger.info("Client initialized successfully.");
 	}
 
@@ -71,12 +149,12 @@ public class ApplicationEntryPoint extends Application
 	 */
 	private static void initializeConfiguration()
 	{
-		s_clientConfiguration = ClientConfiguration.getInstance();
-		if (s_clientConfiguration.isDefaultConfiguration()) {
-			s_logger.warning("Failed on try to read configuration from \"" + ClientConfiguration.CONFIGURATION_PATH
-					+ "\". Created default configuration.");
+		ClientConfiguration = client.ClientConfiguration.getInstance();
+		if (ClientConfiguration.isDefaultConfiguration()) {
+			s_logger.warning("Failed on try to read configuration from \""
+					+ client.ClientConfiguration.CONFIGURATION_PATH + "\". Created default configuration.");
 		}
-		s_logger.config("Client configuration loaded:" + s_clientConfiguration.toString());
+		s_logger.config("Client configuration loaded:" + ClientConfiguration.toString());
 	}
 
 	private void initializeUncughtExceptionHandler()
@@ -97,6 +175,10 @@ public class ApplicationEntryPoint extends Application
 		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, false);
 	}
 
+	/* End of --> Initializing methods region */
+
+	/* region Application override methods */
+
 	/**
 	 * Method opens the UI of the client.
 	 */
@@ -104,17 +186,22 @@ public class ApplicationEntryPoint extends Application
 	public void start(Stage primaryStage)
 	{
 		try {
-			Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/Login.fxml"));
+			Parent root = (Parent) loader.load();
+			LoginController controller = (LoginController) loader.getController();
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 			primaryStage.setScene(scene);
-			primaryStage.setMinWidth(445);
-			primaryStage.setMinHeight(450);
-			primaryStage.setTitle("Zer-Li Client");
+			primaryStage.setWidth(700);
+			primaryStage.setHeight(500);
+			primaryStage.setTitle("Zer-Li");
+			primaryStage.setResizable(false);
+			controller.intializeKeyHandler(scene);
 			primaryStage.show();
 		}
 		catch (Exception e) {
 			s_logger.log(Level.SEVERE, "Start failed!", e);
+			System.exit(1);
 		}
 	}
 
@@ -135,7 +222,21 @@ public class ApplicationEntryPoint extends Application
 		super.init();
 	}
 
-	/* End of --> Initializing methods region */
+	@Override
+	public void stop() throws Exception
+	{
+		try {
+			disconnectUser();
+			disposeConnection();
+		}
+		catch (Exception e) {
+			s_logger.log(Level.SEVERE, "Stopping Failed! ", e);
+		}
+
+		super.stop();
+	}
+
+	/* End of --> Application override methods region */
 
 	/* Private disposing methods region */
 
@@ -143,20 +244,31 @@ public class ApplicationEntryPoint extends Application
 	 * Method closes the connection with the server.
 	 *
 	 */
-	public static void disposeConnection()
+	private static void disposeConnection()
 	{
-		if (clientController != null) {
-			clientController.close();
+		if (Client != null) {
+			Client.setClientStatusHandler(null);
+			Client.setMessagesHandler(null);
+
+			Client.closeConnectionWithServer();
 			s_logger.info("Client disposed successfully");
 		}
+		Client = null;
 	}
 
-	@Override
-	public void stop() throws Exception
+	private void disconnectUser()
 	{
-		disposeConnection();
-		super.stop();
+		if (ConnectedUser != null && Client != null) {
+			if (!Client.isConnected()) {
+				if (!Client.createConnectionWithServer()) {
+					s_logger.severe("Failed on try to create connection with server for send user log out message!");
+					return;
+				}
+			}
+			Message logoutMessage = MessagesFactory.createLogoutMessage(ConnectedUser.getUserName(),
+					ConnectedUser.getPassword());
+			Client.sendMessageToServer(logoutMessage);
+		}
 	}
-
 	/* End of --> Private disposing methods region */
 }

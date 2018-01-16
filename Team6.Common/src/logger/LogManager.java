@@ -4,7 +4,6 @@ package logger;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -18,7 +17,9 @@ import java.util.logging.Logger;
 public class LogManager
 {
 
-	private static Logger s_instance;
+	private static Logger s_instance = null;
+
+	private static String s_path = null;
 
 	/**
 	 * If it is the first call to the method, the method will create a log to the
@@ -49,6 +50,15 @@ public class LogManager
 	}
 
 	/**
+	 * @return returns the {@link String} path of the current logger if it
+	 *         initialized and <code>null </code> if does not.
+	 */
+	public static String getLoggerPath()
+	{
+		return s_path;
+	}
+
+	/**
 	 * 
 	 * The method initialize log file in the path :
 	 * "APPLICATION-LOCATION/log-CURRENTDATE.log".
@@ -75,18 +85,12 @@ public class LogManager
 			fileHandler.setFormatter(formatter);
 			logger.addHandler(fileHandler);
 
-			// Creating consoleHandler and assign to logger
-			Handler consoleHandler = new ConsoleHandler();
-			consoleHandler.setLevel(Level.ALL);
-			consoleHandler.setFormatter(formatter);
-			logger.addHandler(consoleHandler);
-
 			// Setting levels to LOGGER
 			logger.setLevel(Level.ALL);
 
 			File logPath = new File(logName);
 			logger.config("Log created successfully on 'All' Level. Log path: " + logPath.getAbsolutePath());
-
+			s_path = logPath.getPath();
 			return logger;
 		}
 		catch (Exception exception) {
