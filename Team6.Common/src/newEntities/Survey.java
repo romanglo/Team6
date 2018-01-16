@@ -2,6 +2,8 @@
 package newEntities;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -17,22 +19,18 @@ public class Survey implements IEntity
 	 */
 	private static final long serialVersionUID = -2059679189113267694L;
 
+	private static final DateFormat s_dateForamt = new SimpleDateFormat("dd-MM-yyyy");
+
 	private int m_id;
 
-	private String m_firstQuestion;
+	private int m_managerId;
 
-	private String m_secondQuestion;
+	private java.util.Date m_startDate;
 
-	private String m_thirdQuestion;
-
-	private String m_fourthQuestion;
-
-	private String m_fifthQuestion;
-
-	private String m_sixthQuestion;
+	private java.util.Date m_endDate;
 
 	/**
-	 * @return the Id
+	 * @return the id
 	 */
 	public int getId()
 	{
@@ -49,105 +47,54 @@ public class Survey implements IEntity
 	}
 
 	/**
-	 * @return the firstQuestion
+	 * @return the managerId
 	 */
-	public String getFirstQuestion()
+	public int getManagerId()
 	{
-		return m_firstQuestion;
+		return m_managerId;
 	}
 
 	/**
-	 * @param firstQuestion
-	 *            the firstQuestion to set
+	 * @param managerId
+	 *            the managerId to set
 	 */
-	public void setFirstQuestion(String firstQuestion)
+	public void setManagerId(int managerId)
 	{
-		m_firstQuestion = firstQuestion;
+		m_managerId = managerId;
 	}
 
 	/**
-	 * @return the secondQuestion
+	 * @return the startDate
 	 */
-	public String getSecondQuestion()
+	public java.util.Date getStartDate()
 	{
-		return m_secondQuestion;
+		return m_startDate;
 	}
 
 	/**
-	 * @param secondQuestion
-	 *            the secondQuestion to set
+	 * @param startDate
+	 *            the startDate to set
 	 */
-	public void setSecondQuestion(String secondQuestion)
+	public void setStartDate(java.util.Date startDate)
 	{
-		m_secondQuestion = secondQuestion;
+		m_startDate = startDate;
 	}
 
 	/**
-	 * @return the thirdQuestion
+	 * @return the endDate
 	 */
-	public String getThirdQuestion()
+	public java.util.Date getEndDate()
 	{
-		return m_thirdQuestion;
+		return m_endDate;
 	}
 
 	/**
-	 * @param thirdQuestion
-	 *            the thirdQuestion to set
+	 * @param endDate
+	 *            the endDate to set
 	 */
-	public void setThirdQuestion(String thirdQuestion)
+	public void setEndDate(java.util.Date endDate)
 	{
-		m_thirdQuestion = thirdQuestion;
-	}
-
-	/**
-	 * @return the fourthQuestion
-	 */
-	public String getFourthQuestion()
-	{
-		return m_fourthQuestion;
-	}
-
-	/**
-	 * @param fourthQuestion
-	 *            the fourthQuestion to set
-	 */
-	public void setFourthQuestion(String fourthQuestion)
-	{
-		m_fourthQuestion = fourthQuestion;
-	}
-
-	/**
-	 * @return the fifthQuestion
-	 */
-	public String getFifthQuestion()
-	{
-		return m_fifthQuestion;
-	}
-
-	/**
-	 * @param fifthQuestion
-	 *            the fifthQuestion to set
-	 */
-	public void setFifthQuestion(String fifthQuestion)
-	{
-		m_fifthQuestion = fifthQuestion;
-	}
-
-	/**
-	 * @return the sixthQuestion
-	 */
-	public String getSixthQuestion()
-	{
-		return m_sixthQuestion;
-	}
-
-	/**
-	 * @param sixthQuestion
-	 *            the sixthQuestion to set
-	 */
-	public void setSixthQuestion(String sixthQuestion)
-	{
-		m_sixthQuestion = sixthQuestion;
+		m_endDate = endDate;
 	}
 
 	/**
@@ -156,9 +103,8 @@ public class Survey implements IEntity
 	@Override
 	public String toString()
 	{
-		return "Survey [id=" + m_id + "firstQuestion=" + m_firstQuestion + ", secondQuestion=" + m_secondQuestion
-				+ ", thirdQuestion=" + m_thirdQuestion + ", fourthQuestion=" + m_fourthQuestion + ", fifthQuestion="
-				+ m_fifthQuestion + ", sixthQuestion=" + m_sixthQuestion + "]";
+		return "Survey [id=" + m_id + ", managerId=" + m_managerId + ", startDate=" + s_dateForamt.format(m_startDate)
+				+ ", endDate=" + s_dateForamt.format(m_endDate) + "]";
 	}
 
 	/**
@@ -194,5 +140,4 @@ public class Survey implements IEntity
 		}
 		return true;
 	}
-
 }

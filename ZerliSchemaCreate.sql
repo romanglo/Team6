@@ -121,32 +121,26 @@ CREATE TABLE complaints (
 
 CREATE TABLE surveys (
   suId INT AUTO_INCREMENT,
-  suQuestion1 VARCHAR(50) NOT NULL,
-  suQuestion2 VARCHAR(50) NOT NULL,
-  suQuestion3 VARCHAR(50) NOT NULL,
-  suQuestion4 VARCHAR(50) NOT NULL,
-  suQuestion5 VARCHAR(50) NOT NULL,
-  suQuestion6 VARCHAR(50) NOT NULL,
+  smId INT NOT NULL,
+  suStartDate DATE NULL DEFAULT NULL,
+  suEndDate DATE NULL DEFAULT NULL,
+  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   PRIMARY KEY (suId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE surveys_in_shops (
-  ssId INT AUTO_INCREMENT,
+CREATE TABLE survey_results (
+  srId INT AUTO_INCREMENT,
   suId INT NOT NULL,
-  smId INT NOT NULL,
-  ssStartDate DATE NULL DEFAULT NULL,
-  ssAnswer1 INT NOT NULL DEFAULT 0,
-  ssAnswer2 INT NOT NULL DEFAULT 0,
-  ssAnswer3 INT NOT NULL DEFAULT 0,
-  ssAnswer4 INT NOT NULL DEFAULT 0,
-  ssAnswer5 INT NOT NULL DEFAULT 0,
-  ssAnswer6 INT NOT NULL DEFAULT 0,
-  ssNumberOfAnswers INT NOT NULL DEFAULT 0,
-  ssSummary VARCHAR(500) NULL DEFAULT NULL, 
-  ssClosed BIT(1) NOT NULL DEFAULT 0,
+  srEnterDate DATE NULL DEFAULT NULL,
+  srAnswer1 INT NOT NULL,
+  srAnswer2 INT NOT NULL,
+  srAnswer3 INT NOT NULL,
+  srAnswer4 INT NOT NULL,
+  srAnswer5 INT NOT NULL,
+  srAnswer6 INT NOT NULL,
+  srSummary VARCHAR(500) NULL DEFAULT NULL, 
   FOREIGN KEY (suId) REFERENCES surveys (suId) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  PRIMARY KEY (ssId)
+  PRIMARY KEY (srId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
@@ -236,37 +230,37 @@ BEGIN
     ORDER BY iID;
 END; //
 
-CREATE PROCEDURE getShopSurveyAverage( shop_manager_id INT , in_year YEAR , quarter INT)
-BEGIN  
-	
-	DECLARE start_month INT;
-	DECLARE end_month INT;
-   
-	IF (quarter = 1) THEN 
-		SET start_month = 1;
-		SET end_month = 3;
-	ELSEIF (quarter = 2) THEN
-	    SET start_month = 4;
-		SET end_month = 6;
-	ELSEIF (quarter = 3) THEN
-	    SET start_month = 7;
-		SET end_month = 9;
-	ELSE
-	    SET start_month = 10;
-		SET end_month = 12;
-	END IF;
-
-	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
-			ssAnswer1 / ssNumberOfAnswers AS 'First Question Average',
-			ssAnswer2 / ssNumberOfAnswers AS 'Second Question Average', 
-			ssAnswer3 / ssNumberOfAnswers AS 'Third Question Average',
-			ssAnswer4 / ssNumberOfAnswers AS 'Fourth Question Average',
-			ssAnswer5 / ssNumberOfAnswers AS 'Fifth Question Average', 
-			ssAnswer6 / ssNumberOfAnswers AS 'Sixth Question Average'
-	FROM surveys_in_shops WHERE 
-	            smId = shop_manager_id AND YEAR(ssStartDate) = in_year AND
-	            MONTH(ssStartDate) >= start_month AND MONTH(ssStartDate) <= end_month;
-END; //
+--- CREATE PROCEDURE getShopSurveyAverage( shop_manager_id INT , in_year YEAR , quarter INT)
+--- BEGIN  
+--- 	
+--- 	DECLARE start_month INT;
+--- 	DECLARE end_month INT;
+---    
+--- 	IF (quarter = 1) THEN 
+--- 		SET start_month = 1;
+--- 		SET end_month = 3;
+--- 	ELSEIF (quarter = 2) THEN
+--- 	    SET start_month = 4;
+--- 		SET end_month = 6;
+--- 	ELSEIF (quarter = 3) THEN
+--- 	    SET start_month = 7;
+--- 		SET end_month = 9;
+--- 	ELSE
+--- 	    SET start_month = 10;
+--- 		SET end_month = 12;
+--- 	END IF;
+--- 
+--- 	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
+--- 			ssAnswer1 / ssNumberOfAnswers AS 'First Question Average',
+--- 			ssAnswer2 / ssNumberOfAnswers AS 'Second Question Average', 
+--- 			ssAnswer3 / ssNumberOfAnswers AS 'Third Question Average',
+--- 			ssAnswer4 / ssNumberOfAnswers AS 'Fourth Question Average',
+--- 			ssAnswer5 / ssNumberOfAnswers AS 'Fifth Question Average', 
+--- 			ssAnswer6 / ssNumberOfAnswers AS 'Sixth Question Average'
+--- 	FROM surveys_in_shops WHERE 
+--- 	            smId = shop_manager_id AND YEAR(ssStartDate) = in_year AND
+--- 	            MONTH(ssStartDate) >= start_month AND MONTH(ssStartDate) <= end_month;
+--- END; //
 
 CREATE PROCEDURE getShopNumberOfComplaints( shop_manager_id INT , in_year YEAR , quarter INT)
 BEGIN  
@@ -522,19 +516,63 @@ BEGIN
     END IF;
 END; //
 
-CREATE TRIGGER insert_surveys_in_shops_trigger
-BEFORE INSERT ON surveys_in_shops FOR EACH ROW
+CREATE TRIGGER insert_surveys_trigger
+BEFORE INSERT ON surveys FOR EACH ROW
 BEGIN
-    IF (NEW.ssStartDate = '0000-00-00' OR NEW.ssStartDate IS NULL) THEN 
-        SET NEW.ssStartDate = NOW();
+	IF (NEW.suEndDate = '0000-00-00' OR NEW.suEndDate IS NULL) THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey end date could not be null or 0000-00-00.';
+	END IF ;
+
+    IF (NEW.suStartDate = '0000-00-00' OR NEW.suStartDate IS NULL) THEN 
+        SET NEW.suStartDate = NOW();
+    END IF;
+	
+	IF(NEW.suStartDate > NEW.suEndDate) THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey end date must be after the start date.';
+	END IF;
+END; //
+
+CREATE TRIGGER update_surveys_trigger
+BEFORE UPDATE ON surveys FOR EACH ROW
+BEGIN
+	IF (NEW.suEndDate = '0000-00-00' OR NEW.suEndDate IS NULL OR NEW.suStartDate = '0000-00-00' OR NEW.suStartDate IS NULL) THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey end date could not be null or 0000-00-00 at update operation.';
+	END IF ;
+	
+	IF(NEW.suStartDate > NEW.suEndDate) THEN
+		SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey end date must be after the start date.';
+	END IF;
+END; //
+
+CREATE TRIGGER insert_survey_results_trigger
+BEFORE INSERT ON survey_results FOR EACH ROW
+BEGIN 
+	IF (NEW.srEnterDate = '0000-00-00' OR NEW.srEnterDate IS NULL) THEN 
+        SET NEW.srEnterDate = NOW();
+    END IF;
+	
+	IF (NEW.srEnterDate > (SELECT surveys.suEndDate  FROM surveys WHERE NEW.suId = surveys.suId )) THEN 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey enter date could not be after survey closing date';
+    END IF;
+	
+	IF (NEW.srEnterDate < (SELECT surveys.suStartDate  FROM surveys WHERE NEW.suId = surveys.suId )) THEN 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey enter date could not be before survey starting date';
     END IF;
 END; //
 
-CREATE TRIGGER update_surveys_in_shops_trigger
-BEFORE UPDATE ON surveys_in_shops FOR EACH ROW
+CREATE TRIGGER update_survey_results_trigger
+BEFORE UPDATE ON survey_results FOR EACH ROW
 BEGIN 
-    IF ( NEW.ssSummary IS NOT NULL AND NEW.ssClosed = 0) THEN 
-		SET NEW.ssClosed = 1;
+    IF (NEW.srEnterDate != OLD.srEnterDate) THEN 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey result enter date could not be change';
+    END IF;
+	
+	IF (NEW.srEnterDate > (SELECT surveys.suEndDate  FROM surveys WHERE NEW.suId = surveys.suId )) THEN 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey enter date could not be after survey closing date';
+    END IF;
+	
+	IF (NEW.srEnterDate < (SELECT surveys.suStartDate  FROM surveys WHERE NEW.suId = surveys.suId )) THEN 
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Survey enter date could not be before survey starting date';
     END IF;
 END; //
 
@@ -624,7 +662,7 @@ INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES
 
 UPDATE shop_employees SET smId = 1 WHERE uUserName = 'shopemployee';
 UPDATE shop_managers SET smName = 'Haifa' WHERE  smId = 1;
-UPDATE shop_managers SET smName = 'Kramiel' WHERE smId = 2;
+UPDATE shop_managers SET smName = 'Karmiel' WHERE smId = 2;
 UPDATE shop_managers SET smName = 'Akko' WHERE smId = 3;
 
 LOCK TABLES items WRITE;
@@ -657,12 +695,26 @@ INSERT INTO costumers_in_shops (cId,smId) VALUES
 (1,1);
 
 LOCK TABLES surveys WRITE;
-INSERT INTO surveys (suQuestion1,suQuestion2,suQuestion3,suQuestion4,suQuestion5,suQuestion6) VALUES
-('Question 1','Question 2', 'Question 3', 'Question 4', 'Question 5', 'Question 6');
+INSERT INTO surveys (smId,suStartDate,suEndDate) VALUES
+(1,'2017-01-01', '2017-01-31'),
+(2,'2017-01-01', '2017-01-31'),
+(3,'2017-01-01', '2017-01-31'),
+(1,'2017-03-01', '2017-03-31'),
+(2,'2017-03-01', '2017-03-31'),
+(3,'2017-03-01', '2017-03-31');
 
-LOCK TABLES surveys_in_shops WRITE;
-INSERT INTO surveys_in_shops (smId,suId,ssAnswer1,ssAnswer2,ssAnswer3,ssAnswer4,ssAnswer5,ssAnswer6,ssNumberOfAnswers) VALUES
-(1,1,4,4,4,4,4,4,2);
+
+LOCK TABLES survey_results WRITE;
+
+INSERT INTO survey_results (suId,srEnterDate,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES
+(1,'2017-01-02',4,4,4,4,4,4),
+(1,'2017-01-04',2,2,2,2,2,2),
+(2,'2017-01-02',4,4,4,4,4,4),
+(2,'2017-01-02',4,4,4,4,4,4),
+(3,'2017-01-02',4,4,4,4,4,4),
+(3,'2017-01-02',4,4,4,4,4,4),
+(3,'2017-01-02',4,4,4,4,4,4),
+(3,'2017-01-02',4,4,4,4,4,4);
 
 LOCK TABLES reservations WRITE;
 INSERT INTO reservations (cId, smId,rCreditCard, rType, rNumberOfItems, rPrice, rBlessingCard, rDeliveryType, rDeliveryAddress, rDeliveryPhone, rDeliveryName) VALUES 

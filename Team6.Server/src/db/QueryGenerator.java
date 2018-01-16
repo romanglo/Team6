@@ -18,7 +18,7 @@ import newEntities.ReservationsReport;
 import newEntities.ShopCostumer;
 import newEntities.ShopEmployee;
 import newEntities.ShopManager;
-import newEntities.ShopSurvey;
+import newEntities.SurveyResult;
 import newEntities.Survey;
 import newEntities.SurveysReport;
 import newEntities.User;
@@ -346,19 +346,12 @@ public class QueryGenerator {
 		}
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(
-				"INSERT INTO surveys (suId,suQuestion1,suQuestion2,suQuestion3,suQuestion4,suQuestion5,suQuestion6,suSummary) VALUES ('");
-
-		stringBuilder.append(survey.getFirstQuestion());
+				"INSERT INTO surveys (smId,suStartDate,suEndDate) VALUES (");
+		stringBuilder.append(survey.getManagerId());
+		stringBuilder.append(",'");
+		stringBuilder.append(s_dateFormat.format(survey.getStartDate()));
 		stringBuilder.append("','");
-		stringBuilder.append(survey.getSecondQuestion());
-		stringBuilder.append("','");
-		stringBuilder.append(survey.getThirdQuestion());
-		stringBuilder.append("','");
-		stringBuilder.append(survey.getFourthQuestion());
-		stringBuilder.append("','");
-		stringBuilder.append(survey.getFifthQuestion());
-		stringBuilder.append("','");
-		stringBuilder.append(survey.getSixthQuestion());
+		stringBuilder.append(s_dateFormat.format(survey.getEndDate()));
 		stringBuilder.append("');");
 		return stringBuilder.toString();
 	}
@@ -1088,56 +1081,51 @@ public class QueryGenerator {
 
 	// region ShopSurvey Entity
 
-	public static String selectShopSurveyQuery(ShopSurvey shopSurvey) {
-		int id = shopSurvey.getId();
+	public static String selectSurveyResultQuery(SurveyResult surveyResult) {
+		int id = surveyResult.getId();
 		if (id < 1) {
 			loggerLazyLoading();
-			s_logger.warning("Received request to get shop survey entity with impossiable ID = " + id);
+			s_logger.warning("Received request to get survey result entity with impossiable ID = " + id);
 			return null;
 		}
-		return "SELECT * FROM surveys_in_shops WHERE ssId = " + id + " ;";
+		return "SELECT * FROM survey_results WHERE srId = " + id + " ;";
 	}
 
-	public static String selectAllShopSurveyQuery(ShopSurvey shopSurvey) {
-		int surveyId = shopSurvey.getSurveyId();
-		int shopManagerId = shopSurvey.getShopManagerId();
-		if (surveyId < 1 && shopManagerId < 1) {
-			return "SELECT * FROM surveys_in_shops WHERE ssClosed = 0 ;";
-		}
-		if (surveyId < 1) {
-			return "SELECT * FROM surveys_in_shops WHERE smId = " + shopManagerId + " AND ssClosed = 0 ;";
-		}
-
-		if (shopManagerId < 1) {
-			return "SELECT * FROM surveys_in_shops WHERE suId = " + surveyId + " AND ssClosed = 0 ;";
-		}
-
-		return "SELECT * FROM surveys_in_shops WHERE suId = " + surveyId + " AND smId = " + shopManagerId
-				+ " AND ssClosed = 0 ;";
+	public static String selectAllSurveyResultsQuery() {
+		return "SELECT * FROM surveys_in_shops WHERE srSummary IS NULL ;";
 	}
 
-	public static String insertShopSurveyQuery(ShopSurvey shopSurvey) {
-		int surveyId = shopSurvey.getSurveyId();
-		int shopManagerId = shopSurvey.getShopManagerId();
-
-		if (surveyId < 1 || shopManagerId < 1) {
+	public static String insertShopSurveyQuery(SurveyResult surveyResult) {
+		int surveyId = surveyResult.getSurveyId();
+		if (surveyId < 1 ) {
 			loggerLazyLoading();
-			s_logger.warning("Received request to get shop survey entity with impossiable ID's: survey ID = " + surveyId
-					+ ", shop manager ID=" + shopManagerId);
+			s_logger.warning("Received request to insert survey entity with impossiable ID:  " + surveyId) ;
 			return null;
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO surveys_in_shops (suId,smId) VALUES (");
+		stringBuilder.append("INSERT INTO survey_results (suId,srEnterDate,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES (");
 		stringBuilder.append(surveyId);
+		stringBuilder.append(",'");
+		stringBuilder.append(s_dateFormat.format(surveyResult.getEnterDate()));
+		stringBuilder.append("',");
+		stringBuilder.append(surveyResult.getFirstAnswer());
 		stringBuilder.append(',');
-		stringBuilder.append(shopManagerId);
+		stringBuilder.append(surveyResult.getSecondAnswer());
+		stringBuilder.append(',');
+		stringBuilder.append(surveyResult.getThirdAnswer());
+		stringBuilder.append(',');
+		stringBuilder.append(surveyResult.getFourthAnswer());
+		stringBuilder.append(',');
+		stringBuilder.append(surveyResult.getFifthAnswer());
+		stringBuilder.append(',');
+		stringBuilder.append(surveyResult.getSixthAnswer());
 		stringBuilder.append(");");
 		return stringBuilder.toString();
 	}
 
-	public static String updateShopSurveyQuery(ShopSurvey shopSurvey) {
-		int id = shopSurvey.getId();
+	public static String updateShopSurveyQuery(SurveyResult surveyResult) {
+		int id = surveyResult.getId();
 
 		if (id < 1) {
 			loggerLazyLoading();
@@ -1146,25 +1134,23 @@ public class QueryGenerator {
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("UPDATE surveys_in_shops SET ");
-		stringBuilder.append("ssAnswer1 = ");
-		stringBuilder.append(shopSurvey.getAnswer1());
-		stringBuilder.append(", ssAnswer2 = ");
-		stringBuilder.append(shopSurvey.getAnswer2());
-		stringBuilder.append(", ssAnswer3 = ");
-		stringBuilder.append(shopSurvey.getAnswer3());
-		stringBuilder.append(", ssAnswer4 = ");
-		stringBuilder.append(shopSurvey.getAnswer4());
-		stringBuilder.append(", ssAnswer5 = ");
-		stringBuilder.append(shopSurvey.getAnswer5());
-		stringBuilder.append(", ssAnswer6 = ");
-		stringBuilder.append(shopSurvey.getAnswer6());
-		stringBuilder.append(", ssNumberOfAnswers = ");
-		stringBuilder.append(shopSurvey.getNumberOfAnswers());
-		stringBuilder.append(", ssSummary = '");
-		stringBuilder.append(shopSurvey.getSummary());
-		stringBuilder.append("', ssClosed = ");
-		stringBuilder.append(shopSurvey.isClosed() ? 1 : 0);
+		stringBuilder.append("UPDATE survey_results SET ");
+		stringBuilder.append("suId = ");
+		stringBuilder.append(surveyResult.getSurveyId());
+		stringBuilder.append(", srEnterDate = '");
+		stringBuilder.append(s_dateFormat.format(surveyResult.getEnterDate()));
+		stringBuilder.append("', srAnswer1 = ");
+		stringBuilder.append(surveyResult.getFirstAnswer());
+		stringBuilder.append(", srAnswer2 = ");
+		stringBuilder.append(surveyResult.getSecondAnswer());
+		stringBuilder.append(", srAnswer3 = ");
+		stringBuilder.append(surveyResult.getThirdAnswer());
+		stringBuilder.append(", srAnswer4 = ");
+		stringBuilder.append(surveyResult.getFourthAnswer());
+		stringBuilder.append(", srAnswer5 = ");
+		stringBuilder.append(surveyResult.getFifthAnswer());
+		stringBuilder.append(", srAnswer6 = ");
+		stringBuilder.append(surveyResult.getSixthAnswer());
 		stringBuilder.append(" WHERE ssId = ");
 		stringBuilder.append(id);
 		stringBuilder.append(" ;");

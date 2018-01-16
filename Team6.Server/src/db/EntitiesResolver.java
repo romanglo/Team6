@@ -31,7 +31,7 @@ import newEntities.ReservationsReport;
 import newEntities.ShopCostumer;
 import newEntities.ShopEmployee;
 import newEntities.ShopManager;
-import newEntities.ShopSurvey;
+import newEntities.SurveyResult;
 import newEntities.Survey;
 import newEntities.SurveysReport;
 import newEntities.User;
@@ -114,8 +114,8 @@ public class EntitiesResolver {
 			returningList = ResultSetToSurveyEntities(resultSet);
 		} else if (expectedType.equals(SurveysReport.class)) {
 			returningList = ResultSetToSurveysReportEntities(resultSet);
-		} else if (expectedType.equals(ShopSurvey.class)) {
-			returningList = ResultSetToShopSurveysEntities(resultSet);
+		} else if (expectedType.equals(SurveyResult.class)) {
+			returningList = ResultSetToSurveyResultsEntities(resultSet);
 		} else if (expectedType.equals(ShopCostumer.class)) {
 			returningList = ResultSetToShopCostumersEntities(resultSet);
 		}
@@ -171,40 +171,37 @@ public class EntitiesResolver {
 
 	/**
 	 * The method received {@link ResultSet} and resolve it to {@link List} of
-	 * {@link ShopSurvey} entity that describes a shop catalog.
+	 * {@link SurveyResult} entity that describes a shop catalog.
 	 *
 	 * @param resultSet
 	 *            A {@link ResultSet} which will be resolved in it to {@link List}
-	 *            of {@link ShopSurvey} entity.
-	 * @return An {@link List} of {@link ShopSurvey} entity if the resolving
+	 *            of {@link SurveyResult} entity.
+	 * @return An {@link List} of {@link SurveyResult} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToShopSurveysEntities(ResultSet resultSet) {
-		ArrayList<IEntity> shopManagerEntities = new ArrayList<>();
+	private static List<IEntity> ResultSetToSurveyResultsEntities(ResultSet resultSet) {
+		ArrayList<IEntity> surveyResultsEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
 			while (resultSet.next()) {
-				ShopSurvey shopSurvey = new ShopSurvey();
+				SurveyResult surveyResult = new SurveyResult();
 				try {
-					shopSurvey.setId(resultSet.getInt(1));
-					shopSurvey.setSurveyId(resultSet.getInt(2));
-					shopSurvey.setShopManagerId(resultSet.getInt(3));
-					Date sqlDate = resultSet.getDate(4);
+					surveyResult.setId(resultSet.getInt(1));
+					surveyResult.setSurveyId(resultSet.getInt(2));
+					Date sqlDate = resultSet.getDate(3);
 					if (sqlDate != null) {
-						shopSurvey.setStartDate(new java.util.Date(sqlDate.getTime()));
+						surveyResult.setEnterDate(new java.util.Date(sqlDate.getTime()));
 					} else {
-						shopSurvey.setStartDate(null);
+						surveyResult.setEnterDate(null);
 					}
-					shopSurvey.setAnswer1(resultSet.getInt(5));
-					shopSurvey.setAnswer2(resultSet.getInt(6));
-					shopSurvey.setAnswer3(resultSet.getInt(7));
-					shopSurvey.setAnswer4(resultSet.getInt(8));
-					shopSurvey.setAnswer5(resultSet.getInt(9));
-					shopSurvey.setAnswer6(resultSet.getInt(10));
-					shopSurvey.setNumberOfAnswers(resultSet.getInt(11));
-					shopSurvey.setSummary(resultSet.getString(12));
-					shopSurvey.setClosed(resultSet.getInt(13) == 1 ? true : false);
-					shopManagerEntities.add(shopSurvey);
+					surveyResult.setFirstAnswer(resultSet.getInt(4));
+					surveyResult.setSecondAnswer(resultSet.getInt(5));
+					surveyResult.setThirdAnswer(resultSet.getInt(6));
+					surveyResult.setFourthanswer(resultSet.getInt(7));
+					surveyResult.setFifthAnswer(resultSet.getInt(8));
+					surveyResult.setSixthAnswer(resultSet.getInt(9));
+					surveyResult.setSummary(resultSet.getString(10));
+					surveyResultsEntities.add(surveyResult);
 				} catch (Exception ignored) {
 					failedResolve++;
 				}
@@ -215,10 +212,10 @@ public class EntitiesResolver {
 		}
 
 		if (failedResolve != 0) {
-			s_logger.warning("Failed to resolve " + failedResolve + " rows to Shop Survey entity.");
+			s_logger.warning("Failed to resolve " + failedResolve + " rows to Survey Result entity.");
 		}
 
-		return shopManagerEntities.isEmpty() ? null : shopManagerEntities;
+		return surveyResultsEntities.isEmpty() ? null : surveyResultsEntities;
 	}
 
 	/**
@@ -335,13 +332,19 @@ public class EntitiesResolver {
 				Survey survey = new Survey();
 				try {
 					survey.setId(resultSet.getInt(1));
-					survey.setFirstQuestion(resultSet.getString(2));
-					survey.setSecondQuestion(resultSet.getString(3));
-					survey.setThirdQuestion(resultSet.getString(4));
-					survey.setFourthQuestion(resultSet.getString(5));
-					survey.setFifthQuestion(resultSet.getString(6));
-					survey.setSixthQuestion(resultSet.getString(7));
-					surveyEntities.add(survey);
+					survey.setManagerId(resultSet.getInt(2));
+					Date mysqlDate = resultSet.getDate(3);
+					if (mysqlDate != null) {
+						survey.setStartDate(new java.util.Date(mysqlDate.getTime()));
+					} else {
+						survey.setStartDate(null);
+					}
+					mysqlDate = resultSet.getDate(4);
+					if (mysqlDate != null) {
+						survey.setEndDate(new java.util.Date(mysqlDate.getTime()));
+					} else {
+						survey.setEndDate(null);
+					}
 				} catch (Exception ignored) {
 					failedResolve++;
 				}

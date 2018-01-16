@@ -31,7 +31,7 @@ import javafx.stage.Stage;
 import logger.LogManager;
 import newEntities.IEntity;
 import newEntities.ShopEmployee;
-import newEntities.ShopSurvey;
+import newEntities.SurveyResult;
 import newEntities.Survey;
 import newMessages.EntitiesListData;
 import newMessages.EntityData;
@@ -99,7 +99,7 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 	
 	private ObservableList<Integer> list;
 	
-	private ShopSurvey entity;
+	private SurveyResult entity;
 	
 	private List<IEntity> m_surveys_array;
 	
@@ -131,9 +131,9 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 		int surveyid=combobox_surveyida.getValue();
 		for(int i=0;i<m_surveys_array.size();i++)
 		{
-			if(((ShopSurvey)m_surveys_array.get(i)).getId()==surveyid)
+			if(((SurveyResult)m_surveys_array.get(i)).getId()==surveyid)
 			{
-				entity=((ShopSurvey)m_surveys_array.get(i));
+				entity=((SurveyResult)m_surveys_array.get(i));
 			}
 		}
 		Survey survey_entity=new Survey();
@@ -153,12 +153,12 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 	{
 		if(checkFileds())
 		{
-		ShopSurvey cur_shopservey=null;
+		SurveyResult cur_shopservey=null;
 		int surv_id=combobox_surveyida.getValue();
 		for(int i=0;i<m_surveys_array.size();i++)
 		{
-			if(((ShopSurvey)m_surveys_array.get(i)).getId()==surv_id)
-				cur_shopservey =(ShopSurvey)m_surveys_array.get(i);
+			if(((SurveyResult)m_surveys_array.get(i)).getId()==surv_id)
+				cur_shopservey =(SurveyResult)m_surveys_array.get(i);
 		}
 		cur_shopservey.setAnswer1(cur_shopservey.getAnswer1()+combobox_answer1.getValue());
 		cur_shopservey.setAnswer2(cur_shopservey.getAnswer2()+combobox_answer2.getValue());
@@ -265,7 +265,7 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 	}
 	private void initializeSurveys()
 	{
-		ShopSurvey sur_entity= new ShopSurvey();
+		SurveyResult sur_entity= new SurveyResult();
 		sur_entity.setShopManagerId(m_shop);
 		Message msg=MessagesFactory.createGetAllEntityMessage(sur_entity);
 		m_client.sendMessageToServer(msg);
@@ -316,7 +316,7 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 				m_surveys_array = entitiesListData.getEntities();
 				for(int i=0;i<m_surveys_array.size();i++)
 				{
-						m_surveysid_array.add(((ShopSurvey)m_surveys_array.get(i)).getId());
+						m_surveysid_array.add(((SurveyResult)m_surveys_array.get(i)).getId());
 				}
 			list = FXCollections.observableArrayList(m_surveysid_array);
 			combobox_surveyida.setItems(list);	

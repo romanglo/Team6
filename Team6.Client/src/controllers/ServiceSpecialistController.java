@@ -24,7 +24,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import logger.LogManager;
 import newEntities.IEntity;
-import newEntities.ShopSurvey;
+import newEntities.SurveyResult;
 import newEntities.Survey;
 import newMessages.EntitiesListData;
 import newMessages.EntityData;
@@ -92,7 +92,7 @@ public class ServiceSpecialistController
 
 	private ArrayList<String> m_surveysid_array = new ArrayList<String>();
 
-	private ShopSurvey selected_survey;
+	private SurveyResult selected_survey;
 
 	/* End of --> Fields region */
 
@@ -140,7 +140,7 @@ public class ServiceSpecialistController
 	private void initializesurveys()
 	{
 		combobox_id.setValue("");
-		ShopSurvey shopsurvey_entity = new ShopSurvey();
+		SurveyResult shopsurvey_entity = new SurveyResult();
 		Message msg = MessagesFactory.createGetAllEntityMessage(shopsurvey_entity);
 		m_client.sendMessageToServer(msg);
 	}
@@ -160,8 +160,8 @@ public class ServiceSpecialistController
 		if ((combobox_id.getValue() == null) || (combobox_id.getValue().equals(""))) return;
 		int id = Integer.parseInt(combobox_id.getValue());
 		for (int i = 0; i < m_survey_array.size(); i++) {
-			if (id == ((ShopSurvey) m_survey_array.get(i)).getId())
-				selected_survey = (ShopSurvey) m_survey_array.get(i);
+			if (id == ((SurveyResult) m_survey_array.get(i)).getId())
+				selected_survey = (SurveyResult) m_survey_array.get(i);
 		}
 		textfield_answer1.setText(Integer.toString(selected_survey.getAnswer1()));
 		textfield_answer2.setText(Integer.toString(selected_survey.getAnswer2()));
@@ -240,11 +240,11 @@ public class ServiceSpecialistController
 	{
 		IMessageData messageData = msg.getMessageData();
 		if (messageData instanceof EntitiesListData) {
-			if (((EntitiesListData) messageData).getEntities().get(0) instanceof ShopSurvey) {
+			if (((EntitiesListData) messageData).getEntities().get(0) instanceof SurveyResult) {
 				m_survey_array = ((EntitiesListData) messageData).getEntities();
 				for (int i = 0; i < m_survey_array.size(); i++) {
-					if (!(((ShopSurvey) m_survey_array.get(i)).isClosed()))
-						m_surveysid_array.add(Integer.toString(((ShopSurvey) m_survey_array.get(i)).getId()));
+					if (!(((SurveyResult) m_survey_array.get(i)).isClosed()))
+						m_surveysid_array.add(Integer.toString(((SurveyResult) m_survey_array.get(i)).getId()));
 				}
 				m_list = FXCollections.observableArrayList(m_surveysid_array);
 				combobox_id.setItems(m_list);

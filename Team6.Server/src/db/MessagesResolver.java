@@ -25,7 +25,7 @@ import newEntities.ShopCatalogData;
 import newEntities.ShopCostumer;
 import newEntities.ShopEmployee;
 import newEntities.ShopManager;
-import newEntities.ShopSurvey;
+import newEntities.SurveyResult;
 import newEntities.Survey;
 import newEntities.SurveysReport;
 import newEntities.User;
@@ -328,8 +328,8 @@ public class MessagesResolver implements Server.MessagesHandler {
 		IMessageData returnedMessageData = null;
 		if (receivedEntity instanceof Item) {
 			returnedMessageData = onItemEntityReceived((Item) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof ShopSurvey) {
-			returnedMessageData = onShopSurveyEntityReceived((ShopSurvey) receivedEntity, entityData.getOperation());
+		} else if (receivedEntity instanceof SurveyResult) {
+			returnedMessageData = onSurveyResultEntityReceived((SurveyResult) receivedEntity, entityData.getOperation());
 		} else if (receivedEntity instanceof ShopCostumer) {
 			returnedMessageData = onShopCostumerEntityReceived((ShopCostumer) receivedEntity,
 					entityData.getOperation());
@@ -664,7 +664,6 @@ public class MessagesResolver implements Server.MessagesHandler {
 				survey.setId(lastInsertId);
 			}
 			break;
-		
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + survey.toString()
 					+ ", Operation: " + operation.toString());
@@ -1071,7 +1070,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	// end region -> ComplaintsReport Entity Operations
 
-	// region ComplaintsReport Entity Operations
+	// region ShopCostumer Entity Operations
 
 	private IMessageData onShopCostumerEntityReceived(ShopCostumer shopCostumer, EntityDataOperation operation) {
 		boolean result = false;
@@ -1125,19 +1124,19 @@ public class MessagesResolver implements Server.MessagesHandler {
 		return respondMessageData;
 	}
 
-	// end region -> ComplaintsReport Entity Operations
+	// end region -> ShopCostumer Entity Operations
 
-	// region ComplaintsReport Entity Operations
+	// region ShopSurvey Entity Operations
 
-	private IMessageData onShopSurveyEntityReceived(ShopSurvey shopSurvey, EntityDataOperation operation) {
+	private IMessageData onSurveyResultEntityReceived(SurveyResult shopSurvey, EntityDataOperation operation) {
 		boolean result = false;
 		switch (operation) {
 		case Get:
-			String selectQuery = QueryGenerator.selectShopSurveyQuery(shopSurvey);
+			String selectQuery = QueryGenerator.selectSurveyResultQuery(shopSurvey);
 			if (selectQuery == null) {
 				break;
 			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopSurvey.class);
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, SurveyResult.class);
 			if (executeSelectQuery == null) {
 				break;
 			}
@@ -1145,11 +1144,11 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return new EntityData(EntityDataOperation.None, entity);
 
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllShopSurveyQuery(shopSurvey);
+			String selectAllQuery = QueryGenerator.selectAllSurveyResultsQuery();
 			if (selectAllQuery == null) {
 				break;
 			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopSurvey.class);
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, SurveyResult.class);
 			if (executeSelectAllQuery != null) {
 				return executeSelectAllQuery;
 			}
@@ -1168,15 +1167,17 @@ public class MessagesResolver implements Server.MessagesHandler {
 				result = executeQuery(shopSurvey, updateQuery);
 			}
 			break;
+			
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopSurvey.toString()
 					+ ", Operation: " + operation.toString());
 			break;
 		}
+		
 		RespondMessageData respondMessageData = new RespondMessageData();
 		respondMessageData.setSucceed(result);
 		return respondMessageData;
 	}
 
-	// end region -> ComplaintsReport Entity Operations
+	// end region -> ShopSurvey Entity Operations
 }
