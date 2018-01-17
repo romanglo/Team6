@@ -775,8 +775,6 @@ public class ShopManagerController implements Initializable, Client.ClientStatus
 	{
 		ShopManager shopManager = new ShopManager();
 		shopManager.setUserName(ApplicationEntryPoint.ConnectedUser.getUserName());
-		shopManager.setPrivilege(ApplicationEntryPoint.ConnectedUser.getPrivilege());
-		shopManager.setEmail(ApplicationEntryPoint.ConnectedUser.getEmail());
 		Message entityMessage = MessagesFactory.createGetEntityMessage(shopManager);
 		m_client.sendMessageToServer(entityMessage);
 	}

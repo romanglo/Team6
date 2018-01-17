@@ -12,21 +12,21 @@
 	xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="controllers.CompanyEmployee_AddShopDiscountController">
 	<children>
-		<TableView fx:id="catalog_table" layoutX="14.0" layoutY="75.0"
+		<TableView fx:id="tableView_shopSales" layoutX="14.0" layoutY="75.0"
 			prefHeight="240.0" prefWidth="364.0" AnchorPane.bottomAnchor="40.0"
 			AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
 			<columns>
-				<TableColumn fx:id="tablecolumn_id" minWidth="180.0"
+				<TableColumn fx:id="tableColumn_itemInSaleID" minWidth="180.0"
 					prefWidth="-1.0" text="ID" />
-				<TableColumn fx:id="tablecolumn_discountedPrice"
+				<TableColumn fx:id="tableColumn_discountedPrice"
 					minWidth="190.0" prefWidth="-1.0" text="Price" />
 			</columns>
 		</TableView>
-		<Button fx:id="button_save" disable="true" layoutX="334.0"
-			layoutY="320.0" mnemonicParsing="false" onAction="#saveChanges" text="Save changes"
+		<Button fx:id="button_saveSalesChanges" disable="true" layoutX="334.0"
+			layoutY="320.0" mnemonicParsing="false" onAction="#saveSalesCatalogChanges" text="Save changes"
 			AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="15.0" />
-		<Button fx:id="button_reset" disable="true" layoutX="198.0"
-			layoutY="320.0" mnemonicParsing="false" onAction="#resetChanges"
+		<Button fx:id="button_resetSalesChanges" disable="true" layoutX="198.0"
+			layoutY="320.0" mnemonicParsing="false" onAction="#resetSalesCatalogChanges"
 			text="Reset changes" AnchorPane.bottomAnchor="5.0"
 			AnchorPane.rightAnchor="110.0" />
 		<ComboBox fx:id="comboBox_storeList" layoutX="14.0" layoutY="320.0"
@@ -51,10 +51,10 @@
 			</font>
 		</Label>
 		<Button fx:id="button_addNewDiscountedItem" layoutX="16.0"
-			layoutY="37.0" mnemonicParsing="false" onAction="#addItemToCatalog"
+			layoutY="37.0" mnemonicParsing="false" onAction="#addSalesToCatalog"
 			text="Add new discount" />
 		<Button fx:id="button_removeDiscountedItem" layoutX="139.0"
-			layoutY="37.0" mnemonicParsing="false" onAction="#removeItemFromCatalog"
+			layoutY="37.0" mnemonicParsing="false" onAction="#removeItemFromSalesCatalog"
 			text="Remove discount" />
 	</children>
 </AnchorPane>
