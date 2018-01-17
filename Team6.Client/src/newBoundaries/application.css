@@ -1,7 +1,7 @@
 .root {
     -fx-background-color: #ffffff;
     -fx-font-family: Ariel;
-    -fx-font-size: 16.0px;
+    -fx-font-size: 12.0px;
 }
 
 .header-section {
@@ -38,7 +38,7 @@
 
 
 .sidebar-section ToggleButton {
-    -fx-font-size: 20.0px;
+    -fx-font-size: 18.0px;
     -fx-padding: 10.0 15.0 10.0 15.0;
     -fx-border-width: 1.0;
     -fx-border-color: transparent transparent #E8E8E8 transparent;
@@ -71,6 +71,7 @@
 }
 
 .footer-section {
+	-fx-font-size: 16.0px;
     -fx-alignment: center;
     -fx-padding: 10.0 10.0 10.0 10.0;
     -fx-border-width: 1.0;

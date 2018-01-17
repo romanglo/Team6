@@ -104,6 +104,23 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 
 	// end region -> Fields
 
+	// region Getters
+
+	/**
+	 * @return the pressed button in side bar text that received in
+	 *         {@link BaseController#getSideButtonsNames()}, if never pressed button
+	 *         the method will return <code>null</code>.
+	 */
+	protected String getPressedButton()
+	{
+		if (m_currentPressedButton == null) {
+			return null;
+		}
+		return m_currentPressedButton.getText();
+	}
+
+	// end region -> Getters
+
 	// region Constructors
 
 	/**
@@ -247,7 +264,7 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 			m_currentPressedButton = pressedButton;
 			return;
 		}
-		
+
 		if (pressedButton == m_currentPressedButton) {
 			pressedButton.setSelected(true);
 			return;
