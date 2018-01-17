@@ -68,8 +68,6 @@ public class Costumer_CreateReservationPaymentController
 
 	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_name;
 
-	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_amount;
-
 	@FXML private TableColumn<CatalogItemRow, Double> tablecolumn_price;
 
 	@FXML private Button changing_button;
