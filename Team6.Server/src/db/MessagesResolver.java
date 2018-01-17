@@ -649,7 +649,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			if (selectAllQuery == null) {
 				break;
 			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Reservation.class);
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Survey.class);
 			if (executeSelectAllQuery != null) {
 				return executeSelectAllQuery;
 			}

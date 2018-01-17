@@ -346,6 +346,7 @@ public class EntitiesResolver {
 					} else {
 						survey.setEndDate(null);
 					}
+					surveyEntities.add(survey);
 				} catch (Exception ignored) {
 					failedResolve++;
 				}
