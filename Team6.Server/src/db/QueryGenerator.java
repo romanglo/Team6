@@ -345,8 +345,7 @@ public class QueryGenerator {
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(
-				"INSERT INTO surveys (smId,suStartDate,suEndDate) VALUES (");
+		stringBuilder.append("INSERT INTO surveys (smId,suStartDate,suEndDate) VALUES (");
 		stringBuilder.append(survey.getManagerId());
 		stringBuilder.append(",'");
 		stringBuilder.append(s_dateFormat.format(survey.getStartDate()));
@@ -501,9 +500,9 @@ public class QueryGenerator {
 		stringBuilder.append("isDiscountedPrice = ");
 		stringBuilder.append(itemInShop.getDiscountedPrice());
 		stringBuilder.append(" WHERE iId = ");
-		stringBuilder.append(itemInShop.getItemId());
+		stringBuilder.append(itemId);
 		stringBuilder.append(" AND smId = ");
-		stringBuilder.append(itemInShop.getShopManagerId());
+		stringBuilder.append(shopManagerId);
 		stringBuilder.append(';');
 
 		return stringBuilder.toString();
@@ -523,9 +522,9 @@ public class QueryGenerator {
 
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("INSERT INTO items_in_shops (smId,iId,isDiscountedPrice) VALUES (");
-		stringBuilder.append(itemId);
-		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
+		stringBuilder.append(',');
+		stringBuilder.append(itemId);
 		stringBuilder.append(',');
 		stringBuilder.append(itemInShop.getDiscountedPrice());
 		stringBuilder.append(");");
@@ -547,9 +546,9 @@ public class QueryGenerator {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("DELETE FROM items_in_shops WHERE ");
 		stringBuilder.append("iId = ");
-		stringBuilder.append(itemInShop.getItemId());
+		stringBuilder.append(itemId);
 		stringBuilder.append(" AND smId = ");
-		stringBuilder.append(itemInShop.getShopManagerId());
+		stringBuilder.append(shopManagerId);
 		stringBuilder.append(';');
 		return stringBuilder.toString();
 	}
@@ -1017,7 +1016,8 @@ public class QueryGenerator {
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO costumers_in_shops (cId,smId,csCostumerSubscription,csCreditCard,csStartSubscriptionDate) VALUES (");
+		stringBuilder.append(
+				"INSERT INTO costumers_in_shops (cId,smId,csCostumerSubscription,csCreditCard,csStartSubscriptionDate) VALUES (");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
@@ -1099,14 +1099,15 @@ public class QueryGenerator {
 
 	public static String insertShopSurveyQuery(SurveyResult surveyResult) {
 		int surveyId = surveyResult.getSurveyId();
-		if (surveyId < 1 ) {
+		if (surveyId < 1) {
 			loggerLazyLoading();
-			s_logger.warning("Received request to insert survey entity with impossiable ID:  " + surveyId) ;
+			s_logger.warning("Received request to insert survey entity with impossiable ID:  " + surveyId);
 			return null;
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO survey_results (suId,srEnterDate,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES (");
+		stringBuilder.append(
+				"INSERT INTO survey_results (suId,srEnterDate,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES (");
 		stringBuilder.append(surveyId);
 		stringBuilder.append(",'");
 		stringBuilder.append(s_dateFormat.format(surveyResult.getEnterDate()));

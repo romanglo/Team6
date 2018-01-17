@@ -511,8 +511,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				if (m_baseController != null) {
 					nextStage.setOnHidden(e -> m_baseController.dispose());
 				}
-				nextStage.setWidth(720);
-				nextStage.setHeight(500);
+				nextStage.setMinWidth(875);;
+				nextStage.setMinHeight(500);
 				nextStage.show();
 			}
 			catch (Exception e) {
