@@ -337,7 +337,7 @@ public class QueryGenerator {
 	// region Survey Entity
 
 	public static String insertSurveyQuery(Survey survey) {
-		int shopManagerId = survey.getId();
+		int shopManagerId = survey.getManagerId();
 
 		if (shopManagerId < 1) {
 			loggerLazyLoading();
