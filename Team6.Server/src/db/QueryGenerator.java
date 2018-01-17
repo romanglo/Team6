@@ -370,6 +370,24 @@ public class QueryGenerator {
 		return "SELECT * FROM surveys ;";
 	}
 
+	public static String updateSurveyQuery(Survey survey) {
+		int id = survey.getId();
+		if (id < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get survey entity with impossiable ID: " + id);
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("UPDATE surveys SET suStartDate = '");
+		stringBuilder.append(s_dateFormat.format(survey.getStartDate()));
+		stringBuilder.append("', suEndDate = '");
+		stringBuilder.append(s_dateFormat.format(survey.getEndDate()));
+		stringBuilder.append("' WHERE suId = ");
+		stringBuilder.append(id);
+		stringBuilder.append(';');
+		return stringBuilder.toString();
+	}
+
 	// end region -> Survey Entity
 
 	// region Complaints Entity
@@ -627,6 +645,28 @@ public class QueryGenerator {
 		return "SELECT * FROM shop_employees ;";
 	}
 
+	public static String updateShopEmployeeQuery(ShopEmployee shopEmployee) {
+		String userName = shopEmployee.getUserName();
+		int id = shopEmployee.getId();
+
+		if (userName != null && !userName.isEmpty() && id > 1) {
+			return "UPDATE shop_employees SET smId = " + shopEmployee.getShopManagerId() + " WHERE uUserName = '"
+					+ userName + "' AND seId = " + id + ";";
+		}
+
+		if (userName != null && !userName.isEmpty()) {
+			return "UPDATE shop_employees SET smId = " + shopEmployee.getShopManagerId() + " WHERE uUserName = '"
+					+ userName + "' ;";
+		}
+
+		if (id > 1) {
+			return "UPDATE shop_employees SET smId = " + shopEmployee.getShopManagerId() + " WHERE seId = " + id + ";";
+		}
+
+		s_logger.warning("Received request to get Shop Employee entity with impossiable ID's: username = " + userName
+				+ ", ID=" + id);
+		return null;
+	}
 	// end region -> ShopEmployee Entity
 
 	// region ShopManager Entity
@@ -650,6 +690,29 @@ public class QueryGenerator {
 
 	public static String selectShopManagersQuery() {
 		return "SELECT * FROM shop_managers ;";
+	}
+
+	public static String updateShopManagerQuery(ShopManager shopManager) {
+		String userName = shopManager.getUserName();
+		int id = shopManager.getId();
+
+		if (userName != null && !userName.isEmpty() && id > 1) {
+			return "UPDATE shop_managers SET smName = '" + shopManager.getName() + "' WHERE uUserName = '" + userName
+					+ "' AND smId = " + id + ";";
+		}
+
+		if (userName != null && !userName.isEmpty()) {
+			return "UPDATE shop_managers SET smName = '" + shopManager.getName() + "' WHERE uUserName = '" + userName
+					+ "' ;";
+		}
+
+		if (id > 1) {
+			return "UPDATE shop_managers SET smName = '" + shopManager.getName() + "' smId = " + id + ";";
+		}
+
+		s_logger.warning("Received request to get shop costumer entity with impossiable ID's: username = " + userName
+				+ ", ID=" + id);
+		return null;
 	}
 
 	// end region -> ShopManager Entity
@@ -1160,5 +1223,4 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 	// end region -> ShopSurvey Entity
-
 }

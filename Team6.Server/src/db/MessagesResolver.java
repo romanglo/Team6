@@ -664,6 +664,12 @@ public class MessagesResolver implements Server.MessagesHandler {
 				survey.setId(lastInsertId);
 			}
 			break;
+		case Update:
+			String updateQuery = QueryGenerator.updateSurveyQuery(survey);
+			if (updateQuery != null) {
+				result = executeQuery(survey, updateQuery);
+			}
+			break;
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + survey.toString()
 					+ ", Operation: " + operation.toString());
@@ -842,6 +848,13 @@ public class MessagesResolver implements Server.MessagesHandler {
 				return executeSelectAllQuery;
 			}
 			break;
+		case Update:
+			String updateQuery = QueryGenerator.updateShopEmployeeQuery(shopEmployee);
+			if (updateQuery != null) {
+				result = executeQuery(shopEmployee, updateQuery);
+			}
+			break;
+		
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopEmployee.toString()
 					+ ", Operation: " + operation.toString());
@@ -878,6 +891,12 @@ public class MessagesResolver implements Server.MessagesHandler {
 			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopManager.class);
 			if (executeSelectAllQuery != null) {
 				return executeSelectAllQuery;
+			}
+			break;
+		case Update:
+			String updateQuery = QueryGenerator.updateShopManagerQuery(shopManager);
+			if (updateQuery != null) {
+				result = executeQuery(shopManager, updateQuery);
 			}
 			break;
 		default:
