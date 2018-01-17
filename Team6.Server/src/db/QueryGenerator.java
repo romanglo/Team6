@@ -1157,7 +1157,7 @@ public class QueryGenerator {
 	}
 
 	public static String selectAllSurveyResultsQuery() {
-		return "SELECT * FROM surveys_in_shops WHERE srSummary IS NULL ;";
+		return "SELECT * FROM survey_results WHERE srSummary IS NULL ;";
 	}
 
 	public static String insertShopSurveyQuery(SurveyResult surveyResult) {
