@@ -1,74 +1,48 @@
-
-#tf_enterItemId {
-	-fx-text-alignment: center ;
-}
-
  .button
 {
-	-fx-background-color: #5490ff;
+	-fx-background-color: #5490ff;	
+	-fx-background-radius: 22;
 	-fx-text-fill: white;
-	-fx-padding: 6 6 6 6;
-	-fx-border-radius: 8;
+	-fx-border-color: #5490ff;
+	-fx-border-radius: 22;
+	-fx-border-width: 3;
 }
+
 .button:hover 
 {
-    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+     -fx-background-color: white;
+     -fx-text-fill: #5490ff;
 }
 
-.tab-pane .tab-header-area .tab-header-background 
+.button:pressed
 {
-    -fx-opacity: 0;
+	-fx-rotate: 10;
 }
 
-.tab-pane
+.loginButton 
 {
-    -fx-tab-min-width:90px;
-    /*-fx-background-color: lightgrey;*/
+	-fx-font-size: 16;
+	-fx-font-weight: bold;
 }
 
-.tab
+.settingsButton
 {
-    -fx-background-insets: 0 1 0 1,0,0;
-}
-.tab-pane .tab
-{
-    -fx-background-color: #9fa4a0;
-}
-
-.tab-pane .tab:selected
-{
-    -fx-background-color: #5490ff;
+	-fx-border-color: white ;
+	-fx-background-color: transparent ;
+	-fx-background-radius: 5em; 
+	-fx-min-width: 40px;  
+    -fx-min-height: 40px;
+    -fx-max-width: 40px; 
+    -fx-max-height: 40px;
 }
 
-
-.tab-content-area 
-{
--fx-background-color: rgb(218,218,218);
-/*-fx-padding: 1px; 
--fx-border-color: white; 
--fx-border-width: 3px;*/
-/* -fx-opacity: -fx-disabled-opacity;*/
-}
-
-.tab .tab-label 
-{ 
-	-fx-alignment: center-right  ;
-    -fx-text-fill: black;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold; 
-}
-
-.tab:selected .tab-label 
-{ 
-    -fx-alignment: CENTER;
-    -fx-text-fill: white;
-}
 .label
 {
     -fx-text-fill: #5490ff;
     -fx-font-weight: bold;
     -fx-font-size: 16px;
 }
+
 .root
 {
 	-fx-background-color: white;

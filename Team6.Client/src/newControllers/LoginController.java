@@ -10,6 +10,9 @@ import com.sun.istack.internal.Nullable;
 
 import client.ApplicationEntryPoint;
 import client.Client;
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.RotateTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -33,10 +36,12 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import logger.LogManager;
 import newEntities.IEntity;
 import newEntities.User;
@@ -68,6 +73,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	@FXML private PasswordField passwordField_userPassword;
 
+	@FXML private Button btn_settings;
+
 	@FXML private Button btn_login;
 
 	/* End of --> UI Binding Fields region */
@@ -82,6 +89,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	private Stage m_connectingStage;
 
+	private RotateTransition m_settingsButtonRotate;
+	
 	private boolean m_canceled;
 
 	/* End of --> Fields region */
@@ -125,6 +134,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	private void onSettingsButtonPressed(ActionEvent event)
 	{
 		try {
+			m_settingsButtonRotate.stop();
+			btn_settings.setRotate(0);
 			Stage currentStage = (Stage) btn_login.getScene().getWindow();
 
 			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/newBoundaries/LoginSettings.FXML"));
@@ -189,6 +200,38 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		initializeImages();
 
 		initializeTextFields();
+
+		initialzeButtons();
+	}
+
+	private void initialzeButtons()
+	{
+		btn_login.getStyleClass().add("loginButton");
+		btn_settings.getStyleClass().add("settingsButton");
+
+		m_settingsButtonRotate = new RotateTransition(Duration.seconds(2), btn_imageview_settings);
+		m_settingsButtonRotate.setByAngle(360);
+		m_settingsButtonRotate.setCycleCount(Animation.INDEFINITE);
+		m_settingsButtonRotate.setInterpolator(Interpolator.LINEAR);
+
+		btn_settings.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event)
+			{
+				m_settingsButtonRotate.play();
+			}
+		});
+
+		btn_settings.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event)
+			{
+				m_settingsButtonRotate.stop();
+				btn_imageview_settings.setRotate(0);
+			}
+		});
 	}
 
 	private void initializeTextFields()

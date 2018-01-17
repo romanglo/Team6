@@ -42,7 +42,7 @@
 			fitWidth="105.0" layoutX="56.0" layoutY="77.0" pickOnBounds="true"
 			preserveRatio="true" />
 
-		<Button layoutX="607.0" layoutY="3.0" mnemonicParsing="false"
+		<Button fx:id="btn_settings" layoutX="607.0" layoutY="3.0" mnemonicParsing="false"
 			onAction="#onSettingsButtonPressed" prefHeight="25" prefWidth="25"
 			AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
 			<graphic>

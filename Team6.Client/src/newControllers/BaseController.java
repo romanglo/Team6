@@ -235,29 +235,38 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 		ToggleButton pressedButton = (ToggleButton) source;
 
 		String selection = pressedButton.getText();
+
+		if (m_currentPressedButton == null) {
+
+			if (!onSelection(selection)) {
+				m_Logger.info("Selection denied by the implemanting class. The Selection: " + selection);
+				pressedButton.setSelected(false);
+				return;
+			}
+			anchorpane_welcome.setVisible(false);
+			m_currentPressedButton = pressedButton;
+			return;
+		}
 		
-		if (!onSelection(selection)) {
-			m_Logger.info("Selection denied by the implemanting class. The Selection: " + selection);
+		if (pressedButton == m_currentPressedButton) {
+			pressedButton.setSelected(true);
 			return;
 		}
 
-		if (m_currentPressedButton == null) {
-			anchorpane_welcome.setVisible(false);
-		} else {
-
-			if (pressedButton == m_currentPressedButton) {
-				pressedButton.setSelected(true);
-				return;
-			}
-
-			for (Node node : vbox_sidebar.getChildren()) {
-				if (!(node instanceof ToggleButton) || node == pressedButton) {
-					continue;
-				}
-				((ToggleButton) node).setSelected(false);
-			}
+		if (!onSelection(selection)) {
+			m_Logger.info("Selection denied by the implemanting class. The Selection: " + selection);
+			pressedButton.setSelected(false);
+			return;
 		}
 
+		for (Node node : vbox_sidebar.getChildren()) {
+			if (!(node instanceof ToggleButton) || node == pressedButton) {
+				continue;
+			}
+			((ToggleButton) node).setSelected(false);
+		}
+
+		pressedButton.setSelected(true);
 		m_currentPressedButton = pressedButton;
 	}
 
