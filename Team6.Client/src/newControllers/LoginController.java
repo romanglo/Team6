@@ -512,7 +512,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 					nextStage.setOnHidden(e -> m_baseController.dispose());
 				}
 				nextStage.setMinWidth(875);;
-				nextStage.setMinHeight(500);
+				nextStage.setMinHeight(600);
 				nextStage.show();
 			}
 			catch (Exception e) {
