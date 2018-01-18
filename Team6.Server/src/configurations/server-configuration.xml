@@ -9,4 +9,8 @@
 		<username>root</username>
 		<password>123456</password>
 	</db>
+	<time>
+		<LastSubscriptionCheckDate>01-01-2018</LastSubscriptionCheckDate>
+	    <LastGenerationDate>31-12-2017</LastGenerationDate>
+	</time>
 </configuration>

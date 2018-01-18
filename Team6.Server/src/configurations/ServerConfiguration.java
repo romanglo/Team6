@@ -35,6 +35,7 @@ public class ServerConfiguration {
 	private final static File file = new File(
 			ServerConfiguration.class.getProtectionDomain().getCodeSource().getLocation().getPath() + '\\'
 					+ CONFIGURATION_PATH);
+	
 	// end region -> Constants
 
 	// region Singleton Pattern
@@ -87,6 +88,9 @@ public class ServerConfiguration {
 	@XmlElement(name = "db")
 	private DbConfiguration m_dbConfiguration;
 
+	@XmlElement(name = "time")
+	private TimeConfiguration m_timeConfiguration;
+
 	private boolean m_defaultConfiguration = false;
 
 	// end region -> Fields
@@ -99,11 +103,13 @@ public class ServerConfiguration {
 	private ServerConfiguration() {
 		m_connectivityConfiguration = new ConnectivityConfiguration();
 		m_dbConfiguration = new DbConfiguration();
+		m_timeConfiguration = new TimeConfiguration();
 	}
 
 	// end region -> Constructors
 
 	// region Getters
+	
 	/**
 	 * @return the application database configuration.
 	 */
@@ -116,6 +122,13 @@ public class ServerConfiguration {
 	 */
 	public ConnectivityConfiguration getConnectivityConfiguration() {
 		return m_connectivityConfiguration;
+	}
+
+	/**
+	 * @return the application time configuration.
+	 */
+	public TimeConfiguration getTimeConfiguration() {
+		return m_timeConfiguration;
 	}
 
 	/**
@@ -157,7 +170,8 @@ public class ServerConfiguration {
 	 */
 	@Override
 	public String toString() {
-		return "ServerConfiguration [" + m_connectivityConfiguration + ", " + m_dbConfiguration + "]";
+		return "ServerConfiguration [" + m_connectivityConfiguration + ", " + m_dbConfiguration + ", "
+				+ m_timeConfiguration + "]";
 	}
 
 	// end region -> Object Methods Overrides
