@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +22,13 @@ import connectivity.Server;
 import db.DbController;
 import db.MessagesResolver;
 import db.QueryGenerator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.StringBinding;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -38,8 +46,10 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import logger.LogManager;
 import javafx.scene.control.Label;
 
@@ -94,8 +104,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	private TableColumn<SettingsRow, String> tablecolumn_value;
 	@FXML
 	private TableColumn<SettingsRow, String> tablecolumn_region;
-	@FXML
-	private Button btn_update_settings;
 
 	/* Title images */
 	@FXML
@@ -190,7 +198,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 					}
 					rowData.setValue(resultString);
 					drawContantToTable();
-					btn_update_settings.setDisable(false);
 					String msg = "The Configuration " + rowData.getType() + '-' + rowData.getSetting()
 							+ " value changed to " + rowData.getValue();
 					m_logger.info(msg);
@@ -205,8 +212,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		tablecolumn_value.setCellValueFactory(new PropertyValueFactory<>("value"));
 
 		drawContantToTable();
-
-		btn_update_settings.setDisable(true);
 	}
 
 	private void initializeServerLogic() {
@@ -240,7 +245,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			btn_db_stop.setDisable(false);
 			circle_db_on.setFill(Paint.valueOf("green"));
 			circle_db_off.setFill(Paint.valueOf("grey"));
-
 		} catch (Exception e) {
 			addMessageToLog("Failed to disconnect from database, exception : " + e.getMessage());
 			m_logger.log(Level.SEVERE, "Failed to connect to database", event);
@@ -303,12 +307,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			m_logger.log(Level.SEVERE, msg, e);
 			addMessageToLog(msg);
 		}
-	}
-
-	@FXML
-	private void updateSettingsFile(ActionEvent event) {
-		m_configuration.updateResourceFile();
-		btn_update_settings.setDisable(true);
 	}
 
 	@FXML

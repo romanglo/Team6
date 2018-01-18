@@ -1,13 +1,22 @@
  .button
 {
-	-fx-background-color: #5490ff;
+	-fx-background-color: #5490ff;	
+	-fx-background-radius: 22;
 	-fx-text-fill: white;
-	-fx-padding: 6.0 6.0 6.0 6.0;
-	-fx-border-radius: 8.0;
+	-fx-border-color: #5490ff;
+	-fx-border-radius: 22;
+	-fx-border-width: 3;
 }
+
 .button:hover 
 {
-    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+     -fx-background-color: white;
+     -fx-text-fill: #5490ff;
+}
+
+.button:pressed
+{
+	-fx-rotate: 10;
 }
 
 .tab-pane .tab-header-area .tab-header-background 

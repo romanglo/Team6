@@ -11,9 +11,9 @@
 <?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.layout.BorderPane?>
 
 <AnchorPane minHeight="500.0" minWidth="450.0"
 	nodeOrientation="LEFT_TO_RIGHT" prefHeight="500.0" prefWidth="450.0"
@@ -128,7 +128,7 @@
 							prefWidth="200.0">
 							<children>
 								<TableView fx:id="setting_table" editable="true"
-									layoutX="20.0" layoutY="18.0" AnchorPane.bottomAnchor="40.0"
+									layoutX="20.0" layoutY="18.0" AnchorPane.bottomAnchor="5.0"
 									AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
 									AnchorPane.topAnchor="5.0">
 									<columns>
@@ -143,10 +143,7 @@
 										<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
 									</columnResizePolicy>
 								</TableView>
-								<Button fx:id="btn_update_settings" mnemonicParsing="false"
-									onAction="#updateSettingsFile" prefHeight="20.0" prefWidth="80.0"
-									text="Update file" AnchorPane.bottomAnchor="5"
-									AnchorPane.rightAnchor="10.0" />
+
 							</children>
 						</AnchorPane>
 					</content>
