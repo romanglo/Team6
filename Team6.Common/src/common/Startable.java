@@ -6,6 +6,9 @@ import java.util.logging.Logger;
 
 import com.sun.istack.internal.NotNull;
 
+import general.ScheduledExecutor;
+import logger.LogManager;
+
 /**
  *
  * Startable: Base abstract implementation to {@link IStartable} interface.
@@ -29,10 +32,14 @@ public abstract class Startable implements IStartable
 	// region Constructors
 
 	/**
+	 * Create instance of {@link ScheduledExecutor}.
+	 * 
+	 * @see IStartable
+	 * 
 	 * @param throwable
 	 *            if true the method {@link IStartable#Start()} will throw
 	 *            {@link RuntimeException} on error case. if false only the
-	 *            {@link StartableState} will changed.
+	 *            {@link IStartable} state will changed.
 	 * @param logger
 	 *            A logger to write to it.
 	 */
@@ -45,9 +52,55 @@ public abstract class Startable implements IStartable
 		m_Id = getClass().getName();
 
 		m_running = false;
-		
+
 	}
 
+	/**
+	 * 
+	 * Create instance of {@link ScheduledExecutor}, get logger from
+	 * {@link LogManager#getLogger()}.
+	 * 
+	 * @see {@link Startable#Startable(boolean, Logger)}
+	 * @see IStartable
+	 * 
+	 * @param throwable
+	 *            if true the method {@link IStartable#Start()} will throw
+	 *            {@link RuntimeException} on error case. if false only the
+	 *            {@link IStartable} state will changed.
+	 */
+	protected Startable(boolean throwable)
+	{
+		this(throwable, LogManager.getLogger());
+	}
+
+	/**
+	 * Create instance of {@link ScheduledExecutor}. This instance would not throws
+	 * exceptions in {@link IStartable#Start()} method.
+	 * 
+	 * @see {@link Startable#Startable(boolean, Logger)}
+	 * @param logger
+	 *            A logger to write to it.
+	 */
+	protected Startable(@NotNull Logger logger)
+	{
+		this(false, logger);
+	}
+
+	/**
+	 * 
+	 * Create instance of {@link ScheduledExecutor}, get logger from
+	 * {@link LogManager#getLogger()}. This instance would not throws exceptions in
+	 * {@link IStartable#Start()} method.
+	 * 
+	 * @see {@link Startable#Startable(boolean, Logger)}
+	 * 
+	 * @see IStartable
+	 * 
+	 */
+	protected Startable()
+	{
+		this(false, LogManager.getLogger());
+	}
 	// end region -> Constructors
 
 	// region Getters

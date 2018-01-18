@@ -21,21 +21,21 @@ import common.Startable;
 
 /**
  *
- * ScheduledExecutor:Abstract class that execute schedule tasks with result, the
- * class implement {@link IStartable} interface.
+ * ScheduledExecutor: A class that execute schedule tasks in fixed rate with
+ * result, the class implement {@link IStartable} interface.
  * 
  */
-public abstract class ScheduledExecutor extends Startable
+public class ScheduledExecutor extends Startable
 {
 
 	/**
 	 * 
-	 * ScheduledExecutionHandle: The handler of the scheduled task result.
+	 * ScheduledExecutionHandler: The handler of the scheduled task result.
 	 * 
 	 * @param <TData>
 	 *            Scheduled task result type.
 	 */
-	public interface ScheduledExecutionHandle<TData>
+	public interface IScheduledExecutionHandler<TData>
 	{
 
 		/**
@@ -47,6 +47,11 @@ public abstract class ScheduledExecutor extends Startable
 		 */
 		void onScheduledExecution(@Nullable TData executionResult);
 	}
+
+	/**
+	 * The default period of initial delay.
+	 */
+	public static final int DEFAULT_DELAY = 0;
 
 	/**
 	 * The default period of the executor.
@@ -62,7 +67,7 @@ public abstract class ScheduledExecutor extends Startable
 
 	private ScheduledExecutorService m_scheduledExecutorService;
 
-	private ExecutorService m_executorService;
+	private volatile ExecutorService m_executorService;
 
 	private List<Runnable> m_scheduldTasks;
 
@@ -70,19 +75,54 @@ public abstract class ScheduledExecutor extends Startable
 
 	private TimeUnit m_timeUnit;
 
+	private int m_delay;
+
 	// end region -> Fields
 
 	// region Constructors
 
-	protected ScheduledExecutor(boolean throwable, Logger logger)
+	/**
+	 * 
+	 * Create instance that execute schedule tasks in fixed rate with result. The
+	 * execution will happen every {@value ScheduledExecutor#DEFAULT_PERIOD}
+	 * {@value ScheduledExecutor#DEFAULT_TIMEUNIT}.
+	 * 
+	 * @see IStartable
+	 * @param throwable
+	 *            if true the method {@link IStartable#Start()} will throw
+	 *            {@link RuntimeException} on error case. if false only the
+	 *            {@link IStartable} state will changed.
+	 * @param logger
+	 *            A logger to write to it.
+	 */
+	public ScheduledExecutor(boolean throwable, Logger logger)
 	{
-		this(throwable, logger, DEFAULT_PERIOD, DEFAULT_TIMEUNIT);
+		this(throwable, logger, DEFAULT_DELAY, DEFAULT_PERIOD, DEFAULT_TIMEUNIT);
 	}
 
-	protected ScheduledExecutor(boolean throwable, Logger logger, int period, TimeUnit timeUnit)
+	/**
+	 * 
+	 * Create instance that execute schedule tasks in fixed rate with result.
+	 * 
+	 * @see IStartable
+	 * @param throwable
+	 *            if true the method {@link IStartable#Start()} will throw
+	 *            {@link RuntimeException} on error case. if false only the
+	 *            {@link IStartable} state will changed.
+	 * @param logger
+	 *            A logger to write to it.
+	 * @param initialDelay
+	 *            the time to delay first
+	 * @param executionPeriod
+	 *            the period between successive executions
+	 * @param timeUnit
+	 *            the time unit of the initialDelay and period parameters
+	 */
+	public ScheduledExecutor(boolean throwable, Logger logger, int initialDelay, int executionPeriod, TimeUnit timeUnit)
 	{
 		super(throwable, logger);
-		m_period = period;
+		m_delay = initialDelay;
+		m_period = executionPeriod;
 		m_timeUnit = timeUnit;
 		m_scheduldTasks = new ArrayList<>();
 		m_scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
@@ -99,20 +139,19 @@ public abstract class ScheduledExecutor extends Startable
 	 *
 	 * @param <TData>
 	 *            Scheduled task result type.
-	 * @param runnable
+	 * @param callable
 	 *            The scheduled task - Can not be <code>null</code>.
 	 * @param executionHandle
 	 *            A handler of the scheduled task result.
 	 * @return true if the task added successfully, false if did not.
 	 */
-	public <TData> boolean addTask(@NotNull Callable<TData> runnable,
-			@Nullable ScheduledExecutionHandle<TData> executionHandle)
+	public <TData> boolean addTask(@NotNull Callable<TData> callable,
+			@Nullable IScheduledExecutionHandler<TData> executionHandle)
 	{
 		if (isRunning()) {
 			return false;
 		}
-		Future<TData> submit = m_executorService.submit(runnable);
-		Runnable scheduldTask = new ScheduledTask<TData>(submit, executionHandle);
+		Runnable scheduldTask = new ScheduledTask<TData>(callable, executionHandle);
 		synchronized (ScheduledExecutor.class) {
 			m_scheduldTasks.add(scheduldTask);
 		}
@@ -127,7 +166,7 @@ public abstract class ScheduledExecutor extends Startable
 	protected void initialStart()
 	{
 		final Runnable managerTask = new ManagerTask();
-		m_scheduledExecutorService.scheduleAtFixedRate(managerTask, 0, m_period, m_timeUnit);
+		m_scheduledExecutorService.scheduleAtFixedRate(managerTask, m_delay, m_period, m_timeUnit);
 	}
 
 	@Override
@@ -142,7 +181,18 @@ public abstract class ScheduledExecutor extends Startable
 
 	// region Abstract Methods
 
-	protected abstract boolean toExecute();
+	/**
+	 * The method called when the received period has been passed and the method
+	 * check the precondition to execution of the tasks. The default implementation
+	 * always returns <code>true</code>, it may be overridden by extending class.
+	 * 
+	 * @return <code>true</code> to continue execution of the tasks, and
+	 *         <code>false</code> for skip the execution this time.
+	 */
+	protected boolean toExecute()
+	{
+		return true;
+	}
 
 	// end region -> Abstract Methods
 
@@ -183,13 +233,13 @@ public abstract class ScheduledExecutor extends Startable
 	private class ScheduledTask<TData> implements Runnable
 	{
 
-		private Future<TData> m_future;
+		private Callable<TData> m_callable;
 
-		private ScheduledExecutionHandle<TData> m_executionHandle;
+		private IScheduledExecutionHandler<TData> m_executionHandle;
 
-		private ScheduledTask(Future<TData> future, ScheduledExecutionHandle<TData> executionHandle)
+		private ScheduledTask(Callable<TData> callable, IScheduledExecutionHandler<TData> executionHandle)
 		{
-			m_future = future;
+			m_callable = callable;
 			m_executionHandle = executionHandle;
 		}
 
@@ -198,7 +248,9 @@ public abstract class ScheduledExecutor extends Startable
 		{
 			TData result;
 			try {
-				result = m_future.get();
+				Future<TData> future = m_executorService.submit(m_callable);
+				result = future.get();
+
 			}
 			catch (InterruptedException | ExecutionException e) {
 				m_Logger.log(Level.WARNING,
