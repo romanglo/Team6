@@ -63,8 +63,6 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	@FXML private ImageView imageview_background;
 
-	@FXML private ImageView imageview_usericon;
-
 	@FXML private ImageView btn_imageview_settings;
 
 	// login fields and buttons :
@@ -265,15 +263,10 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	private void initializeImages()
 	{
-		InputStream backgoundImage = getClass().getResourceAsStream("/newBoundaries/images/login_background.jpg");
+		InputStream backgoundImage = getClass().getResourceAsStream("/newBoundaries/images/login_background.png");
 		if (backgoundImage != null) {
 			Image image = new Image(backgoundImage);
 			imageview_background.setImage(image);
-		}
-		InputStream userImage = getClass().getResourceAsStream("/newBoundaries/images/default_user.png");
-		if (userImage != null) {
-			Image image = new Image(userImage);
-			imageview_usericon.setImage(image);
 		}
 		InputStream settingsImage = getClass().getResourceAsStream("/newBoundaries/images/settings.png");
 		if (settingsImage != null) {

@@ -6,7 +6,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.Ellipse?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="500"
@@ -17,34 +16,28 @@
 			fitWidth="700" pickOnBounds="true" preserveRatio="false"
 			AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
 			AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-
-		<Ellipse fill="TRANSPARENT" layoutX="107.0" layoutY="242.0"
-			radiusX="93.0" radiusY="169.0" stroke="WHITE" strokeType="INSIDE"
-			strokeWidth="5" />
-		<Label layoutX="33.0" layoutY="183.0" text="User Name:"
-			AnchorPane.leftAnchor="33.0" AnchorPane.topAnchor="183.0" />
-		<TextField fx:id="textField_userName" layoutX="32.0"
-			layoutY="203.0" prefHeight="25.0" prefWidth="149.0" stylesheets="@application.css"
-			AnchorPane.leftAnchor="32.0" />
-		<Label layoutX="33.0" layoutY="231.0" text="Password:"
-			AnchorPane.leftAnchor="33.0" />
+		<Label layoutX="516.0" layoutY="184.0" text="User Name:"
+			AnchorPane.leftAnchor="516.0" AnchorPane.topAnchor="184.0" />
+		<TextField fx:id="textField_userName" layoutX="515.0"
+			layoutY="204.0" prefHeight="25.0" prefWidth="149.0" stylesheets="@application.css"
+			AnchorPane.leftAnchor="515.0" />
+		<Label layoutX="516.0" layoutY="232.0" text="Password:"
+			AnchorPane.leftAnchor="516.0" />
 		<PasswordField fx:id="passwordField_userPassword"
-			layoutX="32.0" layoutY="251.0" prefHeight="25.0" prefWidth="149.0"
-			stylesheets="@application.css" AnchorPane.leftAnchor="32.0" />
-		<Button fx:id="btn_login" layoutX="69.0" layoutY="296.0"
+			layoutX="515.0" layoutY="252.0" prefHeight="25.0" prefWidth="149.0"
+			stylesheets="@application.css" AnchorPane.leftAnchor="515.0" />
+		<Button fx:id="btn_login" layoutX="552.0" layoutY="297.0"
 			mnemonicParsing="false" onAction="#onLoginButtonPressed" prefHeight="37.0"
 			prefWidth="76.0" text="Login">
 			<font>
 				<Font size="16.0" />
 			</font>
 		</Button>
-		<ImageView fx:id="imageview_usericon" fitHeight="100.0"
-			fitWidth="105.0" layoutX="56.0" layoutY="77.0" pickOnBounds="true"
-			preserveRatio="true" />
 
-		<Button fx:id="btn_settings" layoutX="607.0" layoutY="3.0" mnemonicParsing="false"
-			onAction="#onSettingsButtonPressed" prefHeight="25" prefWidth="25"
-			AnchorPane.rightAnchor="3.0" AnchorPane.topAnchor="3.0">
+		<Button fx:id="btn_settings" layoutX="607.0" layoutY="3.0"
+			mnemonicParsing="false" onAction="#onSettingsButtonPressed"
+			prefHeight="25" prefWidth="25" AnchorPane.rightAnchor="3.0"
+			AnchorPane.topAnchor="3.0">
 			<graphic>
 				<ImageView fx:id="btn_imageview_settings" fitHeight="25"
 					fitWidth="25" pickOnBounds="true" preserveRatio="false" />
