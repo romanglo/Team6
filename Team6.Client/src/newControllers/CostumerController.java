@@ -880,8 +880,10 @@ public class CostumerController extends BaseController
 		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
 		tablecolumn_image.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, ImageView>("image"));
 
-		catalog_table.setItems(ItemRow);
-		catalog_table.refresh();
+		Platform.runLater(() -> {
+			catalog_table.setItems(ItemRow);
+			catalog_table.refresh();
+		});
 	}
 
 	private void initializeReservationsTable()
@@ -907,8 +909,10 @@ public class CostumerController extends BaseController
 		tablecolumn_reservation_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
 		tablecolumn_reservation_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
 
-		reservation_table.setItems(reservationTableList);
-		reservation_table.refresh();
+		Platform.runLater(() -> {
+			reservation_table.setItems(reservationTableList);
+			reservation_table.refresh();
+		});
 	}
 
 	private void initializeItemSearchTable()
@@ -935,8 +939,10 @@ public class CostumerController extends BaseController
 		tablecolumn_search_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
 		tablecolumn_search_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
 
-		search_table.setItems(searchItemsList);
-		search_table.refresh();
+		Platform.runLater(() -> {
+			search_table.setItems(searchItemsList);
+			search_table.refresh();
+		});
 	}
 
 	private void initializeCatalog()
