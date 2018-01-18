@@ -1,8 +1,13 @@
 
 package newControllers;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+
+import boundaries.ShopCostumerRow;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -18,21 +23,29 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import newEntities.ComplaintsReport;
+import newEntities.Costumer;
 import newEntities.EntitiesEnums;
 import newEntities.IEntity;
 import newEntities.IncomesReport;
 import newEntities.Report;
 import newEntities.ReservationsReport;
+import newEntities.ShopCostumer;
 import newEntities.ShopManager;
 import newEntities.SurveysReport;
 import newMessages.EntitiesListData;
 import newMessages.EntityData;
+import newMessages.EntityDataOperation;
 import newMessages.IMessageData;
 import newMessages.Message;
 import newMessages.MessagesFactory;
@@ -49,7 +62,7 @@ public class ShopManagerController extends BaseController
 
 	// region Fields
 
-	private @FXML AnchorPane anchorpane_option21;
+	@FXML private AnchorPane anchorpane_subscriptionManagement;
 
 	// end region -> Fields
 
@@ -123,7 +136,7 @@ public class ShopManagerController extends BaseController
 	private Integer m_shopManagerUserID;
 	// End of --> User ID (Only if User is ShopManager)
 
-	private boolean initializeFlag = true;
+	private boolean initFlag = true;
 
 	private boolean firstTime = true;
 
@@ -153,6 +166,32 @@ public class ShopManagerController extends BaseController
 
 	/* End of --> Local enums array */
 
+	/* region Shop Sales Fields */
+
+	private ArrayList<Integer> m_costumersID;
+
+	@FXML private VBox vbox_sidebar;
+
+	@FXML private TableView<ShopCostumerRow> tableView_shopCostumer;
+
+	@FXML private TableColumn<ShopCostumerRow, Integer> tableColumn_shopCostumerID;
+
+	@FXML private TableColumn<ShopCostumerRow, String> tableColumn_shopCostumerSubscription;
+
+	@FXML private TableColumn<ShopCostumerRow, Date> tableColumn_shopCostumerStartDate;
+
+	@FXML private TableColumn<ShopCostumerRow, String> tableColumn_shopCostumerCreditCard;
+
+	@FXML private TableColumn<ShopCostumerRow, Float> tableColumn_shopCostumerCumulativePrice;
+
+	@FXML private Button button_addNewShopCostumer;
+
+	@FXML private TextField textField_newShopCostumerID;
+
+	ObservableList<ShopCostumerRow> shopCostumers = FXCollections.observableArrayList();
+
+	/* end region -> Shop Sales Fields */
+
 	// region BaseController Implementation
 
 	/**
@@ -162,7 +201,11 @@ public class ShopManagerController extends BaseController
 	protected void internalInitialize() throws Exception
 	{
 		if (m_ConnectedUser.getPrivilege() == EntitiesEnums.UserPrivilege.ShopManager) initializeShopManagerUser();
-		else getStoreIdListFromServer();
+		else {
+			vbox_sidebar.getChildren().get(1).setVisible(false);
+			getStoreIdListFromServer();
+		}
+		initializeChartPane();
 	}
 
 	private void initializeShopManagerUser()
@@ -529,12 +572,12 @@ public class ShopManagerController extends BaseController
 		switch (title) {
 			case "Compare Report":
 				anchorPane_mainStage.setVisible(true);
-				anchorpane_option21.setVisible(false);
+				anchorpane_subscriptionManagement.setVisible(false);
 			break;
 
 			case "TODO Add Costumer":
 				anchorPane_mainStage.setVisible(false);
-				anchorpane_option21.setVisible(true);
+				anchorpane_subscriptionManagement.setVisible(true);
 			break;
 
 			default:
@@ -756,6 +799,104 @@ public class ShopManagerController extends BaseController
 
 	/* end region -> Private Methods */
 
+	/*------------------------------------------------------------------------------------------------------------------------------*/
+
+	private void initializeSubscriptionTable()
+	{
+		tableView_shopCostumer.setRowFactory(param -> {
+			TableRow<ShopCostumerRow> tableRow = new TableRow<>();
+			tableRow.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
+					ShopCostumerRow rowData = tableRow.getItem();
+
+					if (rowData.getShopCostumerSubscription() != EntitiesEnums.CostumerSubscription.None.toString()) {
+						errorMSG("Costumer Already have subscription!");
+						return;
+					}
+
+					TextInputDialog dialog = new TextInputDialog();
+					dialog.setTitle("Update Shop Costumer Subscription");
+					dialog.setHeaderText("o you want to update the subscirption to Costumer ID -> "
+							+ rowData.getShopCostumerID() + " ?");
+					dialog.setContentText("Please enter the new value:");
+					// Traditional way to get the response value.
+					Optional<String> result = dialog.showAndWait();
+					if (!result.isPresent()) return;
+					String resultString = result.get();
+					if (!(resultString != null && !resultString.isEmpty())) {
+						return;
+					}
+
+					EntitiesEnums.CostumerSubscription subscription;
+					try {
+						subscription = Enum.valueOf(EntitiesEnums.CostumerSubscription.class, resultString);
+						if (subscription == EntitiesEnums.CostumerSubscription.None) {
+							showInformationMessage("You didn't update the subscription.");
+							return;
+						}
+					}
+					catch (Exception ex) {
+						errorMSG("Subscription doesn't exist!");
+						return;
+					}
+					rowData.setShopCostumerSubscription(resultString);
+					updateShopCostumerSubscription(rowData);
+					drewContantToSubscirptionManagementTable();
+				}
+			});
+			return tableRow;
+		});
+	}
+
+	@FXML
+	private void addNewShopCostumer(ActionEvent event)
+	{
+		int costumerID;
+		try {
+			costumerID = Integer.parseInt(textField_newShopCostumerID.getText());
+			if (checkIfCostumerAlreadyExist(costumerID)) {
+				showInformationMessage("Costumer already sign.");
+				return;
+			}
+			if (!m_costumersID.contains(costumerID)) {
+				errorMSG("Costumer doesn't exist in the system!");
+				return;
+			} else {
+				addShopCostumer(costumerID);
+			}
+		}
+		catch (Exception ex) {
+			errorMSG("Invalid Costumer ID!");
+		}
+	}
+
+	private boolean checkIfCostumerAlreadyExist(int newCostumer)
+	{
+		for (ShopCostumerRow shopCostumer : shopCostumers)
+			if (shopCostumer.getShopCostumerID() == newCostumer) return true;
+		return false;
+	}
+
+	private void addShopCostumerToLocalTable(ShopCostumer newShopCostumer)
+	{
+		ShopCostumerRow newRow;
+		if (newShopCostumer.getCreditCard() != null) newRow = new ShopCostumerRow(newShopCostumer.getCostumerId(),
+				EntitiesEnums.CostumerSubscription.None.toString(), newShopCostumer.getCreditCard(),
+				newShopCostumer.getCumulativePrice());
+		newRow = new ShopCostumerRow(newShopCostumer.getCostumerId(),
+				EntitiesEnums.CostumerSubscription.None.toString(), newShopCostumer.getCumulativePrice());
+		shopCostumers.add(newRow);
+		drewContantToSubscirptionManagementTable();
+	}
+
+	private void drewContantToSubscirptionManagementTable()
+	{
+		tableView_shopCostumer.setItems(shopCostumers);
+		tableView_shopCostumer.refresh();
+	}
+
+	/*------------------------------------------------------------------------------------------------------------------------------*/
+
 	/* Sending message to server methods region */
 
 	private void getStoreIdListFromServer()
@@ -808,6 +949,44 @@ public class ShopManagerController extends BaseController
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
+	private void getAllCostumers()
+	{
+		Costumer costumer = new Costumer();
+		Message msg = MessagesFactory.createGetAllEntityMessage(costumer);
+		m_Client.sendMessageToServer(msg);
+	}
+
+	private void getShopCostumers()
+	{
+		ShopCostumer shopCostumer = new ShopCostumer();
+		shopCostumer.setShopManagerId(m_shopManagerUserID);
+		Message msg = MessagesFactory.createGetAllEntityMessage(shopCostumer);
+		m_Client.sendMessageToServer(msg);
+	}
+
+	private void updateShopCostumerSubscription(ShopCostumerRow changedRow)
+	{
+		ShopCostumer shopCostumer = new ShopCostumer();
+		shopCostumer.setCostumerId(changedRow.getShopCostumerID());
+		shopCostumer.setCostumerSubscription(
+				Enum.valueOf(EntitiesEnums.CostumerSubscription.class, changedRow.getShopCostumerSubscription()));
+		shopCostumer.setSubscriptionStartDate(new Date());
+		shopCostumer.setCumulativePrice(changedRow.getShopCostumerCumulativePrice());
+		if (changedRow.getShopCostumerCreditCard() != null)
+			shopCostumer.setCreditCard(changedRow.getShopCostumerCreditCard());
+		Message msg = MessagesFactory.createUpdateEntityMessage(shopCostumer);
+		m_Client.sendMessageToServer(msg);
+	}
+
+	private void addShopCostumer(int newCostumerID)
+	{
+		ShopCostumer shopCostumer = new ShopCostumer();
+		shopCostumer.setCostumerId(newCostumerID);
+		shopCostumer.setShopManagerId(m_shopManagerUserID);
+		Message msg = MessagesFactory.createAddEntityMessage(shopCostumer);
+		m_Client.sendMessageToServer(msg);
+	}
+
 	/* End of -> Sending message to server methods region */
 
 	/**
@@ -835,10 +1014,6 @@ public class ShopManagerController extends BaseController
 					else {
 						m_surveyReport = (SurveysReport) entity;
 						firstTime = false;
-						if (initializeFlag) {
-							initializeChartPane();
-							initializeFlag = false;
-						}
 					}
 				} else {
 					Report report = (Report) entity;
@@ -849,13 +1024,7 @@ public class ShopManagerController extends BaseController
 						else if (entity instanceof ReservationsReport)
 							m_reservationsReport = (ReservationsReport) entity;
 						else if (entity instanceof ComplaintsReport) m_complaintsReport = (ComplaintsReport) entity;
-						else {
-							m_surveyReport = (SurveysReport) entity;
-							if (initializeFlag) {
-								initializeChartPane();
-								initializeFlag = false;
-							}
-						}
+						else m_surveyReport = (SurveysReport) entity;
 					}
 					if (checkIfCompareReport(report, year)) {
 						if (entity instanceof IncomesReport) m_compareIncomesReport = (IncomesReport) entity;
@@ -863,41 +1032,88 @@ public class ShopManagerController extends BaseController
 							m_compareReservationsReport = (ReservationsReport) entity;
 						else if (entity instanceof ComplaintsReport)
 							m_compareComplaintsReport = (ComplaintsReport) entity;
-						else {
-							m_compareSurveyReport = (SurveysReport) entity;
-							if (initializeFlag) {
-								initializeChartPane();
-								initializeFlag = false;
-							}
-						}
+						else m_compareSurveyReport = (SurveysReport) entity;
 					}
 				}
 			} else {
 				m_shopManagerUserID = ((ShopManager) entity).getId();
+				getAllCostumers();
+				getShopCostumers();
 				initializeSelection();
 			}
 		} // End of if (messageData instanceof EntityData)
 		else if (messageData instanceof EntitiesListData) {
 			List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 			Integer shopManagerId;
-			stores.clear();
-			for (IEntity entity : entities) {
-				if (!(entity instanceof ShopManager)) {
-					m_Logger.warning("Received entity not of the type requested.");
-					return;
+			if (entities.isEmpty()) return;
+			if ((m_shopManagerUserID == null) && (anchorPane_mainStage.isVisible())) {
+				stores.clear();
+				for (IEntity entity : entities) {
+					if (!(entity instanceof ShopManager)) {
+						m_Logger.warning("Received entity not of the type requested.");
+						return;
+					}
+					shopManagerId = ((ShopManager) entity).getId();
+					stores.add(shopManagerId.toString());
 				}
-				shopManagerId = ((ShopManager) entity).getId();
-				stores.add(shopManagerId.toString());
+				initializeSelection();
+				// comboBox_selectionStore.setValue(stores.get(0));
+			} else {
+				if (entities.get(0) instanceof Costumer) {
+					Costumer costumer;
+					for (IEntity entity : entities) {
+						if (!(entity instanceof Costumer)) {
+							m_Logger.warning("Received entity not of the type requested.");
+							return;
+						}
+						costumer = (Costumer) entity;
+						m_costumersID.add(costumer.getId());
+					}
+				} else {
+					ShopCostumer shopCostumer;
+					ShopCostumerRow shopCostumerRow;
+					for (IEntity entity : entities) {
+						if (!(entity instanceof ShopCostumer)) {
+							m_Logger.warning("Received entity not of the type requested.");
+							return;
+						}
+						shopCostumer = (ShopCostumer) entity;
+						if (shopCostumer.getCreditCard() == null
+								|| shopCostumer.getCostumerSubscription() == EntitiesEnums.CostumerSubscription.None) {
+							if ((shopCostumer.getCreditCard() == null) && (shopCostumer
+									.getCostumerSubscription() == EntitiesEnums.CostumerSubscription.None)) {
+								shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
+										shopCostumer.getCostumerSubscription().toString(),
+										shopCostumer.getCumulativePrice());
+							} else if (shopCostumer.getCreditCard() == null) {
+								shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
+										shopCostumer.getCostumerSubscription().toString(),
+										shopCostumer.getSubscriptionStartDate(), shopCostumer.getCumulativePrice());
+							} else {
+								shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
+										shopCostumer.getCostumerSubscription().toString(), shopCostumer.getCreditCard(),
+										shopCostumer.getCumulativePrice());
+							}
+						} else {
+							shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
+									shopCostumer.getCostumerSubscription().toString(),
+									shopCostumer.getSubscriptionStartDate(), shopCostumer.getCreditCard(),
+									shopCostumer.getCumulativePrice());
+							shopCostumers.add(shopCostumerRow);
+						}
+						drewContantToSubscirptionManagementTable();
+						initializeSubscriptionTable();
+					}
+				}
+
 			}
-			initializeSelection();
-			// comboBox_selectionStore.setValue(stores.get(0));
 		} // End of else if(messageData instanceof EntitiesListData)
 		else if (messageData instanceof RespondMessageData) {
 			RespondMessageData respondMessageData = (RespondMessageData) messageData;
 			boolean succeed = respondMessageData.isSucceed();
+			EntityData msgData = (EntityData) respondMessageData.getMessageData();
+			IEntity entity = msgData.getEntity();
 			if (!succeed) {
-				EntityData msgData = (EntityData) respondMessageData.getMessageData();
-				IEntity entity = msgData.getEntity();
 				if (entity instanceof IncomesReport || entity instanceof ReservationsReport
 						|| entity instanceof ComplaintsReport || entity instanceof SurveysReport) {
 					Report report = (Report) entity;
@@ -932,7 +1148,18 @@ public class ShopManagerController extends BaseController
 							errorMSG("There is no reports for the current store ID!");
 						}
 					}
-
+				}
+			} else {
+				if (anchorpane_subscriptionManagement.isVisible()) {
+					if (entity instanceof ShopCostumer) {
+						if (msgData.getOperation() == EntityDataOperation.Update) {
+							showInformationMessage("Successful update.");
+							drewContantToSubscirptionManagementTable();
+						} else if (msgData.getOperation() == EntityDataOperation.Add) {
+							showInformationMessage("Successful add.");
+							addShopCostumerToLocalTable((ShopCostumer) entity);
+						}
+					}
 				}
 			}
 		} // End of else if (messageData instanceof EntitiesListData)

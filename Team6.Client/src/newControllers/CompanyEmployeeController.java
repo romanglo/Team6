@@ -170,15 +170,16 @@ public class CompanyEmployeeController extends BaseController
 						pickType = pickType.substring(11, pickType.indexOf(',') - 1);
 
 						// Classification by selected node.
-						if (pickType.equals(rowData.getName())) pickType = "name";
-						else if (pickType.equals(rowData.getPrice())) pickType = "price";
-						else if (pickType.equals(rowData.getType())) pickType = "type";
-						else if (pickType.equals(rowData.getId())) pickType = "id";
-						else pickType = "image";
+						if (pickType.equals(rowData.getName())) pickType = "Name";
+						else if (pickType.equals(rowData.getPrice())) pickType = "Price";
+						else if (pickType.equals(rowData.getType())) pickType = "Type";
+						else if (pickType.equals(rowData.getId())) pickType = "ID";
+						else pickType = "Image";
 					} else {
-						pickType = selectedNode.getId().substring(12);
+						String selectedId = selectedNode.getId();
+						pickType = selectedId.substring(23, selectedId.length());
 					}
-					if (!(pickType.equals("id") || pickType.equals("image"))) {
+					if (!(pickType.equals("ID") || pickType.equals("Image"))) {
 						TextInputDialog dialog = new TextInputDialog();
 						dialog.setTitle("Update Item Value");
 						dialog.setHeaderText("Do you want to update the item " + pickType + "  ?\n" + "ID: "
@@ -194,10 +195,10 @@ public class CompanyEmployeeController extends BaseController
 
 						switch (pickType) {
 
-							case "name":
+							case "Name":
 								rowData.setM_name(resultString);
 							break;
-							case "type":
+							case "Type":
 								if (!(resultString.equals(EntitiesEnums.ProductType.Flower.toString())
 										|| resultString.equals(EntitiesEnums.ProductType.FlowerPot.toString())
 										|| resultString.equals(EntitiesEnums.ProductType.BridalBouquet.toString())
@@ -210,7 +211,7 @@ public class CompanyEmployeeController extends BaseController
 									rowData.setM_type(resultString);
 								}
 							break;
-							case "price":
+							case "Price":
 								Float price = Float.parseFloat(resultString);
 								if (price <= 0) {
 									errorMSG("The price you entered lower then 0");
@@ -223,7 +224,7 @@ public class CompanyEmployeeController extends BaseController
 						}
 						addEditedItemToArray(rowData);
 						catalogChanged();
-					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("image")) {
+					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("Image")) {
 
 						FileChooser fileChooser = new FileChooser();
 						fileChooser.setTitle("Open Resource File");
