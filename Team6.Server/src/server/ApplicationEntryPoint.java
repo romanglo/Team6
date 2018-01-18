@@ -35,8 +35,8 @@ public class ApplicationEntryPoint extends Application {
 
 	/**
 	 * 
-	 * The main method of the application, the method ensure only one running instance of
-	 * the application, using file lock pattern.
+	 * The main method of the application, the method ensure only one running
+	 * instance of the application, using file lock pattern.
 	 *
 	 * @param args
 	 *            Application arguments.
@@ -99,6 +99,8 @@ public class ApplicationEntryPoint extends Application {
 
 	private ServerConfiguration m_serverConfiguration;
 
+	private ServerScheduledExecutor m_serverScheduledExecutor;
+
 	/**
 	 * Application Database Controller.
 	 */
@@ -127,6 +129,7 @@ public class ApplicationEntryPoint extends Application {
 			primaryStage.setMinWidth(450);
 			primaryStage.setMinHeight(500);
 			primaryStage.setTitle("Zer-Li Server");
+			m_serverScheduledExecutor.Start();
 			primaryStage.show();
 		} catch (Exception ex) {
 			m_logger.log(Level.SEVERE, "UI start failed!", ex);
@@ -157,8 +160,10 @@ public class ApplicationEntryPoint extends Application {
 	public void stop() throws Exception {
 
 		try {
+			disposeScheduledExecutor();
 			disposeDbController();
 			disposeServer();
+			disposeConfiguration();
 		} catch (Exception ex) {
 			m_logger.log(Level.SEVERE, "Disposing failed!", ex);
 		}
@@ -168,6 +173,17 @@ public class ApplicationEntryPoint extends Application {
 		super.stop();
 	}
 
+	private void disposeConfiguration() {
+		if (m_serverConfiguration.updateResourceFile()) {
+			m_logger.info("Configuration resource file updated successfully! Saved configuration: "
+					+ m_serverConfiguration.toString());
+		} else {
+			m_logger.info(
+					"Failed on try to updated configuration resource file, for more information look up in the log. Configuration: "
+							+ m_serverConfiguration.toString());
+		}
+	}
+
 	private void initializeConfiguration() {
 		m_serverConfiguration = ServerConfiguration.getInstance();
 		if (m_serverConfiguration.isDefaultConfiguration()) {
@@ -175,7 +191,7 @@ public class ApplicationEntryPoint extends Application {
 					+ "\". Created default configuration");
 
 		}
-		m_logger.config("Server configuration loaded:" + m_serverConfiguration.toString());
+		m_logger.info("Server configuration loaded:" + m_serverConfiguration.toString());
 	}
 
 	// end region -> Application Method Overrides
@@ -203,6 +219,7 @@ public class ApplicationEntryPoint extends Application {
 
 	private void initializeDbController() {
 		DbContoller = new DbController(m_logger, m_serverConfiguration.getDbConfiguration());
+		m_serverScheduledExecutor = new ServerScheduledExecutor(DbContoller);
 		m_logger.info("Database instance created successfully.");
 	}
 
@@ -226,6 +243,12 @@ public class ApplicationEntryPoint extends Application {
 		DbContoller = null;
 	}
 
+	private void disposeScheduledExecutor() {
+		if (m_serverScheduledExecutor != null && m_serverScheduledExecutor.isRunning()) {
+			m_serverScheduledExecutor.Stop();
+		}
+		m_logger.info("ServerScheduledExecturo disposed successfully.");
+	}
 	// end region - > Private Dispose Methods
 
 }

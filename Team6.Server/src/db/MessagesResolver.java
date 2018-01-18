@@ -91,10 +91,12 @@ public class MessagesResolver implements Server.MessagesHandler {
 		try {
 			queryResult = m_dbController.executeSelectQuery(selectQuery);
 			if (queryResult == null) {
+				m_logger.warning("Failed on try to execute select query : " + selectQuery);
 				return null;
 			}
 			List<IEntity> entities = EntitiesResolver.ResultSetToEntity(queryResult, expectedType);
 			if (entities == null) {
+				m_logger.warning("Failed on try to reslove ResultSet to " + expectedType.getName());
 				return null;
 			}
 			return entities.isEmpty() ? null : new EntitiesListData(EntityDataOperation.None, entities);
@@ -199,7 +201,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 		}
 
 		ResultSet queryResult = null;
-		String getShopCatalogQuery = QueryGenerator.getShopCatalog(shopManagerId);
+		String getShopCatalogQuery = QueryGenerator.getShopCatalogQuery(shopManagerId);
 
 		try {
 			CallableStatement callableStatement = m_dbController.getCallableStatement(getShopCatalogQuery);
@@ -329,7 +331,8 @@ public class MessagesResolver implements Server.MessagesHandler {
 		if (receivedEntity instanceof Item) {
 			returnedMessageData = onItemEntityReceived((Item) receivedEntity, entityData.getOperation());
 		} else if (receivedEntity instanceof SurveyResult) {
-			returnedMessageData = onSurveyResultEntityReceived((SurveyResult) receivedEntity, entityData.getOperation());
+			returnedMessageData = onSurveyResultEntityReceived((SurveyResult) receivedEntity,
+					entityData.getOperation());
 		} else if (receivedEntity instanceof ShopCostumer) {
 			returnedMessageData = onShopCostumerEntityReceived((ShopCostumer) receivedEntity,
 					entityData.getOperation());
@@ -854,7 +857,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 				result = executeQuery(shopEmployee, updateQuery);
 			}
 			break;
-		
+
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopEmployee.toString()
 					+ ", Operation: " + operation.toString());
@@ -884,7 +887,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
 			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectShopManagersQuery();
+			String selectAllQuery = QueryGenerator.selectAllShopManagersQuery();
 			if (selectAllQuery == null) {
 				break;
 			}
@@ -938,12 +941,6 @@ public class MessagesResolver implements Server.MessagesHandler {
 				return executeSelectAllQuery;
 			}
 			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertReservationsReportQuery(reservationsReport);
-			if (insertQuery != null) {
-				result = executeQuery(reservationsReport, insertQuery);
-			}
-			break;
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + reservationsReport.toString()
 					+ ", Operation: " + operation.toString());
@@ -980,12 +977,6 @@ public class MessagesResolver implements Server.MessagesHandler {
 			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, IncomesReport.class);
 			if (executeSelectAllQuery != null) {
 				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertIncomesReportQuery(incomesReport);
-			if (insertQuery != null) {
-				result = executeQuery(incomesReport, insertQuery);
 			}
 			break;
 		default:
@@ -1026,12 +1017,6 @@ public class MessagesResolver implements Server.MessagesHandler {
 				return executeSelectAllQuery;
 			}
 			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertSurveysReportQuery(surveysReport);
-			if (insertQuery != null) {
-				result = executeQuery(surveysReport, insertQuery);
-			}
-			break;
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + surveysReport.toString()
 					+ ", Operation: " + operation.toString());
@@ -1069,12 +1054,6 @@ public class MessagesResolver implements Server.MessagesHandler {
 			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ComplaintsReport.class);
 			if (executeSelectAllQuery != null) {
 				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertComplaintsReportQuery(complaintsReport);
-			if (insertQuery != null) {
-				result = executeQuery(complaintsReport, insertQuery);
 			}
 			break;
 		default:
@@ -1145,7 +1124,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	// end region -> ShopCostumer Entity Operations
 
-	// region ShopSurvey Entity Operations
+	// region SurveyResult Entity Operations
 
 	private IMessageData onSurveyResultEntityReceived(SurveyResult shopSurvey, EntityDataOperation operation) {
 		boolean result = false;
@@ -1186,13 +1165,13 @@ public class MessagesResolver implements Server.MessagesHandler {
 				result = executeQuery(shopSurvey, updateQuery);
 			}
 			break;
-			
+
 		default:
 			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopSurvey.toString()
 					+ ", Operation: " + operation.toString());
 			break;
 		}
-		
+
 		RespondMessageData respondMessageData = new RespondMessageData();
 		respondMessageData.setSucceed(result);
 		return respondMessageData;

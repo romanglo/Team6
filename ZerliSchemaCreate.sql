@@ -149,9 +149,9 @@ CREATE TABLE complaints_reports (
  smId INT NOT NULL,
  crYear YEAR, 
  crQuarter INT NOT NULL DEFAULT 0,
- crMonth1 INT NOT NULL DEFAULT 0,
- crMonth2 INT NOT NULL DEFAULT 0,
- crMonth3 INT NOT NULL DEFAULT 0,
+ crMonth1 INT NULL DEFAULT 0,
+ crMonth2 INT NULL DEFAULT 0,
+ crMonth3 INT NULL DEFAULT 0,
  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
  PRIMARY KEY(smId,crYear,crQuarter)
 );
@@ -159,13 +159,13 @@ CREATE TABLE complaints_reports (
 CREATE TABLE surveys_reports (
  smId INT NOT NULL,
  srYear YEAR, 
- srQuarter FLOAT NOT NULL DEFAULT 0,
- srAnswer1 FLOAT NOT NULL DEFAULT 0,
- srAnswer2 FLOAT NOT NULL DEFAULT 0,
- srAnswer3 FLOAT NOT NULL DEFAULT 0,
- srAnswer4 FLOAT NOT NULL DEFAULT 0,
- srAnswer5 FLOAT NOT NULL DEFAULT 0,
- srAnswer6 FLOAT NOT NULL DEFAULT 0,
+ srQuarter INT NOT NULL DEFAULT 0,
+ srAnswer1 FLOAT NULL DEFAULT 0,
+ srAnswer2 FLOAT NULL DEFAULT 0,
+ srAnswer3 FLOAT NULL DEFAULT 0,
+ srAnswer4 FLOAT NULL DEFAULT 0,
+ srAnswer5 FLOAT NULL DEFAULT 0,
+ srAnswer6 FLOAT NULL DEFAULT 0,
  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
  PRIMARY KEY(smId,srYear,srQuarter)
 );
@@ -174,9 +174,9 @@ CREATE TABLE incomes_reports (
  smId INT NOT NULL,
  irYear YEAR, 
  irQuarter INT NOT NULL DEFAULT 0,
- irMonth1 FLOAT NOT NULL DEFAULT 0,
- irMonth2 FLOAT NOT NULL DEFAULT 0,
- irMonth3 FLOAT NOT NULL DEFAULT 0,
+ irMonth1 FLOAT NULL DEFAULT 0,
+ irMonth2 FLOAT NULL DEFAULT 0,
+ irMonth3 FLOAT NULL DEFAULT 0,
  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
  PRIMARY KEY(smId,irYear,irQuarter)
 );
@@ -185,18 +185,18 @@ CREATE TABLE reservations_reports (
  smId INT NOT NULL,
  rrYear YEAR , 
  rrQuarter INT NOT NULL DEFAULT 0,
- rrMonth1_Flower INT NOT NULL DEFAULT 0,
- rrMonth1_FlowerPot INT NOT NULL DEFAULT 0,
- rrMonth1_FlowerArrangement INT NOT NULL DEFAULT 0,
- rrMonth1_BridalBouquet INT NOT NULL DEFAULT 0,
- rrMonth2_Flower INT NOT NULL DEFAULT 0,
- rrMonth2_FlowerPot INT NOT NULL DEFAULT 0,
- rrMonth2_FlowerArrangement INT NOT NULL DEFAULT 0,
- rrMonth2_BridalBouquet INT NOT NULL DEFAULT 0,
- rrMonth3_Flower INT NOT NULL DEFAULT 0,
- rrMonth3_FlowerPot INT NOT NULL DEFAULT 0,
- rrMonth3_FlowerArrangement INT NOT NULL DEFAULT 0,
- rrMonth3_BridalBouquet INT NOT NULL DEFAULT 0, 
+ rrMonth1_Flower INT NULL DEFAULT 0,
+ rrMonth1_FlowerPot INT NULL DEFAULT 0,
+ rrMonth1_FlowerArrangement INT NULL DEFAULT 0,
+ rrMonth1_BridalBouquet INT NULL DEFAULT 0,
+ rrMonth2_Flower INT NULL DEFAULT 0,
+ rrMonth2_FlowerPot INT NULL DEFAULT 0,
+ rrMonth2_FlowerArrangement INT NULL DEFAULT 0,
+ rrMonth2_BridalBouquet INT NULL DEFAULT 0,
+ rrMonth3_Flower INT NULL DEFAULT 0,
+ rrMonth3_FlowerPot INT NULL DEFAULT 0,
+ rrMonth3_FlowerArrangement INT NULL DEFAULT 0,
+ rrMonth3_BridalBouquet INT NULL DEFAULT 0, 
  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
  PRIMARY KEY(smId,rrYear,rrQuarter)
 ); 
@@ -231,234 +231,152 @@ BEGIN
     ORDER BY iID;
 END; //
 
---- CREATE PROCEDURE getShopSurveyAverage( shop_manager_id INT , in_year YEAR , quarter INT)
---- BEGIN  
---- 	
---- 	DECLARE start_month INT;
---- 	DECLARE end_month INT;
----    
---- 	IF (quarter = 1) THEN 
---- 		SET start_month = 1;
---- 		SET end_month = 3;
---- 	ELSEIF (quarter = 2) THEN
---- 	    SET start_month = 4;
---- 		SET end_month = 6;
---- 	ELSEIF (quarter = 3) THEN
---- 	    SET start_month = 7;
---- 		SET end_month = 9;
---- 	ELSE
---- 	    SET start_month = 10;
---- 		SET end_month = 12;
---- 	END IF;
---- 
---- 	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
---- 			ssAnswer1 / ssNumberOfAnswers AS 'First Question Average',
---- 			ssAnswer2 / ssNumberOfAnswers AS 'Second Question Average', 
---- 			ssAnswer3 / ssNumberOfAnswers AS 'Third Question Average',
---- 			ssAnswer4 / ssNumberOfAnswers AS 'Fourth Question Average',
---- 			ssAnswer5 / ssNumberOfAnswers AS 'Fifth Question Average', 
---- 			ssAnswer6 / ssNumberOfAnswers AS 'Sixth Question Average'
---- 	FROM surveys_in_shops WHERE 
---- 	            smId = shop_manager_id AND YEAR(ssStartDate) = in_year AND
---- 	            MONTH(ssStartDate) >= start_month AND MONTH(ssStartDate) <= end_month;
---- END; //
+CREATE PROCEDURE checkCostumersSubsription()
+BEGIN
 
-CREATE PROCEDURE getShopNumberOfComplaints( shop_manager_id INT , in_year YEAR , quarter INT)
-BEGIN  
-	
-	DECLARE first_month INT;
-	DECLARE second_month INT;
-	DECLARE third_month INT;
-   
-	IF (quarter = 1) THEN 
-		SET first_month = 1;
-		SET second_month = 2;
-		SET third_month = 3;
-	ELSEIF (quarter = 2) THEN
-	    SET first_month = 4;
-	    SET second_month = 5;
-		SET third_month = 6;
-	ELSEIF (quarter = 3) THEN
-	    SET first_month = 7;
-	    SET second_month = 8;
-		SET third_month = 9;
-	ELSE
-	    SET first_month = 10;
-	    SET second_month = 11;
-		SET third_month = 12;
-	END IF;
-
-	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
-		   (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id 
-			AND YEAR(rDeliveryDate) = in_year AND MONTH(cDate) = first_month) AS 'First Month',
-           (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id
-			AND YEAR(rDeliveryDate) = in_year AND MONTH(cDate) = second_month) AS 'Second Month',
-           (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id
-			AND YEAR(rDeliveryDate) = in_year AND MONTH(cDate) = third_month) AS 'Third Month'
-           FROM complaints;
-		    		   
+	UPDATE costumers_in_shops SET 
+		csCostumerSubscription='None', csCreditCard= NULL,
+		csStartSubscriptionDate=NULL, csCumulativePrice =0 
+		WHERE csCostumerSubscription = 'Monthly' AND DATE_ADD(csStartSubscriptionDate, INTERVAL 1 MONTH) > NOW();
+		
+	UPDATE costumers_in_shops SET 
+		csCostumerSubscription='None', csCreditCard= NULL,
+		csStartSubscriptionDate=NULL, csCumulativePrice =0 
+		WHERE csCostumerSubscription = 'Yearly' AND DATE_ADD(csStartSubscriptionDate, INTERVAL 1 YEAR) > NOW();
+		
 END; //
 
-CREATE PROCEDURE getShopIncomes( shop_manager_id INT , in_year YEAR , quarter INT)
+CREATE PROCEDURE generateSurveysReport( shop_manager_id INT , in_year YEAR , quarter INT)
 BEGIN  
 	
-	DECLARE first_month INT;
-	DECLARE second_month INT;
-	DECLARE third_month INT;
-   
-	IF (quarter = 1) THEN 
-		SET first_month = 1;
-		SET second_month = 2;
-		SET third_month = 3;
-	ELSEIF (quarter = 2) THEN
-	    SET first_month = 4;
-	    SET second_month = 5;
-		SET third_month = 6;
-	ELSEIF (quarter = 3) THEN
-	    SET first_month = 7;
-	    SET second_month = 8;
-		SET third_month = 9;
-	ELSE
-	    SET first_month = 10;
-	    SET second_month = 11;
-		SET third_month = 12;
-	END IF;
-
-	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter',
-		   (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
-           rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = first_month) AS 'First Month',
-           (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
-           rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = second_month) AS 'Second Month',
-           (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
-           rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = third_month) AS 'Third Month'
-           FROM reservations;
-		    		   
-END; //
-
-CREATE PROCEDURE getShopReservations( shop_manager_id INT , in_year YEAR , quarter INT)
-BEGIN  
-	
-	DECLARE start_month INT;
 	DECLARE end_month INT;
-   
-	IF (quarter = 1) THEN 
-		SET start_month = 1;
-		SET end_month = 3;
-	ELSEIF (quarter = 2) THEN
-	    SET start_month = 4;
-		SET end_month = 6;
-	ELSEIF (quarter = 3) THEN
-	    SET start_month = 7;
-		SET end_month = 9;
-	ELSE
-	    SET start_month = 10;
-		SET end_month = 12;
-	END IF;
+    
+	SET end_month = quarter * 3;
 
+	INSERT INTO surveys_reports (smId, srYear,srQuarter,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6)   
+		SELECT  shop_manager_id, in_year, quarter,
+				sum(srAnswer1) / count(srAnswer1),
+				sum(srAnswer2) / count(srAnswer2), 
+				sum(srAnswer3) / count(srAnswer3),
+				sum(srAnswer4) / count(srAnswer4),
+				sum(srAnswer5) / count(srAnswer5), 
+				sum(srAnswer6) / count(srAnswer6) 
+		FROM 	(survey_results JOIN surveys ON survey_results.suId = surveys.suId) 
+        WHERE 	smId = shop_manager_id AND YEAR(srEnterDate) = in_year AND
+				MONTH(srEnterDate) >= (end_month - 2) AND MONTH(srEnterDate) <= end_month;
+						
+END; //
+
+CREATE PROCEDURE generateComplaintsReport( shop_manager_id INT , in_year YEAR , quarter INT)
+BEGIN  
 	
-	SELECT shop_manager_id AS 'Shop ID', in_year AS 'Year', quarter AS 'Quarter', 
-		(
-			SELECT SUM(ItemsInShopReservation.irQuantity) 
-            FROM(
-				SELECT JoinedTables.irQuantity, JoinedTables.iType 
-                FROM(
-						SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
-                        FROM reservations 
-						INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
-						INNER JOIN items ON items_in_reservations.iId = items.iId
-					) AS JoinedTables 
-				WHERE 
+	DECLARE end_month INT;
+    
+	SET end_month = quarter * 3;
+
+	INSERT INTO complaints_reports (smId, crYear,crQuarter,crMonth1,crMonth2,crMonth3)   
+		SELECT shop_manager_id, in_year, quarter,
+			   (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id 
+					AND YEAR(coDate) = in_year AND MONTH(coDate) = (end_month - 2)),
+			   (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id
+					AND YEAR(coDate) = in_year AND MONTH(coDate) = (end_month - 1)),
+			   (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id
+					AND YEAR(coDate) = in_year AND MONTH(coDate) = end_month)
+		FROM complaints;
+		    		   
+END; //
+
+CREATE PROCEDURE generateIncomesReport( shop_manager_id INT , in_year YEAR , quarter INT)
+BEGIN  
+	
+	DECLARE end_month INT;
+    
+	SET end_month = quarter * 3;
+
+	INSERT INTO incomes_reports (smId, irYear,irQuarter,irMonth1,irMonth2,irMonth3)
+		SELECT shop_manager_id, in_year, quarter,
+			   (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
+			   rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = (end_month - 2)),
+			   (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
+			   rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = (end_month - 1)),
+			   (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
+			   rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = end_month)
+	    FROM reservations;
+		    		   
+END; //
+
+CREATE PROCEDURE generateReservationsReport( shop_manager_id INT , in_year YEAR , quarter INT)
+BEGIN  
+	
+    DECLARE end_month INT;
+   
+	SET end_month = quarter * 3;
+
+	DROP TABLE IF EXISTS ItemsInShopReservation;
+	CREATE TABLE ItemsInShopReservation(irQuantity INT, iType VARCHAR(20), in_month INT);
+	INSERT INTO ItemsInShopReservation(irQuantity,iType,in_month)
+			SELECT JoinedTables.irQuantity, JoinedTables.iType ,MONTH(JoinedTables.rDeliveryDate) 
+			FROM(
+					SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
+					FROM reservations 
+					INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
+					INNER JOIN items ON items_in_reservations.iId = items.iId
+				) AS JoinedTables 
+			WHERE 
 					JoinedTables.smId = shop_manager_id AND YEAR(JoinedTables.rDeliveryDate) = in_year AND
                     JoinedTables.rType = 'Closed' AND
-					MONTH(JoinedTables.rDeliveryDate) >= start_month AND MONTH(JoinedTables.rDeliveryDate) <= end_month
-				) AS ItemsInShopReservation
-			WHERE ItemsInShopReservation.iType = 'Flower'
-		) AS 'Flowers',
-        (
-			SELECT SUM(ItemsInShopReservation.irQuantity) 
-            FROM(
-				SELECT JoinedTables.irQuantity, JoinedTables.iType 
-                FROM(
-						SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
-                        FROM reservations 
-						INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
-						INNER JOIN items ON items_in_reservations.iId = items.iId
-					) AS JoinedTables 
-				WHERE 
-					JoinedTables.smId = shop_manager_id AND YEAR(JoinedTables.rDeliveryDate) = in_year AND
-                    JoinedTables.rType = 'Closed' AND
-					MONTH(JoinedTables.rDeliveryDate) >= start_month AND MONTH(JoinedTables.rDeliveryDate) <= end_month
-				) AS ItemsInShopReservation
-			WHERE ItemsInShopReservation.iType = 'FlowerPot'
-		) AS 'FlowerPots',
-        (
-			SELECT SUM(ItemsInShopReservation.irQuantity) 
-            FROM(
-				SELECT JoinedTables.irQuantity, JoinedTables.iType 
-                FROM(
-						SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
-                        FROM reservations 
-						INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
-						INNER JOIN items ON items_in_reservations.iId = items.iId
-					) AS JoinedTables 
-				WHERE 
-					JoinedTables.smId = shop_manager_id AND YEAR(JoinedTables.rDeliveryDate) = in_year AND
-                    JoinedTables.rType = 'Closed' AND
-					MONTH(JoinedTables.rDeliveryDate) >= start_month AND MONTH(JoinedTables.rDeliveryDate) <= end_month
-				) AS ItemsInShopReservation
-			WHERE ItemsInShopReservation.iType = 'BridalBouquet'
-		) AS 'BridalBouquets',
-        (
-			SELECT SUM(ItemsInShopReservation.irQuantity) 
-            FROM(
-				SELECT JoinedTables.irQuantity, JoinedTables.iType 
-                FROM(
-						SELECT reservations.smId, reservations.rDeliveryDate, reservations.rType ,items_in_reservations.irQuantity, items.iType 
-                        FROM reservations 
-						INNER JOIN items_in_reservations ON reservations.rId = items_in_reservations.rId
-						INNER JOIN items ON items_in_reservations.iId = items.iId
-					) AS JoinedTables 
-				WHERE 
-					JoinedTables.smId = shop_manager_id AND YEAR(JoinedTables.rDeliveryDate) = in_year AND
-                    JoinedTables.rType = 'Closed' AND
-					MONTH(JoinedTables.rDeliveryDate) >= start_month AND MONTH(JoinedTables.rDeliveryDate) <= end_month
-				) AS ItemsInShopReservation
-			WHERE ItemsInShopReservation.iType = 'FlowerArrangement'
-		) AS 'FlowerArrangements'
-    	FROM items_in_reservations GROUP BY shop_manager_id;
-        
+					MONTH(JoinedTables.rDeliveryDate) >= (end_month - 2) AND MONTH(JoinedTables.rDeliveryDate) <= end_month;
+
+	INSERT INTO reservations_reports (smId,rrYear,rrQuarter,
+									  rrMonth1_Flower,rrMonth1_FlowerPot,rrMonth1_FlowerArrangement,rrMonth1_BridalBouquet,
+									  rrMonth2_Flower,rrMonth2_FlowerPot,rrMonth2_FlowerArrangement,rrMonth2_BridalBouquet,
+								      rrMonth3_Flower,rrMonth3_FlowerPot,rrMonth3_FlowerArrangement,rrMonth3_BridalBouquet)
+		SELECT shop_manager_id, in_year, quarter, 
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation 
+				WHERE ItemsInShopReservation.iType = 'Flower' AND ItemsInShopReservation.in_month = (end_month -2)),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'FlowerPot' AND ItemsInShopReservation.in_month = (end_month -2)),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'BridalBouquet' AND ItemsInShopReservation.in_month = (end_month -2)),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'FlowerArrangement' AND ItemsInShopReservation.in_month = (end_month -2)),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation 
+				WHERE ItemsInShopReservation.iType = 'Flower' AND ItemsInShopReservation.in_month = (end_month -1)),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'FlowerPot' AND ItemsInShopReservation.in_month = (end_month -1)),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'BridalBouquet' AND ItemsInShopReservation.in_month = (end_month -1)),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'FlowerArrangement' AND ItemsInShopReservation.in_month = (end_month -1)),
+               (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation 
+				WHERE ItemsInShopReservation.iType = 'Flower' AND ItemsInShopReservation.in_month = end_month),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'FlowerPot' AND ItemsInShopReservation.in_month = end_month),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'BridalBouquet' AND ItemsInShopReservation.in_month = end_month),
+			   (SELECT SUM(ItemsInShopReservation.irQuantity) 
+				FROM ItemsInShopReservation
+				WHERE ItemsInShopReservation.iType = 'FlowerArrangement' AND ItemsInShopReservation.in_month = end_month)
+		FROM items_in_reservations GROUP BY shop_manager_id;
+			
+	DROP TABLE ItemsInShopReservation;
+    
 END; //
 
 --
 -- Create triggers:
 --
-
---- CREATE TRIGGER insert_item_trigger
---- BEFORE INSERT ON items FOR EACH ROW
---- BEGIN
---- 	IF (NEW.iImage = NULL) THEN
---- 	
---- 		SET NEW.iImage = '\״\\0C\0		\n\r\Z\Z $.\' \",#(7),01444\'9=82<.342\\0C			\r\r2!!22222222222222222222222222222222222222222222222222ְ\0\0P\0P\"\0\"\0\ִ\0\0\0\0\0\0\0\0\0\0\0	\n\ִ\0µ\0\0\0}\0!1AQa\"q2‘¡#B±ֱR\ׁנ$3br‚	\n\Z%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰’“”•–—˜™¢£₪¥¦§¨©×²³´µ¶·¸¹÷\ֲ\ֳ\ִ\ֵ\ֶ\ַ\ָ\ֹ\ֺ\ׂ\׃\װ\ױ\ײ\׳\״\\\ב\ג\ד\ה\ו\ז\ח\ט\י\ךסעףפץצקרשת\ִ\0\0\0\0\0\0\0\0	\n\ִ\0µ\0\0w\0!1AQaq\"2B‘¡±ֱ	#3Rנbr\ׁ\n$4\ב%ס\Z&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰’“”•–—˜™¢£₪¥¦§¨©×²³´µ¶·¸¹÷\ֲ\ֳ\ִ\ֵ\ֶ\ַ\ָ\ֹ\ֺ\ׂ\׃\װ\ױ\ײ\׳\״\\\ג\ד\ה\ו\ז\ח\ט\י\ךעףפץצקרשת\\0\0\0\0?\0קת(×—w~Oָ˜.G‎ף@\0ET\׃\\\ַ\<€u×2j27¡=ת¦I$’rORj\ִRL¡‰\n‡¿ZQEF\׳3±ֹ•\0\זu9¿\גsW†›\חr}°(:lX;]ֱקֱ (¨c\װd^Cפ5z˜\ח‡‘\װµ5„±ע¿:u×°$Aֱ (­ת*¥¥ע>\0}U÷QEEs7‘	~§ ץI$’rORj\ז£&\י•>Qתע)–ש“\מ?u9{P0¢*axJ\ן\2*k;¯!¶?ת²*׃–%2:פ>†±e‰ב£ת\׀EV\ם\זU§¦hתE¥¼r\ֽeq5”“\\ָNI‘»²ƒ\־\ׂA¿\ֲyf₪}2%נצ£§\ך\Z—\"‘§E»]80\הf)(”\r×\אy ®\ַQ^U/-×]s\ַסץ\ךkd–+Xco:eEY%·{\ֻ`t\ֹ\ח-\0QE`A׀¶›ֿ„?C׀z־¿‡ֻp¯\ֿ\ד§I¶fCCץ\ה\׀0¢*¦\u!?\\ַ\ו\ֵ]\׃Ty.\\ֻc‏uJ\יv]H3sשףU<?\ג¨iק\ֿoe1’ף¡¾Sq\—=7lg\״פ4\0QE/ץ+½ֱקקצy71y{hlfE‚\טMs\ִ”³kvW2\ֶgk\י-´‡`‹ף‰De¨]ס·L‘»“:\כ½F\ַPM6\׀Z¥: ףUd”עUC™ `”\0rֲ¡׃®פֻ­r\ג\-2(ex.|<\יvS‚*“G=pp(¢\גץ/\ֻe¥h»ן¡‚\ך\ג\׀\\\ֻ$ˆ[q\״6©US€\ּzס€­k¡·ס÷\הGe~צ¶\יd/]¡E–\זpw-T†\0©_›†$9¥\ׁuK\ri,₪±\׃\־K«7”m\n>Hd„8³ַ \ג©ר‚m\"\ֲ\y¦AvKH\י—`0^W½\'I´(¢’\rzRkk;\ֽF\גH’\ג;¶µµ†	\ZX\ּ#,“\ה.€z€p:\ם7\ֿ‏ֿ‹\ם?jףy\צ¯/\ּ\ךzש_\'ON\״\ֿ9®KZװ´(l#:—v³+ָcAjF¹V“\0\הl\בGa[Z±§\Ceo§Yky£¸tDR*°2₪|‚₪ƒ@‚(­IG’Cc‏UJױ¶]FGק±שסT¼_\ג\ׁ~\ַ\\ײV¸\\א½\ֲB\0M£«	ש\ַ\ױ&‹;\\ֵkq$>CIף„ףA †Sƒ‘ƒַ­\n(¢¥ס%„—¶Rֱ\0gk„עּ¡w;ס‘\ֹ{u¬‎+D·׃µ{+‹K‹ˆRhZ\'•¥V€ֲ\ה\ל\ֳ*®:`u7‰\בd=zƒ\טk‚¬Tph\0¢)t\ֿֵ₪\\\\ZL¾d\ֺR\װ<¶\ױ3”pJ\ןv8\ָ\א(ם‚\ֱv:|:h°¸÷†k	\דw™\הV\ם \״Nׁ¼\ֹP0N}«b\־נ8\ָ~n€ץvQ\\]¯‚56\ֻM‹Lס\f³†XZo±+שעo¬\״ ~U+xR\ט\ֺo5]V[ש\ׂ?-^\0צ¥F\ג\ּHGֱ\'\ו\0pƒ\כ]}\0QE\חֻ jV¢\׳3[Zש\ׁ\ִ\f‘²‡{\ם\\0>€t\ַ7\ם\'y½´\F¿%¥\״i\\גi-R_1¥([ֲ \ּ`€\ֿvצ\װ\ִ\ֶD»=‡נ\ױx\ו’,\לb¹8 aEV£₪ksµ¡$\0LµYck°§\ןֺm\־6{\ײן‡­na·Qyuצ¹\ד4\Xq$\ד\ו)€` d“[Vנˆ!Tz“\ךh\0¢*Z«wh&׃‰‏=V¨ AEV)S†\״ױˆo¥ˆ8ui\ֻsy\לGQTd\׃\\d\ֶב‡¡\א\׀0¢*Eװ£#חצ\ז†װ£ה‰ק\ג×5ֲ˜\ֿ\אsB\\0ָˆ‏<PES¦½–PW…S\״w×ך¥OaWc\׃\\\א\ָ\ב}‡&¯Ep‘y\מOS@QP\ZFק\זC\0ױ×( AEW\';
---- 
---- 	END IF;
---- 	
---- END; //
- 
- 
---- CREATE TRIGGER before_update_item_trigger
---- BEFORE UPDATE ON items FOR EACH ROW
---- BEGIN
---- 	IF (NEW.iDeleted = 1) THEN
---- 	
---- 		SET NEW.iImage = NULL;
---- 	
---- 	ELSEIF (NEW.iImage = NULL) THEN 
---- 	
---- 		SET NEW.iImage = '\״\\0C\0		\n\r\Z\Z $.\' \",#(7),01444\'9=82<.342\\0C			\r\r2!!22222222222222222222222222222222222222222222222222ְ\0\0P\0P\"\0\"\0\ִ\0\0\0\0\0\0\0\0\0\0\0	\n\ִ\0µ\0\0\0}\0!1AQa\"q2‘¡#B±ֱR\ׁנ$3br‚	\n\Z%&\'()*456789:CDEFGHIJSTUVWXYZcdefghijstuvwxyzƒ„…†‡ˆ‰’“”•–—˜™¢£₪¥¦§¨©×²³´µ¶·¸¹÷\ֲ\ֳ\ִ\ֵ\ֶ\ַ\ָ\ֹ\ֺ\ׂ\׃\װ\ױ\ײ\׳\״\\\ב\ג\ד\ה\ו\ז\ח\ט\י\ךסעףפץצקרשת\ִ\0\0\0\0\0\0\0\0	\n\ִ\0µ\0\0w\0!1AQaq\"2B‘¡±ֱ	#3Rנbr\ׁ\n$4\ב%ס\Z&\'()*56789:CDEFGHIJSTUVWXYZcdefghijstuvwxyz‚ƒ„…†‡ˆ‰’“”•–—˜™¢£₪¥¦§¨©×²³´µ¶·¸¹÷\ֲ\ֳ\ִ\ֵ\ֶ\ַ\ָ\ֹ\ֺ\ׂ\׃\װ\ױ\ײ\׳\״\\\ג\ד\ה\ו\ז\ח\ט\י\ךעףפץצקרשת\\0\0\0\0?\0קת(×—w~Oָ˜.G‎ף@\0ET\׃\\\ַ\<€u×2j27¡=ת¦I$’rORj\ִRL¡‰\n‡¿ZQEF\׳3±ֹ•\0\זu9¿\גsW†›\חr}°(:lX;]ֱקֱ (¨c\װd^Cפ5z˜\ח‡‘\װµ5„±ע¿:u×°$Aֱ (­ת*¥¥ע>\0}U÷QEEs7‘	~§ ץI$’rORj\ז£&\י•>Qתע)–ש“\מ?u9{P0¢*axJ\ן\2*k;¯!¶?ת²*׃–%2:פ>†±e‰ב£ת\׀EV\ם\זU§¦hתE¥¼r\ֽeq5”“\\ָNI‘»²ƒ\־\ׂA¿\ֲyf₪}2%נצ£§\ך\Z—\"‘§E»]80\הf)(”\r×\אy ®\ַQ^U/-×]s\ַסץ\ךkd–+Xco:eEY%·{\ֻ`t\ֹ\ח-\0QE`A׀¶›ֿ„?C׀z־¿‡ֻp¯\ֿ\ד§I¶fCCץ\ה\׀0¢*¦\u!?\\ַ\ו\ֵ]\׃Ty.\\ֻc‏uJ\יv]H3sשףU<?\ג¨iק\ֿoe1’ף¡¾Sq\—=7lg\״פ4\0QE/ץ+½ֱקקצy71y{hlfE‚\טMs\ִ”³kvW2\ֶgk\י-´‡`‹ף‰De¨]ס·L‘»“:\כ½F\ַPM6\׀Z¥: ףUd”עUC™ `”\0rֲ¡׃®פֻ­r\ג\-2(ex.|<\יvS‚*“G=pp(¢\גץ/\ֻe¥h»ן¡‚\ך\ג\׀\\\ֻ$ˆ[q\״6©US€\ּzס€­k¡·ס÷\הGe~צ¶\יd/]¡E–\זpw-T†\0©_›†$9¥\ׁuK\ri,₪±\׃\־K«7”m\n>Hd„8³ַ \ג©ר‚m\"\ֲ\y¦AvKH\י—`0^W½\'I´(¢’\rzRkk;\ֽF\גH’\ג;¶µµ†	\ZX\ּ#,“\ה.€z€p:\ם7\ֿ‏ֿ‹\ם?jףy\צ¯/\ּ\ךzש_\'ON\״\ֿ9®KZװ´(l#:—v³+ָcAjF¹V“\0\הl\בGa[Z±§\Ceo§Yky£¸tDR*°2₪|‚₪ƒ@‚(­IG’Cc‏UJױ¶]FGק±שסT¼_\ג\ׁ~\ַ\\ײV¸\\א½\ֲB\0M£«	ש\ַ\ױ&‹;\\ֵkq$>CIף„ףA †Sƒ‘ƒַ­\n(¢¥ס%„—¶Rֱ\0gk„עּ¡w;ס‘\ֹ{u¬‎+D·׃µ{+‹K‹ˆRhZ\'•¥V€ֲ\ה\ל\ֳ*®:`u7‰\בd=zƒ\טk‚¬Tph\0¢)t\ֿֵ₪\\\\ZL¾d\ֺR\װ<¶\ױ3”pJ\ןv8\ָ\א(ם‚\ֱv:|:h°¸÷†k	\דw™\הV\ם \״Nׁ¼\ֹP0N}«b\־נ8\ָ~n€ץvQ\\]¯‚56\ֻM‹Lס\f³†XZo±+שעo¬\״ ~U+xR\ט\ֺo5]V[ש\ׂ?-^\0צ¥F\ג\ּHGֱ\'\ו\0pƒ\כ]}\0QE\חֻ jV¢\׳3[Zש\ׁ\ִ\f‘²‡{\ם\\0>€t\ַ7\ם\'y½´\F¿%¥\״i\\גi-R_1¥([ֲ \ּ`€\ֿvצ\װ\ִ\ֶD»=‡נ\ױx\ו’,\לb¹8 aEV£₪ksµ¡$\0LµYck°§\ןֺm\־6{\ײן‡­na·Qyuצ¹\ד4\Xq$\ד\ו)€` d“[Vנˆ!Tz“\ךh\0¢*Z«wh&׃‰‏=V¨ AEV)S†\״ױˆo¥ˆ8ui\ֻsy\לGQTd\׃\\d\ֶב‡¡\א\׀0¢*Eװ£#חצ\ז†װ£ה‰ק\ג×5ֲ˜\ֿ\אsB\\0ָˆ‏<PES¦½–PW…S\״w×ך¥OaWc\׃\\\א\ָ\ב}‡&¯Ep‘y\מOS@QP\ZFק\זC\0ױ×( AEW\';
---- 	
---- 	END IF;
---- 	
---- END; //
 
 CREATE TRIGGER after_update_item_trigger
 AFTER UPDATE ON items FOR EACH ROW
@@ -646,12 +564,105 @@ BEGIN
     END IF;
 END; //
 
+CREATE TRIGGER insert_complaints_reports_trigger
+BEFORE INSERT ON complaints_reports FOR EACH ROW
+BEGIN
+    IF (NEW.crMonth1 IS NULL) THEN 
+        SET NEW.crMonth1  = 0 ;
+    END IF;
+	IF (NEW.crMonth2 IS NULL) THEN 
+        SET NEW.crMonth2  = 0 ;
+    END IF;
+	IF (NEW.crMonth3 IS NULL) THEN 
+        SET NEW.crMonth3  = 0 ;
+    END IF;
+END; //
+
+CREATE TRIGGER insert_surveys_reports_trigger
+BEFORE INSERT ON surveys_reports FOR EACH ROW
+BEGIN
+    IF (NEW.srAnswer1 IS NULL) THEN 
+        SET NEW.srAnswer1  = 0 ;
+    END IF;
+	IF (NEW.srAnswer2 IS NULL) THEN 
+        SET NEW.srAnswer2  = 0 ;
+    END IF;
+	IF (NEW.srAnswer3 IS NULL) THEN 
+        SET NEW.srAnswer3  = 0 ;
+    END IF;
+	IF (NEW.srAnswer4 IS NULL) THEN 
+        SET NEW.srAnswer4  = 0 ;
+    END IF;
+	IF (NEW.srAnswer5 IS NULL) THEN 
+        SET NEW.srAnswer5  = 0 ;
+    END IF;
+    IF (NEW.srAnswer6 IS NULL) THEN 
+        SET NEW.srAnswer6  = 0 ;
+    END IF;
+END; //
+
+CREATE TRIGGER insert_incomes_reports_trigger
+BEFORE INSERT ON incomes_reports FOR EACH ROW
+BEGIN
+    IF (NEW.irMonth1 IS NULL) THEN 
+        SET NEW.irMonth1  = 0 ;
+    END IF;
+	IF (NEW.irMonth2 IS NULL) THEN 
+        SET NEW.irMonth2  = 0 ;
+    END IF;
+	IF (NEW.irMonth3 IS NULL) THEN 
+        SET NEW.irMonth3  = 0 ;
+    END IF;
+END; //
+
+CREATE TRIGGER insert_reservations_reports_trigger
+BEFORE INSERT ON reservations_reports FOR EACH ROW
+BEGIN
+    IF (NEW.rrMonth1_Flower IS NULL) THEN 
+        SET NEW.rrMonth1_Flower  = 0 ;
+    END IF;
+	IF (NEW.rrMonth1_FlowerPot IS NULL) THEN 
+        SET NEW.rrMonth1_FlowerPot  = 0 ;
+    END IF;
+	IF (NEW.rrMonth1_FlowerArrangement IS NULL) THEN 
+        SET NEW.rrMonth1_FlowerArrangement  = 0 ;
+    END IF;
+    IF (NEW.rrMonth1_BridalBouquet IS NULL) THEN 
+        SET NEW.rrMonth1_BridalBouquet  = 0 ;
+    END IF;
+    
+     IF (NEW.rrMonth2_Flower IS NULL) THEN 
+        SET NEW.rrMonth2_Flower  = 0 ;
+    END IF;
+	IF (NEW.rrMonth2_FlowerPot IS NULL) THEN 
+        SET NEW.rrMonth2_FlowerPot  = 0 ;
+    END IF;
+	IF (NEW.rrMonth2_FlowerArrangement IS NULL) THEN 
+        SET NEW.rrMonth2_FlowerArrangement  = 0 ;
+    END IF;
+    IF (NEW.rrMonth2_BridalBouquet IS NULL) THEN 
+        SET NEW.rrMonth2_BridalBouquet  = 0 ;
+    END IF;
+    
+     IF (NEW.rrMonth3_Flower IS NULL) THEN 
+        SET NEW.rrMonth3_Flower  = 0 ;
+    END IF;
+	IF (NEW.rrMonth3_FlowerPot IS NULL) THEN 
+        SET NEW.rrMonth3_FlowerPot  = 0 ;
+    END IF;
+	IF (NEW.rrMonth3_FlowerArrangement IS NULL) THEN 
+        SET NEW.rrMonth3_FlowerArrangement  = 0 ;
+    END IF;
+    IF (NEW.rrMonth3_BridalBouquet IS NULL) THEN 
+        SET NEW.rrMonth3_BridalBouquet  = 0 ;
+    END IF;
+END; //
+
 DELIMITER ;
 
 --
 -- Insert data to tables:
 --
-
 
 LOCK TABLES shop_managers WRITE;
 
@@ -742,54 +753,21 @@ INSERT INTO complaints (cId,smId ,coComplaint ) VALUES
 LOCK TABLES complaints_reports WRITE;
 INSERT INTO complaints_reports (smId ,crYear, crQuarter, crMonth1, crMonth2, crMonth3) VALUES 
 (1,'2017',1,0,0,1),
-(1,'2018',1,1,2,3),
-(1,'2018',2,4,5,6),
-(1,'2018',3,7,8,9),
-(1,'2018',4,10,11,12),
-(2,'2017',1,1,1,0),
-(2,'2018',1,12,11,10),
-(2,'2018',2,9,8,7),
-(2,'2018',3,6,5,3),
-(2,'2018',4,3,2,1);
+(2,'2017',1,1,1,0);
 
 LOCK TABLES surveys_reports WRITE;
 INSERT INTO surveys_reports (smId ,srYear, srQuarter, srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES 
 (1,'2017',1,0,0,1,1,1,1),
-(1,'2018',1,1,2,3,1,1,1),
-(1,'2018',2,4,5,6,1,1,1),
-(1,'2018',3,7,8,9,1,1,1),
-(1,'2018',4,10,11,12,1,1,1),
-(2,'2017',1,1,1,0,1,1,1),
-(2,'2018',1,12,11,10,1,1,1),
-(2,'2018',2,9,8,7,1,1,1),
-(2,'2018',3,6,5,3,1,1,1),
-(2,'2018',4,3,2,1,1,1,1);
+(2,'2017',1,1,1,0,1,1,1);
 
 LOCK TABLES incomes_reports WRITE;
 INSERT INTO incomes_reports (smId ,irYear, irQuarter, irMonth1, irMonth2, irMonth3) VALUES 
 (1,'2017',1,0,0,1),
-(1,'2018',1,5246,2,3),
-(1,'2018',2,4,1341,6),
-(1,'2018',3,100,8,9),
-(1,'2018',4,10,11,12),
-(2,'2017',2,1,4124,0),
-(2,'2018',1,1768,11,10),
-(2,'2018',2,9,6363,7),
-(2,'2018',3,6,5,857875),
-(2,'2018',4,3,2,1);
+(2,'2017',2,1,4124,0);
 
 LOCK TABLES reservations_reports WRITE;
 INSERT INTO reservations_reports (smId ,rrYear, rrQuarter,rrMonth1_Flower, rrMonth1_FlowerPot, rrMonth1_FlowerArrangement,rrMonth1_BridalBouquet,rrMonth2_Flower,rrMonth2_FlowerPot,rrMonth2_FlowerArrangement,rrMonth2_BridalBouquet, rrMonth3_Flower, rrMonth3_FlowerPot ,rrMonth3_FlowerArrangement,rrMonth3_BridalBouquet) VALUES 
 (1,'2017',1,0,0,1,1,0,0,1,1,0,0,1,1),
-(1,'2018',1,1,2,3,1,1,1,0,0,1,1,0,0),
-(1,'2018',2,4,5,6,1,1,1,0,0,1,1,0,0),
-(1,'2018',3,7,8,9,1,1,1,0,0,1,1,0,0),
-(1,'2018',4,1,1,2,1,1,1,0,0,1,1,0,0),
-(2,'2017',1,1,1,0,1,1,1,0,0,1,1,0,0),
-(2,'2018',1,1,1,0,1,1,1,0,0,1,1,0,9),
-(2,'2018',2,9,8,7,1,1,1,0,0,1,1,0,0),
-(2,'2018',3,6,5,3,1,1,1,0,0,1,1,0,0),
-(2,'2018',4,3,2,1,1,1,1,0,0,1,1,0,0);
+(2,'2017',1,1,1,0,1,1,1,0,0,1,1,0,0);
 
-UNLOCK TABLES;         
-
+UNLOCK TABLES;

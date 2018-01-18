@@ -64,20 +64,20 @@ public class QueryGenerator {
 		return "CALL checkCostumersSubsription();";
 	}
 
-	public static String getShopIncomesQuery(int shopManagerId, String year, int querter) {
-		return "CALL getShopIncomes(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	public static String generateIncomesReportQuery(int shopManagerId, String year, int querter) {
+		return "CALL generateIncomesReport(" + shopManagerId + ",'" + year + "'," + querter + ")";
 	}
 
-	public static String getShopReservationsQuery(int shopManagerId, String year, int querter) {
-		return "CALL getShopReservations(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	public static String generateReservationsReportQuery(int shopManagerId, String year, int querter) {
+		return "CALL generateReservationsReport(" + shopManagerId + ",'" + year + "'," + querter + ")";
 	}
 
-	public static String getShopNumberOfComplaintsQuery(int shopManagerId, String year, int querter) {
-		return "CALL getShopNumberOfComplaints(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	public static String generateComplaintsReportQuery(int shopManagerId, String year, int querter) {
+		return "CALL generateComplaintsReport(" + shopManagerId + ",'" + year + "'," + querter + ")";
 	}
 
-	public static String getShopSurveyAverageQuery(int shopManagerId, String year, int querter) {
-		return "CALL getShopSurveyAverage(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	public static String generateSurveysReportQuery(int shopManagerId, String year, int querter) {
+		return "CALL generateSurveysReport(" + shopManagerId + ",'" + year + "'," + querter + ")";
 	}
 
 	// region Items Entity
@@ -781,55 +781,6 @@ public class QueryGenerator {
 				+ s_yearFormat.format(year) + "' ;";
 	}
 
-	public static String insertReservationsReportQuery(ReservationsReport reservationsReport) {
-		int shopManagerId = reservationsReport.getShopManagerId();
-		Date year = reservationsReport.getYear();
-		int quarter = reservationsReport.getQuarter();
-
-		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning(
-					"Received request to get reservations report entity with impossiable ID's: Shop Manager ID = "
-							+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(
-				"INSERT INTO reservations_reports (smId,rrYear,rrQuarter,rrMonth1_Flower,rrMonth1_FlowerPot,rrMonth1_FlowerArrangement,rrMonth1_BridalBouquet,rrMonth2_Flower,rrMonth2_FlowerPot,rrMonth2_FlowerArrangement,rrMonth2_BridalBouquet,rrMonth3_Flower,rrMonth3_FlowerPot,rrMonth3_FlowerArrangement,rrMonth3_BridalBouquet) VALUES (");
-		stringBuilder.append(shopManagerId);
-		stringBuilder.append(",'");
-		stringBuilder.append(s_yearFormat.format(year));
-		stringBuilder.append("',");
-		stringBuilder.append(quarter);
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowersInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerPotsInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerArrangementsInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedBridalBouquetsInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowersInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerPotsInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerArrangementsInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedBridalBouquetsInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowersInThirdMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerPotsInThirdMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerArrangementsInThirdMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedBridalBouquetsInThirdMonth());
-		stringBuilder.append(");");
-		return stringBuilder.toString();
-
-	}
-
 	// end region -> ReservationsReport Entity
 
 	// region IncomesReport Entity
@@ -872,34 +823,6 @@ public class QueryGenerator {
 		}
 		return "SELECT * FROM incomes_reports WHERE smId = " + shopManagerId + " AND irYear ='"
 				+ s_yearFormat.format(year) + "' ;";
-	}
-
-	public static String insertIncomesReportQuery(IncomesReport incomesReport) {
-		int shopManagerId = incomesReport.getShopManagerId();
-		Date year = incomesReport.getYear();
-		int quarter = incomesReport.getQuarter();
-
-		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get incomes report entity with impossiable ID's: Shop Manager ID = "
-					+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO incomes_reports (smId,irYear,irQuarter,irMonth1,irMonth2,irMonth3) VALUES (");
-		stringBuilder.append(shopManagerId);
-		stringBuilder.append(",'");
-		stringBuilder.append(s_yearFormat.format(year));
-		stringBuilder.append("',");
-		stringBuilder.append(quarter);
-		stringBuilder.append(',');
-		stringBuilder.append(incomesReport.getIncomesInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(incomesReport.getIncomesInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(incomesReport.getIncomesInThirdMonth());
-		stringBuilder.append(");");
-		return stringBuilder.toString();
 	}
 
 	// end region -> IncomesReport Entity
@@ -946,41 +869,6 @@ public class QueryGenerator {
 				+ s_yearFormat.format(year) + "' ;";
 	}
 
-	public static String insertSurveysReportQuery(SurveysReport surveysReport) {
-		int shopManagerId = surveysReport.getShopManagerId();
-		Date year = surveysReport.getYear();
-		int quarter = surveysReport.getQuarter();
-
-		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get incomes report entity with impossiable ID's: Shop Manager ID = "
-					+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(
-				"INSERT INTO surveys_reports (smId,srYear,srQuarter,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES (");
-		stringBuilder.append(shopManagerId);
-		stringBuilder.append(",'");
-		stringBuilder.append(s_yearFormat.format(year));
-		stringBuilder.append("',");
-		stringBuilder.append(quarter);
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getFirstAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getSecondAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getThirdAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getFourthAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getFifthAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getSixthAnswerAverage());
-		stringBuilder.append(");");
-		return stringBuilder.toString();
-	}
-
 	// end region -> SurveysReport Entity
 
 	// region ComplaintsReport Entity
@@ -1025,36 +913,6 @@ public class QueryGenerator {
 		}
 		return "SELECT * FROM complaints_reports WHERE smId = " + shopManagerId + " AND crYear ='"
 				+ s_yearFormat.format(year) + "' ;";
-	}
-
-	public static String insertComplaintsReportQuery(ComplaintsReport complaintsReport) {
-		int shopManagerId = complaintsReport.getShopManagerId();
-		Date year = complaintsReport.getYear();
-		int quarter = complaintsReport.getQuarter();
-
-		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning(
-					"Received request to get complaints report entity with impossiable ID's: Shop Manager ID = "
-							+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder
-				.append("INSERT INTO complaints_reports (smId,crYear,crQuarter,crMonth1,crMonth2,crMonth3) VALUES (");
-		stringBuilder.append(shopManagerId);
-		stringBuilder.append(",'");
-		stringBuilder.append(s_yearFormat.format(year));
-		stringBuilder.append("',");
-		stringBuilder.append(quarter);
-		stringBuilder.append(',');
-		stringBuilder.append(complaintsReport.getNumberOfComplaintsFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(complaintsReport.getNumberOfComplaintsSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(complaintsReport.getNumberOfComplaintsThirdMonth());
-		stringBuilder.append(");");
-		return stringBuilder.toString();
 	}
 
 	// end region -> ComplaintsReport Entity
