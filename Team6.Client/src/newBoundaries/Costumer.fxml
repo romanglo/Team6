@@ -90,8 +90,10 @@
 							<children>
 								<Label layoutX="100.0" layoutY="0.0" text="Shop" />
 								<ComboBox fx:id="combo_shop" layoutX="150.0" layoutY="-5.0"
-									minHeight="35.0" minWidth="150.0" onAction="#shopComboClick"
-									prefHeight="35.0" />
+									minHeight="35.0" minWidth="150.0" prefHeight="35.0" />
+								<Button layoutX="320.0" layoutY="-5.0" minHeight="35.0"
+									minWidth="100.0" mnemonicParsing="false" onAction="#shopComboClick"
+									text="Get Catalog" />
 								<TableView fx:id="catalog_table" editable="true"
 									layoutX="0.0" layoutY="35.0" minWidth="500" prefHeight="220.0"
 									prefWidth="500.0" AnchorPane.bottomAnchor="50.39999999999998"
@@ -141,8 +143,8 @@
 									layoutX="156.0" layoutY="166.0" minHeight="25.0" prefHeight="25.0"
 									prefWidth="193.0" />
 								<Button layoutX="249.0" layoutY="200.0" minWidth="100"
-									mnemonicParsing="false" onAction="#addButtonClickCustomizedType"
-									text="Add" />
+									mnemonicParsing="false" onAction="#searchButtonClickCustomizedType"
+									text="Search" />
 								<Button layoutX="20.0" layoutY="270.0" minWidth="200.0"
 									mnemonicParsing="false" onAction="#catalogButtonClickOnCustomizedType"
 									text="Catalog" AnchorPane.bottomAnchor="10.600000000000012"
@@ -150,6 +152,32 @@
 								<Button layoutX="270.0" layoutY="270.0" minWidth="200.0"
 									mnemonicParsing="false" onAction="#paymentButtonClick" text="Payment"
 									AnchorPane.bottomAnchor="10.600000000000012"
+									AnchorPane.rightAnchor="10.0" />
+							</children>
+						</AnchorPane>
+						<AnchorPane fx:id="anchorpane_search" visible="false"
+							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
+							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+							<children>
+								<TableView fx:id="search_table" editable="true"
+									layoutX="-7.0" layoutY="35.0" prefHeight="200.0" prefWidth="500.0"
+									AnchorPane.bottomAnchor="60.0" AnchorPane.leftAnchor="5.0"
+									AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0">
+									<columns>
+										<TableColumn fx:id="tablecolumn_search_id"
+											editable="false" minWidth="50.0" prefWidth="50.0" resizable="false"
+											sortable="false" text="ID" />
+										<TableColumn fx:id="tablecolumn_search_name"
+											editable="false" minWidth="225.0" prefWidth="225.0"
+											resizable="false" sortable="false" text="ID" />
+										<TableColumn fx:id="tablecolumn_search_price"
+											editable="false" minWidth="225.0" prefWidth="225" resizable="false"
+											sortable="false" text="Price" />
+									</columns>
+								</TableView>
+								<Button layoutX="340.0" layoutY="275.0" minWidth="100.0"
+									mnemonicParsing="false" onAction="#costumizedButtonClickOnCatalogType"
+									prefWidth="100.0" text="Back" AnchorPane.bottomAnchor="5.0"
 									AnchorPane.rightAnchor="10.0" />
 							</children>
 						</AnchorPane>

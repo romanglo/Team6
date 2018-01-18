@@ -12,16 +12,14 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import boundaries.CatalogItemRow;
-import controllers.Costumer_CreateReservationPaymentController;
 import controllers.Costumer_SavedData;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -35,14 +33,15 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import newEntities.Costumer;
+import newEntities.EntitiesEnums.CostumerSubscription;
+import newEntities.EntitiesEnums.ProductType;
+import newEntities.EntitiesEnums.ReservationDeliveryType;
+import newEntities.EntitiesEnums.ReservationType;
 import newEntities.IEntity;
 import newEntities.Item;
 import newEntities.ItemInReservation;
@@ -50,10 +49,6 @@ import newEntities.Reservation;
 import newEntities.ShopCatalogData;
 import newEntities.ShopCostumer;
 import newEntities.ShopManager;
-import newEntities.EntitiesEnums.CostumerSubscription;
-import newEntities.EntitiesEnums.ProductType;
-import newEntities.EntitiesEnums.ReservationDeliveryType;
-import newEntities.EntitiesEnums.ReservationType;
 import newMessages.EntitiesListData;
 import newMessages.EntityData;
 import newMessages.IMessageData;
@@ -86,6 +81,8 @@ public class CostumerController extends BaseController
 
 	@FXML private AnchorPane anchorpane_costumized;
 
+	@FXML private AnchorPane anchorpane_search;
+
 	@FXML private AnchorPane anchorpane_payment;
 
 	@FXML private AnchorPane anchorpane_credit_card;
@@ -115,6 +112,14 @@ public class CostumerController extends BaseController
 	@FXML private TextField max_price;
 
 	@FXML private TextField item_amount;
+
+	@FXML private TableView<CatalogItemRow> search_table;
+
+	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_search_id;
+
+	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_search_name;
+
+	@FXML private TableColumn<CatalogItemRow, Float> tablecolumn_search_price;
 
 	@FXML private TableView<CatalogItemRow> payment_table;
 
@@ -198,6 +203,8 @@ public class CostumerController extends BaseController
 
 	private ObservableList<String> minutesList = FXCollections.observableArrayList();
 
+	private ObservableList<CatalogItemRow> searchItemsList = FXCollections.observableArrayList();
+
 	private boolean m_useSubscription;
 
 	private ArrayList<ShopManager> shopManagerList;
@@ -227,6 +234,7 @@ public class CostumerController extends BaseController
 		anchorpane_costumized.setVisible(true);
 		anchorpane_credit_card.setVisible(false);
 		anchorpane_payment.setVisible(false);
+		anchorpane_search.setVisible(false);
 	}
 
 	@FXML
@@ -236,6 +244,7 @@ public class CostumerController extends BaseController
 		anchorpane_costumized.setVisible(false);
 		anchorpane_credit_card.setVisible(false);
 		anchorpane_payment.setVisible(false);
+		anchorpane_search.setVisible(false);
 		initializeCatalog();
 	}
 
@@ -246,6 +255,7 @@ public class CostumerController extends BaseController
 		anchorpane_costumized.setVisible(false);
 		anchorpane_payment.setVisible(true);
 		anchorpane_credit_card.setVisible(false);
+		anchorpane_search.setVisible(false);
 		initializePayment();
 	}
 
@@ -256,6 +266,7 @@ public class CostumerController extends BaseController
 		anchorpane_costumized.setVisible(false);
 		anchorpane_payment.setVisible(false);
 		anchorpane_credit_card.setVisible(true);
+		anchorpane_search.setVisible(false);
 		initializeCreditCard();
 	}
 
@@ -392,7 +403,6 @@ public class CostumerController extends BaseController
 			alert.setHeaderText(null);
 			alert.setContentText("You will lose your reservation, are you sure?");
 			Optional<ButtonType> result = alert.showAndWait();
-			/* TODO : save last value*/
 			if (result.get() == ButtonType.OK) {
 				Costumer_SavedData.setReservationList(new ArrayList<>());
 				m_currComboShop = combo_shop.getValue();
@@ -414,7 +424,7 @@ public class CostumerController extends BaseController
 	}
 
 	@FXML
-	private void addButtonClickCustomizedType(ActionEvent addEvent)
+	private void searchButtonClickCustomizedType(ActionEvent searchEvent)
 	{
 		if (domain_color.getText().equals("") || min_price.getText().equals("") || max_price.getText().equals("")
 				|| item_amount.getText().equals("")) {
@@ -426,7 +436,7 @@ public class CostumerController extends BaseController
 			return;
 		}
 
-		ItemInReservation itemInReservation = null;
+		searchItemsList = FXCollections.observableArrayList();
 		for (Item entity : m_catalogList) {
 			if (entity.getDomainColor().equals(domain_color.getText())
 					&& (entity.getPrice() >= Double.parseDouble(min_price.getText())
@@ -436,30 +446,23 @@ public class CostumerController extends BaseController
 				// 1. Domain color as requested.
 				// 2. Price is in range.
 				// 3. The entity is of the type 'Flower'.
-
-				itemInReservation = new ItemInReservation();
-				itemInReservation.setItemId(entity.getId());
-				itemInReservation.setQuantity(Integer.parseInt(item_amount.getText()));
-				itemInReservation.setPrice((float) (Integer.parseInt(item_amount.getText()) * entity.getPrice()));
-				itemInReservation.setItemName(entity.getName());
-
-				break;
+				CatalogItemRow catalogItemRow = new CatalogItemRow(entity.getId(), entity.getName(),
+						entity.getType().toString(),
+						(float) (Integer.parseInt(item_amount.getText()) * entity.getPrice()), domain_color.getText());
+				searchItemsList.add(catalogItemRow);
 			}
 		}
 
-		if (itemInReservation != null) {
-			Costumer_SavedData.addItemToReservation(itemInReservation);
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Success");
-			alert.setHeaderText(null);
-			alert.setContentText("An item was added to the reservation list.");
-			alert.showAndWait();
-		} else {
+		if (searchItemsList.isEmpty()) {
 			Alert alert = new Alert(AlertType.INFORMATION);
 			alert.setTitle("Attention");
 			alert.setHeaderText(null);
 			alert.setContentText("A match wasn't found, please try again.");
-			alert.show();
+			alert.showAndWait();
+		} else {
+			initializeItemSearchTable();
+			anchorpane_search.setVisible(true);
+			anchorpane_costumized.setVisible(false);
 		}
 	}
 
@@ -580,12 +583,6 @@ public class CostumerController extends BaseController
 			case Catalog:
 				onMessageReceivedCatalogType(msg);
 			break;
-			case Costumized:
-				onMessageReceivedCostumizedType(msg);
-			break;
-			case Payment:
-				onMessageReceivedPaymentType(msg);
-			break;
 			case CreditCard:
 				onMessageReceivedCreditCardType(msg);
 			break;
@@ -702,16 +699,6 @@ public class CostumerController extends BaseController
 			m_Logger.warning("Received message data not of the type requested.");
 			return;
 		}
-	}
-
-	private void onMessageReceivedCostumizedType(Message msg)
-	{
-
-	}
-
-	private void onMessageReceivedPaymentType(Message msg)
-	{
-
 	}
 
 	private void onMessageReceivedCreditCardType(Message msg)
@@ -922,6 +909,34 @@ public class CostumerController extends BaseController
 
 		reservation_table.setItems(reservationTableList);
 		reservation_table.refresh();
+	}
+
+	private void initializeItemSearchTable()
+	{
+		search_table.setRowFactory(param -> {
+			TableRow<CatalogItemRow> tableRow = new TableRow<>();
+			tableRow.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
+					CatalogItemRow rowData = tableRow.getItem();
+
+					ItemInReservation itemInReservation = new ItemInReservation();
+					itemInReservation.setItemId(rowData.getM_id());
+					itemInReservation.setQuantity(Integer.parseInt(item_amount.getText()));
+					itemInReservation.setPrice(rowData.getM_price());
+					itemInReservation.setItemName(rowData.getName());
+
+					Costumer_SavedData.addItemToReservation(itemInReservation);
+				}
+			});
+			return tableRow;
+		});
+
+		tablecolumn_search_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
+		tablecolumn_search_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
+		tablecolumn_search_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
+
+		search_table.setItems(searchItemsList);
+		search_table.refresh();
 	}
 
 	private void initializeCatalog()
