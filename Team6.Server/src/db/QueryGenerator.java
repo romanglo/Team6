@@ -56,8 +56,28 @@ public class QueryGenerator {
 		return "SELECT LAST_INSERT_ID();";
 	}
 
-	public static String getShopCatalog(int shopManagerId) {
+	public static String getShopCatalogQuery(int shopManagerId) {
 		return "CALL getShopCatalog(" + shopManagerId + ");";
+	}
+
+	public static String checkCostumersSubscriptionQuery() {
+		return "CALL checkCostumersSubsription();";
+	}
+
+	public static String getShopIncomesQuery(int shopManagerId, String year, int querter) {
+		return "CALL getShopIncomes(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	}
+
+	public static String getShopReservationsQuery(int shopManagerId, String year, int querter) {
+		return "CALL getShopReservations(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	}
+
+	public static String getShopNumberOfComplaintsQuery(int shopManagerId, String year, int querter) {
+		return "CALL getShopNumberOfComplaints(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	}
+
+	public static String getShopSurveyAverageQuery(int shopManagerId, String year, int querter) {
+		return "CALL getShopSurveyAverage(" + shopManagerId + ",'" + year + "'," + querter + ")";
 	}
 
 	// region Items Entity
@@ -688,7 +708,7 @@ public class QueryGenerator {
 		return returningString;
 	}
 
-	public static String selectShopManagersQuery() {
+	public static String selectAllShopManagersQuery() {
 		return "SELECT * FROM shop_managers ;";
 	}
 
@@ -939,7 +959,7 @@ public class QueryGenerator {
 
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append(
-				"INSERT INTO incomes_reports (smId,srYear,srQuarter,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES (");
+				"INSERT INTO surveys_reports (smId,srYear,srQuarter,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES (");
 		stringBuilder.append(shopManagerId);
 		stringBuilder.append(",'");
 		stringBuilder.append(s_yearFormat.format(year));
@@ -1217,7 +1237,7 @@ public class QueryGenerator {
 		stringBuilder.append(surveyResult.getFifthAnswer());
 		stringBuilder.append(", srAnswer6 = ");
 		stringBuilder.append(surveyResult.getSixthAnswer());
-		stringBuilder.append(" WHERE ssId = ");
+		stringBuilder.append(" WHERE srId = ");
 		stringBuilder.append(id);
 		stringBuilder.append(" ;");
 		return stringBuilder.toString();
