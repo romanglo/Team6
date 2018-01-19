@@ -398,10 +398,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public void onClientDisconnected()
 	{
-		if(m_connectingStage != null && m_connectingStage.isShowing()) {
+		if (m_connectingStage != null && m_connectingStage.isShowing()) {
 			m_connectingStage.close();
 		}
-		m_canceled = true;
 	}
 
 	/* End of --> Implemented methods region */
@@ -507,9 +506,16 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			Stage currentStage = (Stage) btn_login.getScene().getWindow();
 
 			ProgressIndicator progressIndicator = new ProgressIndicator();
-			Label label = new Label("Trying to connect ...");
-		
+			Label label = new Label();
+			label.setStyle(".label " + "{" + " -fx-text-fill: black;" + " -fx-font-weight: bold;"
+					+ " -fx-font-size: 20px;" + "}");
+			label.setText("Trying to connect ...");
 			Button button = new Button();
+			button.setStyle(" .button " + "{" + " -fx-background-color: #bfbfbf;" + "	-fx-background-radius: 22;"
+					+ "	-fx-text-fill: white;" + "	-fx-border-color: teal;" + "	-fx-border-radius: 22;"
+					+ "	-fx-border-width: 3;" + "}" + " .button:hover " + "{" + "     -fx-background-color: white;"
+					+ "     -fx-text-fill: teal; " + "}");
+
 			button.setText("Cancel");
 			button.setOnAction(event -> {
 				m_canceled = true;
@@ -519,7 +525,6 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			VBox root = new VBox(10, label, progressIndicator, button);
 			root.setAlignment(Pos.BASELINE_CENTER);
 			Scene scene = new Scene(root, 300, 150);
-			scene.getStylesheets().add(getClass().getResource("/newBoundaries/login.css").toExternalForm());
 			m_connectingStage = new Stage();
 			m_connectingStage.setScene(scene);
 			m_connectingStage.setResizable(false);
@@ -559,7 +564,6 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 					nextStage.setOnHidden(e -> m_baseController.dispose());
 				}
 				nextStage.setMinWidth(875);
-				;
 				nextStage.setMinHeight(600);
 				nextStage.show();
 			}
