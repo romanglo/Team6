@@ -65,6 +65,14 @@
     -fx-font-size: 16.0px;
 }
 
+.content-section .label
+{
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
+
 .content-section-label .label .text{
     -fx-fill: #ffffff;
     -fx-stroke: #000000;
@@ -82,18 +90,6 @@
 .user-details {
     -fx-background-color: linear-gradient(#ffffff,#cccccc);
 }
-
-.user-details .button {
-	-fx-background-color: #5490ff;
-	-fx-text-fill: white;
-	-fx-padding: 6.0 6.0 6.0 6.0;
-	-fx-border-radius: 8.0;
-}
-
-.user-details .button:hover {
-    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
-}
-
 
 .table-view{
    -fx-background-color: transparent;

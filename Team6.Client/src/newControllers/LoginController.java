@@ -12,9 +12,14 @@ import client.ApplicationEntryPoint;
 import client.Client;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WritableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -41,6 +46,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import logger.LogManager;
 import newEntities.IEntity;
@@ -54,7 +60,7 @@ import newMessages.MessagesFactory;
 /**
  *
  * LoginController: Create first connection with the server and login to the
- * system.
+ * system, the controller related to 'Login.FXML' and 'LoginSettings.FXML' .
  * 
  */
 public class LoginController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
@@ -88,7 +94,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	private Stage m_connectingStage;
 
 	private RotateTransition m_settingsButtonRotate;
-	
+
 	private boolean m_canceled;
 
 	/* End of --> Fields region */
@@ -146,6 +152,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			nextStage.setResizable(false);
 			nextStage.initModality(Modality.WINDOW_MODAL);
 			nextStage.initOwner(currentStage);
+			setSettingsAnimation(currentStage, nextStage);
 			nextStage.showAndWait();
 		}
 		catch (Exception e) {
@@ -153,6 +160,52 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			showInformationMessage("The settings can not be changed at this time..");
 			return;
 		}
+	}
+
+	private void setSettingsAnimation(Stage currentStage, Stage stageToAnimate)
+	{
+
+		double screenRightEdge = currentStage.getX() + currentStage.getWidth();
+		stageToAnimate.setX(screenRightEdge);
+		stageToAnimate.setY(currentStage.getY());
+		stageToAnimate.setWidth(0);
+
+		Timeline timeline = new Timeline();
+
+		WritableValue<Double> writableWidth = new WritableValue<Double>() {
+
+			@Override
+			public Double getValue()
+			{
+				return stageToAnimate.getWidth();
+			}
+
+			@Override
+			public void setValue(Double value)
+			{
+				stageToAnimate.setX(screenRightEdge - value);
+				stageToAnimate.setWidth(value);
+			}
+		};
+
+		KeyValue kv = new KeyValue(writableWidth, 300d);
+		KeyFrame kf = new KeyFrame(Duration.millis(1500), kv);
+		timeline.getKeyFrames().addAll(kf);
+		timeline.play();
+		stageToAnimate.setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+			@Override
+			public void handle(WindowEvent event)
+			{
+				Timeline timeline = new Timeline();
+				KeyFrame endFrame = new KeyFrame(Duration.millis(1500), new KeyValue(writableWidth, 0.0));
+				timeline.getKeyFrames().add(endFrame);
+				timeline.setOnFinished(e -> Platform.runLater(() -> stageToAnimate.hide()));
+				timeline.play();
+				event.consume();
+			}
+		});
+
 	}
 
 	/* End of --> UI events region */
@@ -345,8 +398,10 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public void onClientDisconnected()
 	{
-		// TODO ROMAN : check if try to connect in this moment and back to regular
-		// window.
+		if(m_connectingStage != null && m_connectingStage.isShowing()) {
+			m_connectingStage.close();
+		}
+		m_canceled = true;
 	}
 
 	/* End of --> Implemented methods region */
@@ -453,7 +508,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 			ProgressIndicator progressIndicator = new ProgressIndicator();
 			Label label = new Label("Trying to connect ...");
-
+		
 			Button button = new Button();
 			button.setText("Cancel");
 			button.setOnAction(event -> {
@@ -467,7 +522,6 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			scene.getStylesheets().add(getClass().getResource("/newBoundaries/login.css").toExternalForm());
 			m_connectingStage = new Stage();
 			m_connectingStage.setScene(scene);
-			m_connectingStage.setTitle("Connecting");
 			m_connectingStage.setResizable(false);
 			m_connectingStage.initModality(Modality.WINDOW_MODAL);
 			m_connectingStage.initStyle(StageStyle.TRANSPARENT);
@@ -504,7 +558,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				if (m_baseController != null) {
 					nextStage.setOnHidden(e -> m_baseController.dispose());
 				}
-				nextStage.setMinWidth(875);;
+				nextStage.setMinWidth(875);
+				;
 				nextStage.setMinHeight(600);
 				nextStage.show();
 			}

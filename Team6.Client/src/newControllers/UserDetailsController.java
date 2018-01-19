@@ -6,20 +6,23 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import client.ApplicationEntryPoint;
-import javafx.fxml.Initializable;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import newEntities.User;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
-import javafx.scene.control.Button;
-import javafx.event.ActionEvent;
+import javafx.util.Duration;
+import newEntities.User;
 
 /**
  *
- * UserDetailsController: TODO Roman: Auto-generated type stub - Change with
- * type description
+ * UserDetailsController: Controller that related to UserDetails.fxml
  * 
  */
 public class UserDetailsController implements Initializable
@@ -80,17 +83,15 @@ public class UserDetailsController implements Initializable
 			break;
 			case CostumerService:
 				priv = "Costumer Service Employee";
-
 			break;
 			case ServiceSpecialist:
 				priv = "Costumer Service Specialist";
-
 			break;
 			case ShopEmployee:
 				priv = "Shop Employee";
-
 			break;
 			case ShopManager:
+				priv = "Shop Manager";
 			default:
 				priv = " - ";
 			break;
@@ -102,7 +103,11 @@ public class UserDetailsController implements Initializable
 	private void onClosePressed(ActionEvent event)
 	{
 		Stage currentStage = (Stage) imageview_user.getScene().getWindow();
-		currentStage.close();
+		Timeline timeline = new Timeline();
+		KeyFrame key = new KeyFrame(Duration.seconds(1),
+				new KeyValue(currentStage.getScene().getRoot().opacityProperty(), 0));
+		timeline.getKeyFrames().add(key);
+		timeline.setOnFinished((actionEvent) -> currentStage.close());
+		timeline.play();
 	}
-
 }
