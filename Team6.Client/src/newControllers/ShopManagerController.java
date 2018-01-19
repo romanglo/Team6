@@ -191,6 +191,8 @@ public class ShopManagerController extends BaseController
 
 	private boolean initFlag = true;
 
+	private boolean firstInit = true;
+
 	private ArrayList<Integer> costumers = new ArrayList<>();
 
 	ObservableList<ShopCostumerRow> costumerInShop = FXCollections.observableArrayList();
@@ -294,10 +296,12 @@ public class ShopManagerController extends BaseController
 		secondReportStore = new ComboBox<>(stores);
 		secondReportStore.setValue(comboBox_selectionStore.getValue());
 		secondReportStore.setPrefWidth(93);
+		if(barChart_currentChart.getTitle() != null)
+			barChartAfterChangeInitialize(compareChart, secondReportStore.getValue(), secondReportType.getText(), secondReportYear.getText(), secondReportQuarter.getValue());
 		secondReportStore.setOnAction(comboBox_selectionStore.getOnAction());
 		secondReportQuarter.setOnAction(comboBox_selectionQuarter.getOnAction());
 		secondSubmitButton = new Button("Show Report");
-		secondSubmitButton.setPrefWidth(84);
+		secondSubmitButton.setPrefWidth(100);
 		secondSubmitButton.setPrefHeight(25);
 		secondSubmitButton.setOnAction(button_submit.getOnAction());
 		yearChangeListener = (obs, oldText, newText) -> selectionYearChanged(secondReportYear, (String) oldText);
@@ -473,20 +477,24 @@ public class ShopManagerController extends BaseController
 	{
 		AnchorPane.setRightAnchor(((Node) pane_dataPane), 380.0);
 		AnchorPane.setTopAnchor(((Node) pane_dataPane), 75.0);
-
-		initializeCompareReportVariables();
-
+		
 		CategoryAxis xAxis = new CategoryAxis();
 		NumberAxis yAxis = new NumberAxis();
 		compareChart = new BarChart<String, Number>(xAxis, yAxis);
 		compareChart.setCategoryGap(2.5);
 
+		initializeCompareReportVariables();
+
 		comparePane = new Pane(compareChart);
-		anchorPane_viewStage.getChildren().add(comparePane);
-		AnchorPane.setRightAnchor(((Node) comparePane), 15.0);
-		AnchorPane.setTopAnchor(((Node) comparePane), 75.0);
-		AnchorPane.setLeftAnchor(((Node) comparePane), 380.0);
-		AnchorPane.setBottomAnchor(((Node) comparePane), 35.0);
+		Platform.runLater(() -> {
+			anchorPane_viewStage.getChildren().add(comparePane);
+		});
+		Platform.runLater(() -> {
+			AnchorPane.setRightAnchor(((Node) comparePane), 15.0);
+			AnchorPane.setTopAnchor(((Node) comparePane), 75.0);
+			AnchorPane.setLeftAnchor(((Node) comparePane), 380.0);
+			AnchorPane.setBottomAnchor(((Node) comparePane), 35.0);
+		});
 	}
 
 	/**
@@ -523,7 +531,10 @@ public class ShopManagerController extends BaseController
 	@FXML
 	private void requestedReportDetailsChanged(ActionEvent event)
 	{
-		if (firstTime && event.getSource().equals(comboBox_selectionQuarter)) return;
+		if (firstInit && event.getSource().equals(comboBox_selectionQuarter)) {
+			firstInit = false;
+			return;
+		}
 		int storeID, quarter, yearInt = 2017;
 		Calendar year = Calendar.getInstance();
 		if (event.getSource().equals(comboBox_selectionQuarter) || event.getSource().equals(comboBox_selectionStore)) {
@@ -1136,11 +1147,15 @@ public class ShopManagerController extends BaseController
 									barChart_currentChart.setVisible(false);
 								}
 							} else {
+								String title = barChart_currentChart.getTitle();
 								Platform.runLater(() -> {
 									barChart_currentChart.getData().clear();
 									if (barChart_currentChart.getXAxis().getLabel() != null)
 										barChart_currentChart.getXAxis().setLabel(
 												comboBox_selectionQuarter.getValue() + " " + year.get(Calendar.YEAR));
+									if (title != null)
+										barChart_currentChart.setTitle(title.substring(0, title.length() - 1)
+												+ comboBox_selectionStore.getValue());
 								});
 								if (!firstTime) errorMSG("There is no reports for the current store ID!");
 							}
@@ -1152,12 +1167,15 @@ public class ShopManagerController extends BaseController
 						else if (entity instanceof ComplaintsReport) m_compareComplaintsReport = null;
 						else {
 							m_compareSurveyReport = null;
+							String title = compareChart.getTitle();
 							Platform.runLater(() -> {
 								compareChart.getData().clear();
 								if (compareChart.getXAxis().getLabel() != null) compareChart.getXAxis()
 										.setLabel(secondReportQuarter.getValue() + " " + year.get(Calendar.YEAR));
+								if (title != null) compareChart.setTitle(
+										title.substring(0, title.length() - 1) + secondReportStore.getValue());
 							});
-							errorMSG("There is no reports for the current store ID!");
+							errorMSG("There is no reports for the requested details!");
 						}
 					}
 
