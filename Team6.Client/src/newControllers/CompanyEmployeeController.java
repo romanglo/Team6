@@ -179,7 +179,7 @@ public class CompanyEmployeeController extends BaseController
 						String selected = selectedNode.getId();
 						pickType = selected.substring(23, selected.length());
 					}
-					if (!(pickType.equals("ID") || pickType.equals("Image"))) {
+					if (!(pickType.equals("ID") || pickType.equals("Image") || pickType.equals("Type"))) {
 						TextInputDialog dialog = new TextInputDialog();
 						dialog.setTitle("Update Item Value");
 						dialog.setHeaderText("Do you want to update the item " + pickType + "  ?\n" + "ID: "
@@ -241,6 +241,52 @@ public class CompanyEmployeeController extends BaseController
 						}
 						catalogChanged();
 
+					} else if(event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("Type")) {
+						Dialog<CatalogItemRow> addDialog = new Dialog<>();
+						addDialog.setTitle("Edit Catalog Item Type");
+						
+
+						Label labelSubject = new Label("Do you want to update the item " + pickType + "  ?\n" + "ID: "
+								+ rowData.getM_id() + " , Name: " + rowData.getM_name() + " , Type: "
+								+ rowData.getM_type() + " , Price: " + rowData.getM_price());
+
+						ObservableList<String> typeList = FXCollections.observableArrayList();
+						typeList.add("Flower");
+						typeList.add("FlowerPot");
+						typeList.add("BridalBouquet");
+						typeList.add("FlowerArrangement");
+						ComboBox<String> comboBoxType = new ComboBox<>(typeList);
+						comboBoxType.setValue("Flower");
+						
+						ButtonType buttonTypeOk = new ButtonType("Done", ButtonData.OK_DONE);
+						addDialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+						addDialog.setResultConverter(new Callback<ButtonType, CatalogItemRow>() {
+
+							@Override
+							public CatalogItemRow call(ButtonType b)
+							{
+								if (b == buttonTypeOk) {
+									String newType = comboBoxType.getValue();
+									rowData.setM_type(newType);
+									addEditedItemToArray(rowData);
+									catalogChanged();
+									drawContantToTable();
+								}
+								return null;
+							}
+						});
+						GridPane dialogGrid = new GridPane();
+						dialogGrid.add(labelSubject, 1, 2);
+						dialogGrid.add(new Label("\n"), 1, 4);
+						dialogGrid.add(new Label("Types: "), 1, 6);
+						dialogGrid.add(comboBoxType, 1, 8);
+						addDialog.getDialogPane().setContent(dialogGrid);
+
+						Optional<CatalogItemRow> result = addDialog.showAndWait();
+						if (!(result.isPresent())) return;
+						
+						
+						
 					}
 					drawContantToTable();
 				}

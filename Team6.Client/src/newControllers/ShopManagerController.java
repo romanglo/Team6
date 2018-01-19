@@ -144,6 +144,8 @@ public class ShopManagerController extends BaseController
 	private boolean firstTime = true;
 
 	private boolean listenerFlag = true;
+	
+	private int comparePressed = 0;
 
 	/* End of --> Private fields */
 
@@ -254,7 +256,7 @@ public class ShopManagerController extends BaseController
 			comboBox_selectionStore.setValue(stores.get(0));
 		});
 		else Platform.runLater(() -> {
-			comboBox_selectionStore.setValue(m_shopManagerUserID.toString());
+			comboBox_selectionStore.setValue(m_shopManagerUser.getId() + " - " + m_shopManagerUser.getName());
 		});
 
 		if (m_ConnectedUser.getPrivilege() == EntitiesEnums.UserPrivilege.ShopManager) {
@@ -271,7 +273,9 @@ public class ShopManagerController extends BaseController
 
 	private void initializeStoreReportVariables()
 	{
-		int storeId = Integer.parseInt(comboBox_selectionStore.getValue());
+		String store = comboBox_selectionStore.getValue();
+		store = store.substring(0, store.indexOf("-") - 1);
+		int storeId = Integer.parseInt(store);
 		int quarter = quarters.indexOf(comboBox_selectionQuarter.getValue()) + 1;
 		int yearInt = Integer.parseInt(textField_selectionYear.getText());
 		Calendar year = Calendar.getInstance();
@@ -505,6 +509,7 @@ public class ShopManagerController extends BaseController
 	@FXML
 	private void compareReports(ActionEvent event)
 	{
+		comparePressed = 2;
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
 		primaryStage.setMinWidth(885);
 		primaryStage.setMinHeight(600);
@@ -536,13 +541,18 @@ public class ShopManagerController extends BaseController
 			return;
 		}
 		int storeID, quarter, yearInt = 2017;
+		String store;
 		Calendar year = Calendar.getInstance();
 		if (event.getSource().equals(comboBox_selectionQuarter) || event.getSource().equals(comboBox_selectionStore)) {
-			storeID = Integer.parseInt(comboBox_selectionStore.getValue());
+			store = comboBox_selectionStore.getValue();
+			store = store.substring(0, store.indexOf("-") - 1);
+			storeID = Integer.parseInt(store);
 			yearInt = Integer.parseInt(textField_selectionYear.getText());
 			quarter = quarters.indexOf(comboBox_selectionQuarter.getValue()) + 1;
 		} else {
-			storeID = Integer.parseInt(secondReportStore.getValue());
+			store = secondReportStore.getValue();
+			store = store.substring(0, store.indexOf("-") - 1);
+			storeID = Integer.parseInt(store);
 			yearInt = Integer.parseInt(secondReportYear.getText());
 			quarter = quarters.indexOf(secondReportQuarter.getValue()) + 1;
 		}
@@ -575,11 +585,16 @@ public class ShopManagerController extends BaseController
 			return;
 		}
 		if (sourceValue.length() == 4) {
+			String store;
 			if (source.equals(textField_selectionYear)) {
-				storeID = Integer.parseInt(comboBox_selectionStore.getValue());
+				store = comboBox_selectionStore.getValue();
+				store = store.substring(0, store.indexOf("-") - 1);
+				storeID = Integer.parseInt(store);
 				quarter = quarters.indexOf(comboBox_selectionQuarter.getValue()) + 1;
 			} else {
-				storeID = Integer.parseInt(secondReportStore.getValue());
+				store = comboBox_selectionStore.getValue();
+				store = store.substring(0, store.indexOf("-") - 1);
+				storeID = Integer.parseInt(store);
 				quarter = quarters.indexOf(secondReportQuarter.getValue()) + 1;
 			}
 			getStoreReportsFromServer(storeID, quarter, year.getTime());
@@ -593,12 +608,12 @@ public class ShopManagerController extends BaseController
 		if (event.getSource().equals(button_submit)) {
 			if (m_reservationsReport == null || m_complaintsReport == null || m_incomesReport == null
 					|| m_surveyReport == null) {
-				errorMSG("Report doesn't exist!");
+				errorMSG(comboBox_selectionReportType.getValue() + " does not exist for store: " + comboBox_selectionStore.getValue() + " !");
 				return;
 			}
 		} else if (m_compareIncomesReport == null || m_compareReservationsReport == null
 				|| m_compareComplaintsReport == null || m_compareSurveyReport == null) {
-			errorMSG("Compare report doesn't exist!");
+			errorMSG("Compare " + secondReportType.getText() +" does not exist for store: " + secondReportStore.getValue() + " !");
 			return;
 		}
 
@@ -703,7 +718,7 @@ public class ShopManagerController extends BaseController
 	protected boolean onSelection(String title)
 	{
 		switch (title) {
-			case "Compare Report":
+			case "Compare Reports":
 				anchorPane_mainStage.setVisible(true);
 				anchorpane_shopCostumerManagement.setVisible(false);
 			break;
@@ -725,7 +740,7 @@ public class ShopManagerController extends BaseController
 	@Override
 	protected String[] getSideButtonsNames()
 	{
-		return new String[] { "Compare Report", "Costumers Management" };
+		return new String[] { "Compare Reports", "Costumers Management" };
 	}
 
 	/* region Private Methods */
@@ -925,7 +940,8 @@ public class ShopManagerController extends BaseController
 	{
 		// clear previous chart data and insert new values.
 		barToInit.getData().clear();
-		barToInit.setTitle(reportType + " Summary. Store ID: " + storeId);
+		String store = storeId.substring(storeId.indexOf("-") + 1, storeId.length());
+		barToInit.setTitle(reportType + store + " Summary.");
 		barToInit.getXAxis().setLabel(quarter + " " + year);
 		barToInit.getYAxis().setLabel(reportType);
 	}
@@ -1058,18 +1074,18 @@ public class ShopManagerController extends BaseController
 			List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 			if (!entities.isEmpty()) {
 				if (entities.get(0) instanceof ShopManager) {
-					Integer shopManagerId;
+					String shop;
 					stores.clear();
 					for (IEntity entity : entities) {
 						if (!(entity instanceof ShopManager)) {
 							m_Logger.warning("Received entity not of the type requested.");
 							return;
 						}
-						shopManagerId = ((ShopManager) entity).getId();
-						stores.add(shopManagerId.toString());
+						shop = ((ShopManager) entity).getId() + " - ";
+						shop = shop + ((ShopManager) entity).getName();
+						stores.add(shop);
 					}
 					initializeSelection();
-					// comboBox_selectionStore.setValue(stores.get(0));
 				} else if (entities.get(0) instanceof ShopCostumer) {
 					ShopCostumer shopCostumer;
 					ShopCostumerRow shopCostumerRow;
