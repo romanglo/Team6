@@ -176,8 +176,8 @@ public class CompanyEmployeeController extends BaseController
 						else if (pickType.equals(rowData.getId())) pickType = "ID";
 						else pickType = "Image";
 					} else {
-						String selectedId = selectedNode.getId();
-						pickType = selectedId.substring(23, selectedId.length());
+						String selected = selectedNode.getId();
+						pickType = selected.substring(23, selected.length());
 					}
 					if (!(pickType.equals("ID") || pickType.equals("Image"))) {
 						TextInputDialog dialog = new TextInputDialog();
@@ -204,7 +204,8 @@ public class CompanyEmployeeController extends BaseController
 										|| resultString.equals(EntitiesEnums.ProductType.BridalBouquet.toString())
 										|| resultString
 												.equals(EntitiesEnums.ProductType.FlowerArrangement.toString()))) {
-									errorMSG("The type you entered doesn't exist");
+									errorMSG(
+											"The type you entered doesn't exist!\nValids types:\n Flower\n FlowerPot\n BridalBouquet\n FlowerArrangement");
 									m_Logger.warning("Entered wrorg ProductType");
 									return;
 								} else {
@@ -489,7 +490,7 @@ public class CompanyEmployeeController extends BaseController
 	/* end region -> FXML Methods */
 
 	/**
-	 * -----------------------------------------------------------------------------------------
+	 * ------------------------------------------------------------------------------------------------------------------------------
 	 **/
 	/* region Add Shop Sales Methods */
 
@@ -639,7 +640,7 @@ public class CompanyEmployeeController extends BaseController
 			{
 				if (b == buttonTypeOk) {
 					if (!(checkAddNewSaleFields(textFieldID, textFieldDiscountedPrice))) return null;
-
+					if (!(checkIfNewItemExistInCatalog(textFieldID.getText()))) return null;
 					CatalogItemRow newItem;
 					ItemInShop itemToAdd = new ItemInShop();
 					newItem = new CatalogItemRow(Integer.parseInt(textFieldID.getText()),
@@ -814,6 +815,14 @@ public class CompanyEmployeeController extends BaseController
 		return true;
 	}
 
+	private boolean checkIfNewItemExistInCatalog(String itemID)
+	{
+		for (CatalogItemRow item : catalog)
+			if (item.getId() == itemID) return true;
+		errorMSG("Item ID doesn't exist in catalog!");
+		return false;
+	}
+
 	/**
 	 * Able access to save\reset buttons.
 	 * 
@@ -951,6 +960,7 @@ public class CompanyEmployeeController extends BaseController
 	{
 		tableView_catalog.setItems(catalog);
 		tableView_catalog.refresh();
+
 	}
 
 	/**
@@ -1105,7 +1115,7 @@ public class CompanyEmployeeController extends BaseController
 					if (((EntityData) respondMessageData.getMessageData()).getEntity() instanceof ItemInShop) {
 						if (!succeed) {
 							Platform.runLater(() -> {
-								showInformationMessage("There are no discaonts for this shop");
+								showInformationMessage("There are no discounts for this shop");
 							});
 							shopSales.clear();
 							drawContantToShopSalesTable();
