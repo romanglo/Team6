@@ -620,6 +620,7 @@ public class CostumerController extends BaseController
 			Costumer costumer = (Costumer) entity;
 			costumer.setUser(m_ConnectedUser);
 			Costumer_SavedData.initializeSavedData(costumer);
+			m_ConnectedUser = costumer;
 		} else if (messageData instanceof EntitiesListData) {
 			List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 			shopManagerList = new ArrayList<>();
