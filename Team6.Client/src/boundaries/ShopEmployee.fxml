@@ -34,9 +34,7 @@
             <Button layoutX="76.0" layoutY="335.0" mnemonicParsing="false" onAction="#addSurvey" prefHeight="25.0" prefWidth="97.0" text="Add survey" />
             <Label layoutX="102.0" layoutY="104.0" prefHeight="17.0" prefWidth="97.0" text="Questions" />
             <Label layoutX="257.0" layoutY="104.0" prefHeight="17.0" prefWidth="97.0" text="Answers" />
-            <Label layoutX="14.0" layoutY="77.0" prefHeight="17.0" prefWidth="81.0" text="Survey Id:" />
             <Button layoutX="212.0" layoutY="335.0" mnemonicParsing="false" onAction="#clear" prefHeight="25.0" prefWidth="97.0" text="Clear" />
-            <ComboBox fx:id="combobox_surveyida" layoutX="76.0" layoutY="73.0" onAction="#selectSurvey" prefWidth="150.0" />
          </children></AnchorPane>
 
 		<!--  Title: -->

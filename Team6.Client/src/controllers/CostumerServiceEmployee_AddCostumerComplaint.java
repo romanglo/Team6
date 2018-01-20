@@ -129,7 +129,7 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 	 * 			Save button clicked.
 	 */
 	@FXML
-	public void saveButtonClick(ActionEvent event)
+	public void addComplaint_saveButtonClick(ActionEvent event)
 	{
 		if(IDField.getText().equals("")||textarea_costumercomplaint.getText().equals(""))
 		{
@@ -149,7 +149,7 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 			combobox_shop.getItems().clear();
 			m_shopmanager_array.clear();
 			m_managerid_array.clear();
-			initializeShopCombobox();
+			addcomplaint_initializeShopCombobox();
 			combobox_shop.setDisable(false);
 			textarea_costumercomplaint.clear();
 			IDField.clear();
@@ -187,7 +187,7 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
-		initializeShopCombobox();
+		addcomplaint_initializeShopCombobox();
 	}
 
 	private void initializeFields()
@@ -223,12 +223,7 @@ public class CostumerServiceEmployee_AddCostumerComplaint implements Initializab
 		m_client.setClientStatusHandler(this);
 	}
 	
-	private void initializeShopCombobox()
-	{
-		ShopManager entity= new ShopManager();
-		Message msg=MessagesFactory.createGetAllEntityMessage(entity);
-		m_client.sendMessageToServer(msg);
-	}
+
 
 	/* End of --> Initializing methods region */
 

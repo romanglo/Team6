@@ -98,44 +98,7 @@ public class ServiceSpecialistController
 
 	/* Initializing methods region */
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void initialize(URL url, ResourceBundle rb)
-	{
-		initializeFields();
-		initializeImages();
-		initializeClientHandler();
-		initializesurveys();
-	}
 
-	private void initializeFields()
-	{
-		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
-		m_client = ApplicationEntryPoint.Client;
-	}
-
-	private void initializeImages()
-	{
-		InputStream serverGif = getClass().getResourceAsStream("/boundaries/images/Flower.gif");
-		if (serverGif != null) {
-			Image image = new Image(serverGif);
-			imageview_gif.setImage(image);
-		}
-		InputStream title = getClass().getResourceAsStream("/boundaries/images/Zerli_Headline.jpg");
-		if (title != null) {
-			Image image = new Image(title);
-			imageview_title.setImage(image);
-		}
-	}
-
-	private void initializeClientHandler()
-	{
-		m_client.setMessagesHandler(this);
-		m_client.setClientStatusHandler(this);
-	}
 
 	private void initializesurveys()
 	{
@@ -148,32 +111,7 @@ public class ServiceSpecialistController
 	/* End of --> Initializing methods region */
 
 	/* UI events region */
-	/**
-	 * Adds questions and answers in the right place when choosing a survey.
-	 *
-	 * @param event
-	 *            Combo box clicked.
-	 */
-	@FXML
-	public void selectSurvey(ActionEvent event)
-	{
-		if ((combobox_id.getValue() == null) || (combobox_id.getValue().equals(""))) return;
-		int id = Integer.parseInt(combobox_id.getValue());
-		for (int i = 0; i < m_survey_array.size(); i++) {
-			if (id == ((SurveyResult) m_survey_array.get(i)).getId())
-				selected_survey = (SurveyResult) m_survey_array.get(i);
-		}
-		textfield_answer1.setText(Integer.toString(selected_survey.getAnswer1()));
-		textfield_answer2.setText(Integer.toString(selected_survey.getAnswer2()));
-		textfield_answer3.setText(Integer.toString(selected_survey.getAnswer3()));
-		textfield_answer4.setText(Integer.toString(selected_survey.getAnswer4()));
-		textfield_answer5.setText(Integer.toString(selected_survey.getAnswer5()));
-		textfield_answer6.setText(Integer.toString(selected_survey.getAnswer6()));
-		Survey survey_entity = new Survey();
-		survey_entity.setId(selected_survey.getSurveyId());
-		Message msg = MessagesFactory.createGetEntityMessage(survey_entity);
-		m_client.sendMessageToServer(msg);
-	}
+
 
 	/**
 	 * Updating and closing the survey.
@@ -181,37 +119,7 @@ public class ServiceSpecialistController
 	 * @param event
 	 *            save button clicked.
 	 */
-	@FXML
-	public void saveAnalysis(ActionEvent event)
-	{
-		if ((textarea_analysis.getText().equals("")) || (combobox_id.getValue().equals(""))) {
-			showInformationMessage("Specialist analisys area Or survey id is empty");
-		} else {
-			selected_survey.setSummary(textarea_analysis.getText());
-			selected_survey.setClosed(true);
-			Message msg = MessagesFactory.createUpdateEntityMessage(selected_survey);
-			m_client.sendMessageToServer(msg);
-			combobox_id.setDisable(true);
-			combobox_id.getItems().clear();
-			m_survey_array.clear();
-			m_surveysid_array.clear();
-			initializesurveys();
-			combobox_id.setDisable(false);
-			textarea_analysis.clear();
-			textfield_answer1.clear();
-			textfield_answer2.clear();
-			textfield_answer3.clear();
-			textfield_answer4.clear();
-			textfield_answer5.clear();
-			textfield_answer6.clear();
-			textfield_question1.clear();
-			textfield_question2.clear();
-			textfield_question3.clear();
-			textfield_question4.clear();
-			textfield_question5.clear();
-			textfield_question6.clear();
-		}
-	}
+
 
 	/* End of --> UI events region */
 
@@ -250,16 +158,6 @@ public class ServiceSpecialistController
 				combobox_id.setItems(m_list);
 			}
 		} else {
-			if (messageData instanceof EntityData) {
-				if (((EntityData) messageData).getEntity() instanceof Survey) {
-					textfield_question1.setText(((Survey) ((EntityData) messageData).getEntity()).getFirstQuestion());
-					textfield_question2.setText(((Survey) ((EntityData) messageData).getEntity()).getSecondQuestion());
-					textfield_question3.setText(((Survey) ((EntityData) messageData).getEntity()).getThirdQuestion());
-					textfield_question4.setText(((Survey) ((EntityData) messageData).getEntity()).getFourthQuestion());
-					textfield_question5.setText(((Survey) ((EntityData) messageData).getEntity()).getFifthQuestion());
-					textfield_question6.setText(((Survey) ((EntityData) messageData).getEntity()).getSixthQuestion());
-				}
-			} else {
 				if (messageData instanceof RespondMessageData) {
 					if ((((RespondMessageData) messageData).isSucceed())) {
 						m_logger.severe("successfully updated");
@@ -267,7 +165,6 @@ public class ServiceSpecialistController
 				}
 			}
 		}
-	}
 
 	/**
 	 * {@inheritDoc}

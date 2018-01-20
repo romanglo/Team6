@@ -160,12 +160,12 @@ public class ShopEmployeeController implements Initializable, Client.ClientStatu
 			if(((SurveyResult)m_surveys_array.get(i)).getId()==surv_id)
 				cur_shopservey =(SurveyResult)m_surveys_array.get(i);
 		}
-		cur_shopservey.setAnswer1(cur_shopservey.getAnswer1()+combobox_answer1.getValue());
-		cur_shopservey.setAnswer2(cur_shopservey.getAnswer2()+combobox_answer2.getValue());
-		cur_shopservey.setAnswer3(cur_shopservey.getAnswer3()+combobox_answer3.getValue());
-		cur_shopservey.setAnswer4(cur_shopservey.getAnswer4()+combobox_answer4.getValue());
-		cur_shopservey.setAnswer5(cur_shopservey.getAnswer5()+combobox_answer5.getValue());
-		cur_shopservey.setAnswer6(cur_shopservey.getAnswer6()+combobox_answer6.getValue());
+		cur_shopservey.setAnswer1(combobox_answer1.getValue());
+		cur_shopservey.setAnswer2(combobox_answer2.getValue());
+		cur_shopservey.setAnswer3(combobox_answer3.getValue());
+		cur_shopservey.setAnswer4(ccombobox_answer4.getValue());
+		cur_shopservey.setAnswer5(combobox_answer5.getValue());
+		cur_shopservey.setAnswer6(combobox_answer6.getValue());
 		cur_shopservey.setNumberOfAnswers(cur_shopservey.getNumberOfAnswers()+1);
 		Message msg=MessagesFactory.createUpdateEntityMessage(cur_shopservey);
 		m_client.sendMessageToServer(msg);

@@ -107,7 +107,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint
 		initializeFields();
 		initializeImages();
 		initializeClientHandler();
-		initializeComplaint();
+		treatComplaint_initializeComplaint();
 	}
 
 	private void initializeFields()
@@ -143,7 +143,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint
 		m_client.setClientStatusHandler(this);
 	}
 
-	private void initializeComplaint()
+	private void treatComplaint_initializeComplaint()
 	{
 		Complaint entity = new Complaint();
 		Message msg = MessagesFactory.createGetAllEntityMessage(entity);
@@ -187,7 +187,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint
 	 *            click on check box.
 	 */
 	@FXML
-	public void financialCompensation(ActionEvent event)
+	public void treatComplaint_financialCompensation(ActionEvent event)
 	{
 		if (financial_compensation.isDisable()) financial_compensation.setDisable(false);
 		else financial_compensation.setDisable(true);
@@ -200,7 +200,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint
 	 *            Update button clicked
 	 */
 	@FXML
-	public void updateClick(ActionEvent event)
+	public void treatComplaint_updateClick(ActionEvent event)
 	{
 		if ((combobox_id.getValue().equals(""))) {
 			showInformationMessage("complaint id field is empty");
@@ -241,14 +241,14 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint
 	}
 
 	@FXML
-	public void setIdInCombobox()
+	public void treatComplaint_setIdInCombobox()
 	{
 		list = FXCollections.observableArrayList(m_id_array);
 		combobox_id.setItems(list);
 	}
 
 	@FXML
-	public void chooseComplaint(ActionEvent event)
+	public void treatComplaint_chooseComplaint(ActionEvent event)
 	{
 		if ((combobox_id.getValue() == null) || (combobox_id.getValue().equals(""))) return;
 		int id = Integer.parseInt(combobox_id.getValue());
@@ -267,7 +267,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint
 		combobox_id.getItems().clear();
 		m_complaint_array.clear();
 		m_id_array.clear();
-		initializeComplaint();
+		treatComplaint_initializeComplaint();
 		combobox_id.setDisable(false);
 		textarea_complaint.clear();
 		textarea_summary.clear();
@@ -315,7 +315,7 @@ public class CostumerSeviceEmployee_TreatmentAnOpenComplaint
 					m_id_array.add(s);
 				}
 			}
-			setIdInCombobox();
+			treatComplaint_setIdInCombobox();
 		} else if (messageData instanceof EntityData) // Happens when it need to update refund.
 		{
 			Costumer cos_entity = (Costumer) ((EntityData) messageData).getEntity();

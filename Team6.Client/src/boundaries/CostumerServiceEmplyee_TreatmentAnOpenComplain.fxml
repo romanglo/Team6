@@ -16,12 +16,11 @@
          <children>
             <ImageView fx:id="imageview_subtitle" fitHeight="48.0" fitWidth="390.0" layoutX="-1.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true" />
             <Label layoutX="73.0" layoutY="64.0" prefHeight="17.0" prefWidth="107.0" text="Id:" />
-            <ComboBox fx:id="combobox_id" layoutX="129.0" layoutY="60.0" onAction="#chooseComplaint" prefWidth="150.0" />
+            <ComboBox fx:id="combobox_id" layoutX="129.0" layoutY="60.0" onAction="#treatComplaint_chooseComplaint" prefWidth="150.0" />
             <TextArea fx:id="textarea_complaint" layoutX="6.0" layoutY="117.0" prefHeight="93.0" prefWidth="180.0" />
-            <Button layoutX="78.0" layoutY="257.0" mnemonicParsing="false" onAction="#updateClick" prefHeight="25.0" prefWidth="78.0" text="Update" />
-            <CheckBox fx:id="checkbox_financial" layoutX="23.0" layoutY="222.0" mnemonicParsing="false" onAction="#financialCompensation" text="Financial compensation" />
+            <Button layoutX="78.0" layoutY="257.0" mnemonicParsing="false" onAction="#treatComplaint_updateClick" prefHeight="25.0" prefWidth="78.0" text="Update" />
+            <CheckBox fx:id="checkbox_financial" layoutX="23.0" layoutY="222.0" mnemonicParsing="false" onAction="#treatComplaint_financialCompensation" text="Financial compensation" />
             <TextField fx:id="financial_compensation" disable="true" layoutX="176.0" layoutY="218.0" />
-            <Button layoutX="193.0" layoutY="257.0" mnemonicParsing="false" onAction="#backButtonClick" prefHeight="25.0" prefWidth="78.0" text="Back" />
             <Label layoutX="16.0" layoutY="95.0" prefHeight="17.0" prefWidth="180.0" text="Costumer complaint:" />
             <Label layoutX="214.0" layoutY="95.0" prefHeight="17.0" prefWidth="167.0" text="Complaint summary:" />
             <TextArea fx:id="textarea_summary" layoutX="202.0" layoutY="117.0" prefHeight="93.0" prefWidth="180.0" />
