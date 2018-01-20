@@ -91,6 +91,8 @@ public class ShopManagerController extends BaseController
 	@FXML private Button button_submit;
 
 	@FXML private Button button_compare;
+	
+	@FXML private Button button_oneReport;
 
 	@FXML private TextField secondReportType;
 
@@ -145,7 +147,7 @@ public class ShopManagerController extends BaseController
 
 	private boolean listenerFlag = true;
 	
-	private int comparePressed = 0;
+	private boolean sizeChanged = false;
 
 	/* End of --> Private fields */
 
@@ -263,6 +265,7 @@ public class ShopManagerController extends BaseController
 			comboBox_selectionQuarter.setVisible(false);
 			textField_selectionYear.setVisible(false);
 			button_compare.setVisible(false);
+			button_oneReport.setVisible(false);
 			comboBox_selectionStore.setVisible(false);
 		}
 		yearChangeListener = (obs, oldText, newText) -> selectionYearChanged(textField_selectionYear, (String) oldText);
@@ -346,7 +349,9 @@ public class ShopManagerController extends BaseController
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue)
 			{
-				mainStageSizeChanged_StageReorder();
+				Platform.runLater(() ->{
+					mainStageSizeChanged_StageReorder();
+				});
 			}
 		});
 		pane_dataPane.widthProperty().addListener(new ChangeListener<Number>() {
@@ -354,7 +359,9 @@ public class ShopManagerController extends BaseController
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue)
 			{
-				mainStageSizeChanged_StageReorder();
+				Platform.runLater(() ->{
+					mainStageSizeChanged_StageReorder();
+				});
 			}
 		});
 		Platform.runLater(() -> {
@@ -466,7 +473,13 @@ public class ShopManagerController extends BaseController
 				AnchorPane.setLeftAnchor(((Node) comparePane), (anchorPane_viewStage.getWidth() - 10) / 2);
 				AnchorPane.setRightAnchor(((Node) comparePane), 15.0);
 				compareChart.setPrefSize(comparePane.getWidth(), comparePane.getHeight());
+				if (m_reservationsReport == null || m_complaintsReport == null || m_incomesReport == null
+						|| m_surveyReport == null)
+					sizeChanged = true;
 				button_submit.fire();
+				if (m_compareIncomesReport == null || m_compareReservationsReport == null
+						|| m_compareComplaintsReport == null || m_compareSurveyReport == null)
+					sizeChanged = true;
 				secondSubmitButton.fire();
 			}
 		}
@@ -509,12 +522,19 @@ public class ShopManagerController extends BaseController
 	@FXML
 	private void compareReports(ActionEvent event)
 	{
-		comparePressed = 2;
 		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		primaryStage.setMinWidth(885);
-		primaryStage.setMinHeight(600);
+		Platform.runLater(() ->{
+			primaryStage.setMinWidth(885);
+			primaryStage.setMinHeight(600);
+		});
 		compareReportsNewStage();
 		button_compare.setDisable(true);
+		button_oneReport.setDisable(false);
+		secondReportQuarter.setVisible(true);
+		secondReportStore.setVisible(true);
+		secondReportType.setVisible(true);
+		secondReportYear.setVisible(true);
+		secondSubmitButton.setVisible(true);
 	}
 
 	/**
@@ -605,6 +625,10 @@ public class ShopManagerController extends BaseController
 	@FXML
 	private void showSelectionReport(ActionEvent event)
 	{
+		if(sizeChanged) {
+			sizeChanged = false;
+			return;
+		}
 		if (event.getSource().equals(button_submit)) {
 			if (m_reservationsReport == null || m_complaintsReport == null || m_incomesReport == null
 					|| m_surveyReport == null) {
@@ -718,7 +742,7 @@ public class ShopManagerController extends BaseController
 	protected boolean onSelection(String title)
 	{
 		switch (title) {
-			case "Compare Reports":
+			case "Reports":
 				anchorPane_mainStage.setVisible(true);
 				anchorpane_shopCostumerManagement.setVisible(false);
 			break;
@@ -740,7 +764,7 @@ public class ShopManagerController extends BaseController
 	@Override
 	protected String[] getSideButtonsNames()
 	{
-		return new String[] { "Compare Reports", "Costumers Management" };
+		return new String[] { "Reports", "Costumers Management" };
 	}
 
 	/* region Private Methods */
@@ -1208,4 +1232,25 @@ public class ShopManagerController extends BaseController
 	}
 
 	// end region -> BaseController Implementation
+	
+	@FXML 
+	private void resetPane(ActionEvent event)
+	{
+		button_compare.setDisable(false);
+		button_oneReport.setDisable(true);
+		secondReportQuarter.setVisible(false);
+		secondReportStore.setVisible(false);
+		secondReportType.setVisible(false);
+		secondReportYear.setVisible(false);
+		secondSubmitButton.setVisible(false);
+		comparePane.getChildren().clear();
+		comparePane = null;
+		AnchorPane.setRightAnchor(((Node) pane_dataPane), 10.0);
+		AnchorPane.setTopAnchor(((Node) pane_dataPane), 50.0);
+		barChart_currentChart.setPrefSize(pane_dataPane.getWidth(), pane_dataPane.getHeight());
+		Platform.runLater(() -> {
+			mainStageSizeChanged_StageReorder();
+		});
+		
+	}
 }
