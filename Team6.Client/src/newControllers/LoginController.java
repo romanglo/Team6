@@ -4,6 +4,7 @@ package newControllers;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.istack.internal.Nullable;
@@ -142,7 +143,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			btn_settings.setRotate(0);
 			Stage currentStage = (Stage) btn_login.getScene().getWindow();
 
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/newBoundaries/LoginSettings.FXML"));
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/newBoundaries/LoginSettings.fxml"));
 			Parent parent = (Parent) fxmlLoader.load();
 			Scene scene = new Scene(parent);
 			scene.getStylesheets().add(getClass().getResource("/newBoundaries/login.css").toExternalForm());
@@ -156,7 +157,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			nextStage.showAndWait();
 		}
 		catch (Exception e) {
-			m_logger.severe("Failed on try to load the settings window, excepion: " + e.getMessage());
+			m_logger.log(Level.SEVERE,"Failed on try to load the settings window", e);
 			showInformationMessage("The settings can not be changed at this time..");
 			return;
 		}
@@ -437,32 +438,32 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 		switch (userEntity.getPrivilege()) {
 			case Administrator:
-				url = getClass().getResource("/newBoundaries/Administrator.FXML");
+				url = getClass().getResource("/newBoundaries/Administrator.fxml");
 			break;
 
 			case CompanyEmployee:
-				url = getClass().getResource("/newBoundaries/CompanyEmployee.FXML");
+				url = getClass().getResource("/newBoundaries/CompanyEmployee.fxml");
 			break;
 
 			case Costumer:
-				url = getClass().getResource("/newBoundaries/Costumer.FXML");
+				url = getClass().getResource("/newBoundaries/Costumer.fxml");
 			break;
 
 			case CostumerService:
-				url = getClass().getResource("/newBoundaries/CostumerServiceEmployee.FXML");
+				url = getClass().getResource("/newBoundaries/CostumerServiceEmployee.fxml");
 			break;
 
 			case ServiceSpecialist:
-				url = getClass().getResource("/newBoundaries/ServiceSpecialist.FXML");
+				url = getClass().getResource("/newBoundaries/ServiceSpecialist.fxml");
 			break;
 
 			case ShopEmployee:
-				url = getClass().getResource("/newBoundaries/ShopEmployee.FXML");
+				url = getClass().getResource("/newBoundaries/ShopEmployee.fxml");
 			break;
 
 			case ChainManager:
 			case ShopManager:
-				url = getClass().getResource("/newBoundaries/ShopManager.FXML");
+				url = getClass().getResource("/newBoundaries/ShopManager.fxml");
 			break;
 
 			default:
@@ -490,7 +491,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 		catch (Exception e) {
 			String errorString = "Failed on try to load the next scene";
-			m_logger.severe(errorString + ", excepion: " + e.getMessage());
+			m_logger.log(Level.SEVERE, errorString,e );
 			showInformationMessage(errorString);
 			return;
 		}
