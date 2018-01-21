@@ -117,14 +117,14 @@ CREATE TABLE items_in_shops(
 
 CREATE TABLE complaints (
   coId INT NOT NULL AUTO_INCREMENT,
-  cId INT NOT NULL,
-  smId INT NOT NULL,
-  cseId INT NOT NULL,
+  cId INT,
+  smId INT,
+  cseId INT,
   coDate DATE  NULL DEFAULT NULL,
   coComplaint VARCHAR(200) NOT NULL,
   coSummary VARCHAR(200) NULL DEFAULT NULL,
   coOpened BIT(1) NOT NULL DEFAULT 1,
-  FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE CASCADE ON UPDATE NO ACTION,
   FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY (cseId) REFERENCES costumer_service_employees (cseId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   PRIMARY KEY (coId)
@@ -132,16 +132,16 @@ CREATE TABLE complaints (
 
 CREATE TABLE surveys (
   suId INT AUTO_INCREMENT,
-  smId INT NOT NULL,
+  smId INT,
   suStartDate DATE NULL DEFAULT NULL,
   suEndDate DATE NULL DEFAULT NULL,
-  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
   PRIMARY KEY (suId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE survey_results (
   srId INT AUTO_INCREMENT,
-  suId INT NOT NULL,
+  suId INT,
   srEnterDate DATE NULL DEFAULT NULL,
   srAnswer1 INT NOT NULL,
   srAnswer2 INT NOT NULL,
@@ -150,24 +150,24 @@ CREATE TABLE survey_results (
   srAnswer5 INT NOT NULL,
   srAnswer6 INT NOT NULL,
   srSummary VARCHAR(500) NULL DEFAULT NULL, 
-  FOREIGN KEY (suId) REFERENCES surveys (suId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (suId) REFERENCES surveys (suId) ON DELETE CASCADE ON UPDATE NO ACTION,
   PRIMARY KEY (srId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 
 CREATE TABLE complaints_reports (
- smId INT NOT NULL,
+ smId INT,
  crYear YEAR, 
  crQuarter INT NOT NULL DEFAULT 0,
  crMonth1 INT NULL DEFAULT 0,
  crMonth2 INT NULL DEFAULT 0,
  crMonth3 INT NULL DEFAULT 0,
- FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
  PRIMARY KEY(smId,crYear,crQuarter)
 );
 
 CREATE TABLE surveys_reports (
- smId INT NOT NULL,
+ smId INT,
  srYear YEAR, 
  srQuarter INT NOT NULL DEFAULT 0,
  srAnswer1 FLOAT NULL DEFAULT 0,
@@ -176,23 +176,23 @@ CREATE TABLE surveys_reports (
  srAnswer4 FLOAT NULL DEFAULT 0,
  srAnswer5 FLOAT NULL DEFAULT 0,
  srAnswer6 FLOAT NULL DEFAULT 0,
- FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
  PRIMARY KEY(smId,srYear,srQuarter)
 );
 
 CREATE TABLE incomes_reports (
- smId INT NOT NULL,
+ smId INT,
  irYear YEAR, 
  irQuarter INT NOT NULL DEFAULT 0,
  irMonth1 FLOAT NULL DEFAULT 0,
  irMonth2 FLOAT NULL DEFAULT 0,
  irMonth3 FLOAT NULL DEFAULT 0,
- FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
  PRIMARY KEY(smId,irYear,irQuarter)
 );
 
 CREATE TABLE reservations_reports (
- smId INT NOT NULL,
+ smId INT,
  rrYear YEAR , 
  rrQuarter INT NOT NULL DEFAULT 0,
  rrMonth1_Flower INT NULL DEFAULT 0,
@@ -207,7 +207,7 @@ CREATE TABLE reservations_reports (
  rrMonth3_FlowerPot INT NULL DEFAULT 0,
  rrMonth3_FlowerArrangement INT NULL DEFAULT 0,
  rrMonth3_BridalBouquet INT NULL DEFAULT 0, 
- FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+ FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
  PRIMARY KEY(smId,rrYear,rrQuarter)
 ); 
 
@@ -561,19 +561,19 @@ BEGIN
 			DELETE FROM costumers WHERE costumers.uUserName = NEW.uUserName;
 		ELSEIF (OLD.uPrivilege = 'ShopEmployee') THEN
 			DELETE FROM shop_employees WHERE shop_employees.uUserName = NEW.uUserName;
-		ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
+		ELSEIF (OLD.uPrivilege = 'ShopManager') THEN
 			DELETE FROM shop_managers WHERE shop_managers.uUserName = NEW.uUserName;
-		ELSEIF (NEW.uPrivilege = 'CostumerService') THEN
+		ELSEIF (OLD.uPrivilege = 'CostumerService') THEN
 			DELETE FROM costumer_service_employees WHERE costumer_service_employees.uUserName = NEW.uUserName;
 		END IF;
 		
 		IF (NEW.uPrivilege = 'Costumer') THEN 
 			INSERT INTO costumers (uUserName) VALUES (NEW.uUserName);
-		ELSEIF (NEW.uPrivilege = 'ShopEmployee') THEN
+		ELSEIF (OLD.uPrivilege = 'ShopEmployee') THEN
 			INSERT INTO shop_employees (uUserName) VALUES (NEW.uUserName);
-		ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
+		ELSEIF (OLD.uPrivilege = 'ShopManager') THEN
 			INSERT INTO shop_managers (uUserName) VALUES (NEW.uUserName);
-		ELSEIF (NEW.uPrivilege = 'CostumerService') THEN
+		ELSEIF (OLD.uPrivilege = 'CostumerService') THEN
 			INSERT INTO costumer_service_employees (uUserName) VALUES (NEW.uUserName);
 		END IF;
 	
