@@ -19,7 +19,6 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -102,24 +101,24 @@ public class AdministratorController implements Initializable, Client.ClientStat
 		m_client.setClientStatusHandler(this);
 	}
 
-	/**
-	 * TODO раам: Auto-generated comment stub - Change it!
-	 *
-	 * @param e
-	 * @throws IOException 
-	 */
+	
 	/* End of --> Initializing methods region */
 
 	/* Client handlers implementation region */
 	
-	public void changeCustomerCoordinates (ActionEvent e) throws IOException
+	/**
+	 * TODO раам: Auto-generated comment stub - Change it!
+	 *
+	 * @param event : open the window of coordinates if change coordinates button was pressed
+	 * @throws IOException :
+	 */
+	
+	public void changeCustomerCoordinates (ActionEvent event) throws IOException
 	{
-		((Node)e.getSource()).getScene().getWindow().hide(); //hiding primary window
+		((Node)event.getSource()).getScene().getWindow().hide(); //hiding primary window
 		Stage primaryStage = new Stage();
 		FXMLLoader loader = new FXMLLoader();
-		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinates.fxml").openStream());
-		@SuppressWarnings("unused") Administrator_CoordinatesController AdministratorCoordinatesController  = loader.getController();
-		
+		Parent root = loader.load(getClass().getResource("/boundaries/Administrator_Coordinates.fxml").openStream());		
 		
 		Scene scene = new Scene(root);			
 		scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
@@ -155,8 +154,8 @@ public class AdministratorController implements Initializable, Client.ClientStat
 	
 	/**
 	 *
-	 * @param event
-	 * @throws IOException
+	 * @param event : close window if exit system button was pressed
+	 * @throws IOException : 
 	 */
 	public void closeWindow(ActionEvent event) throws IOException
 	{
