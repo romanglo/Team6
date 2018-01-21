@@ -122,13 +122,13 @@ public class CompanyEmployeeController extends BaseController
 
 	@FXML private Button button_resetSalesChanges;
 
-	@FXML private ComboBox<Integer> comboBox_storeList;
+	@FXML private ComboBox<String> comboBox_storeList;
 	/* End of --> Action catalog buttons */
 
 	/* View and changes savers lists declaration */
 	ObservableList<CatalogItemRow> shopSales = FXCollections.observableArrayList();
 
-	ObservableList<Integer> stores = FXCollections.observableArrayList();
+	ObservableList<String> stores = FXCollections.observableArrayList();
 
 	ArrayList<ItemInShop> salesAdded = new ArrayList<>();
 
@@ -149,7 +149,7 @@ public class CompanyEmployeeController extends BaseController
 	@Override
 	protected void internalInitialize() throws Exception
 	{
-
+		getCatalogFromServer();
 	}
 
 	private void initializeConfigurationTable()
@@ -194,34 +194,17 @@ public class CompanyEmployeeController extends BaseController
 						if (resultString == null || resultString.isEmpty()) return;
 
 						switch (pickType) {
-
 							case "Name":
 								rowData.setM_name(resultString);
-							break;
-							case "Type":
-								if (!(resultString.equals(EntitiesEnums.ProductType.Flower.toString())
-										|| resultString.equals(EntitiesEnums.ProductType.FlowerPot.toString())
-										|| resultString.equals(EntitiesEnums.ProductType.BridalBouquet.toString())
-										|| resultString
-												.equals(EntitiesEnums.ProductType.FlowerArrangement.toString()))) {
-									errorMSG(
-											"The type you entered doesn't exist!\nValids types:\n Flower\n FlowerPot\n BridalBouquet\n FlowerArrangement");
-									m_Logger.warning("Entered wrorg ProductType");
-									return;
-								} else {
-									rowData.setM_type(resultString);
-								}
 							break;
 							case "Price":
 								Float price = Float.parseFloat(resultString);
 								if (price <= 0) {
 									errorMSG("The price you entered lower then 0");
-									m_Logger.warning("Entered zero or negative price");
 									return;
 								} else {
 									rowData.setM_price(price);
 								}
-
 						}
 						addEditedItemToArray(rowData);
 						catalogChanged();
@@ -241,10 +224,9 @@ public class CompanyEmployeeController extends BaseController
 						}
 						catalogChanged();
 
-					} else if(event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("Type")) {
+					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("Type")) {
 						Dialog<CatalogItemRow> addDialog = new Dialog<>();
 						addDialog.setTitle("Edit Catalog Item Type");
-						
 
 						Label labelSubject = new Label("Do you want to update the item " + pickType + "  ?\n" + "ID: "
 								+ rowData.getM_id() + " , Name: " + rowData.getM_name() + " , Type: "
@@ -256,8 +238,8 @@ public class CompanyEmployeeController extends BaseController
 						typeList.add("BridalBouquet");
 						typeList.add("FlowerArrangement");
 						ComboBox<String> comboBoxType = new ComboBox<>(typeList);
-						comboBoxType.setValue("Flower");
-						
+						comboBoxType.setValue(rowData.getType());
+
 						ButtonType buttonTypeOk = new ButtonType("Done", ButtonData.OK_DONE);
 						addDialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
 						addDialog.setResultConverter(new Callback<ButtonType, CatalogItemRow>() {
@@ -284,9 +266,7 @@ public class CompanyEmployeeController extends BaseController
 
 						Optional<CatalogItemRow> result = addDialog.showAndWait();
 						if (!(result.isPresent())) return;
-						
-						
-						
+
 					}
 					drawContantToTable();
 				}
@@ -420,7 +400,6 @@ public class CompanyEmployeeController extends BaseController
 				if (b == buttonTypeOk) {
 					if (!(checkAddNewCatalogItemFields(textFieldName, textFieldPrice, textFieldDomainColor))) {
 						errorMSG("One or more of fields is empty");
-						m_Logger.warning("AddItem - One or more of fields is empty");
 						return null;
 					}
 					CatalogItemRow newItem;
@@ -525,12 +504,10 @@ public class CompanyEmployeeController extends BaseController
 	private void selectShop(ActionEvent event)
 	{
 		if (comboBox_storeList.getItems().isEmpty()) return;
-		int shop_number = comboBox_storeList.getValue();
+		button_addNewDiscountedItem.setDisable(false);
+		button_removeDiscountedItem.setDisable(false);
+		int shop_number = stringShopIdToInt(comboBox_storeList.getValue());
 		getShopSalesFromServer(shop_number);
-		ItemInShop entity = new ItemInShop();
-		entity.setShopManagerId(shop_number);
-		Message msg = MessagesFactory.createGetAllEntityMessage(entity);
-		m_Client.sendMessageToServer(msg);
 	}
 
 	/* end region -> FXML Methods */
@@ -572,13 +549,11 @@ public class CompanyEmployeeController extends BaseController
 						discountedPrice = Float.parseFloat(resultString);
 					}
 					catch (Exception e) {
-						m_Logger.warning("Failed to read discounted price");
 						errorMSG("Invalid discounted price!");
 						return;
 					}
 					if (discountedPrice <= 0) {
 						errorMSG("The price you entered lower then 0");
-						m_Logger.warning("Entered zero or negative price");
 						return;
 					} else {
 						rowData.setM_price(discountedPrice);
@@ -633,9 +608,8 @@ public class CompanyEmployeeController extends BaseController
 			if (idToRemove == idInTable) {
 				ItemInShop itemToRemove = new ItemInShop();
 				itemToRemove.setItemId(idToRemove);
-				;
 				itemToRemove.setDiscountedPrice(shopSales.get(i).getM_price());
-				itemToRemove.setShopManagerId(comboBox_storeList.getValue());
+				itemToRemove.setShopManagerId(stringShopIdToInt(comboBox_storeList.getValue()));
 				salesRemoved.add(itemToRemove);
 				shopSales.remove(i);
 				shopSalesCatalogChanged();
@@ -653,7 +627,7 @@ public class CompanyEmployeeController extends BaseController
 	@FXML
 	private void resetSalesCatalogChanges(ActionEvent event)
 	{
-		int shopID = comboBox_storeList.getValue();
+		int shopID = stringShopIdToInt(comboBox_storeList.getValue());
 		getShopSalesFromServer(shopID);
 		cleanSavedDataShopSalesArray();
 	}
@@ -692,7 +666,7 @@ public class CompanyEmployeeController extends BaseController
 					newItem = new CatalogItemRow(Integer.parseInt(textFieldID.getText()),
 							Float.parseFloat(textFieldDiscountedPrice.getText()));
 
-					itemToAdd.setShopManagerId(comboBox_storeList.getValue());
+					itemToAdd.setShopManagerId(stringShopIdToInt(comboBox_storeList.getValue()));
 					itemToAdd.setItemId(Integer.parseInt(textFieldID.getText()));
 					itemToAdd.setDiscountedPrice(Float.parseFloat(textFieldDiscountedPrice.getText()));
 					salesAdded.add(itemToAdd);
@@ -755,7 +729,7 @@ public class CompanyEmployeeController extends BaseController
 			m_Client.sendMessageToServer(entityMessage);
 		}
 
-		int shopID = comboBox_storeList.getValue();
+		int shopID = stringShopIdToInt(comboBox_storeList.getValue());
 		getShopSalesFromServer(shopID);
 		cleanSavedDataShopSalesArray();
 	}
@@ -789,7 +763,7 @@ public class CompanyEmployeeController extends BaseController
 		ItemInShop editedItem = new ItemInShop();
 		editedItem.setItemId(rowData.getM_id());
 		editedItem.setDiscountedPrice(rowData.getM_price());
-		editedItem.setShopManagerId(comboBox_storeList.getValue());
+		editedItem.setShopManagerId(stringShopIdToInt(comboBox_storeList.getValue()));
 		int indexOfExistItemEntityInArray;
 		if ((indexOfExistItemEntityInArray = checkIfItemAlreadySaleExistInArray(editedItem)) != -1)
 			salesChanged.set(indexOfExistItemEntityInArray, editedItem);
@@ -818,12 +792,10 @@ public class CompanyEmployeeController extends BaseController
 
 		if (inputedID == null || inputedDiscountedPrice == null) {
 			errorMSG("One or more fields are empty");
-			m_Logger.warning("AddItem - One or more fields are empty");
 			return false;
 		}
 		if (inputedID.isEmpty() || inputedDiscountedPrice.isEmpty()) {
 			errorMSG("One or more fields are empty");
-			m_Logger.warning("AddItem - One or more fields are empty");
 			return false;
 		}
 
@@ -835,27 +807,23 @@ public class CompanyEmployeeController extends BaseController
 		}
 		catch (Exception ex) {
 			errorMSG("Invalid input!");
-			m_Logger.warning("Entered invalid values");
 			return false;
 		}
 
 		if (itemID <= 0) {
 			errorMSG("The ID you entered lower then 0");
-			m_Logger.warning("Entered zero or negative ID");
 			return false;
 		}
 
 		for (CatalogItemRow item : shopSales) {
 			if (item.getM_id() == itemID) {
 				errorMSG("Item discount already exist!");
-				m_Logger.warning("Entered existed item id");
 				return false;
 			}
 		}
 
 		if (newPrice <= 0) {
 			errorMSG("The price you entered lower then 0");
-			m_Logger.warning("Entered zero or negative price");
 			return false;
 		}
 		return true;
@@ -864,7 +832,7 @@ public class CompanyEmployeeController extends BaseController
 	private boolean checkIfNewItemExistInCatalog(String itemID)
 	{
 		for (CatalogItemRow item : catalog)
-			if (item.getId() == itemID) return true;
+			if (itemID.equals(item.getId())) return true;
 		errorMSG("Item ID doesn't exist in catalog!");
 		return false;
 	}
@@ -1067,6 +1035,26 @@ public class CompanyEmployeeController extends BaseController
 		itemsCatalogRemoved.clear();
 	}
 
+	private void companyCatalogInit(List<IEntity> catalogItems)
+	{
+		for (IEntity entity : catalogItems) {
+			if (!(entity instanceof Item)) {
+				m_Logger.warning("Received entity not of the type requested.");
+				return;
+			}
+			Item item = (Item) entity;
+			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getType().toString(),
+					item.getPrice(), item.getDomainColor(), item.getImage());
+			catalog.add(itemRow);
+		}
+	}
+
+	private int stringShopIdToInt(String shopID)
+	{
+		shopID = shopID.substring(0, shopID.indexOf(' '));
+		return Integer.parseInt(shopID);
+	}
+
 	/* end region -> Private Methods */
 
 	/* Sending message to server methods region */
@@ -1107,17 +1095,7 @@ public class CompanyEmployeeController extends BaseController
 		if (anchorpane_editCatalog.isVisible()) {
 			if (messageData instanceof EntitiesListData) {
 				catalog.clear();
-				List<IEntity> entityList = ((EntitiesListData) messageData).getEntities();
-				for (IEntity entity : entityList) {
-					if (!(entity instanceof Item)) {
-						m_Logger.warning("Received entity not of the type requested.");
-						return;
-					}
-					Item item = (Item) entity;
-					CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getType().toString(),
-							item.getPrice(), item.getDomainColor(), item.getImage());
-					catalog.add(itemRow);
-				}
+				companyCatalogInit(((EntitiesListData) messageData).getEntities());
 				drawContantToTable();
 			} else if (messageData instanceof RespondMessageData) {
 				RespondMessageData respondMessageData = (RespondMessageData) messageData;
@@ -1132,13 +1110,15 @@ public class CompanyEmployeeController extends BaseController
 				List<IEntity> entityList = ((EntitiesListData) messageData).getEntities();
 				if (entityList.isEmpty()) return;
 				if (entityList.get(0) instanceof ShopManager) {
+					String shop;
 					ShopManager shopID;
 					for (IEntity entity : entityList) {
 						if (!(entity instanceof ShopManager)) {
 							m_Logger.warning("Failed to get ");
 						}
 						shopID = (ShopManager) entity;
-						stores.add(shopID.getId());
+						shop = shopID.getId() + " - " + shopID.getName();
+						stores.add(shop);
 					}
 					comboBox_storeList.setItems(stores);
 				} else {
@@ -1168,6 +1148,11 @@ public class CompanyEmployeeController extends BaseController
 						}
 					}
 				}
+			}
+		} else {
+			if (messageData instanceof EntitiesListData) {
+				catalog.clear();
+				companyCatalogInit(((EntitiesListData) messageData).getEntities());
 			}
 		}
 	}

@@ -965,7 +965,7 @@ public class ShopManagerController extends BaseController
 		// clear previous chart data and insert new values.
 		barToInit.getData().clear();
 		String store = storeId.substring(storeId.indexOf("-") + 1, storeId.length());
-		barToInit.setTitle(reportType + store + " Summary.");
+		barToInit.setTitle(reportType + store + " Summary");
 		barToInit.getXAxis().setLabel(quarter + " " + year);
 		barToInit.getYAxis().setLabel(reportType);
 	}
@@ -1218,7 +1218,6 @@ public class ShopManagerController extends BaseController
 							errorMSG("There is no reports for the requested details!");
 						}
 					}
-
 				}
 			} else {
 				if (m_shopManagerUserID != null && anchorpane_shopCostumerManagement.isVisible()) {
