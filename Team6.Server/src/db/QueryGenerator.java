@@ -8,6 +8,7 @@ import logger.LogManager;
 import newEntities.Complaint;
 import newEntities.ComplaintsReport;
 import newEntities.Costumer;
+import newEntities.CostumerServiceEmployee;
 import newEntities.IEntity;
 import newEntities.IncomesReport;
 import newEntities.Item;
@@ -414,33 +415,50 @@ public class QueryGenerator {
 
 	public static String selectComplaintQuery(Complaint complaint) {
 		int id = complaint.getId();
-		if (id > 1) {
-			return "SELECT * FROM complaints WHERE coId = " + id + ';';
-		}
-		int costumerId = complaint.getCostumerId();
-		int shopManagerId = complaint.getShopManagerId();
-
-		if (costumerId > 0 && shopManagerId > 0) {
-			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND smId = " + shopManagerId + ';';
+		if (id < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get complaint entity with impossiable ID: " + id);
+			return null;
 		}
 
-		if (costumerId > 0) {
-			return "SELECT * FROM complaints WHERE cId = " + costumerId + ';';
-		}
-
-		if (shopManagerId > 0) {
-			return "SELECT * FROM complaints WHERE smId = " + shopManagerId + ';';
-		}
-
-		loggerLazyLoading();
-		s_logger.warning("Received request to get complaint entity with impossiable ID's: complaint ID = " + id
-				+ "costumer ID = " + costumerId + ", shop manager ID=" + shopManagerId);
-		return null;
-
+		return "SELECT * FROM complaints WHERE coId = " + id + ';';
 	}
 
-	public static String selectAllComplaintsQuery() {
-		return "SELECT * FROM complaints ;";
+	public static String selectAllComplaintsQuery(Complaint complaint) {
+
+		if (complaint == null) {
+			return "SELECT * from complaints;";
+		}
+
+		int costumerId = complaint.getCostumerId();
+		int shopManagerId = complaint.getShopManagerId();
+		int costumerServiceId = complaint.getCostumerServiceEmployeeId();
+
+		if (costumerId > 0 && shopManagerId > 0 && costumerServiceId > 0) {
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND smId = " + shopManagerId
+					+ " AND cseId = " + costumerServiceId + " ;";
+		}
+		if (costumerId > 0 && shopManagerId > 0) {
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
+		}
+		if (costumerId > 0 && costumerServiceId > 0) {
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND cseId = " + costumerServiceId + " ;";
+		}
+		if (shopManagerId > 0 && costumerServiceId > 0) {
+			return "SELECT * FROM complaints WHERE smId = " + shopManagerId + " AND cseId = " + costumerServiceId
+					+ " ;";
+		}
+		if (costumerId > 0) {
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " ;";
+		}
+		if (shopManagerId > 0) {
+			return "SELECT * FROM complaints WHERE smId = " + shopManagerId + " ;";
+		}
+		if (costumerServiceId > 0) {
+			return "SELECT * FROM complaints WHERE cseId = " + costumerServiceId + " ;";
+		}
+		return "SELECT * from complaints;";
+
 	}
 
 	public static String insertComplaintQuery(Complaint complaint) {
@@ -1101,4 +1119,24 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 	// end region -> ShopSurvey Entity
+
+	// region Costumer Service Employee Entity
+
+	
+	public static String selectCostumerServiceEmployeeQuery(CostumerServiceEmployee costumerServiceEmployee) {
+		int id = costumerServiceEmployee.getId();
+		if (id < 1) {
+			loggerLazyLoading();
+			s_logger.warning("Received request to get costumer service employee entity with impossiable ID = " + id);
+			return null;
+		}
+		return "SELECT * FROM costumer_service_employees WHERE cseId = " + id + " ;";
+	}
+
+	public static String selectAllCostumerServiceEmployeesQuery() {
+		return "SELECT * FROM costumer_service_employees;";
+	}
+	
+	// end region -> Costumer Service Employee Entity
+
 }

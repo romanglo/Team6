@@ -25,6 +25,8 @@ public class Complaint implements IEntity
 
 	private int m_costumerId;
 
+	private int m_costumerServiceEmployeeId;
+
 	private int m_shopManagerId;
 
 	private java.util.Date m_creationDate;
@@ -50,6 +52,23 @@ public class Complaint implements IEntity
 	public void setId(int id)
 	{
 		this.m_id = id;
+	}
+
+	/**
+	 * @return the costumerServiceEmployeeId
+	 */
+	public int getCostumerServiceEmployeeId()
+	{
+		return m_costumerServiceEmployeeId;
+	}
+
+	/**
+	 * @param costumerServiceEmployeeId
+	 *            the costumerServiceEmployeeId to set
+	 */
+	public void setCostumerServiceEmployeeId(int costumerServiceEmployeeId)
+	{
+		m_costumerServiceEmployeeId = costumerServiceEmployeeId;
 	}
 
 	/**
@@ -161,7 +180,8 @@ public class Complaint implements IEntity
 	public String toString()
 	{
 		return "Complaint [id=" + m_id + ", costumerId=" + m_costumerId + ", shopManagerId=" + m_shopManagerId
-				+ ", creationDate=" + s_dateForamt.format(m_creationDate) + ", complaint=" + m_complaint + ", summary=" + m_summary
+				+ ", costumerServiceEmployeeId=" + m_costumerServiceEmployeeId  +", creationDate="
+				+ s_dateForamt.format(m_creationDate) + ", complaint=" + m_complaint + ", summary=" + m_summary
 				+ ", opened=" + m_opened + "]";
 	}
 
@@ -197,5 +217,5 @@ public class Complaint implements IEntity
 			return false;
 		}
 		return true;
-	}	
+	}
 }

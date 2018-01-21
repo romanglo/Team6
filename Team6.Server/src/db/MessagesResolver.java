@@ -13,6 +13,7 @@ import logger.LogManager;
 import newEntities.Complaint;
 import newEntities.ComplaintsReport;
 import newEntities.Costumer;
+import newEntities.CostumerServiceEmployee;
 import newEntities.EntitiesEnums.UserStatus;
 import newEntities.IEntity;
 import newEntities.IncomesReport;
@@ -338,6 +339,8 @@ public class MessagesResolver implements Server.MessagesHandler {
 					entityData.getOperation());
 		} else if (receivedEntity instanceof Costumer) {
 			returnedMessageData = onCostumerEntityReceived((Costumer) receivedEntity, entityData.getOperation());
+		}else if (receivedEntity instanceof CostumerServiceEmployee) {
+			returnedMessageData = onCostumerServiceEmployeeEntityReceived((CostumerServiceEmployee) receivedEntity, entityData.getOperation());
 		} else if (receivedEntity instanceof Reservation) {
 			returnedMessageData = onReservationEntityReceived((Reservation) receivedEntity, entityData.getOperation());
 		} else if (receivedEntity instanceof ShopManager) {
@@ -376,8 +379,50 @@ public class MessagesResolver implements Server.MessagesHandler {
 		return returnedMessageData;
 	}
 
+	
 	// end region -> Server.MessagesHandler Implementation
 
+	// region Costumer Service Employee Entity Operations
+	private IMessageData onCostumerServiceEmployeeEntityReceived(CostumerServiceEmployee costumerServiceEmployee,
+			EntityDataOperation operation) {
+		boolean result = false;
+		switch (operation) {
+		case Get:
+			String selectQuery = QueryGenerator.selectCostumerServiceEmployeeQuery(costumerServiceEmployee);
+			if (selectQuery == null) {
+				break;
+			}
+			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, CostumerServiceEmployee.class);
+			if (executeSelectQuery == null) {
+				break;
+			}
+			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+			return new EntityData(EntityDataOperation.None, entity);
+		case GetALL:
+			String selectAllQuery = QueryGenerator.selectAllCostumerServiceEmployeesQuery();
+			if (selectAllQuery == null) {
+				break;
+			}
+			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, CostumerServiceEmployee.class);
+			if (executeSelectAllQuery != null) {
+				return executeSelectAllQuery;
+			}
+			break;
+
+		default:
+			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + costumerServiceEmployee.toString() + ", Operation: "
+					+ operation.toString());
+			break;
+		}
+
+		RespondMessageData respondMessageData = new RespondMessageData();
+		respondMessageData.setSucceed(result);
+		return respondMessageData;
+	}
+	
+	// end region -> Costumer Service Employee Entity Operations
+	
+	
 	// region Item Entity Operations
 
 	private IMessageData onItemEntityReceived(Item item, EntityDataOperation operation) {
@@ -703,7 +748,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
 			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllComplaintsQuery();
+			String selectAllQuery = QueryGenerator.selectAllComplaintsQuery(complaint);
 			if (selectAllQuery == null) {
 				break;
 			}

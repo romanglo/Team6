@@ -7,6 +7,7 @@ import java.io.Serializable;
  *
  * ShopEmployee: A POJO to database 'shop_employees' table.
  * 
+ * @see IEntity
  */
 public class ShopEmployee extends User
 {
@@ -61,7 +62,7 @@ public class ShopEmployee extends User
 	@Override
 	public String toString()
 	{
-		return "ShopEmployee [id=" + m_id + ", shopManagerId=" + m_shopManagerId + ", user=" + super.toString() + "]";
+		return "ShopEmployee [id=" + m_id + ", shopManagerId=" + m_shopManagerId + ", " + super.toString() + "]";
 	}
 
 	/**

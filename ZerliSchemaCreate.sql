@@ -57,6 +57,14 @@ CREATE TABLE shop_employees (
   PRIMARY KEY (seId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE costumer_service_employees (
+  cseId INT AUTO_INCREMENT,
+  uUserName VARCHAR(20),
+  FOREIGN KEY (uUserName) REFERENCES users (uUserName) ON DELETE CASCADE ON UPDATE NO ACTION,
+  UNIQUE INDEX uUserName_UNIQUE (uUserName ASC),
+  PRIMARY KEY (cseId)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 CREATE TABLE items (
 	iId INT AUTO_INCREMENT,
 	iName VARCHAR(20) NOT NULL,
@@ -110,13 +118,15 @@ CREATE TABLE items_in_shops(
 CREATE TABLE complaints (
   coId INT NOT NULL AUTO_INCREMENT,
   cId INT NOT NULL,
-  smId Int NOT NULL,
+  smId INT NOT NULL,
+  cseId INT NOT NULL,
   coDate DATE  NULL DEFAULT NULL,
   coComplaint VARCHAR(200) NOT NULL,
   coSummary VARCHAR(200) NULL DEFAULT NULL,
   coOpened BIT(1) NOT NULL DEFAULT 1,
   FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  FOREIGN KEY (cseId) REFERENCES costumer_service_employees (cseId) ON DELETE NO ACTION ON UPDATE NO ACTION,
   PRIMARY KEY (coId)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -537,7 +547,9 @@ BEGIN
         INSERT INTO shop_employees (uUserName) VALUES (NEW.uUserName);
 	ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
         INSERT INTO shop_managers (uUserName) VALUES (NEW.uUserName);
-    END IF;
+	ELSEIF (NEW.uPrivilege = 'CostumerService') THEN
+        INSERT INTO costumer_service_employees (uUserName) VALUES (NEW.uUserName);
+	END IF;
 END; //
 	
 CREATE TRIGGER update_users_trigger
@@ -551,6 +563,8 @@ BEGIN
 			DELETE FROM shop_employees WHERE shop_employees.uUserName = NEW.uUserName;
 		ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
 			DELETE FROM shop_managers WHERE shop_managers.uUserName = NEW.uUserName;
+		ELSEIF (NEW.uPrivilege = 'CostumerService') THEN
+			DELETE FROM costumer_service_employees WHERE costumer_service_employees.uUserName = NEW.uUserName;
 		END IF;
 		
 		IF (NEW.uPrivilege = 'Costumer') THEN 
@@ -559,6 +573,8 @@ BEGIN
 			INSERT INTO shop_employees (uUserName) VALUES (NEW.uUserName);
 		ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
 			INSERT INTO shop_managers (uUserName) VALUES (NEW.uUserName);
+		ELSEIF (NEW.uPrivilege = 'CostumerService') THEN
+			INSERT INTO costumer_service_employees (uUserName) VALUES (NEW.uUserName);
 		END IF;
 	
     END IF;
@@ -747,8 +763,8 @@ INSERT INTO items_in_reservations (rId, iId, iName, irQuantity, irPrice) VALUES
 (1,5,'Aconite',1,5);
 
 LOCK TABLES complaints WRITE;
-INSERT INTO complaints (cId,smId ,coComplaint ) VALUES 
-(1,1,'The received product is not as orders.');
+INSERT INTO complaints (cId,smId,cseId ,coComplaint ) VALUES 
+(1,1,1,'The received product is not as orders.');
 
 LOCK TABLES complaints_reports WRITE;
 INSERT INTO complaints_reports (smId ,crYear, crQuarter, crMonth1, crMonth2, crMonth3) VALUES 

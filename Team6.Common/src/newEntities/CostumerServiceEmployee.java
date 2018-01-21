@@ -1,26 +1,25 @@
-
 package newEntities;
 
 import java.io.Serializable;
 
 /**
- *
- * Costumer: A POJO to database 'costumers' table.
- * 
- * @see IEntity
- */
-public class Costumer extends User
+*
+* CostumerServiceEmployee: A POJO to database 'costumer_service_employees' table.
+* 
+* @see IEntity
+*/
+public class CostumerServiceEmployee extends User
 {
 
 	/**
 	 * Serial version unique ID, necessary due to the class implements
 	 * {@link Serializable}
 	 */
-	private static final long serialVersionUID = -9072452554963769141L;
+	private static final long serialVersionUID = -6360427450521124338L;
+
 
 	private int m_id;
 
-	private float m_balance;
 
 	/**
 	 * @return the id
@@ -39,22 +38,6 @@ public class Costumer extends User
 		m_id = id;
 	}
 
-	/**
-	 * @return the balance
-	 */
-	public float getBalance()
-	{
-		return m_balance;
-	}
-
-	/**
-	 * @param balance
-	 *            the balance to set
-	 */
-	public void setBalance(float balance)
-	{
-		m_balance = balance;
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -62,7 +45,7 @@ public class Costumer extends User
 	@Override
 	public String toString()
 	{
-		return "Costumer [id=" + m_id + ", balance=" + m_balance + ", " + super.toString() + "]";
+		return "Costumer [id=" + m_id + ", " + super.toString() + "]";
 	}
 
 	/**
@@ -89,14 +72,13 @@ public class Costumer extends User
 		if (!super.equals(obj)) {
 			return false;
 		}
-		if (!(obj instanceof Costumer)) {
+		if (!(obj instanceof CostumerServiceEmployee)) {
 			return false;
 		}
-		Costumer other = (Costumer) obj;
+		CostumerServiceEmployee other = (CostumerServiceEmployee) obj;
 		if (m_id != other.m_id) {
 			return false;
 		}
 		return true;
 	}
-
 }

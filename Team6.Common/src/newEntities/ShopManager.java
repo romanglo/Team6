@@ -7,6 +7,8 @@ import java.io.Serializable;
  *
  * ShopManager: A POJO to database 'shop_managers' table.
  * 
+ * @see IEntity
+ * 
  */
 public class ShopManager extends User
 {
