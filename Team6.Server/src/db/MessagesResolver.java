@@ -95,7 +95,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 				m_logger.warning("Failed on try to execute select query : " + selectQuery);
 				return null;
 			}
-			List<IEntity> entities = EntitiesResolver.ResultSetToEntity(queryResult, expectedType);
+			List<IEntity> entities = EntitiesResolver.resultSetToEntity(queryResult, expectedType);
 			if (entities == null) {
 				m_logger.warning("Failed on try to reslove ResultSet to " + expectedType.getName());
 				return null;

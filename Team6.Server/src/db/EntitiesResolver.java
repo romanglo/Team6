@@ -26,6 +26,7 @@ import newEntities.ItemInShop;
 import newEntities.Complaint;
 import newEntities.ComplaintsReport;
 import newEntities.Costumer;
+import newEntities.CostumerServiceEmployee;
 import newEntities.Reservation;
 import newEntities.ReservationsReport;
 import newEntities.ShopCostumer;
@@ -76,7 +77,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link IEntity} if the resolving succeed, and
 	 *         <code>null</code> if did not.
 	 */
-	public static <TData extends IEntity> List<IEntity> ResultSetToEntity(ResultSet resultSet,
+	public static <TData extends IEntity> List<IEntity> resultSetToEntity(ResultSet resultSet,
 			Class<TData> expectedType) {
 		loggerLazyLoading();
 
@@ -87,42 +88,71 @@ public class EntitiesResolver {
 
 		List<IEntity> returningList = null;
 		if (expectedType.equals(User.class)) {
-			returningList = ResultSetToUserEntities(resultSet);
+			returningList = resultSetToUserEntities(resultSet);
 		} else if (expectedType.equals(Item.class)) {
-			returningList = ResultSetToItemEntities(resultSet);
+			returningList = resultSetToItemEntities(resultSet);
 		} else if (expectedType.equals(Costumer.class)) {
-			returningList = ResultSetToCostumerEntities(resultSet);
+			returningList = resultSetToCostumerEntities(resultSet);
 		} else if (expectedType.equals(Complaint.class)) {
-			returningList = ResultSetToComplaintEntities(resultSet);
+			returningList = resultSetToComplaintEntities(resultSet);
 		} else if (expectedType.equals(ComplaintsReport.class)) {
-			returningList = ResultSetToComplaintsReportEntities(resultSet);
+			returningList = resultSetToComplaintsReportEntities(resultSet);
 		} else if (expectedType.equals(IncomesReport.class)) {
-			returningList = ResultSetToIncomesReportEntities(resultSet);
+			returningList = resultSetToIncomesReportEntities(resultSet);
 		} else if (expectedType.equals(ItemInReservation.class)) {
-			returningList = ResultSetToItemInReservationEntities(resultSet);
+			returningList = resultSetToItemInReservationEntities(resultSet);
 		} else if (expectedType.equals(ItemInShop.class)) {
-			returningList = ResultSetToItemInShopEntities(resultSet);
+			returningList = resultSetToItemInShopEntities(resultSet);
 		} else if (expectedType.equals(Reservation.class)) {
-			returningList = ResultSetToReservationEntities(resultSet);
+			returningList = resultSetToReservationEntities(resultSet);
 		} else if (expectedType.equals(ReservationsReport.class)) {
-			returningList = ResultSetToReservationsReportEntities(resultSet);
+			returningList = resultSetToReservationsReportEntities(resultSet);
 		} else if (expectedType.equals(ShopEmployee.class)) {
-			returningList = ResultSetToShopEmployeeEntities(resultSet);
+			returningList = resultSetToShopEmployeeEntities(resultSet);
 		} else if (expectedType.equals(ShopManager.class)) {
-			returningList = ResultSetToShopManagerEntities(resultSet);
+			returningList = resultSetToShopManagerEntities(resultSet);
 		} else if (expectedType.equals(Survey.class)) {
-			returningList = ResultSetToSurveyEntities(resultSet);
+			returningList = resultSetToSurveyEntities(resultSet);
 		} else if (expectedType.equals(SurveysReport.class)) {
-			returningList = ResultSetToSurveysReportEntities(resultSet);
+			returningList = resultSetToSurveysReportEntities(resultSet);
 		} else if (expectedType.equals(SurveyResult.class)) {
-			returningList = ResultSetToSurveyResultsEntities(resultSet);
+			returningList = resultSetToSurveyResultEntities(resultSet);
 		} else if (expectedType.equals(ShopCostumer.class)) {
-			returningList = ResultSetToShopCostumersEntities(resultSet);
+			returningList = resultSetToShopCostumerEntities(resultSet);
+		} else if(expectedType.equals(CostumerServiceEmployee.class)) {
+			returningList = resultSetToCostumerServiceEmployeeEntities(resultSet);
 		}
 
 		return returningList;
 	}
 
+	private static List<IEntity> resultSetToCostumerServiceEmployeeEntities(ResultSet resultSet) {
+		ArrayList<IEntity> ShopCostumerEntities = new ArrayList<>();
+		int failedResolve = 0;
+		try {
+			while (resultSet.next()) {
+				CostumerServiceEmployee costumerServiceEmployee = new CostumerServiceEmployee();
+				try {
+					costumerServiceEmployee.setId(resultSet.getInt(1));
+					costumerServiceEmployee.setUserName(resultSet.getString(2));
+					ShopCostumerEntities.add(costumerServiceEmployee);
+				} catch (Exception ignored) {
+					failedResolve++;
+				}
+			}
+		} catch (SQLException e) {
+			s_logger.warning("Failed to resolve an ResultSet to Shop Costumer entity, exception:" + e.getMessage());
+			return null;
+		}
+
+		if (failedResolve != 0) {
+			s_logger.warning("Failed to resolve " + failedResolve + " rows to Shop Costumer entity.");
+		}
+
+		return ShopCostumerEntities.isEmpty() ? null : ShopCostumerEntities;
+	}
+
+	
 	/**
 	 * The method received {@link ResultSet} and resolve it to {@link List} of
 	 * {@link ShopCostumer} entity that describes a shop catalog.
@@ -133,8 +163,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link ShopCostumer} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-
-	private static List<IEntity> ResultSetToShopCostumersEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToShopCostumerEntities(ResultSet resultSet) {
 		ArrayList<IEntity> ShopCostumerEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -180,7 +209,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link SurveyResult} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToSurveyResultsEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToSurveyResultEntities(ResultSet resultSet) {
 		ArrayList<IEntity> surveyResultsEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -277,7 +306,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link SurveysReport} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToSurveysReportEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToSurveysReportEntities(ResultSet resultSet) {
 		ArrayList<IEntity> surveysReportEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -324,7 +353,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link Survey} entity if the resolving succeed,
 	 *         and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToSurveyEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToSurveyEntities(ResultSet resultSet) {
 
 		ArrayList<IEntity> surveyEntities = new ArrayList<>();
 		int failedResolve = 0;
@@ -373,7 +402,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link ShopManager} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToShopManagerEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToShopManagerEntities(ResultSet resultSet) {
 		ArrayList<IEntity> shopManagerEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -409,7 +438,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link ShopEmployee} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToShopEmployeeEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToShopEmployeeEntities(ResultSet resultSet) {
 		ArrayList<IEntity> shopEmployeeEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -445,7 +474,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link ReservationsReport} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToReservationsReportEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToReservationsReportEntities(ResultSet resultSet) {
 		ArrayList<IEntity> reservationsReportEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -503,7 +532,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link ItemInShop} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToItemInShopEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToItemInShopEntities(ResultSet resultSet) {
 		ArrayList<IEntity> itemInShopEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -539,7 +568,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link ItemInReservation} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToItemInReservationEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToItemInReservationEntities(ResultSet resultSet) {
 		ArrayList<IEntity> itemInReservationEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -577,7 +606,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link IncomesReport} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToIncomesReportEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToIncomesReportEntities(ResultSet resultSet) {
 		ArrayList<IEntity> incomesReportEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -621,7 +650,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link ComplaintsReport} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToComplaintsReportEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToComplaintsReportEntities(ResultSet resultSet) {
 		ArrayList<IEntity> complaintsReportEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -665,7 +694,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link Complaint} entity if the resolving succeed,
 	 *         and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToComplaintEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToComplaintEntities(ResultSet resultSet) {
 		ArrayList<IEntity> complaintsEntities = new ArrayList<>();
 		int failedResolve = 0;
 		try {
@@ -675,15 +704,16 @@ public class EntitiesResolver {
 					complaint.setId(resultSet.getInt(1));
 					complaint.setCostumerId(resultSet.getInt(2));
 					complaint.setShopManagerId(resultSet.getInt(3));
-					Date mysqlDate = resultSet.getDate(4);
+					complaint.setCostumerServiceEmployeeId(resultSet.getInt(4));
+					Date mysqlDate = resultSet.getDate(5);
 					if(mysqlDate!= null) {
 					complaint.setCreationDate(new java.util.Date(mysqlDate.getTime()));}
 					else {
 						complaint.setCreationDate(null);
 					}
-					complaint.setComplaint(resultSet.getString(5));
-					complaint.setSummary(resultSet.getString(6));
-					complaint.setOpened(resultSet.getString(7).equals("0") ? false : true);
+					complaint.setComplaint(resultSet.getString(6));
+					complaint.setSummary(resultSet.getString(7));
+					complaint.setOpened(resultSet.getString(8).equals("0") ? false : true);
 					complaintsEntities.add(complaint);
 				} catch (Exception ignored) {
 					failedResolve++;
@@ -710,7 +740,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link Item} entity. if the resolving succeed, and
 	 *         <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToItemEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToItemEntities(ResultSet resultSet) {
 
 		ArrayList<IEntity> itemEntities = new ArrayList<>();
 		int failedResolve = 0;
@@ -755,7 +785,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link Costumer} entity if the resolving succeed,
 	 *         and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToCostumerEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToCostumerEntities(ResultSet resultSet) {
 
 		ArrayList<IEntity> costumerEntities = new ArrayList<>();
 		int failedResolve = 0;
@@ -792,7 +822,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link User} entity if the resolving succeed, and
 	 *         <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToUserEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToUserEntities(ResultSet resultSet) {
 
 		ArrayList<IEntity> userEntities = new ArrayList<>();
 		int failedResolve = 0;
@@ -831,7 +861,7 @@ public class EntitiesResolver {
 	 * @return An {@link List} of {@link Reservation} entity if the resolving
 	 *         succeed, and <code>null</code> if did not.
 	 */
-	private static List<IEntity> ResultSetToReservationEntities(ResultSet resultSet) {
+	private static List<IEntity> resultSetToReservationEntities(ResultSet resultSet) {
 
 		ArrayList<IEntity> reservationEntities = new ArrayList<>();
 		int failedResolve = 0;

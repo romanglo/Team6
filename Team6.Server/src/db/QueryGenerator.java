@@ -464,18 +464,21 @@ public class QueryGenerator {
 	public static String insertComplaintQuery(Complaint complaint) {
 		int costumerId = complaint.getCostumerId();
 		int shopManagerId = complaint.getShopManagerId();
-
-		if (shopManagerId < 1 || costumerId < 1) {
+		int costumerServiceEmployeeId = complaint.getCostumerServiceEmployeeId();
+		if (shopManagerId < 1 || costumerId < 1 || costumerServiceEmployeeId < 1) {
 			loggerLazyLoading();
-			s_logger.warning("Received request to get complaint entity with impossiable ID's: costumer ID = "
-					+ costumerId + ", shop manager ID=" + shopManagerId);
+			s_logger.warning("Received request to insert complaint entity with impossiable ID's: costumer ID = "
+					+ costumerId + ", shop manager ID = " + shopManagerId + ", costumer service employee ID = "
+					+ costumerServiceEmployeeId);
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO complaints (cId,smId,coDate,coComplaint,coSummary,coOpened) VALUES (");
+		stringBuilder.append("INSERT INTO complaints (cId,smId,cseId,coDate,coComplaint,coSummary,coOpened) VALUES (");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
+		stringBuilder.append(',');
+		stringBuilder.append(costumerServiceEmployeeId);
 		stringBuilder.append(",'");
 		stringBuilder.append(s_dateFormat.format(complaint.getCreationDate()));
 		stringBuilder.append("','");
@@ -492,11 +495,12 @@ public class QueryGenerator {
 		int id = complaint.getId();
 		int costumerId = complaint.getCostumerId();
 		int shopManagerId = complaint.getShopManagerId();
-
-		if (id < 1 || shopManagerId < 1 || costumerId < 1) {
+		int costumerServiceEmployeeId = complaint.getCostumerServiceEmployeeId();
+		if (shopManagerId < 1 || costumerId < 1 || costumerServiceEmployeeId < 1) {
 			loggerLazyLoading();
-			s_logger.warning("Received request to get complaint entity with impossiable ID's: complain ID = " + id
-					+ ", costumer ID = " + costumerId + ", shop manager ID=" + shopManagerId);
+			s_logger.warning("Received request to update complaint entity with impossiable ID's: costumer ID = "
+					+ costumerId + ", shop manager ID = " + shopManagerId + ", costumer service employee ID = "
+					+ costumerServiceEmployeeId);
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
@@ -1122,21 +1126,35 @@ public class QueryGenerator {
 
 	// region Costumer Service Employee Entity
 
-	
 	public static String selectCostumerServiceEmployeeQuery(CostumerServiceEmployee costumerServiceEmployee) {
 		int id = costumerServiceEmployee.getId();
-		if (id < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get costumer service employee entity with impossiable ID = " + id);
-			return null;
+		String userName = costumerServiceEmployee.getUserName();
+
+		if (id > 1 && userName != null && !userName.isEmpty()) {
+			return "SELECT * FROM costumer_service_employees WHERE cseId = " + id + " AND uUserName = '" + userName
+					+ "' ;";
+
 		}
-		return "SELECT * FROM costumer_service_employees WHERE cseId = " + id + " ;";
+		if (id > 1) {
+			return "SELECT * FROM costumer_service_employees WHERE cseId = " + id + " ;";
+		}
+
+		if (userName != null && !userName.isEmpty()) {
+			return "SELECT * FROM costumer_service_employees WHERE uUserName = '" + userName + "' ;";
+
+		}
+
+		loggerLazyLoading();
+		s_logger.warning(
+				"Received request to get costumer service employee entity with impossiable ID's: costumer service ID = "
+						+ id + ", user name = " + userName);
+		return null;
 	}
 
 	public static String selectAllCostumerServiceEmployeesQuery() {
 		return "SELECT * FROM costumer_service_employees;";
 	}
-	
+
 	// end region -> Costumer Service Employee Entity
 
 }

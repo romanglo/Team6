@@ -220,7 +220,7 @@ public class ServerScheduledExecutor extends Startable {
 					m_Logger.warning("Failed on try to execute select query : " + selectQuery);
 					return false;
 				}
-				entities = EntitiesResolver.ResultSetToEntity(queryResult, ShopManager.class);
+				entities = EntitiesResolver.resultSetToEntity(queryResult, ShopManager.class);
 				if (entities == null) {
 					m_Logger.warning("Failed on try to reslove ResultSet to ShopManager.");
 					return false;
