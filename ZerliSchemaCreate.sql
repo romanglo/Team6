@@ -41,7 +41,7 @@ CREATE TABLE costumers_in_shops (
 	csCostumerSubscription VARCHAR(7) NULL DEFAULT 'None',
 	csCreditCard VARCHAR(16) NULL DEFAULT NULL,
 	csStartSubscriptionDate DATE NULL DEFAULT NULL,
-	csCumulativePrice INT NOT NULL DEFAULT 0,
+	csCumulativePrice FLOAT NOT NULL DEFAULT 0,
 	FOREIGN KEY (cId) REFERENCES costumers (cId) ON DELETE CASCADE ON UPDATE NO ACTION,
 	FOREIGN KEY (smId) REFERENCES shop_managers (smId) ON DELETE CASCADE ON UPDATE NO ACTION,
 	PRIMARY KEY (cId,smId)

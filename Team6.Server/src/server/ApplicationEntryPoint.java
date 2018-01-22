@@ -28,10 +28,14 @@ import common.UncaughetExceptions;
  */
 public class ApplicationEntryPoint extends Application {
 
+	// region Static Fields
+
 	private final static String s_lockFilePath = "ServerLockFile.lock";
 	private static File s_file;
 	private static FileChannel s_fileChannel;
 	private static FileLock s_lockFile;
+
+	// end region -> static Fields.
 
 	/**
 	 * 
@@ -173,6 +177,12 @@ public class ApplicationEntryPoint extends Application {
 		super.stop();
 	}
 
+	/**
+	 * 
+	 * The method dispose the {@link ServerConfiguration} and also try to update
+	 * {@link ServerConfiguration} resource file.
+	 *
+	 */
 	private void disposeConfiguration() {
 		if (m_serverConfiguration.updateResourceFile()) {
 			m_logger.info("Configuration resource file updated successfully! Saved configuration: "
@@ -184,6 +194,12 @@ public class ApplicationEntryPoint extends Application {
 		}
 	}
 
+	/**
+	 * 
+	 * The method call first time to {@link ServerConfiguration#getInstance()}} and
+	 * initialize the {@link ServerConfiguration}.
+	 *
+	 */
 	private void initializeConfiguration() {
 		m_serverConfiguration = ServerConfiguration.getInstance();
 		if (m_serverConfiguration.isDefaultConfiguration()) {

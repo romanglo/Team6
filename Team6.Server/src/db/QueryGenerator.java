@@ -293,7 +293,9 @@ public class QueryGenerator {
 		if (entityType.equals(User.class)) {
 			return selectAllUserQuery();
 		}
-
+		if (entityType.equals(ItemInReservation.class)) {
+			return selectAllItemInReservationQuery((ItemInReservation) entity);
+		}
 		logMessage("generateSelectAllQuery method received unsupported entity, type: " + entity.getClass().getName());
 		return null;
 	}
@@ -340,9 +342,6 @@ public class QueryGenerator {
 		}
 		if (entityType.equals(ItemInShop.class)) {
 			return selectItemInShopQuery((ItemInShop) entity);
-		}
-		if (entityType.equals(ItemInReservation.class)) {
-			return selectItemInReservationQuery((ItemInReservation) entity);
 		}
 		if (entityType.equals(ReservationsReport.class)) {
 			return selectReservationsReportQuery((ReservationsReport) entity);
@@ -953,7 +952,7 @@ public class QueryGenerator {
 
 	// region ItemInReservation Entity
 
-	private static String selectItemInReservationQuery(ItemInReservation itemInReservation) {
+	private static String selectAllItemInReservationQuery(ItemInReservation itemInReservation) {
 		int itemId = itemInReservation.getItemId();
 		int reservationId = itemInReservation.getReservationId();
 		if (itemId > 0 && reservationId > 0) {

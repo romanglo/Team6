@@ -14,14 +14,14 @@ import java.util.logging.Logger;
 
 import common.IStartable;
 import common.NotRunningException;
+import common.ScheduledExecutor;
 import common.Startable;
+import common.ScheduledExecutor.IScheduledExecutionHandler;
 import configurations.ServerConfiguration;
 import configurations.TimeConfiguration;
 import db.DbController;
 import db.EntitiesResolver;
 import db.QueryGenerator;
-import general.ScheduledExecutor;
-import general.ScheduledExecutor.IScheduledExecutionHandler;
 import logger.LogManager;
 import newEntities.IEntity;
 import newEntities.ShopManager;
@@ -128,7 +128,10 @@ public class ServerScheduledExecutor extends Startable {
 	 * subscriptions, and resetting them in case they expire.
 	 */
 	private class SubscriptionCheckerTask implements Callable<Boolean>, IScheduledExecutionHandler<Boolean> {
-
+		
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public Boolean call() throws Exception {
 			if (!m_dbController.isRunning()) {
@@ -167,6 +170,9 @@ public class ServerScheduledExecutor extends Startable {
 			return true;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void onScheduledExecution(Boolean executionResult) {
 			if (executionResult == null) {
@@ -187,6 +193,9 @@ public class ServerScheduledExecutor extends Startable {
 	 */
 	private class ReportsGeneratorTask implements Callable<Boolean>, IScheduledExecutionHandler<Boolean> {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public Boolean call() throws Exception {
 			if (!m_dbController.isRunning()) {
@@ -302,6 +311,9 @@ public class ServerScheduledExecutor extends Startable {
 			return true;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void onScheduledExecution(Boolean executionResult) {
 			if (executionResult == null) {

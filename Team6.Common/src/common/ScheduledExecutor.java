@@ -1,5 +1,5 @@
 
-package general;
+package common;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +15,6 @@ import java.util.logging.Logger;
 
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
-
-import common.IStartable;
-import common.Startable;
 
 /**
  *

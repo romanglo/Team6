@@ -51,55 +51,38 @@ import logger.LogManager;
 public class ServerController implements Initializable, Server.ServerStatusHandler, Server.ClientConnectionHandler {
 	// region UI Elements
 
-	@FXML
-	private TabPane tabpane;
+	private @FXML TabPane tabpane;
 
 	/* Database start-stop button declaration */
-	@FXML
-	private Button btn_db_start;
-	@FXML
-	private Button btn_db_stop;
+	private @FXML Button btn_db_start;
+	private @FXML Button btn_db_stop;
 
 	/* Database status declaration */
-	@FXML
-	private Circle circle_db_on;
-	@FXML
-	private Circle circle_db_off;
+	private @FXML Circle circle_db_on;
+	private @FXML Circle circle_db_off;
 
 	/* Connectivity start-stop button declaration */
 
-	@FXML
-	private Button btn_connectivity_start;
-	@FXML
-	private Button btn_connectivity_stop;
+	private @FXML Button btn_connectivity_start;
+	private @FXML Button btn_connectivity_stop;
 
 	/* Connectivity status declaration */
-	@FXML
-	private Circle circle_connectivity_on;
-	@FXML
-	private Circle circle_connectivity_off;
-	@FXML
-	private Label label_numberOfConnectedUsers;
+	private @FXML Circle circle_connectivity_on;
+	private @FXML Circle circle_connectivity_off;
+	private @FXML Label label_numberOfConnectedUsers;
 
 	/* Log text view declaration */
-	@FXML
-	private TextArea textarea_log;
+	private @FXML TextArea textarea_log;
 
 	/* Setting table declaration */
-	@FXML
-	private TableView<SettingsRow> setting_table;
-	@FXML
-	private TableColumn<SettingsRow, String> tablecolumn_setting;
-	@FXML
-	private TableColumn<SettingsRow, String> tablecolumn_value;
-	@FXML
-	private TableColumn<SettingsRow, String> tablecolumn_region;
+	private @FXML TableView<SettingsRow> setting_table;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_setting;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_value;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_region;
 
 	/* Title images */
-	@FXML
-	private ImageView imageview_gif;
-	@FXML
-	Button btn_run_logger_file;
+	private @FXML ImageView imageview_gif;
+	private @FXML Button btn_run_logger_file;
 
 	// end region -> UI Elements
 
@@ -137,6 +120,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		initializeConfigurationTable();
 	}
 
+	/**
+	 * This method initialize all the images in {@link ServerController}.
+	 */
 	private void initializeImages() {
 		InputStream serverGif = getClass().getResourceAsStream("ServerGIF.gif");
 		if (serverGif != null) {
@@ -145,6 +131,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 	}
 
+	/**
+	 * This method initialize {@link ServerController#setting_table} and set
+	 * necessary triggers.
+	 */
 	private void initializeConfigurationTable() {
 		setting_table.setRowFactory(param -> {
 			TableRow<SettingsRow> tableRow = new TableRow<>();
@@ -173,7 +163,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 							m_configuration.getConnectivityConfiguration().setPort(port);
 							m_server.setPort(port);
 							if (m_server.isListening()) {
-								showInformationMessage(
+								showAlertMessage(
 										"Attention: You must reopen application connection for the changes to take effect!");
 							}
 						} catch (NumberFormatException e) {
@@ -182,7 +172,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 					} else {
 						m_configuration.getDbConfiguration().updateValueByName(rowData.getSetting(), resultString);
 						if (m_dbContoller.isRunning()) {
-							showInformationMessage(
+							showAlertMessage(
 									"Attention: You must reopen database connection for the changes to take effect!");
 						}
 					}
@@ -204,6 +194,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		drawContantToTable();
 	}
 
+	/**
+	 * Initialize {@link ServerController} internal logic.
+	 */
 	private void initializeServerLogic() {
 		m_server.setServerActionHandler(this);
 		m_server.setClientConnectionHandler(this);
@@ -213,6 +206,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		m_server.setMessagesHandler(m_messageResolver);
 	}
 
+	/**
+	 * Initialize {@link ServerController} fields.
+	 */
 	private void initializeFields() {
 		m_dbContoller = ApplicationEntryPoint.DbContoller;
 		m_server = ApplicationEntryPoint.Server;
@@ -225,8 +221,15 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	// region UI Methods
 
-	@FXML
-	private void startDb(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_db_start} and try
+	 * to open connection with the DB.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void startDb(ActionEvent event) {
 		try {
 			addMessageToLog("Trying to connect to the database with the configuration: "
 					+ m_configuration.getDbConfiguration().toString());
@@ -246,8 +249,15 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		addMessageToLog("Connected successfully to the database");
 	}
 
-	@FXML
-	private void stopDb(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_db_stop} and try to
+	 * close connection with the DB.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void stopDb(ActionEvent event) {
 		try {
 			addMessageToLog("Trying to disconnect from the database");
 			m_dbContoller.Stop();
@@ -264,8 +274,15 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		addMessageToLog("Disconnected successfully from the database");
 	}
 
-	@FXML
-	private void startConnectivity(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_connectivity_start}
+	 * and try to open {@link Server} connection.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void startConnectivity(ActionEvent event) {
 		String ip;
 		try {
 			ip = InetAddress.getLocalHost().toString();
@@ -285,8 +302,15 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 	}
 
-	@FXML
-	private void stopConnectivity(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_connectivity_stop}
+	 * and try to close {@link Server} connection.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void stopConnectivity(ActionEvent event) {
 		String msg = "Trying to stop TCP\\IP connection";
 		m_logger.info(msg);
 		addMessageToLog(msg);
@@ -299,19 +323,26 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 	}
 
-	@FXML
-	private void runLoggerFile(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_run_logger_file}
+	 * and try to load the logger file.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void runLoggerFile(ActionEvent event) {
 		String loggerPath = LogManager.getLoggerPath();
 		if (!(loggerPath != null && !loggerPath.isEmpty())) {
 			m_logger.warning("'Show Text Log' button while the log path not initialized.");
-			showInformationMessage("Text log file did not initialized.");
+			showAlertMessage("Text log file did not initialized.");
 			return;
 		}
 
 		File file = new File(loggerPath);
 		if (!file.exists()) {
 			m_logger.warning("There is not a log in the receiving log path: " + loggerPath);
-			showInformationMessage("Text logger did not initialized.");
+			showAlertMessage("Text logger did not initialized.");
 			return;
 		}
 
@@ -319,7 +350,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		if (!Desktop.isDesktopSupported()) {
 			m_logger.info(
 					"'Desktop Platform' is not supported in this computer, so it is impossible to open text log file.");
-			showInformationMessage("Error:\nFiles opening platfron are not supported in this computer!\nLog path: \""
+			showAlertMessage("Error:\nFiles opening platfron are not supported in this computer!\nLog path: \""
 					+ loggerPath + "\"");
 			return;
 
@@ -331,14 +362,20 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			desktop.open(file);
 		} catch (IOException ex) {
 			m_logger.severe("Failed on try to open the text logger file! Exception: " + ex.getMessage());
-			showInformationMessage(
-					"Some error occured on try to open the text log file!\nLog path: \"" + loggerPath + "\"");
+			showAlertMessage("Some error occured on try to open the text log file!\nLog path: \"" + loggerPath + "\"");
 		}
 	}
+
 	// end region -> UI Methods
 
 	// region Private Methods
 
+	/**
+	 * 
+	 * The method draw the {@link ServerConfiguration} to
+	 * {@link ServerController#setting_table}.
+	 *
+	 */
 	private void drawContantToTable() {
 		DbConfiguration dbConfiguration = m_configuration.getDbConfiguration();
 		ConnectivityConfiguration connectivityConfiguration = m_configuration.getConnectivityConfiguration();
@@ -357,7 +394,13 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		setting_table.setItems(settings);
 	}
 
-	private void showInformationMessage(String message) {
+	/**
+	 * The method show dialog message from {@link Alert} type.
+	 *
+	 * @param message
+	 *            the message to show.
+	 */
+	private void showAlertMessage(String message) {
 		if (message == null || message.isEmpty()) {
 			return;
 		}
@@ -371,6 +414,12 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		addMessageToLog(message);
 	}
 
+	/**
+	 * The methods print a message to visual logger.
+	 *
+	 * @param msg
+	 *            the message to print.
+	 */
 	private void addMessageToLog(String msg) {
 		if (msg != null && !msg.isEmpty()) {
 			LocalDateTime now = LocalDateTime.now();
@@ -383,6 +432,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 	}
 
+	/**
+	 * The methods reset all the 'Connected' {@link User} entities in the DB to be
+	 * 'Disconnected'.
+	 */
 	private void resetUsersStatus() {
 		if (!m_dbContoller.isRunning()) {
 			m_resetUserStatus = true;
@@ -445,6 +498,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	// region Server.ClientConnectionHandler Implementation
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onClientConnected(String clientDetails, int numberOfConnectedClients) {
 		javafx.application.Platform
@@ -453,6 +509,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				"A client: " + clientDetails + " connected, number of connected clients: " + numberOfConnectedClients);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onClientDisconnected(String clientDetails, int numberOfConnectedClients) {
 		javafx.application.Platform
