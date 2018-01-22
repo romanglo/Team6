@@ -67,12 +67,16 @@ public class AdministratorController extends BaseController
 	private @FXML TextField textField_password;
 
 	private @FXML TextField textField_branch;
-
+	
 	private @FXML TextField textField_shopManagerId;
-
+	
 	private @FXML Label label_branch;
 
 	private @FXML Label label_shopManagerId;
+	
+	private @FXML Label label_privillege;
+	
+	private @FXML Label label_status;
 	
 	private User selected_user;
 	
@@ -120,13 +124,14 @@ public class AdministratorController extends BaseController
 		al.add("Actived");
 		list = FXCollections.observableArrayList(al);
 		comboBox_status.setItems(list);
+		comboBox_status.setVisible(false);
+		label_status.setVisible(false);
 	}
 
 	protected void initializePrivillge()
 	{
 		ArrayList<String> al = new ArrayList<String>();
 		al.add("administrator");
-		al.add("costumer");
 		al.add("shop employee");
 		al.add("chain manager");
 		al.add("shop manager");
@@ -135,6 +140,8 @@ public class AdministratorController extends BaseController
 		al.add("costumer service");
 		list = FXCollections.observableArrayList(al);
 		comboBox_privillge.setItems(list);
+		comboBox_privillge.setVisible(false);
+		label_privillege.setVisible(false);
 	}
 
 	/**
@@ -192,10 +199,9 @@ public class AdministratorController extends BaseController
 	}
 	
 	/**
-	 * TODO раам: Auto-generated comment stub - Change it!
 	 *
-	 * @param event
-	 * @throws IOException
+	 * @param event : send update message to the server when update button pressed
+	 * @throws IOException :
 	 */
 	public void updatebtn1(ActionEvent event) throws IOException
 	{
@@ -216,7 +222,7 @@ public class AdministratorController extends BaseController
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ShopEmployee);
 		else if(privilege=="chain manager")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ChainManager);
-		else if(privilege=="shop manager")
+		else if(privilege=="shop manager"||privilege=="ShopManager")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ShopManager);
 		else if(privilege=="service specialist")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ServiceSpecialist);
@@ -224,43 +230,9 @@ public class AdministratorController extends BaseController
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.CompanyEmployee);
 		else if(privilege=="costumer service")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.CostumerService);	
-		Message msg=MessagesFactory.createUpdateEntityMessage(selected_user);
-		m_Client.sendMessageToServer(msg);
-		/*switch (privilege) {
-			case "administror":
-				selected_user.setPrivilege(EntitiesEnums.UserPrivilege.Administrator);
-			break;
-
-			case "costumer":
-				selected_user.setPrivilege(EntitiesEnums.UserPrivilege.Costumer);
-			break;
-
-			case "shop employee":
-				selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ShopEmployee);
-			break;
-
-			case "chain manager":
-				selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ChainManager);
-			break;
-
-			case "shop manager":
-				selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ShopManager);
-			break;
-
-			case "service specialist":
-				selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ServiceSpecialist);
-			break;
-
-			case "company employee":
-				selected_user.setPrivilege(EntitiesEnums.UserPrivilege.CompanyEmployee);
-			break;
-
-			case "costumer service":
-				selected_user.setPrivilege(EntitiesEnums.UserPrivilege.CostumerService);
-			break;
-			default:
-				break;
-		}*/
+		//msg=MessagesFactory.createUpdateEntityMessage(selected_user);
+		//m_Client.sendMessageToServer(msg);
+		
 		String status = comboBox_status.getValue().toString();
 		if(status.equals("Actived")) {
 			if(selected_user.getStatus().equals(EntitiesEnums.UserStatus.Blocked))
@@ -268,28 +240,14 @@ public class AdministratorController extends BaseController
 		}
 		else if(status.equals("Blocked"))
 			selected_user.setStatus(EntitiesEnums.UserStatus.Blocked);
-		msg=MessagesFactory.createUpdateEntityMessage(selected_user);
-		m_Client.sendMessageToServer(msg);
-
-		/*String status = comboBox_status.getValue();
-		switch (status) {
-			case "Actived":
-				selected_user.setStatus(EntitiesEnums.UserStatus.Disconnected);
-			break;
-
-			case "Blocked":
-				selected_user.setStatus(EntitiesEnums.UserStatus.Blocked);
-			break;
-		}
 		Message msg=MessagesFactory.createUpdateEntityMessage(selected_user);
-		m_Client.sendMessageToServer(msg);*/
-
+		m_Client.sendMessageToServer(msg);
 	}
 	
 	/**
 	 *
-	 * @param event
-	 * @throws IOException
+	 * @param event : get the selected user from comboBox_user
+	 * @throws IOException :
 	 */
 	@FXML
 	public void userSelected(ActionEvent event) throws IOException
@@ -299,13 +257,26 @@ public class AdministratorController extends BaseController
 			if (((User) arrlist.get(i)).getUserName().equals(username)) selected_user = (User) arrlist.get(i);
 		}
 		comboBox_privillge.setValue((selected_user.getPrivilege().toString()));
-		comboBox_status.setValue(selected_user.getStatus().toString());
+		if(selected_user.getStatus().equals(EntitiesEnums.UserStatus.Connected)||selected_user.getStatus().equals(EntitiesEnums.UserStatus.Disconnected))
+			comboBox_status.setValue("Actived");
+		else
+			comboBox_status.setValue("Blocked");
+		comboBox_status.setVisible(true);
+		label_status.setVisible(true);
+		if(username.equals("costumer")) {
+			comboBox_privillge.setVisible(false);
+			label_privillege.setVisible(false);
+		}else
+		{
+			comboBox_privillge.setVisible(true);
+			label_privillege.setVisible(true);
+		}
 	}
 
 
 	/**
 	 *
-	 * @param event
+	 * @param event : request all the system users from the server when get button pressed
 	 */
 	public void getBtn(ActionEvent event)
 	{
@@ -317,8 +288,8 @@ public class AdministratorController extends BaseController
 
 	/**
 	 *
-	 * @param event
-	 * @throws IOException
+	 * @param event : send update message to the server when update button pressed
+	 * @throws IOException :
 	 */
 	public void updatebtn(ActionEvent event) throws IOException
 	{
@@ -342,7 +313,6 @@ public class AdministratorController extends BaseController
 					//m_Client.sendMessageToServer(shopEmployeeEntityMessage);
 				break;
 				case ShopManager:
-					ShopManager shopManagerEntity = new ShopManager();
 					shopManager.setUserName(tempEntity.getUserName());
 					shopManager.setEmail(textField_email.getText());
 					shopManager.setPassword(textField_password.getText());
@@ -379,13 +349,10 @@ public class AdministratorController extends BaseController
 			ArrayList<String> al = new ArrayList<String>();
 			User user = new User();
 			for(int i=0;i<arrlist.size();i++)
-			{
+			{		
 				user = (User) arrlist.get(i);
 				al.add(user.getUserName());	
 			}
-			//list = FXCollections.observableArrayList(al);
-			//if(list!=null)
-			//comboBox_user.setItems(list);
 			javafx.application.Platform.runLater(()-> {
 				list = FXCollections.observableArrayList(al);
 				if(list!=null)

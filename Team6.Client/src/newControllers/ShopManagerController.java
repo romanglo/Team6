@@ -30,6 +30,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -54,6 +55,7 @@ import newMessages.Message;
 import newMessages.MessagesFactory;
 import newMessages.RespondMessageData;
 
+
 /**
  *
  * ExampleController: TODO Yoni
@@ -63,22 +65,22 @@ import newMessages.RespondMessageData;
 public class ShopManagerController extends BaseController
 {
 
-	// region Fields
+	// region Actors Panes
 
-	private @FXML AnchorPane anchorpane_shopCostumerManagement;
+	@FXML private AnchorPane anchorpane_shopCostumerManagement;
 
-	// end region -> Fields
+	@FXML private AnchorPane anchorPane_mainStage;
 
-	/* UI Binding Fields region */
+	// end region -> Actors Panes
 
-	// Data AnchorPane declaration
+	/* Reports stage */
+
+	// Data AnchorPanes declaration
 	@FXML private Pane pane_dataPane;
 
 	@FXML private Pane comparePane;
 
 	@FXML private AnchorPane anchorPane_viewStage;
-
-	@FXML private AnchorPane anchorPane_mainStage;
 	// End of --> Data AnchorPane declaration
 
 	// Selection area declaration
@@ -86,34 +88,21 @@ public class ShopManagerController extends BaseController
 
 	@FXML private ComboBox<String> comboBox_selectionQuarter;
 
-	// @FXML private TextField textField_selectionYear;
-
 	@FXML private Spinner<Integer> spinner_selectionYear;
 
 	@FXML private ComboBox<String> comboBox_selectionStore;
 
 	@FXML private Button button_submit;
 
-	@FXML private Button button_compare;
-
-	@FXML private Button button_oneReport;
-
 	@FXML private TextField secondReportType;
 
 	@FXML private ComboBox<String> secondReportQuarter;
-
-	// @FXML private TextField secondReportYear;
 
 	@FXML private Spinner<Integer> secondReportYear;
 
 	@FXML private ComboBox<String> secondReportStore;
 
 	@FXML private Button secondSubmitButton;
-
-	private SpinnerValueFactory<Integer> spinnerValueFactory_selectionYear;
-
-	private SpinnerValueFactory<Integer> spinnerValueFactory_secondSelectionYear;
-
 	// End of --> Selection area declaration
 
 	// Charts declaration
@@ -124,9 +113,13 @@ public class ShopManagerController extends BaseController
 	@FXML private Label label_noReports;
 	// End of --> Charts declaration
 
-	/* End of --> UI Binding Fields region */
-
 	/* Private fields */
+
+	// Year Spinners Value Factory
+	private SpinnerValueFactory<Integer> spinnerValueFactory_selectionYear;
+
+	private SpinnerValueFactory<Integer> spinnerValueFactory_secondSelectionYear;
+	// End of --> Year Spinners Value Factory
 
 	// Selection store reports
 	private IncomesReport m_incomesReport;
@@ -144,20 +137,13 @@ public class ShopManagerController extends BaseController
 	private ComplaintsReport m_compareComplaintsReport;
 
 	private SurveysReport m_compareSurveyReport;
-
 	// End of --> Selection store reports
 
-	// User ID (Only if User is ShopManager)
-	private Integer m_shopManagerUserID;
-
-	private ShopManager m_shopManagerUser;
-	// End of --> User ID (Only if User is ShopManager)
-
+	// Flags
 	private boolean firstTime = true;
 
 	private boolean regularReport = true;
-
-	private int minYear = 2010;
+	// End of --> Flags
 
 	/* End of --> Private fields */
 
@@ -184,15 +170,27 @@ public class ShopManagerController extends BaseController
 	// End of --> Month ArrayList
 
 	/* End of --> Local enums array */
+	/* End of --> Reports stage */
+
+	// User ID (Only if User is ShopManager)
+	private Integer m_shopManagerUserID;
+
+	private ShopManager m_shopManagerUser;
+	// End of --> User ID (Only if User is ShopManager)
 
 	/* Shop Manager - Add Costumer To Shop Stage Fields */
 
+	// Side Bar Menu VBbox
 	@FXML private VBox vbox_sidebar;
-
+	// End of --> Side Bar Menu VBbox
+	
+	// Add New Shop Costumer Fields
 	@FXML private TextField textField_addShopCostumer;
 
 	@FXML private Button button_addShopCostumer;
+	// End of --> Add New Shop Costumer Fields
 
+	// Subscription Table
 	@FXML private TableView<ShopCostumerRow> tableView_shopCostumer;
 
 	@FXML private TableColumn<ShopCostumerRow, Integer> tableColumn_shopCostumerID;
@@ -204,13 +202,23 @@ public class ShopManagerController extends BaseController
 	@FXML private TableColumn<ShopCostumerRow, String> tableColumn_shopCostumerCreditCard;
 
 	@FXML private TableColumn<ShopCostumerRow, Float> tableColumn_shopCostumerCumulativePrice;
-
+	// End of --> Subscription Table
+	
+	// Flags
 	private boolean initFlag = true;
-
+	// End of --> Flags
+	
+	// Registered Company Costumers
 	private ArrayList<Integer> costumers = new ArrayList<>();
-
+	// End of --> Registered Company Costumers
+	
+	// Registered Shop Costumers
 	ObservableList<ShopCostumerRow> costumerInShop = FXCollections.observableArrayList();
+	// End of --> Registered Shop Costumers
+	
 	/* End of -> Shop Manager - Add Costumer To Shop Stage Fields */
+	
+	 @FXML private ToggleButton toggleButton_compareReport;
 
 	// region BaseController Implementation
 
@@ -254,7 +262,7 @@ public class ShopManagerController extends BaseController
 			year--;
 		}
 
-		spinnerValueFactory_selectionYear = new SpinnerValueFactory.IntegerSpinnerValueFactory(minYear, year);
+		spinnerValueFactory_selectionYear = new SpinnerValueFactory.IntegerSpinnerValueFactory(2010, year);
 		spinner_selectionYear.setValueFactory(spinnerValueFactory_selectionYear);
 		spinner_selectionYear.getValueFactory().setValue(year);
 		comboBox_selectionReportType.setItems(reportsType);
@@ -277,8 +285,7 @@ public class ShopManagerController extends BaseController
 			Platform.runLater(() -> {
 				comboBox_selectionQuarter.setVisible(false);
 				spinner_selectionYear.setVisible(false);
-				button_compare.setVisible(false);
-				button_oneReport.setVisible(false);
+				toggleButton_compareReport.setVisible(false);
 				comboBox_selectionStore.setVisible(false);
 			});
 		}
@@ -306,7 +313,7 @@ public class ShopManagerController extends BaseController
 		secondReportQuarter.setPrefWidth(93);
 		secondReportYear = new Spinner<>();
 		secondReportYear.setPrefWidth(69);
-		spinnerValueFactory_secondSelectionYear = new SpinnerValueFactory.IntegerSpinnerValueFactory(minYear,
+		spinnerValueFactory_secondSelectionYear = new SpinnerValueFactory.IntegerSpinnerValueFactory(2010,
 				year.get(Calendar.YEAR));
 		secondReportYear.setValueFactory(spinnerValueFactory_secondSelectionYear);
 		secondReportYear.getValueFactory().setValue(spinner_selectionYear.getValue());
@@ -511,29 +518,6 @@ public class ShopManagerController extends BaseController
 			AnchorPane.setLeftAnchor(((Node) comparePane), 380.0);
 			AnchorPane.setBottomAnchor(((Node) comparePane), 35.0);
 		});
-	}
-
-	/**
-	 * Activate when Compare Report button pressed. Create and initialize compare
-	 * report variables.
-	 * 
-	 */
-	@FXML
-	private void compareReports(ActionEvent event)
-	{
-		Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-		Platform.runLater(() -> {
-			primaryStage.setMinWidth(885);
-			primaryStage.setMinHeight(600);
-		});
-		compareReportsNewStage();
-		button_compare.setDisable(true);
-		button_oneReport.setDisable(false);
-		secondReportQuarter.setVisible(true);
-		secondReportStore.setVisible(true);
-		secondReportType.setVisible(true);
-		secondReportYear.setVisible(true);
-		secondSubmitButton.setVisible(true);
 	}
 
 	/**
@@ -1074,12 +1058,7 @@ public class ShopManagerController extends BaseController
 						else {
 							m_surveyReport = null;
 							if (m_shopManagerUserID != null) {
-								if (!(label_noReports.isVisible())) {
-									label_noReports.setVisible(true);
-									comboBox_selectionReportType.setVisible(false);
-									button_submit.setVisible(false);
-									barChart_currentChart.setVisible(false);
-								}
+								showInformationMessage("No report for current shop.");
 							} else {
 								String title = barChart_currentChart.getTitle();
 								final String shop = getShopName(comboBox_selectionStore.getValue());
@@ -1094,7 +1073,7 @@ public class ShopManagerController extends BaseController
 										barChart_currentChart.setTitle(reportType + shop + " Summary");
 									}
 								});
-								if (!firstTime) errorMSG("There is no reports for:\n" + shop + " Store, "
+								if (!firstTime) errorMSG("There are no reports for:\n" + shop + " Store, "
 										+ comboBox_selectionQuarter.getValue() + " Quarter in "
 										+ spinner_selectionYear.getValue());
 								else firstTime = false;
@@ -1107,7 +1086,7 @@ public class ShopManagerController extends BaseController
 						else {
 							m_compareSurveyReport = null;
 							String title = compareChart.getTitle();
-							final String shop = getShopName(secondReportType.getText());
+							final String shop = getShopName(secondReportStore.getValue());
 							Platform.runLater(() -> {
 								compareChart.getData().clear();
 								if (compareChart.getXAxis().getLabel() != null) compareChart.getXAxis()
@@ -1118,7 +1097,7 @@ public class ShopManagerController extends BaseController
 									compareChart.setTitle(reportType + shop + " Summary");
 								}
 							});
-							errorMSG("There is no reports for:\n" + shop + " Store, " + secondReportQuarter.getValue()
+							errorMSG("There are no reports for:\n" + shop + " Store, " + secondReportQuarter.getValue()
 									+ " Quarter in " + secondReportYear.getValue());
 						}
 					}
@@ -1141,26 +1120,6 @@ public class ShopManagerController extends BaseController
 	}
 
 	// end region -> BaseController Implementation
-
-	@FXML
-	private void resetPane(ActionEvent event)
-	{
-		button_compare.setDisable(false);
-		button_oneReport.setDisable(true);
-		secondReportQuarter.setVisible(false);
-		secondReportStore.setVisible(false);
-		secondReportType.setVisible(false);
-		secondReportYear.setVisible(false);
-		secondSubmitButton.setVisible(false);
-		comparePane.getChildren().clear();
-		comparePane = null;
-		AnchorPane.setRightAnchor(((Node) pane_dataPane), 10.0);
-		AnchorPane.setTopAnchor(((Node) pane_dataPane), 50.0);
-		barChart_currentChart.setPrefSize(pane_dataPane.getWidth(), pane_dataPane.getHeight());
-		Platform.runLater(() -> {
-			mainStageSizeChanged_StageReorder();
-		});
-	}
 
 	private ShopCostumerRow costumerRowInit(ShopCostumer shopCostumer)
 	{
@@ -1188,5 +1147,38 @@ public class ShopManagerController extends BaseController
 					shopCostumer.getCreditCard(), shopCostumer.getCumulativePrice());
 		}
 		return shopCostumerRow;
+	}
+	
+	@FXML
+	private void reprotStageChange(ActionEvent event)
+	{
+		if(toggleButton_compareReport.isSelected())
+		{
+			Stage primaryStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+			Platform.runLater(() -> {
+				primaryStage.setMinWidth(885);
+				primaryStage.setMinHeight(600);
+			});
+			compareReportsNewStage();
+			secondReportQuarter.setVisible(true);
+			secondReportStore.setVisible(true);
+			secondReportType.setVisible(true);
+			secondReportYear.setVisible(true);
+			secondSubmitButton.setVisible(true);
+		} else {
+			secondReportQuarter.setVisible(false);
+			secondReportStore.setVisible(false);
+			secondReportType.setVisible(false);
+			secondReportYear.setVisible(false);
+			secondSubmitButton.setVisible(false);
+			comparePane.getChildren().clear();
+			comparePane = null;
+			AnchorPane.setRightAnchor(((Node) pane_dataPane), 10.0);
+			AnchorPane.setTopAnchor(((Node) pane_dataPane), 50.0);
+			barChart_currentChart.setPrefSize(pane_dataPane.getWidth(), pane_dataPane.getHeight());
+			Platform.runLater(() -> {
+				mainStageSizeChanged_StageReorder();
+			});
+		}
 	}
 }

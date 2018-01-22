@@ -76,10 +76,10 @@
 						<ComboBox fx:id="comboBox_user" layoutX="170.0" layoutY="70.0" onAction="#userSelected" prefWidth="150.0" promptText="Select username" />
 				        <ComboBox fx:id="comboBox_status" layoutX="170.0" layoutY="120.0" prefWidth="150.0" />
 						<ComboBox fx:id="comboBox_privillge" layoutX="170.0" layoutY="170.0" prefWidth="150.0" />
-			            <Button fx:id="button_update1" layoutX="170.0" layoutY="220.0" mnemonicParsing="false" onAction="#updatebtn1" text="Update" />			
+					    <Button fx:id="button_update1" layoutX="170.0" layoutY="220.0" mnemonicParsing="false" onAction="#updatebtn1" text="Update" />			
 						<Label layoutX="80.0" layoutY="75.0" text="Customer's user" />
-     			        <Label layoutX="80.0" layoutY="125.0" text="Status" />
-            			<Label layoutX="80.0" layoutY="175.0" text="Privilge" />
+     			        <Label fx:id="label_status" layoutX="80.0" layoutY="125.0" text="Status" />
+            			<Label fx:id="label_privillege" layoutX="80.0" layoutY="175.0" text="Privillege" />
 						<Label text="Update User Status">
 							<font>
 								<Font name="Berlin Sans FB Demi Bold" size="36" />
