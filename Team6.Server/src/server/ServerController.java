@@ -391,7 +391,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 
 		try {
-			String updateAllUsersToDisconnectQuery = QueryGenerator.updateAllUsersToDisconnectQuery();
+			String updateAllUsersToDisconnectQuery = QueryGenerator.generateUpdateAllUsersToDisconnectQuery();
 			boolean executeQuery = m_dbContoller.executeQuery(updateAllUsersToDisconnectQuery);
 			String msg;
 			if (executeQuery) {

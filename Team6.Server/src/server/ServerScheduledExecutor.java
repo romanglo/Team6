@@ -144,7 +144,7 @@ public class ServerScheduledExecutor extends Startable {
 				return null;
 			}
 
-			String query = QueryGenerator.checkCostumersSubscriptionQuery();
+			String query = QueryGenerator.generateCheckCostumersSubscriptionQuery();
 
 			try {
 				CallableStatement callableStatement = m_dbController.getCallableStatement(query);
@@ -209,7 +209,7 @@ public class ServerScheduledExecutor extends Startable {
 				}
 			}
 
-			String selectQuery = QueryGenerator.selectAllShopManagersQuery();
+			String selectQuery = QueryGenerator.generateSelectAllQuery(new ShopManager());
 
 			ResultSet queryResult = null;
 			List<IEntity> entities;
