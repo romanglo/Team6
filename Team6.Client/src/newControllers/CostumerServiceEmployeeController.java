@@ -359,6 +359,16 @@ public class CostumerServiceEmployeeController extends BaseController
 	@FXML
 	private void openSurveys_AddSurvey(ActionEvent event)
 	{
+		if(opensurvey_combobox_shopname.getValue()==null)
+		{
+			showInformationMessage("You left empty fields.");
+			return;
+		}
+		if(opensurvey_datepicker_enddate.getValue()==null)
+		{
+			showInformationMessage("You left empty fields.");
+			return;
+		}
 		String state = opensurvey_button_openclose_survey.getText();
 		if (state.equals("Update end date")) {
 			LocalDate localDate = opensurvey_datepicker_enddate.getValue();
