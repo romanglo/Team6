@@ -384,7 +384,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	@FXML
 	private void openSurveys_selectShop(ActionEvent event)
 	{
-		String shopname = opensurvey_combobox_shopname.getValue();
+		String shopname = opensurvey_combobox_shopname.getValue().substring(opensurvey_combobox_shopname.getValue().indexOf('-')+1,opensurvey_combobox_shopname.getValue().length());
 		shopid = 0;
 		for (int i = 0; i < m_addsurvey_shopmanager_array.size(); i++) {
 			if (((ShopManager) m_addsurvey_shopmanager_array.get(i)).getName().equals(shopname)) {
@@ -619,7 +619,7 @@ public class CostumerServiceEmployeeController extends BaseController
 				if (((EntitiesListData) messageData).getEntities().get(0) instanceof ShopManager) {
 					m_addsurvey_shopmanager_array = ((EntitiesListData) messageData).getEntities();
 					for (int i = 0; i < m_addsurvey_shopmanager_array.size(); i++) {
-						m_addsurvey_names_array.add(((ShopManager) m_addsurvey_shopmanager_array.get(i)).getName());
+						m_addsurvey_names_array.add( ((ShopManager) m_addsurvey_shopmanager_array.get(i)).getId()+ " -"+((ShopManager) m_addsurvey_shopmanager_array.get(i)).getName());
 					}
 					javafx.application.Platform.runLater(() -> {
 						opensurvey_combobox_shopname.getItems().clear();
@@ -707,8 +707,12 @@ public class CostumerServiceEmployeeController extends BaseController
 					int today = (int) new Date().getTime();
 					for (int i = 0; i < complaints.size(); i++) {
 						int time = (int) (((Complaint) complaints.get(i)).getCreationDate().getTime());
+						if((((Complaint) complaints.get(i)).isOpened()))
+						{
 						if ((today - time) / (24 * 60 * 60 * 1000) >= 1) {
-							twentyfour = twentyfour +" ," + (((Complaint) complaints.get(i)).getId());
+							if(twentyfour.equals("")) twentyfour = twentyfour +" " + (((Complaint) complaints.get(i)).getId());
+							else twentyfour = twentyfour +" ," + (((Complaint) complaints.get(i)).getId());
+						}
 						}
 					}
 					if (!twentyfour.equals("")) {
