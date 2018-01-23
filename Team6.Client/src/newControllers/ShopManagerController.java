@@ -233,6 +233,7 @@ public class ShopManagerController extends BaseController
 
 	// region BaseController Implementation
 
+	// ----------------------------------------------------------------------------INIT-------------------------------------------------------------
 	/**
 	 * {@inheritDoc}
 	 */
@@ -240,7 +241,7 @@ public class ShopManagerController extends BaseController
 	protected void internalInitialize() throws Exception
 	{
 		if (m_ConnectedUser.getPrivilege() == EntitiesEnums.UserPrivilege.ShopManager) {
-			initializeShopManagerUser();
+			getShopManagerUser();
 			getAllCostumer();
 		} else {
 			vbox_sidebar.getChildren().get(1).setVisible(false);
@@ -249,21 +250,17 @@ public class ShopManagerController extends BaseController
 		initializeChartPane();
 	}
 
-	private void initializeShopManagerUser()
-	{
-		ShopManager shopManager = new ShopManager();
-		shopManager.setUserName(m_ConnectedUser.getUserName());
-		Message entityMessage = MessagesFactory.createGetEntityMessage(shopManager);
-		m_Client.sendMessageToServer(entityMessage);
-	}
-
+	/**
+	 * Initialize all report selection fields accord to the current value in DB.
+	 *
+	 */
 	@FXML
 	private void initializeSelection()
 	{
 		Calendar currentDate = Calendar.getInstance();
 		int currentQuarter = currentDate.get(Calendar.MONTH);
-		final int finalQuarter;
 		int year = currentDate.get(Calendar.YEAR);
+		final int finalQuarter;
 
 		if (currentQuarter >= 10) finalQuarter = 3;
 		else if (currentQuarter >= 7) finalQuarter = 2;
@@ -273,31 +270,21 @@ public class ShopManagerController extends BaseController
 			year--;
 		}
 
+		toggleSwitch_compareReport.setSwitchedListener((isOn) -> reprotStageChange(isOn));
 		spinnerValueFactory_selectionYear = new SpinnerValueFactory.IntegerSpinnerValueFactory(2010, year);
 		spinnerValueFactory_secondSelectionYear = new SpinnerValueFactory.IntegerSpinnerValueFactory(2010, year);
 		spinner_selectionYear.setValueFactory(spinnerValueFactory_selectionYear);
 		spinner_selectionYear.getValueFactory().setValue(year);
 		comboBox_selectionReportType.setItems(reportsType);
+		comboBox_selectionQuarter.setItems(quarters);
+		comboBox_selectionStore.setItems(stores);
 		Platform.runLater(() -> {
 			comboBox_selectionReportType.setValue(reportsType.get(0));
-		});
-		comboBox_selectionQuarter.setItems(quarters);
-		Platform.runLater(() -> {
 			comboBox_selectionQuarter.setValue(quarters.get(finalQuarter - 1));
-		});
+			if (m_shopManagerUserID == null) comboBox_selectionStore.setValue(stores.get(0));
+			else comboBox_selectionStore.setValue(m_shopManagerUserID + " - " + m_shopManagerUser.getName());
 
-		toggleSwitch_compareReport.setSwitchedListener((isOn) -> reprotStageChange(isOn));
-
-		comboBox_selectionStore.setItems(stores);
-		if (m_shopManagerUserID == null) Platform.runLater(() -> {
-			comboBox_selectionStore.setValue(stores.get(0));
-		});
-		else Platform.runLater(() -> {
-			comboBox_selectionStore.setValue(m_shopManagerUserID + " - " + m_shopManagerUser.getName());
-		});
-
-		if (m_ConnectedUser.getPrivilege() == EntitiesEnums.UserPrivilege.ShopManager) {
-			Platform.runLater(() -> {
+			if (m_ConnectedUser.getPrivilege() == EntitiesEnums.UserPrivilege.ShopManager) {
 				comboBox_selectionQuarter.setVisible(false);
 				spinner_selectionYear.setVisible(false);
 				comboBox_selectionStore.setVisible(false);
@@ -307,41 +294,41 @@ public class ShopManagerController extends BaseController
 				toggleSwitch_compareReport.setVisible(false);
 				label_compare.setVisible(false);
 				AnchorPane.setBottomAnchor(((Node) pane_dataPane), 15.0);
-			});
-		}
+			}
+		});
 
-		initializeStoreReportVariables();
+		getReportByCurrentValues("Regular Report");
 	}
 
-	private void initializeStoreReportVariables()
-	{
-		String store = getShopID(comboBox_selectionStore.getValue());
-		int storeId = Integer.parseInt(store);
-		int quarter = quarters.indexOf(comboBox_selectionQuarter.getValue()) + 1;
-		int yearInt = spinner_selectionYear.getValue();
-		Calendar year = Calendar.getInstance();
-		year.set(Calendar.YEAR, yearInt);
-		getStoreReportsFromServer(storeId, quarter, year.getTime());
-	}
-
+	/**
+	 * Initialize compare reports values when Compare stage requested.
+	 *
+	 */
 	@FXML
 	private void initializeCompareReportVariables()
 	{
 		secondReportQuarter = new ComboBox<>(quarters);
-		secondReportQuarter.setValue(comboBox_selectionQuarter.getValue());
-		secondReportQuarter.setPrefWidth(93);
 		secondReportYear = new Spinner<>();
+		secondReportType = new TextField();
+		secondReportStore = new ComboBox<>(stores);
+		secondSubmitButton = new Button("Show Report");
+
+		secondReportQuarter.setPrefWidth(93);
 		secondReportYear.setPrefWidth(69);
+		secondReportType.setPrefWidth(80);
+		secondReportType.setPrefWidth(175);
+		secondReportStore.setPrefWidth(120);
+		secondSubmitButton.setPrefWidth(100);
+		secondSubmitButton.setPrefHeight(25);
+
+		secondReportQuarter.setValue(comboBox_selectionQuarter.getValue());
 		secondReportYear.setValueFactory(spinnerValueFactory_secondSelectionYear);
 		secondReportYear.getValueFactory().setValue(spinner_selectionYear.getValue());
-		secondReportType = new TextField();
-		secondReportType.setPrefWidth(80);
 		secondReportType.setText(comboBox_selectionReportType.getValue());
 		secondReportType.setDisable(true);
-		secondReportType.setPrefWidth(175);
-		secondReportStore = new ComboBox<>(stores);
 		secondReportStore.setValue(comboBox_selectionStore.getValue());
-		secondReportStore.setPrefWidth(120);
+		secondSubmitButton.setOnAction(button_submit.getOnAction());
+
 		if (barChart_currentChart.getTitle() != null) {
 			String reportType = secondReportType.getText();
 			reportType = reportType.replaceAll("Report", "");
@@ -349,13 +336,6 @@ public class ShopManagerController extends BaseController
 					secondReportYear.getValue().toString(), secondReportQuarter.getValue());
 		}
 
-		secondSubmitButton = new Button("Show Report");
-		secondSubmitButton.setPrefWidth(100);
-		secondSubmitButton.setPrefHeight(25);
-		secondSubmitButton.setOnAction(button_submit.getOnAction());
-		// yearChangeListener = (obs, oldText, newText) ->
-		// selectionYearChanged(secondReportYear, (String) oldText);
-		// secondReportYear.textProperty().addListener(yearChangeListener);
 		m_compareIncomesReport = m_incomesReport;
 		m_compareReservationsReport = m_reservationsReport;
 		m_compareComplaintsReport = m_complaintsReport;
@@ -368,7 +348,6 @@ public class ShopManagerController extends BaseController
 		AnchorPane.setTopAnchor(((Node) secondReportType), 50.0);
 		AnchorPane.setTopAnchor(((Node) secondReportStore), 50.0);
 		AnchorPane.setTopAnchor(((Node) secondSubmitButton), 50.0);
-
 		AnchorPane.setLeftAnchor(((Node) secondReportQuarter), 12.0);
 		AnchorPane.setLeftAnchor(((Node) secondReportYear), 112.0);
 		AnchorPane.setLeftAnchor(((Node) secondReportType), 187.0);
@@ -377,15 +356,22 @@ public class ShopManagerController extends BaseController
 		secondReportStore.setVisible(true);
 	}
 
+	/**
+	 * Initialize the pane of regular(not compare) report BarChart view.
+	 *
+	 */
 	@FXML
 	private void initializeChartPane()
 	{
 		CategoryAxis xAxis = new CategoryAxis();
 		NumberAxis yAxis = new NumberAxis();
 		barChart_currentChart = new BarChart<String, Number>(xAxis, yAxis);
+
 		Platform.runLater(() -> {
 			pane_dataPane.getChildren().add(barChart_currentChart);
+			mainStageSizeChanged_StageReorder();
 		});
+		// Add listener to pane size.
 		pane_dataPane.heightProperty().addListener(new ChangeListener<Number>() {
 
 			@Override
@@ -406,11 +392,14 @@ public class ShopManagerController extends BaseController
 				});
 			}
 		});
-		Platform.runLater(() -> {
-			mainStageSizeChanged_StageReorder();
-		});
 	}
 
+	/**
+	 * 
+	 * Initialize Shop Sales table columns and define action when double click on
+	 * table row
+	 *
+	 */
 	private void initializeShopCostumerConfigurationTable()
 	{
 		tableView_shopCostumer.setRowFactory(param -> {
@@ -454,18 +443,26 @@ public class ShopManagerController extends BaseController
 		drewContantToTable();
 	}
 
-	private void saveShopCostumerSubscription(ShopCostumerRow changedShopCostumer, String newSubscription)
+	// --------------------------------------------------------------------------INIT---------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------PRIVATE-----------------------------------------------------------
+
+	/**
+	 * Re-set Subscription table values.
+	 *
+	 */
+	private void drewContantToTable()
 	{
-		Date currentDate = new Date();
-		ShopCostumer shopCostumer = new ShopCostumer();
-		shopCostumer.setCostumerId(changedShopCostumer.getShopCostumerID());
-		shopCostumer.setCostumerSubscription(Enum.valueOf(EntitiesEnums.CostumerSubscription.class, newSubscription));
-		shopCostumer.setShopManagerId(m_shopManagerUserID);
-		shopCostumer.setSubscriptionStartDate(currentDate);
-		Message msg = MessagesFactory.createUpdateEntityMessage(shopCostumer);
-		m_Client.sendMessageToServer(msg);
+		tableView_shopCostumer.setItems(costumerInShop);
+		tableView_shopCostumer.refresh();
 	}
 
+	/**
+	 * Update Subscription table.
+	 *
+	 * @param updatedShopCostumer
+	 *            Edited Shop Costumer.
+	 */
 	private void updateTable(ShopCostumer updatedShopCostumer)
 	{
 		for (ShopCostumerRow rowData : costumerInShop)
@@ -476,6 +473,14 @@ public class ShopManagerController extends BaseController
 		drewContantToTable();
 	}
 
+	/**
+	 * Check if Costumer already signed to the shop.
+	 *
+	 * @param costumerID
+	 *            The Costumer ID.
+	 * @return <code>true</code> if Costumer already signed to the current store and
+	 *         return <code>false</code> otherwise.
+	 */
 	private boolean checkIfShopCostumerAlreadyExist(int costumerID)
 	{
 		for (ShopCostumerRow rowData : costumerInShop)
@@ -483,10 +488,45 @@ public class ShopManagerController extends BaseController
 		return false;
 	}
 
-	private void drewContantToTable()
+	/**
+	 * Check if costumer is exist in DB.
+	 *
+	 * @param costumerId
+	 *            The Costumer ID.
+	 * @return <code>true</code> if costumer exist and <code>false</code> otherwise.
+	 */
+	private int checkIfCostumerExist(int costumerId)
 	{
-		tableView_shopCostumer.setItems(costumerInShop);
-		tableView_shopCostumer.refresh();
+		for (Costumer costumer : costumers)
+			if (costumer.getId() == costumerId) return costumers.indexOf(costumer);
+		return -1;
+	}
+
+	/**
+	 * Create and initialize the compare report variables and insert them into main
+	 * stage.
+	 * 
+	 */
+	private void compareReportsNewStage()
+	{
+		AnchorPane.setRightAnchor(((Node) pane_dataPane), 380.0);
+		AnchorPane.setTopAnchor(((Node) pane_dataPane), 75.0);
+
+		CategoryAxis xAxis = new CategoryAxis();
+		NumberAxis yAxis = new NumberAxis();
+		compareChart = new BarChart<String, Number>(xAxis, yAxis);
+
+		initializeCompareReportVariables();
+
+		comparePane = new Pane(compareChart);
+
+		Platform.runLater(() -> {
+			anchorPane_viewStage.getChildren().add(comparePane);
+			AnchorPane.setRightAnchor(((Node) comparePane), 15.0);
+			AnchorPane.setTopAnchor(((Node) comparePane), 75.0);
+			AnchorPane.setLeftAnchor(((Node) comparePane), 380.0);
+			AnchorPane.setBottomAnchor(((Node) comparePane), 35.0);
+		});
 	}
 
 	/**
@@ -510,265 +550,124 @@ public class ShopManagerController extends BaseController
 	}
 
 	/**
-	 * Create and initialize the compare report variables and insert them into main
-	 * stage.
-	 * 
+	 * Check the source and decide which Bar Chart to change.
+	 *
+	 * @param reportType
+	 *            Report type to show.
+	 * @param source
+	 *            The source who ask for reports. Options : Regular Report or
+	 *            Complaint Report.
 	 */
-	private void compareReportsNewStage()
-	{
-		AnchorPane.setRightAnchor(((Node) pane_dataPane), 380.0);
-		AnchorPane.setTopAnchor(((Node) pane_dataPane), 75.0);
-
-		CategoryAxis xAxis = new CategoryAxis();
-		NumberAxis yAxis = new NumberAxis();
-		compareChart = new BarChart<String, Number>(xAxis, yAxis);
-
-		initializeCompareReportVariables();
-
-		comparePane = new Pane(compareChart);
-		Platform.runLater(() -> {
-			anchorPane_viewStage.getChildren().add(comparePane);
-		});
-		Platform.runLater(() -> {
-			AnchorPane.setRightAnchor(((Node) comparePane), 15.0);
-			AnchorPane.setTopAnchor(((Node) comparePane), 75.0);
-			AnchorPane.setLeftAnchor(((Node) comparePane), 380.0);
-			AnchorPane.setBottomAnchor(((Node) comparePane), 35.0);
-		});
-	}
-
-	/**
-	 * Activate when Report Type ComboBox value changed. Set the Compare report type
-	 * accord to the default report type.
-	 * 
-	 */
-	@FXML
-	private void reportTypeChanged(ActionEvent event)
-	{
-		if (secondReportType == null) return;
-		secondReportType.setText(comboBox_selectionReportType.getValue());
-	}
-
-	private void getReportByCurrentValues(String source)
-	{
-		int storeID, quarter, yearInt = 2017;
-		String store;
-		Calendar year = Calendar.getInstance();
-		if (source.equals("Regular Report")) {
-			store = getShopID(comboBox_selectionStore.getValue());
-			storeID = Integer.parseInt(store);
-			yearInt = spinner_selectionYear.getValue();
-			quarter = quarters.indexOf(comboBox_selectionQuarter.getValue()) + 1;
-		} else {
-			store = getShopID(secondReportStore.getValue());
-			storeID = Integer.parseInt(store);
-			yearInt = secondReportYear.getValue();
-			quarter = quarters.indexOf(secondReportQuarter.getValue()) + 1;
-		}
-		year.set(Calendar.YEAR, yearInt);
-		if (storeID == 0) {
-			if (m_shopManagerUserID != null) storeID = m_shopManagerUserID;
-			else return;
-		}
-		getStoreReportsFromServer(storeID, quarter, year.getTime());
-	}
-
-	@FXML
-	private void showSelectionReport(ActionEvent event)
-	{
-		if (event.getSource().equals(button_submit)) regularReport = true;
-		else regularReport = false;
-		if (event.getSource().equals(button_submit)) getReportByCurrentValues("Regular Report");
-		else getReportByCurrentValues("Compare Report");
-	}
-
-	private void showSelectionReports(String report, String source)
+	private void reportToShow(String reportType, String source)
 	{
 		String shop, year, quarter;
-		switch (source) {
-			case "Regular Report":
-				barChart_currentChart.setLegendVisible(false);
-				shop = comboBox_selectionStore.getValue();
-				year = (spinner_selectionYear.getValue()).toString();
-				quarter = comboBox_selectionQuarter.getValue();
-				switch (report) {
-					case "Financial Incomes Report":
-						showFinancialIncomesOrComplaintsReport("Financial Incomes", barChart_currentChart, shop, year,
-								quarter, m_incomesReport);
-					break;
-					case "Complaints Report":
-						showFinancialIncomesOrComplaintsReport("Complaints", barChart_currentChart, shop, year, quarter,
-								m_complaintsReport);
-					break;
-					case "Reservations Report":
-						barChart_currentChart.setLegendVisible(true);
-						showReservationsReport(barChart_currentChart, shop, year, quarter, m_reservationsReport);
-					break;
-					default:
-						showSatisfactionReport(barChart_currentChart, shop, year, quarter, m_surveyReport);
-				}
-			break;
-			case "Compare Report":
-				compareChart.setLegendVisible(false);
-				shop = secondReportStore.getValue();
-				year = (secondReportYear.getValue()).toString();
-				quarter = secondReportQuarter.getValue();
-				switch (report) {
-					case "Financial Incomes Report":
-						showFinancialIncomesOrComplaintsReport("Financial Incomes", compareChart, shop, year, quarter,
-								m_compareIncomesReport);
-					break;
-					case "Complaints Report":
-						showFinancialIncomesOrComplaintsReport("Complaints", compareChart, shop, year, quarter,
-								m_compareComplaintsReport);
-					break;
-					case "Reservations Report":
-						compareChart.setLegendVisible(true);
-						showReservationsReport(compareChart, shop, year, quarter, m_compareReservationsReport);
-					break;
-					default:
-						showSatisfactionReport(compareChart, shop, year, quarter, m_compareSurveyReport);
-				}
-		}
-	}
+		BarChart<String, Number> barToChange;
+		Report report;
 
-	private String getShopID(String fullNameShop)
-	{
-		String shopID = fullNameShop.substring(0, fullNameShop.indexOf("-") - 1);
-		return shopID;
-	}
-
-	private String getShopName(String fullNameShop)
-	{
-		String shopName = fullNameShop.substring(fullNameShop.indexOf("-") + 1, fullNameShop.length());
-		return shopName;
-	}
-
-	private int checkIfCostumerExist(int costumerId)
-	{
-		for (Costumer costumer : costumers)
-			if (costumer.getId() == costumerId) return costumers.indexOf(costumer);
-		return -1;
-	}
-
-	@FXML
-	private void showCostumerDetails(ActionEvent event)
-	{
-		int costumerId, costumerIndexInArray;
-		try {
-			costumerId = Integer.parseInt(textField_addShopCostumer.getText());
+		if (source.equals("Regular Report")) {
+			barChart_currentChart.setLegendVisible(false);
+			barToChange = barChart_currentChart;
+			shop = comboBox_selectionStore.getValue();
+			year = (spinner_selectionYear.getValue()).toString();
+			quarter = comboBox_selectionQuarter.getValue();
+			switch (reportType) {
+				case "Financial Incomes Report":
+					report = m_incomesReport;
+					showRequestedReport(reportType, barToChange, shop, year, quarter, report);
+				break;
+				case "Complaints Report":
+					report = m_complaintsReport;
+					showRequestedReport(reportType, barToChange, shop, year, quarter, report);
+				break;
+				case "Reservations Report":
+					barChart_currentChart.setLegendVisible(true);
+					report = m_reservationsReport;
+					showRequestedReport(reportType, barToChange, shop, year, quarter, report);
+				break;
+				default:
+					report = m_surveyReport;
+					showRequestedReport(reportType, barToChange, shop, year, quarter, report);
+			}
+		} else {
+			compareChart.setLegendVisible(false);
+			barToChange = compareChart;
+			shop = secondReportStore.getValue();
+			year = (secondReportYear.getValue()).toString();
+			quarter = secondReportQuarter.getValue();
+			switch (reportType) {
+				case "Financial Incomes Report":
+					report = m_compareIncomesReport;
+					showRequestedReport(reportType, barToChange, shop, year, quarter, report);
+				break;
+				case "Complaints Report":
+					report = m_compareComplaintsReport;
+					showRequestedReport(reportType, barToChange, shop, year, quarter, report);
+				break;
+				case "Reservations Report":
+					barChart_currentChart.setLegendVisible(true);
+					report = m_compareReservationsReport;
+					showRequestedReport(reportType, barToChange, shop, year, quarter, report);
+				break;
+				default:
+					report = m_compareSurveyReport;
+					showRequestedReport(reportType, barToChange, shop, year, quarter, report);
+			}
 		}
-		catch (Exception ex) {
-			errorMSG("Invalid ID!");
-			textField_addShopCostumer.clear();
-			return;
-		}
-		if ((costumerIndexInArray = checkIfCostumerExist(costumerId)) == -1) {
-			errorMSG("Costumer doesn't exist in the system.");
-			textField_addShopCostumer.clear();
-			return;
-		}
-		if (checkIfShopCostumerAlreadyExist(costumerId)) {
-			showInformationMessage("Costumer already sign up!");
-			textField_addShopCostumer.clear();
-			return;
-		}
-		Costumer costumer = costumers.get(costumerIndexInArray);
-		textFiled_costumerDetails.setText("ID: " + costumer.getId() + " , UserName:  " + costumer.getUserName());
-	}
-
-	@FXML
-	private void addShopCostumer(ActionEvent event)
-	{
-		int costumerId;
-		String costumerDetails = textFiled_costumerDetails.getText();
-		if (costumerDetails.isEmpty()) {
-			errorMSG("Enter Costumer ID!");
-			return;
-		}
-		costumerDetails = costumerDetails.substring(costumerDetails.indexOf(":") + 2, costumerDetails.indexOf(",") - 1);
-		costumerId = Integer.parseInt(costumerDetails);
-
-		ShopCostumer shopCostumer = new ShopCostumer();
-		shopCostumer.setCostumerId(costumerId);
-		shopCostumer.setShopManagerId(m_shopManagerUserID);
-		shopCostumer.setCostumerSubscription(EntitiesEnums.CostumerSubscription.None);
-		shopCostumer.setSubscriptionStartDate(new Date());
-		textFiled_costumerDetails.clear();
-		textField_addShopCostumer.clear();
-		Message msg = MessagesFactory.createAddEntityMessage(shopCostumer);
-		m_Client.sendMessageToServer(msg);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Change Bar Chart values.
+	 *
+	 * @param reportTypeName
+	 *            The report type.
+	 * @param barToChange
+	 *            The Bar Chart to change.
+	 * @param store
+	 *            The report store name.
+	 * @param year
+	 *            The report year.
+	 * @param quarter
+	 *            The report quarter.
+	 * @param reportData
+	 *            The report to show.
 	 */
-	@Override
-	protected boolean onSelection(String title)
+	private void showRequestedReport(String reportTypeName, BarChart<String, Number> barToChange, String store,
+			String year, String quarter, Report reportData)
 	{
-		switch (title) {
-			case "Reports":
-				anchorPane_mainStage.setVisible(true);
-				anchorpane_shopCostumerManagement.setVisible(false);
+		switch (reportTypeName) {
+			case "Financial Incomes Report":
+				showFinancialIncomesOrComplaintsReport("Financial Incomes", barToChange, store, year, quarter,
+						reportData);
 			break;
-
-			case "Costumers\nManagement":
-				anchorPane_mainStage.setVisible(false);
-				anchorpane_shopCostumerManagement.setVisible(true);
+			case "Complaints Report":
+				showFinancialIncomesOrComplaintsReport("Complaints", barToChange, store, year, quarter, reportData);
 			break;
-
+			case "Reservations Report":
+				barToChange.setLegendVisible(true);
+				showReservationsReport(barToChange, store, year, quarter, (ReservationsReport) reportData);
+			break;
 			default:
-				return false;
-		}
-		return true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected String[] getSideButtonsNames()
-	{
-		return new String[] { "Reports", "Costumers\nManagement" };
-	}
-
-	/* region Private Methods */
-
-	/**
-	 * Create error window for user.
-	 * 
-	 */
-	private void errorMSG(String errorType)
-	{
-		Platform.runLater(() -> {
-			Alert errorMessage = new Alert(AlertType.ERROR);
-			errorMessage.setTitle("Error Message");
-			errorMessage.setContentText(errorType);
-			errorMessage.show();
-		});
-	}
-
-	/**
-	 * Parse string to the month number.
-	 * 
-	 * @param monthString
-	 *            Input string.
-	 * @return The month number.
-	 */
-	private int parseMonthToNum(String monthString)
-	{
-		switch (monthString) {
-			case "Jan":
-				return 1;
-			case "Apr":
-				return 4;
-			case "Jul":
-				return 7;
-			default:
-				return 10;
+				showSatisfactionReport(barToChange, store, year, quarter, (SurveysReport) reportData);
 		}
 	}
 
+	/**
+	 * Change Bar Chart accord to report values. Method for Incomes or Complaints
+	 * report.
+	 *
+	 * @param reportTypeName
+	 *            The report type.
+	 * @param barToChange
+	 *            The Bar Chart to change.
+	 * @param storeId
+	 *            The report store.
+	 * @param year
+	 *            The report year.
+	 * @param quarter
+	 *            The report quarter.
+	 * @param reportData
+	 *            The report.
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void showFinancialIncomesOrComplaintsReport(String reportTypeName, BarChart barToChange, String storeId,
 			String year, String quarter, Report reportData)
@@ -831,6 +730,22 @@ public class ShopManagerController extends BaseController
 		barToChange.getData().addAll(barDataSeries);
 	}
 
+	/**
+	 * Change Bar Chart accord to report values. Method for Reservations report.
+	 *
+	 * @param reportTypeName
+	 *            The report type.
+	 * @param barToChange
+	 *            The Bar Chart to change.
+	 * @param storeId
+	 *            The report store.
+	 * @param year
+	 *            The report year.
+	 * @param quarter
+	 *            The report quarter.
+	 * @param reportData
+	 *            The report.
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void showReservationsReport(BarChart barToChange, String storeId, String year, String quarter,
 			ReservationsReport reportData)
@@ -883,6 +798,22 @@ public class ShopManagerController extends BaseController
 		barToChange.getData().addAll(firstType, secondType, thirdType, fourthType);
 	}
 
+	/**
+	 * Change Bar Chart accord to report values. Method for Survey report.
+	 *
+	 * @param reportTypeName
+	 *            The report type.
+	 * @param barToChange
+	 *            The Bar Chart to change.
+	 * @param storeId
+	 *            The report store.
+	 * @param year
+	 *            The report year.
+	 * @param quarter
+	 *            The report quarter.
+	 * @param reportData
+	 *            The report.
+	 */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void showSatisfactionReport(BarChart barToChange, String storeId, String year, String quarter,
 			SurveysReport reportData)
@@ -903,6 +834,20 @@ public class ShopManagerController extends BaseController
 		barToChange.getData().addAll(Question);
 	}
 
+	/**
+	 * Reset the old Bar Chart values and update the Bar Chart title.
+	 *
+	 * @param barToInit
+	 *            The Bar Chart to change.
+	 * @param fullNameStore
+	 *            The store full name.
+	 * @param reportType
+	 *            The report type.
+	 * @param year
+	 *            The report year.
+	 * @param quarter
+	 *            The report quarter.
+	 */
 	@SuppressWarnings("rawtypes")
 	private void barChartAfterChangeInitialize(BarChart barToInit, String fullNameStore, String reportType, String year,
 			String quarter)
@@ -915,10 +860,275 @@ public class ShopManagerController extends BaseController
 		barToInit.getYAxis().setLabel(reportType);
 	}
 
-	/* end region -> Private Methods */
+	/**
+	 * Initialize {@link ShopCostumerRow} by available {@link ShopCostumer} values.
+	 *
+	 * @param shopCostumer
+	 *            The {@link ShopCostumer}.
+	 * @return {@link ShopCostumerRow} with all {@link ShopCostumer} values.
+	 */
+	private ShopCostumerRow costumerRowInit(ShopCostumer shopCostumer)
+	{
+		ShopCostumerRow shopCostumerRow;
+		if (shopCostumer.getCreditCard() != null && shopCostumer.getCreditCard().equals("null"))
+			shopCostumer.setCreditCard("None");
+		if (shopCostumer.getCreditCard() == null
+				|| shopCostumer.getCostumerSubscription() == EntitiesEnums.CostumerSubscription.None) {
+			if (shopCostumer.getCreditCard() == null
+					&& shopCostumer.getCostumerSubscription() == EntitiesEnums.CostumerSubscription.None) {
+				shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
+						shopCostumer.getCostumerSubscription().toString(), shopCostumer.getCumulativePrice());
+			} else if (shopCostumer.getCreditCard() == null) {
+				shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
+						shopCostumer.getCostumerSubscription().toString(), shopCostumer.getSubscriptionStartDate(),
+						shopCostumer.getCumulativePrice());
+			} else {
+				shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
+						shopCostumer.getCostumerSubscription().toString(), shopCostumer.getCreditCard(),
+						shopCostumer.getCumulativePrice());
+			}
+		} else {
+			shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
+					shopCostumer.getCostumerSubscription().toString(), shopCostumer.getSubscriptionStartDate(),
+					shopCostumer.getCreditCard(), shopCostumer.getCumulativePrice());
+		}
+		return shopCostumerRow;
+	}
 
-	/* Sending message to server methods region */
+	/**
+	 * Activated when {@link ToggleSwitch} changed.
+	 *
+	 * @param isOn
+	 *            <code>true</code> if {@link ToggleSwitch} is on,
+	 *            <code>false</code> otherwise.
+	 */
+	private void reprotStageChange(boolean isOn)
+	{
+		if (isOn) {
+			Stage primaryStage = (Stage) button_submit.getScene().getWindow();
+			Platform.runLater(() -> {
+				primaryStage.setMinWidth(885);
+				primaryStage.setMinHeight(600);
+			});
+			compareReportsNewStage();
+			secondReportQuarter.setVisible(true);
+			secondReportStore.setVisible(true);
+			secondReportType.setVisible(true);
+			secondReportYear.setVisible(true);
+			secondSubmitButton.setVisible(true);
+		} else {
+			secondReportQuarter.setVisible(false);
+			secondReportStore.setVisible(false);
+			secondReportType.setVisible(false);
+			secondReportYear.setVisible(false);
+			secondSubmitButton.setVisible(false);
+			comparePane.getChildren().clear();
+			comparePane = null;
+			AnchorPane.setRightAnchor(((Node) pane_dataPane), 10.0);
+			AnchorPane.setTopAnchor(((Node) pane_dataPane), 50.0);
+			barChart_currentChart.setPrefSize(pane_dataPane.getWidth(), pane_dataPane.getHeight());
+			Platform.runLater(() -> {
+				mainStageSizeChanged_StageReorder();
+			});
+		}
+	}
 
+	/**
+	 * Get the shop full name and return store ID.
+	 *
+	 * @param fullNameShop
+	 *            The shop full name.
+	 * @return Shop ID.
+	 */
+	private String getShopID(String fullNameShop)
+	{
+		String shopID = fullNameShop.substring(0, fullNameShop.indexOf("-") - 1);
+		return shopID;
+	}
+
+	/**
+	 * Get the shop full name and return store name.
+	 *
+	 * @param fullNameShop
+	 *            The shop full name.
+	 * @return Shop name.
+	 */
+	private String getShopName(String fullNameShop)
+	{
+		String shopName = fullNameShop.substring(fullNameShop.indexOf("-") + 1, fullNameShop.length());
+		return shopName;
+	}
+
+	/**
+	 * Create error window for user.
+	 * 
+	 */
+	private void errorMSG(String errorType)
+	{
+		Platform.runLater(() -> {
+			Alert errorMessage = new Alert(AlertType.ERROR);
+			errorMessage.setTitle("Error Message");
+			errorMessage.setContentText(errorType);
+			errorMessage.show();
+		});
+	}
+
+	/**
+	 * Parse string to the month number.
+	 * 
+	 * @param monthString
+	 *            Input string.
+	 * @return The month number.
+	 */
+	private int parseMonthToNum(String monthString)
+	{
+		switch (monthString) {
+			case "Jan":
+				return 1;
+			case "Apr":
+				return 4;
+			case "Jul":
+				return 7;
+			default:
+				return 10;
+		}
+	}
+
+	// ----------------------------------------------------------------------------PRIVATE-----------------------------------------------------------
+
+	// -----------------------------------------------------------------------------FXML------------------------------------------------------------
+
+	/**
+	 * Activate when one of the "Show Report" pressed.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
+	 */
+	@FXML
+	private void showReportButtonPressed(ActionEvent event)
+	{
+		if (event.getSource().equals(button_submit)) {
+			regularReport = true;
+			getReportByCurrentValues("Regular Report");
+		} else {
+			regularReport = false;
+			getReportByCurrentValues("Compare Report");
+		}
+	}
+
+	/**
+	 * Activate when Report Type ComboBox value changed. Set the Compare report type
+	 * accord to the default report type.
+	 * 
+	 */
+	@FXML
+	private void reportTypeChanged(ActionEvent event)
+	{
+		if (secondReportType == null) return;
+		secondReportType.setText(comboBox_selectionReportType.getValue());
+	}
+
+	/**
+	 * Activated when "Show Costumer Details" button pressed.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
+	 */
+	@FXML
+	private void showCostumerDetails(ActionEvent event)
+	{
+		int costumerId, costumerIndexInArray;
+		try {
+			costumerId = Integer.parseInt(textField_addShopCostumer.getText());
+		}
+		catch (Exception ex) {
+			errorMSG("Invalid ID!");
+			textField_addShopCostumer.clear();
+			textFiled_costumerDetails.clear();
+			return;
+		}
+		if ((costumerIndexInArray = checkIfCostumerExist(costumerId)) == -1) {
+			errorMSG("Costumer doesn't exist in the system.");
+			textField_addShopCostumer.clear();
+			textFiled_costumerDetails.clear();
+			return;
+		}
+		if (checkIfShopCostumerAlreadyExist(costumerId)) {
+			showInformationMessage("Costumer already sign up!");
+			textField_addShopCostumer.clear();
+			textFiled_costumerDetails.clear();
+			return;
+		}
+		Costumer costumer = costumers.get(costumerIndexInArray);
+		textFiled_costumerDetails.setText("ID: " + costumer.getId() + " , UserName:  " + costumer.getUserName());
+	}
+
+	/**
+	 * Activated when "Add Shop Costumer" button pressed.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
+	 */
+	@FXML
+	private void addShopCostumer(ActionEvent event)
+	{
+		int costumerId;
+		String costumerDetails = textFiled_costumerDetails.getText();
+		if (costumerDetails.isEmpty()) {
+			errorMSG("Enter Costumer ID!");
+			return;
+		}
+		costumerDetails = costumerDetails.substring(costumerDetails.indexOf(":") + 2, costumerDetails.indexOf(",") - 1);
+		costumerId = Integer.parseInt(costumerDetails);
+
+		textFiled_costumerDetails.clear();
+		textField_addShopCostumer.clear();
+		addNewShopCostumer(costumerId);
+	}
+
+	// -----------------------------------------------------------------------------FXML------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------SERVER-COMMUNICATION---------------------------------------------
+
+	/**
+	 * Send message to server to get connected shop manager entity.
+	 *
+	 */
+	private void getShopManagerUser()
+	{
+		ShopManager shopManager = new ShopManager();
+		shopManager.setUserName(m_ConnectedUser.getUserName());
+		Message entityMessage = MessagesFactory.createGetEntityMessage(shopManager);
+		m_Client.sendMessageToServer(entityMessage);
+	}
+
+	/**
+	 * Send Get All message to server for all Shop Costumer.
+	 *
+	 */
+	private void getCostumersInShop()
+	{
+		ShopCostumer shopCostumer = new ShopCostumer();
+		shopCostumer.setShopManagerId(m_shopManagerUserID);
+		shopCostumer.setCostumerId(0);
+		Message msg = MessagesFactory.createGetAllEntityMessage(shopCostumer);
+		m_Client.sendMessageToServer(msg);
+	}
+
+	/**
+	 * Send Get All message to server for all Costumer.
+	 *
+	 */
+	private void getAllCostumer()
+	{
+		Message msg = MessagesFactory.createGetAllEntityMessage(new Costumer());
+		m_Client.sendMessageToServer(msg);
+	}
+
+	/**
+	 * Send get message to server for all exist stores.
+	 *
+	 */
 	private void getStoreIdListFromServer()
 	{
 		Message entityMessage;
@@ -927,9 +1137,14 @@ public class ShopManagerController extends BaseController
 	}
 
 	/**
-	 * Activate when Store ComboBox value changed. Send Get messages for all store
-	 * report.
+	 * Send Get messages for requested store report.
 	 * 
+	 * @param store
+	 *            The store.
+	 * @param quarter
+	 *            The report quarter.
+	 * @param year
+	 *            The report year.
 	 */
 	private void getStoreReportsFromServer(int store, int quarter, java.util.Date year)
 	{
@@ -970,22 +1185,103 @@ public class ShopManagerController extends BaseController
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
-	private void getCostumersInShop()
+	/**
+	 * Send update message to server with new shop costumer subscription.
+	 *
+	 * @param changedShopCostumer
+	 *            The Shop Costumer.
+	 * @param newSubscription
+	 *            The new subscription.
+	 */
+	private void saveShopCostumerSubscription(ShopCostumerRow changedShopCostumer, String newSubscription)
+	{
+		Date currentDate = new Date();
+		ShopCostumer shopCostumer = new ShopCostumer();
+		shopCostumer.setCostumerId(changedShopCostumer.getShopCostumerID());
+		shopCostumer.setCostumerSubscription(Enum.valueOf(EntitiesEnums.CostumerSubscription.class, newSubscription));
+		shopCostumer.setShopManagerId(m_shopManagerUserID);
+		shopCostumer.setSubscriptionStartDate(currentDate);
+		Message msg = MessagesFactory.createUpdateEntityMessage(shopCostumer);
+		m_Client.sendMessageToServer(msg);
+	}
+
+	/**
+	 * Send get message to server with requested report details.
+	 *
+	 * @param source
+	 *            The source who ask for reports. Options : Regular Report or
+	 *            Compare Report.
+	 */
+	private void getReportByCurrentValues(String source)
+	{
+		int storeID, quarter, yearInt = 2017;
+		String store;
+		Calendar year = Calendar.getInstance();
+		if (source.equals("Regular Report")) {
+			store = getShopID(comboBox_selectionStore.getValue());
+			storeID = Integer.parseInt(store);
+			yearInt = spinner_selectionYear.getValue();
+			quarter = quarters.indexOf(comboBox_selectionQuarter.getValue()) + 1;
+		} else {
+			store = getShopID(secondReportStore.getValue());
+			storeID = Integer.parseInt(store);
+			yearInt = secondReportYear.getValue();
+			quarter = quarters.indexOf(secondReportQuarter.getValue()) + 1;
+		}
+		year.set(Calendar.YEAR, yearInt);
+		getStoreReportsFromServer(storeID, quarter, year.getTime());
+	}
+
+	/**
+	 * Send add message to server with new Shop Costumer.
+	 *
+	 * @param costumerId
+	 *            The Shop Costumer ID.
+	 */
+	private void addNewShopCostumer(int costumerId)
 	{
 		ShopCostumer shopCostumer = new ShopCostumer();
+		shopCostumer.setCostumerId(costumerId);
 		shopCostumer.setShopManagerId(m_shopManagerUserID);
-		shopCostumer.setCostumerId(0);
-		Message msg = MessagesFactory.createGetAllEntityMessage(shopCostumer);
+		shopCostumer.setCostumerSubscription(EntitiesEnums.CostumerSubscription.None);
+		shopCostumer.setSubscriptionStartDate(new Date());
+		Message msg = MessagesFactory.createAddEntityMessage(shopCostumer);
 		m_Client.sendMessageToServer(msg);
 	}
 
-	private void getAllCostumer()
+	// ----------------------------------------------------------------------------SERVER-COMMUNICATION---------------------------------------------
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean onSelection(String title)
 	{
-		Message msg = MessagesFactory.createGetAllEntityMessage(new Costumer());
-		m_Client.sendMessageToServer(msg);
+		switch (title) {
+			case "Reports":
+				anchorPane_mainStage.setVisible(true);
+				anchorpane_shopCostumerManagement.setVisible(false);
+			break;
+
+			case "Costumers\nManagement":
+				anchorPane_mainStage.setVisible(false);
+				anchorpane_shopCostumerManagement.setVisible(true);
+			break;
+
+			default:
+				return false;
+		}
+		return true;
 	}
 
-	/* End of -> Sending message to server methods region */
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String[] getSideButtonsNames()
+	{
+		return new String[] { "Reports", "Costumers\nManagement" };
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -1015,7 +1311,7 @@ public class ShopManagerController extends BaseController
 					else {
 						m_surveyReport = (SurveysReport) entity;
 						Platform.runLater(
-								() -> showSelectionReports(comboBox_selectionReportType.getValue(), "Regular Report"));
+								() -> reportToShow(comboBox_selectionReportType.getValue(), "Regular Report"));
 					}
 				} else {
 					if (entity instanceof IncomesReport) m_compareIncomesReport = (IncomesReport) entity;
@@ -1024,7 +1320,7 @@ public class ShopManagerController extends BaseController
 					else if (entity instanceof ComplaintsReport) m_compareComplaintsReport = (ComplaintsReport) entity;
 					else {
 						m_compareSurveyReport = (SurveysReport) entity;
-						Platform.runLater(() -> showSelectionReports(secondReportType.getText(), "Compare Report"));
+						Platform.runLater(() -> reportToShow(secondReportType.getText(), "Compare Report"));
 					}
 				}
 			} else {
@@ -1163,63 +1459,4 @@ public class ShopManagerController extends BaseController
 	}
 
 	// end region -> BaseController Implementation
-
-	private ShopCostumerRow costumerRowInit(ShopCostumer shopCostumer)
-	{
-		ShopCostumerRow shopCostumerRow;
-		if (shopCostumer.getCreditCard() != null && shopCostumer.getCreditCard().equals("null"))
-			shopCostumer.setCreditCard("None");
-		if (shopCostumer.getCreditCard() == null
-				|| shopCostumer.getCostumerSubscription() == EntitiesEnums.CostumerSubscription.None) {
-			if (shopCostumer.getCreditCard() == null
-					&& shopCostumer.getCostumerSubscription() == EntitiesEnums.CostumerSubscription.None) {
-				shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
-						shopCostumer.getCostumerSubscription().toString(), shopCostumer.getCumulativePrice());
-			} else if (shopCostumer.getCreditCard() == null) {
-				shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
-						shopCostumer.getCostumerSubscription().toString(), shopCostumer.getSubscriptionStartDate(),
-						shopCostumer.getCumulativePrice());
-			} else {
-				shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
-						shopCostumer.getCostumerSubscription().toString(), shopCostumer.getCreditCard(),
-						shopCostumer.getCumulativePrice());
-			}
-		} else {
-			shopCostumerRow = new ShopCostumerRow(shopCostumer.getCostumerId(),
-					shopCostumer.getCostumerSubscription().toString(), shopCostumer.getSubscriptionStartDate(),
-					shopCostumer.getCreditCard(), shopCostumer.getCumulativePrice());
-		}
-		return shopCostumerRow;
-	}
-
-	private void reprotStageChange(boolean isOn)
-	{
-		if (isOn) {
-			Stage primaryStage = (Stage) button_submit.getScene().getWindow();
-			Platform.runLater(() -> {
-				primaryStage.setMinWidth(885);
-				primaryStage.setMinHeight(600);
-			});
-			compareReportsNewStage();
-			secondReportQuarter.setVisible(true);
-			secondReportStore.setVisible(true);
-			secondReportType.setVisible(true);
-			secondReportYear.setVisible(true);
-			secondSubmitButton.setVisible(true);
-		} else {
-			secondReportQuarter.setVisible(false);
-			secondReportStore.setVisible(false);
-			secondReportType.setVisible(false);
-			secondReportYear.setVisible(false);
-			secondSubmitButton.setVisible(false);
-			comparePane.getChildren().clear();
-			comparePane = null;
-			AnchorPane.setRightAnchor(((Node) pane_dataPane), 10.0);
-			AnchorPane.setTopAnchor(((Node) pane_dataPane), 50.0);
-			barChart_currentChart.setPrefSize(pane_dataPane.getWidth(), pane_dataPane.getHeight());
-			Platform.runLater(() -> {
-				mainStageSizeChanged_StageReorder();
-			});
-		}
-	}
 }
