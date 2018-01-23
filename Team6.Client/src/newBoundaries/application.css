@@ -170,16 +170,6 @@
 .combo-box .cell:selected {
     -fx-text-fill: teal;
 }
-
-
-.chart {
-    -fx-padding: 10px;
-    -fx-font-size: 1.0em;
-    
-}
-.chart-content {
-    -fx-padding: 30px;    
-}
  
 .chart-title {
   -fx-text-fill: #4682b4;
@@ -207,12 +197,15 @@
 .chart-plot-background {
     -fx-background-color: transparent;
 }
+
 .chart-vertical-grid-lines {
     -fx-stroke: transparent ;
-}
+} 
+
 .chart-horizontal-grid-lines {
     -fx-stroke: #3278fa;
 }
+
 .chart-alternative-row-fill {
     -fx-fill: #dddddd;
     -fx-stroke: transparent;
