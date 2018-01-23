@@ -4,6 +4,7 @@ package boundaries;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.InputStream;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
@@ -79,7 +80,8 @@ public class CatalogItemRow
 		this.m_type = m_type;
 		this.m_price = m_price;
 		this.m_domainColor = domainColor;
-		this.m_image = ResizeImage(new Image(getClass().getResourceAsStream("/boundaries/images/Zerli_Headline.jpg")));
+		InputStream defualt = getClass().getResourceAsStream("/newBoundaries/images/no_image.png");
+		this.m_image = ResizeImage(new Image(defualt));
 	}
 
 	/**
@@ -129,7 +131,8 @@ public class CatalogItemRow
 		this.m_type = type;
 		this.m_price = price;
 		this.m_domainColor = domainColor;
-		this.m_image = null;
+		InputStream defualt = getClass().getResourceAsStream("/newBoundaries/images/no_image.png");
+		this.m_image = ResizeImage(new Image(defualt));
 	}
 	
 	/**

@@ -56,9 +56,7 @@ import newMessages.MessagesFactory;
 import newMessages.RespondMessageData;
 
 /**
- *
- * ExampleController: TODO Yoni
- * 
+ * ShopManagerController : Managed the Shop Manager and Chain Manager UI.
  * 
  */
 public class ShopManagerController extends BaseController
@@ -397,7 +395,7 @@ public class ShopManagerController extends BaseController
 	/**
 	 * 
 	 * Initialize Shop Sales table columns and define action when double click on
-	 * table row
+	 * table row.
 	 *
 	 */
 	private void initializeShopCostumerConfigurationTable()
