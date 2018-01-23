@@ -292,6 +292,27 @@ public class Costumer_SavedData
 			s_itemsInReservation.add(item);
 		}
 	}
+	
+	/**
+	 * Remove the {@link IEntity} from the reservation list of the costumer.
+	 *
+	 * @param item
+	 *            the item to remove.
+	 */
+	public static void removeItemFromReservation(IEntity item)
+	{
+		ItemInReservation recievedItem = (ItemInReservation) item;
+		if (s_itemsInReservation != null) {
+			for (IEntity entity : s_itemsInReservation) {
+				ItemInReservation itemInReservation = (ItemInReservation) entity;
+				if (recievedItem.getItemId() == itemInReservation.getItemId()) {
+					recievedItem = itemInReservation;
+					break;
+				}
+			}
+			s_itemsInReservation.remove(recievedItem);
+		}
+	}
 
 	/**
 	 * Update the refunds of the costumer.
