@@ -3,8 +3,7 @@ package newControllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-import javax.xml.bind.ParseConversionEvent;
+import java.util.Observable;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +16,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
-import newEntities.Costumer;
 import newEntities.EntitiesEnums;
 import newEntities.IEntity;
 import newEntities.ShopEmployee;
@@ -31,7 +29,6 @@ import newMessages.RespondMessageData;
 
 /**
  *
- * ExampleController: TODO Yoni
  * 
  * 
  */
@@ -58,7 +55,9 @@ public class AdministratorController extends BaseController
 	
 	private @FXML ComboBox<String> comboBox_privillge;
 	
-	private @FXML TextField textField_username;
+	private @FXML ComboBox<String> comboBox_user1;
+	
+	//private @FXML TextField textField_username;
 
 	private @FXML TextField textField_email;
 
@@ -111,7 +110,7 @@ public class AdministratorController extends BaseController
 		initializeStatus();
 		initializePrivillge();
 	}
-	
+
 	protected void initializeUsers()
 	{
 		User tempEntity = new User();
@@ -119,6 +118,7 @@ public class AdministratorController extends BaseController
 		m_Client.sendMessageToServer(msg);
 	}
 	
+
 	protected void initializeStatus()
 	{
 		ArrayList<String> al = new ArrayList<String>();
@@ -129,17 +129,17 @@ public class AdministratorController extends BaseController
 		comboBox_status.setVisible(false);
 		label_status.setVisible(false);
 	}
-
+	
 	protected void initializePrivillge()
 	{
 		ArrayList<String> al = new ArrayList<String>();
-		al.add("administrator");
-		al.add("shop employee");
-		al.add("chain manager");
-		al.add("shop manager");
-		al.add("service specialist");
-		al.add("company employee");
-		al.add("costumer service");
+		al.add("Administrator");
+		al.add("Shop employee");
+		al.add("Chain manager");
+		al.add("Shop manager");
+		al.add("Service specialist");
+		al.add("Company employee");
+		al.add("Costumer service");
 		list = FXCollections.observableArrayList(al);
 		comboBox_privillge.setItems(list);
 		comboBox_privillge.setVisible(false);
@@ -170,9 +170,7 @@ public class AdministratorController extends BaseController
 			break;
 
 			case "User Coordinates":
-				anchorpane_option1.setVisible(false);
-				anchorpane_option21.setVisible(true);
-				textField_username.setText("Enter Username");
+				comboBox_user1.setValue(null);
 				textField_email.setVisible(false);
 				textField_password.setVisible(false);
 				textField_branch.setVisible(false);
@@ -182,6 +180,9 @@ public class AdministratorController extends BaseController
 				label_branch.setVisible(false);
 				label_shopManagerId.setVisible(false);
 				button_update.setVisible(false);
+				anchorpane_option1.setVisible(false);
+				anchorpane_option21.setVisible(true);
+				initializeUsers();
 
 			break;
 
@@ -193,11 +194,13 @@ public class AdministratorController extends BaseController
 
 	/**
 	 * {@inheritDoc}
+	 * 
+	 * @return window : return the window name to open the right window 
 	 */
 	@Override
 	protected String[] getSideButtonsNames()
 	{
-		return window;//new String[] { "User Status", "User Coordinates" };
+		return window;
 	}
 
 	protected void showInformationMessage(String message)
@@ -217,6 +220,7 @@ public class AdministratorController extends BaseController
 	/**
 	 *
 	 * @param event : send update message to the server when update button pressed
+	 *
 	 * @throws IOException :
 	 */
 	public void updatebtn1(ActionEvent event) throws IOException
@@ -246,8 +250,6 @@ public class AdministratorController extends BaseController
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.CompanyEmployee);
 		else if(privilege=="costumer service")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.CostumerService);	
-		//msg=MessagesFactory.createUpdateEntityMessage(selected_user);
-		//m_Client.sendMessageToServer(msg);
 		
 		String status = comboBox_status.getValue().toString();
 		if(status.equals("Actived")) {
@@ -280,7 +282,7 @@ public class AdministratorController extends BaseController
 			comboBox_status.setValue("Blocked");
 		comboBox_status.setVisible(true);
 		label_status.setVisible(true);
-		if(username.equals("costumer")) {
+		if(selected_user.getPrivilege().equals(EntitiesEnums.UserPrivilege.Costumer)) {
 			comboBox_privillge.setVisible(false);
 			label_privillege.setVisible(false);
 		}else
@@ -289,20 +291,72 @@ public class AdministratorController extends BaseController
 			label_privillege.setVisible(true);
 		}
 	}
-
-
+	
 	/**
 	 *
-	 * @param event : request all the system users from the server when get button pressed
+	 * @param event :
+	 * @throws IOException 
 	 */
-	public void getBtn(ActionEvent event)
+	public void userSelected1(ActionEvent event) throws IOException
 	{
-		User tempEntity = new User();
+		if(comboBox_user1==null)
+		{
+			return;
+		}
+		Message msg;
+		String username = comboBox_user1.getValue() == null ? "" :comboBox_user1.getValue() ;
+		button_update.setVisible(true);
+		label_password.setVisible(true);
+		label_email.setVisible(true);
+		textField_email.setVisible(true);
+		textField_password.setVisible(true);
+		textField_email.textProperty().addListener((observable,oldValue,newValue) ->
+		{
+			if(newValue.length()==41)
+				textField_email.setText(oldValue);
+		});
+		textField_password.textProperty().addListener((observable,oldValue,newValue) ->
+		{
+			if(newValue.length()==21)
+				textField_password.setText(oldValue);
+		});
+		for (int i = 0; i < arrlist.size(); i++) {
+			if (((User) arrlist.get(i)).getUserName().equals(username))
+				selected_user = (User) arrlist.get(i);
+		}
+		if(username!=null) {
+		textField_email.setText(selected_user.getEmail());
+		textField_password.setText(selected_user.getPassword());
+		if(selected_user.getPrivilege().equals(EntitiesEnums.UserPrivilege.ShopManager))
+		{
+			ShopManager shopManager= new ShopManager();
+			shopManager.setUserName(selected_user.getUserName());
+			shopManager.setEmail(selected_user.getEmail());
+			shopManager.setPassword(selected_user.getPassword());
+			shopManager.setPrivilege(selected_user.getPrivilege());
+			shopManager.setStatus(selected_user.getStatus());
+			msg=MessagesFactory.createGetEntityMessage(shopManager);
+			m_Client.sendMessageToServer(msg);
+		}else if(selected_user.getPrivilege().equals(EntitiesEnums.UserPrivilege.ShopEmployee))
+		{
+			ShopEmployee shopEmployee= new ShopEmployee();
+			shopEmployee.setUserName(selected_user.getUserName());
+			shopEmployee.setEmail(selected_user.getEmail());
+			shopEmployee.setPassword(selected_user.getPassword());
+			shopEmployee.setPrivilege(selected_user.getPrivilege());
+			shopEmployee.setStatus(selected_user.getStatus());
+			msg=MessagesFactory.createGetEntityMessage(shopEmployee);
+			m_Client.sendMessageToServer(msg);
+		}else
+		{
+			 msg = MessagesFactory.createGetEntityMessage(selected_user);
+				m_Client.sendMessageToServer(msg);
+		}
 		
-		Message msg = MessagesFactory.createGetAllEntityMessage(tempEntity);
-		m_Client.sendMessageToServer(msg);
+		}
+		
 	}
-
+	
 	/**
 	 *
 	 * @param event : send update message to the server when update button pressed
@@ -312,37 +366,34 @@ public class AdministratorController extends BaseController
 	{
 		if (textField_email.getText().equals("")) showInformationMessage("Please enter email.");
 		else if (textField_password.getText().equals("")) showInformationMessage("Please enter password.");
-		else if (textField_username.getText().equals("")) showInformationMessage("Please enter username to edit.");
 		else {
-			switch (tempEntity.getPrivilege()) {
+			switch (selected_user.getPrivilege()) {
 				case ShopEmployee:
 					ShopEmployee shopEmployeeEntity = new ShopEmployee();
-					shopEmployeeEntity.setUserName(tempEntity.getUserName());
+					shopEmployeeEntity.setUserName(selected_user.getUserName());
 					shopEmployeeEntity.setEmail(textField_email.getText());
 					shopEmployeeEntity.setPassword(textField_password.getText());
-					shopEmployeeEntity.setPrivilege(tempEntity.getPrivilege());
-					shopEmployeeEntity.setStatus(tempEntity.getStatus());
+					shopEmployeeEntity.setPrivilege(selected_user.getPrivilege());
+					shopEmployeeEntity.setStatus(selected_user.getStatus());
 					shopEmployeeEntity.setShopManagerId(Integer.parseInt(textField_shopManagerId.getText()));
 					shopEmployeeEntity.setId(shopEmployee.getId());
 					Message shopEmployeeEntityMessage = MessagesFactory.createUpdateEntityMessage(shopEmployeeEntity);
 					m_Client.sendMessageToServer(shopEmployeeEntityMessage);
-					//shopEmployeeEntityMessage = MessagesFactory.createAddEntityMessage(shopEmployeeEntity);
-					//m_Client.sendMessageToServer(shopEmployeeEntityMessage);
 				break;
 				case ShopManager:
-					shopManager.setUserName(tempEntity.getUserName());
+					shopManager.setUserName(selected_user.getUserName());
 					shopManager.setEmail(textField_email.getText());
 					shopManager.setPassword(textField_password.getText());
 					shopManager.setName(textField_branch.getText());
-					shopManager.setPrivilege(tempEntity.getPrivilege());
-					shopManager.setStatus(tempEntity.getStatus());
+					shopManager.setPrivilege(selected_user.getPrivilege());
+					shopManager.setStatus(selected_user.getStatus());
 					Message shopManagerEntityMessage = MessagesFactory.createUpdateEntityMessage(shopManager);
 					m_Client.sendMessageToServer(shopManagerEntityMessage);
 				break;
 				default:
-					userEntity.setEmail(textField_email.getText());
-					userEntity.setPassword(textField_password.getText());
-					Message entityMessage = MessagesFactory.createUpdateEntityMessage(userEntity);
+					selected_user.setEmail(textField_email.getText());
+					selected_user.setPassword(textField_password.getText());
+					Message entityMessage = MessagesFactory.createUpdateEntityMessage(selected_user);
 					m_Client.sendMessageToServer(entityMessage);
 				break;
 
@@ -353,6 +404,7 @@ public class AdministratorController extends BaseController
 
 	/**
 	 * {@inheritDoc}
+	 * @return: return if the window opened for the firs time
 	 */
 	@Override
 	public void onMessageReceived(Message msg) throws Exception
@@ -403,106 +455,50 @@ public class AdministratorController extends BaseController
 		if(msg.getMessageData() instanceof EntityData)
 		{	
 			EntityData entityData =(EntityData) msg.getMessageData();
+			if(comboBox_user1.getValue()==null)
+				return;
 			if(entityData.getEntity() instanceof ShopEmployee)
 			{
 			shopEmployee  = (ShopEmployee) entityData.getEntity();
 			textField_shopManagerId.setText(Integer.toString(shopEmployee.getShopManagerId()));
+			textField_shopManagerId.setVisible(true);
+			textField_branch.setVisible(false);
+			label_shopManagerId.setVisible(true);
+			label_branch.setVisible(false);
 			}
-			if(entityData.getEntity() instanceof ShopManager)
+			else if(entityData.getEntity() instanceof ShopManager)
 			{
 			shopManager  = (ShopManager) entityData.getEntity();
 			textField_branch.setText(shopManager.getName());
+			textField_shopManagerId.setVisible(false);
+			textField_branch.setVisible(true);
+			label_shopManagerId.setVisible(false);
+			label_branch.setVisible(true);
+			}else {
+				textField_shopManagerId.setVisible(false);
+				textField_branch.setVisible(false);
+				label_shopManagerId.setVisible(false);
+				label_branch.setVisible(false);
 			}
 			
 		}
 		else if(msg.getMessageData() instanceof EntitiesListData)
 		{
-		EntitiesListData entityListData=(EntitiesListData) msg.getMessageData();
-		arrlist = (ArrayList<IEntity>) entityListData.getEntities();
-		String name = textField_username.getText();
-		if(name.equals("")) 
-		{
-			textField_email.setVisible(false);
-			textField_password.setVisible(false);
-			textField_branch.setVisible(false);
-			textField_shopManagerId.setVisible(false);
-			label_email.setVisible(false);
-			label_password.setVisible(false);
-			label_branch.setVisible(false);
-			label_shopManagerId.setVisible(false);
-			button_update.setVisible(false);
-			showInformationMessage("Please enter username");
-		}
-		for(int i=0;i<arrlist.size();i++)
-		{
-			tempEntity = (User) arrlist.get(i);
-			if(tempEntity.getUserName().equals(name))
-			{
-				button_update.setVisible(true);
-				label_password.setVisible(true);
-				label_email.setVisible(true);
-				textField_email.setVisible(true);
-				textField_password.setVisible(true);
-				if(tempEntity.getPrivilege().equals(EntitiesEnums.UserPrivilege.ShopEmployee))
-				{
-					shopEmployee.setUserName(tempEntity.getUserName());
-					shopEmployee.setEmail(tempEntity.getEmail());
-					shopEmployee.setPassword(tempEntity.getPassword());
-					shopEmployee.setPrivilege(tempEntity.getPrivilege());
-					shopEmployee.setStatus(tempEntity.getStatus());
-					textField_email.setText(tempEntity.getEmail());
-					textField_password.setText(tempEntity.getPassword());
-					label_shopManagerId.setVisible(true);
-					textField_shopManagerId.setVisible(true);
-					label_branch.setVisible(false);
-					textField_branch.setVisible(false);
-					msg=MessagesFactory.createGetEntityMessage(shopEmployee);
-					m_Client.sendMessageToServer(msg);
-					break;
-				} 
-				else if(tempEntity.getPrivilege().equals(EntitiesEnums.UserPrivilege.ShopManager))
-				{
-					shopManager.setUserName(tempEntity.getUserName());
-					textField_email.setText(tempEntity.getEmail());
-					textField_password.setText(tempEntity.getPassword());
-					label_shopManagerId.setVisible(false);
-					textField_shopManagerId.setVisible(false);
-					label_branch.setVisible(true);
-					textField_branch.setVisible(true);
-					msg=MessagesFactory.createGetEntityMessage(shopManager);
-					m_Client.sendMessageToServer(msg);
-					break;
-				}
-				else
-				{
-					textField_email.setText(tempEntity.getEmail());
-					textField_password.setText(tempEntity.getPassword());
-					userEntity=tempEntity;
-					label_shopManagerId.setVisible(false);
-					textField_shopManagerId.setVisible(false);
-					label_branch.setVisible(false);
-					textField_branch.setVisible(false);
-					break;
-				}
-				
-				
+			EntitiesListData entityListData=(EntitiesListData) msg.getMessageData();
+			arrlist = (ArrayList<IEntity>) entityListData.getEntities();
+			ArrayList<String> al = new ArrayList<String>();
+			User user = new User();
+			for(int i=0;i<arrlist.size();i++)
+			{		
+				user = (User) arrlist.get(i);
+				al.add(user.getUserName());	
 			}
-				
-		}
-		if(!tempEntity.getUserName().equals(name)&&!name.equals(""))
-		{
-			button_update.setVisible(false);
-			textField_email.setVisible(false);
-			textField_password.setVisible(false);
-			textField_branch.setVisible(false);
-			textField_shopManagerId.setVisible(false);
-			label_email.setVisible(false);
-			label_password.setVisible(false);
-			label_branch.setVisible(false);
-			label_shopManagerId.setVisible(false);
-			showInformationMessage("User don't exist");
-		}
-	}
+			javafx.application.Platform.runLater(()-> {
+				list = FXCollections.observableArrayList(al);
+				if(list!=null)
+					comboBox_user1.setItems(list);
+			});
+			}
 		
 		else 
 			if(msg.getMessageData() instanceof RespondMessageData)

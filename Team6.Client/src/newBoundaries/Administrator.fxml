@@ -90,9 +90,8 @@
 				</AnchorPane>
 				<AnchorPane fx:id="anchorpane_option21" visible="false">
 					<children>
-						<Button text="Get" layoutX="400.0" layoutY="70.0" mnemonicParsing="false" fx:id="button_get" onAction="#getBtn"/>	
+						<ComboBox fx:id="comboBox_user1" layoutX="170.0" layoutY="70.0" onAction="#userSelected1" prefWidth="150.0" promptText="Select username" />
 						<Button text="Update" layoutX="170.0" layoutY="270" mnemonicParsing="false" fx:id="button_update" onAction="#updatebtn" />			
-						<TextField fx:id="textField_username" layoutX="170" layoutY="70.0" />
 						<TextField fx:id="textField_email" layoutX="170" layoutY="120.0" />
 						<TextField fx:id="textField_password" layoutX="170" layoutY="170.0" />
 						<TextField fx:id="textField_branch" layoutX="170" layoutY="220.0" />
