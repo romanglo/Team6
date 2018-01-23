@@ -569,11 +569,11 @@ BEGIN
 		
 		IF (NEW.uPrivilege = 'Costumer') THEN 
 			INSERT INTO costumers (uUserName) VALUES (NEW.uUserName);
-		ELSEIF (OLD.uPrivilege = 'ShopEmployee') THEN
+		ELSEIF (NEW.uPrivilege = 'ShopEmployee') THEN
 			INSERT INTO shop_employees (uUserName) VALUES (NEW.uUserName);
-		ELSEIF (OLD.uPrivilege = 'ShopManager') THEN
+		ELSEIF (NEW.uPrivilege = 'ShopManager') THEN
 			INSERT INTO shop_managers (uUserName) VALUES (NEW.uUserName);
-		ELSEIF (OLD.uPrivilege = 'CostumerService') THEN
+		ELSEIF (NEW.uPrivilege = 'CostumerService') THEN
 			INSERT INTO costumer_service_employees (uUserName) VALUES (NEW.uUserName);
 		END IF;
 	
