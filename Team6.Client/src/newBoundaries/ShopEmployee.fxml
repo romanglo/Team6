@@ -79,7 +79,7 @@
             <Label layoutX="22.0" layoutY="237.0" prefHeight="17.0" prefWidth="45.0" text="4." AnchorPane.leftAnchor="50.0" />
             <Label layoutX="22.0" layoutY="270.0" prefHeight="17.0" prefWidth="45.0" text="5." AnchorPane.leftAnchor="50.0" />
             <Label layoutX="22.0" layoutY="303.0" prefHeight="17.0" prefWidth="45.0" text="6." AnchorPane.leftAnchor="50.0" />
-            <Button layoutX="76.0" layoutY="335.0" mnemonicParsing="false" onAction="#addSurvey" prefHeight="25.0" prefWidth="97.0" text="Add survey" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="250.0" />
+            <Button layoutX="76.0" layoutY="335.0" mnemonicParsing="false" onAction="#addSurvey" prefWidth="100.0" text="Add survey" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
             <Label layoutX="102.0" layoutY="104.0" prefHeight="17.0" prefWidth="97.0" text="Questions" AnchorPane.leftAnchor="65.0" />
             <Label layoutX="257.0" layoutY="104.0" prefHeight="17.0" prefWidth="97.0" text="Answers" AnchorPane.leftAnchor="470.0" />
                   <Spinner fx:id="combobox_answer1" layoutX="260.0" layoutY="130.0" prefHeight="25.0" prefWidth="51.0" AnchorPane.leftAnchor="470.0" />
