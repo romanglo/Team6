@@ -126,6 +126,7 @@ public class ServiceSpecialistController extends BaseController
 		if (messageData instanceof EntitiesListData) {
 			if (((EntitiesListData) messageData).getEntities().get(0) instanceof SurveyResult) {
 				m_survey_array = ((EntitiesListData) messageData).getEntities();
+				m_surveysid_array.clear();
 				for (int i = 0; i < m_survey_array.size(); i++) {
 					if (((SurveyResult) m_survey_array.get(i)).getSummary()==null)
 						m_surveysid_array.add(Integer.toString(((SurveyResult) m_survey_array.get(i)).getId()));
@@ -141,6 +142,7 @@ public class ServiceSpecialistController extends BaseController
 						m_Logger.severe("successfully updated");
 						javafx.application.Platform.runLater(()-> {
 							initializesurveys();
+							showInformationMessage("Successfully added");
 						});
 						
 					}
@@ -152,6 +154,7 @@ public class ServiceSpecialistController extends BaseController
 	
 	//UI events region
 	
+
 	@FXML
 	public void saveAnalysis(ActionEvent event)
 	{
@@ -181,6 +184,7 @@ public class ServiceSpecialistController extends BaseController
 		textfield_question5.clear();
 		textfield_question6.clear();
 		m_surveysid_array.clear();
+		textarea_analysis.clear();
 		SurveyResult shopsurvey_entity = new SurveyResult();
 		Message msg = MessagesFactory.createGetAllEntityMessage(shopsurvey_entity);
 		m_Client.sendMessageToServer(msg);
@@ -188,8 +192,12 @@ public class ServiceSpecialistController extends BaseController
 	
 	@FXML
 	private void selectSurvey(ActionEvent event)
-	{				
-		if((combobox_id.getValue().equals(""))||(combobox_id.getValue()==null))
+	{	
+		if(combobox_id.getValue()==null)
+		{
+			return;
+		}
+		if(combobox_id.getValue().equals(""))
 			return;
 			int id=Integer.parseInt(combobox_id.getValue());			
 			

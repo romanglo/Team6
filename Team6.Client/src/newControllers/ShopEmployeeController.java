@@ -194,7 +194,7 @@ public class ShopEmployeeController extends BaseController
 						 combobox_answer4.setValueFactory(svf4);
 						 combobox_answer5.setValueFactory(svf5);
 						 combobox_answer6.setValueFactory(svf6);
-
+						 showInformationMessage("Successfully added");
 					});
 
 				}
