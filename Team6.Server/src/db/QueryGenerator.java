@@ -1431,7 +1431,9 @@ public class QueryGenerator {
 		stringBuilder.append(surveyResult.getFifthAnswer());
 		stringBuilder.append(", srAnswer6 = ");
 		stringBuilder.append(surveyResult.getSixthAnswer());
-		stringBuilder.append(" WHERE srId = ");
+		stringBuilder.append(", srSummary = '");
+		stringBuilder.append(surveyResult.getSummary());
+		stringBuilder.append("' WHERE srId = ");
 		stringBuilder.append(id);
 		stringBuilder.append(" ;");
 		return stringBuilder.toString();
