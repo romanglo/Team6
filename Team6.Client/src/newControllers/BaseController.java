@@ -32,7 +32,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -96,10 +99,10 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 
 	private ToggleButton m_currentPressedButton = null;
 
-	private Paint m_redPaint;
-
-	private Paint m_greenPaint;
-
+	private RadialGradient m_redGradient;
+	
+	private RadialGradient m_greenGradient;
+	
 	private Tooltip m_connectedToolTip;
 
 	private Tooltip m_disconnectedToolTip;
@@ -181,8 +184,12 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 
 	private void initializeBottomBar()
 	{
-		m_redPaint = Paint.valueOf("red");
-		m_greenPaint = Paint.valueOf("green");
+		double centerX = circle_connection_status.getCenterX();
+		double centerY = circle_connection_status.getCenterY();
+		double radius = circle_connection_status.getRadius();
+		m_redGradient = new RadialGradient(0,.1,centerX,centerY,radius,false,CycleMethod.NO_CYCLE,new Stop(0, Color.ORANGERED),new Stop(1, Color.RED));
+		m_greenGradient =new RadialGradient(0,.1,centerX,centerY,radius,false,CycleMethod.NO_CYCLE,new Stop(0, Color.GREENYELLOW),new Stop(1, Color.GREEN));
+		
 		m_connectedToolTip = new Tooltip();
 		m_connectedToolTip.setText("Connected to server.");
 		m_disconnectedToolTip = new Tooltip();
@@ -195,10 +202,10 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	{
 		Platform.runLater(() -> {
 			if (connected) {
-				circle_connection_status.setFill(m_greenPaint);
+				circle_connection_status.setFill(m_greenGradient);
 				Tooltip.install(circle_connection_status, m_connectedToolTip);
 			} else {
-				circle_connection_status.setFill(m_redPaint);
+				circle_connection_status.setFill(m_redGradient);
 				Tooltip.install(circle_connection_status, m_disconnectedToolTip);
 			}
 		});

@@ -46,6 +46,7 @@
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 16px;
+    -fx-effect: dropshadow( gaussian , grey , 0,0,1,2 );
 }
 
 .root

@@ -39,7 +39,10 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import logger.LogManager;
 
@@ -129,6 +132,16 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			Image image = new Image(serverGif);
 			imageview_gif.setImage(image);
 		}
+		
+		RadialGradient dbRed = new RadialGradient(0, .1, circle_db_off.getCenterX(), circle_db_off.getCenterY(),
+				circle_db_off.getRadius(), false, CycleMethod.NO_CYCLE, new Stop(0, Color.ORANGERED),
+				new Stop(1, Color.RED));
+		circle_db_off.setFill(dbRed);
+		
+		RadialGradient connectivityRed = new RadialGradient(0, .1, circle_connectivity_off.getCenterX(),
+				circle_connectivity_off.getCenterY(), circle_connectivity_off.getRadius(), false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.ORANGERED), new Stop(1, Color.RED));
+		circle_connectivity_off.setFill(connectivityRed);
 	}
 
 	/**
@@ -220,7 +233,6 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	// end region -> Initializable Implementation
 
 	// region UI Methods
-
 	/**
 	 * 
 	 * The method called on click of {@link ServerController#btn_db_start} and try
@@ -236,8 +248,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			m_dbContoller.Start();
 			btn_db_start.setDisable(true);
 			btn_db_stop.setDisable(false);
-			circle_db_on.setFill(Paint.valueOf("green"));
-			circle_db_off.setFill(Paint.valueOf("grey"));
+
+			final RadialGradient green = new RadialGradient(0, .1, circle_db_on.getCenterX(), circle_db_on.getCenterY(),
+					circle_db_on.getRadius(), false, CycleMethod.NO_CYCLE, new Stop(0, Color.GREENYELLOW),
+					new Stop(1, Color.GREEN));
+			circle_db_on.setFill(green);
+
+			circle_db_off.setFill(Color.GREY);
+
 		} catch (Exception e) {
 			addMessageToLog("Failed to disconnect from database, exception : " + e.getMessage());
 			m_logger.log(Level.SEVERE, "Failed to connect to database", event);
@@ -263,8 +281,13 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			m_dbContoller.Stop();
 			btn_db_start.setDisable(false);
 			btn_db_stop.setDisable(true);
-			circle_db_on.setFill(Paint.valueOf("grey"));
-			circle_db_off.setFill(Paint.valueOf("red"));
+
+			circle_db_on.setFill(Color.GREY);
+
+			final RadialGradient red = new RadialGradient(0, .1, circle_db_off.getCenterX(), circle_db_off.getCenterY(),
+					circle_db_off.getRadius(), false, CycleMethod.NO_CYCLE, new Stop(0, Color.ORANGERED),
+					new Stop(1, Color.RED));
+			circle_db_off.setFill(red);
 
 		} catch (Exception e) {
 			m_logger.log(Level.SEVERE, "Failed to disconnect from database", event);
@@ -475,8 +498,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 		btn_connectivity_start.setDisable(true);
 		btn_connectivity_stop.setDisable(false);
-		circle_connectivity_on.setFill(Paint.valueOf("green"));
-		circle_connectivity_off.setFill(Paint.valueOf("grey"));
+
+		circle_connectivity_off.setFill(Color.GREY);
+
+		final RadialGradient green = new RadialGradient(0, .1, circle_connectivity_on.getCenterX(),
+				circle_connectivity_on.getCenterY(), circle_connectivity_on.getRadius(), false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.GREENYELLOW), new Stop(1, Color.GREEN));
+		circle_connectivity_on.setFill(green);
+		
 		addMessageToLog("TCP\\IP connection opened successfully");
 
 		resetUsersStatus();
@@ -489,8 +518,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	public void onServerStopped() {
 		btn_connectivity_start.setDisable(false);
 		btn_connectivity_stop.setDisable(true);
-		circle_connectivity_on.setFill(Paint.valueOf("grey"));
-		circle_connectivity_off.setFill(Paint.valueOf("red"));
+
+		circle_connectivity_on.setFill(Color.GREY);
+
+		final RadialGradient red = new RadialGradient(0, .1, circle_connectivity_off.getCenterX(),
+				circle_connectivity_off.getCenterY(), circle_connectivity_off.getRadius(), false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.ORANGERED), new Stop(1, Color.RED));
+		circle_connectivity_off.setFill(red);
+		
 		addMessageToLog("TCP\\IP connection closed successfully");
 	}
 

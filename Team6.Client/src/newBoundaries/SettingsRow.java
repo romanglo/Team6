@@ -1,6 +1,7 @@
 
 package newBoundaries;
 
+import client.ClientConfiguration;
 import javafx.scene.control.TableView;
 
 /**
