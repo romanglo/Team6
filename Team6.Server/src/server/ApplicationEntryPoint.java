@@ -147,7 +147,7 @@ public class ApplicationEntryPoint extends Application {
 	public void init() throws Exception {
 		try {
 			m_logger = LogManager.getLogger();
-			initializeUncughtExceptionHandler();
+			initializeUncaughtExceptionHandler();
 			initializeConfiguration();
 			initializeDbController();
 			intializeServer();
@@ -214,7 +214,12 @@ public class ApplicationEntryPoint extends Application {
 
 	// region Private Initialize Methods
 
-	private void initializeUncughtExceptionHandler() {
+	/**
+	 * The method initialize shutdown sequence in case of uncaught exception.
+	 * 
+	 * @see UncaughetExceptions
+	 */
+	private void initializeUncaughtExceptionHandler() {
 		UncaughetExceptions.UncaughtExceptionsHandler uncaughtExceptionsHandler = new UncaughetExceptions.UncaughtExceptionsHandler() {
 			@Override
 			public void onUncaughtException(Throwable throwable) {
@@ -225,14 +230,22 @@ public class ApplicationEntryPoint extends Application {
 				}
 			}
 		};
-		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, false);
+		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, true);
 	}
 
-	private void intializeServer() throws IOException {
+	/**
+	 * The method create instance of {@link Server} using
+	 * {@link ServerConfiguration}.
+	 */
+	private void intializeServer() {
 		Server = new Server(m_logger, m_serverConfiguration.getConnectivityConfiguration().getPort());
 		m_logger.info("Server instance created successfully.");
 	}
 
+	/**
+	 * The method create instance of {@link DbController} using
+	 * {@link ServerConfiguration}.
+	 */
 	private void initializeDbController() {
 		DbContoller = new DbController(m_logger, m_serverConfiguration.getDbConfiguration());
 		m_serverScheduledExecutor = new ServerScheduledExecutor(DbContoller);
@@ -243,6 +256,13 @@ public class ApplicationEntryPoint extends Application {
 
 	// region -> Private Dispose Methods
 
+	/**
+	 * 
+	 * The method close connection if opened and dispose {@link Server}.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs while closing the server socket.
+	 */
 	private void disposeServer() throws IOException {
 		if (Server != null) {
 			Server.close();
@@ -251,6 +271,11 @@ public class ApplicationEntryPoint extends Application {
 		Server = null;
 	}
 
+	/**
+	 * 
+	 * The method close connection with {@link DbController}.
+	 *
+	 */
 	private void disposeDbController() {
 		if (DbContoller != null && DbContoller.isRunning()) {
 			DbContoller.Stop();
@@ -259,6 +284,10 @@ public class ApplicationEntryPoint extends Application {
 		DbContoller = null;
 	}
 
+	/**
+	 * The method shutdown the {@link ServerScheduledExecutor}.
+	 *
+	 */
 	private void disposeScheduledExecutor() {
 		if (m_serverScheduledExecutor != null && m_serverScheduledExecutor.isRunning()) {
 			m_serverScheduledExecutor.Stop();

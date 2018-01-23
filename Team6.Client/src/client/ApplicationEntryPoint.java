@@ -34,6 +34,8 @@ import logger.LogManager;
 public class ApplicationEntryPoint extends Application
 {
 
+	// region Static Fields
+
 	private final static String s_lockFilePath = "ClientLockFile.lock";
 
 	private static File s_file;
@@ -42,9 +44,11 @@ public class ApplicationEntryPoint extends Application
 
 	private static FileLock s_lockFile;
 
+	// end region -> Static Fields
+
 	/**
-	 * The main method of the application, the method ensure only one running instance of
-	 * the application, using file lock pattern. *
+	 * The main method of the application, the method ensure only one running
+	 * instance of the application, using file lock pattern. *
 	 * 
 	 * @param args
 	 *            Application arguments.
@@ -157,6 +161,11 @@ public class ApplicationEntryPoint extends Application
 		s_logger.config("Client configuration loaded:" + ClientConfiguration.toString());
 	}
 
+	/**
+	 * The method initialize shutdown sequence in case of uncaught exception.
+	 * 
+	 * @see UncaughetExceptions
+	 */
 	private void initializeUncughtExceptionHandler()
 	{
 		UncaughetExceptions.UncaughtExceptionsHandler uncaughtExceptionsHandler = new UncaughetExceptions.UncaughtExceptionsHandler() {
@@ -172,7 +181,7 @@ public class ApplicationEntryPoint extends Application
 				}
 			}
 		};
-		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, false);
+		UncaughetExceptions.startHandling(uncaughtExceptionsHandler, true);
 	}
 
 	/* End of --> Initializing methods region */
@@ -180,7 +189,7 @@ public class ApplicationEntryPoint extends Application
 	/* region Application override methods */
 
 	/**
-	 * Method opens the UI of the client.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void start(Stage primaryStage)
@@ -205,6 +214,9 @@ public class ApplicationEntryPoint extends Application
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void init() throws Exception
 	{
@@ -222,6 +234,9 @@ public class ApplicationEntryPoint extends Application
 		super.init();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void stop() throws Exception
 	{
@@ -256,6 +271,12 @@ public class ApplicationEntryPoint extends Application
 		Client = null;
 	}
 
+	/**
+	 * 
+	 * The method send disconnection message to the server as part of the shutdown
+	 * sequence.
+	 *
+	 */
 	private void disconnectUser()
 	{
 		if (ConnectedUser != null && Client != null) {
@@ -270,5 +291,6 @@ public class ApplicationEntryPoint extends Application
 			Client.sendMessageToServer(logoutMessage);
 		}
 	}
+	
 	/* End of --> Private disposing methods region */
 }

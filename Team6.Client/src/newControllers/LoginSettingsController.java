@@ -33,29 +33,37 @@ import logger.LogManager;
  */
 public class LoginSettingsController implements Initializable
 {
-	/* UI Binding Fields region */
+	// region UI Fields
 
-	@FXML private TableView<SettingsRow> setting_table;
+	private @FXML TableView<SettingsRow> setting_table;
 
-	@FXML private TableColumn<SettingsRow, String> tablecolumn_setting;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_setting;
 
-	@FXML private TableColumn<SettingsRow, String> tablecolumn_value;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_value;
 
-	@FXML private Button btn_update_settings;
+	private @FXML Button btn_update_settings;
 
-	/* End of --> UI Binding Fields region */
+	// end region -> UI Fields
 
-	/* Fields */
+	// region Fields
+
 	private Logger m_logger;
 
 	private ClientConfiguration m_configuration;
 
 	private Client m_client;
 
-	/* End of --> Fields region */
+	// end region -> Fields
 
-	/* UI events region */
+	// region UI events
 
+	/**
+	 * 
+	 * The method update the {@link ClientConfiguration} resource file.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
 	@FXML
 	private void updateSettingsFile(ActionEvent event)
 	{
@@ -63,9 +71,9 @@ public class LoginSettingsController implements Initializable
 		btn_update_settings.setDisable(true);
 	}
 
-	/* End of --> UI events region */
+	// end region -> UI events
 
-	/* Initializing methods region */
+	// region Initializing methods region
 
 	/**
 	 * {@inheritDoc}
@@ -79,6 +87,10 @@ public class LoginSettingsController implements Initializable
 		initializeConfigurationTable();
 	}
 
+	/**
+	 * The method initialize {@link LoginSettingsController#setting_table} and set
+	 * necessary triggers.
+	 */
 	private void initializeConfigurationTable()
 	{
 		setting_table.setRowFactory(param -> {
@@ -106,11 +118,11 @@ public class LoginSettingsController implements Initializable
 						case ClientConfiguration.PROPERTY_NAME_IP:
 							long count = resultString.chars().filter(ch -> ch == '.').count();
 							if (!resultString.equalsIgnoreCase("localhost") && count != 3) {
-								wrongInput=true;
-								showInformationMessage("Please enter valid IP address!");
+								wrongInput = true;
+								showAlertMessage("Please enter valid IP address!");
 								break;
 							}
-							
+
 							resultString = resultString.toLowerCase();
 							m_logger.info(String.format("The properry:\"%s\" updated from %s to %s",
 									ClientConfiguration.PROPERTY_NAME_IP, m_configuration.getIp(), resultString));
@@ -138,7 +150,7 @@ public class LoginSettingsController implements Initializable
 								wrongInput = true;
 							}
 							if (wrongInput) {
-								showInformationMessage("The port must be an number between 0 to 65535!");
+								showAlertMessage("The port must be an number between 0 to 65535!");
 							}
 						break;
 
@@ -163,10 +175,16 @@ public class LoginSettingsController implements Initializable
 		btn_update_settings.setDisable(true);
 	}
 
-	/* End of --> Initializing methods region */
+	// end region -> Initializing methods region
 
-	/* Private methods region */
+	// region Private methods
 
+	/**
+	 * 
+	 * The method draw the {@link ClientConfiguration} to
+	 * {@link LoginSettingsController#setting_table}.
+	 *
+	 */
 	private void drawContantToTable()
 	{
 		ObservableList<SettingsRow> settings = FXCollections.observableArrayList();
@@ -177,7 +195,13 @@ public class LoginSettingsController implements Initializable
 		setting_table.setItems(settings);
 	}
 
-	private void showInformationMessage(String message)
+	/**
+	 * The method show dialog message from {@link Alert} type.
+	 *
+	 * @param message
+	 *            the message to show.
+	 */
+	private void showAlertMessage(String message)
 	{
 		if (message == null || message.isEmpty()) {
 			return;
@@ -189,5 +213,6 @@ public class LoginSettingsController implements Initializable
 
 		alert.showAndWait();
 	}
-	/* End of --> Private methods region */
+	
+	// end region -> Private methods
 }

@@ -1,54 +1,76 @@
+
 package newBoundaries;
 
 import javafx.scene.control.TableView;
 
 /**
-*
-* SettingsRow: POJO class for binding between {@link ClientConfiguration} to
-* {@link TableView}.
-* 
-*/
-@SuppressWarnings("javadoc")
-public class SettingsRow {
-	
+ *
+ * SettingsRow: POJO class for binding between {@link ClientConfiguration} to
+ * {@link TableView}.
+ * 
+ */
+public class SettingsRow
+{
+
 	/* Fields region */
-	
-	private String setting;
-	private String value;
-	
+
+	private String m_setting;
+
+	private String m_value;
+
 	/* End of --> Fields region */
-	
+
 	/* Constructors region */
-	
-	public SettingsRow(String setting, String value) {
+
+	@SuppressWarnings("javadoc")
+	public SettingsRow(String setting, String value)
+	{
 		super();
-		this.setting = setting;
-		this.value = value;
+		m_setting = setting;
+		m_value = value;
 	}
-	
+
 	/* End of --> Constructors region */
-	
+
 	/* Getters region */
-	
-	public String getSetting() {
-		return setting;
+
+	/**
+	 * @return the settings
+	 */
+	public String getSetting()
+	{
+		return m_setting;
 	}
-	
-	public String getValue() {
-		return value;
+
+	/**
+	 * @return the value
+	 */
+	public String getValue()
+	{
+		return m_value;
 	}
-	
+
 	/* End of --> Getters region */
-	
+
 	/* Setters region */
-	
-	public void setSetting(String setting) {
-		this.setting = setting;
+
+	/**
+	 * @param setting
+	 *            a settings to set.
+	 */
+	public void setSetting(String setting)
+	{
+		this.m_setting = setting;
 	}
-	
-	public void setValue(String value) {
-		this.value = value;
+
+	/**
+	 * @param value
+	 *            a value to set.
+	 */
+	public void setValue(String value)
+	{
+		this.m_value = value;
 	}
-	
+
 	/* End of --> Setters region */
 }

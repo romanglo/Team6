@@ -132,7 +132,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	}
 
 	/**
-	 * This method initialize {@link ServerController#setting_table} and set
+	 * The method initialize {@link ServerController#setting_table} and set
 	 * necessary triggers.
 	 */
 	private void initializeConfigurationTable() {

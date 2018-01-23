@@ -68,19 +68,19 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 {
 	/* UI Binding Fields region */
 
-	@FXML private ImageView imageview_background;
+	private @FXML ImageView imageview_background;
 
-	@FXML private ImageView btn_imageview_settings;
+	private @FXML ImageView btn_imageview_settings;
 
 	// login fields and buttons :
 
-	@FXML private TextField textField_userName;
+	private @FXML TextField textField_userName;
 
-	@FXML private PasswordField passwordField_userPassword;
+	private @FXML PasswordField passwordField_userPassword;
 
-	@FXML private Button btn_settings;
+	private @FXML Button btn_settings;
 
-	@FXML private Button btn_login;
+	private @FXML Button btn_login;
 
 	/* End of --> UI Binding Fields region */
 
@@ -102,6 +102,12 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	/* UI events region */
 
+	/**
+	 * This method is an listener to on action event of login button.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
 	@FXML
 	private void onLoginButtonPressed(ActionEvent event)
 	{
@@ -110,17 +116,17 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		String pasword = passwordField_userPassword.getText();
 
 		if ((userName == null || userName.isEmpty()) && (pasword == null || pasword.isEmpty())) {
-			showInformationMessage("Please enter your username and password.");
+			showAlertMessage("Please enter your username and password.");
 			return;
 		}
 
 		if (userName == null || userName.isEmpty()) {
-			showInformationMessage("Please enter your username.");
+			showAlertMessage("Please enter your username.");
 			return;
 		}
 
 		if (pasword == null || pasword.isEmpty()) {
-			showInformationMessage("Please enter your password.");
+			showAlertMessage("Please enter your password.");
 			return;
 		}
 
@@ -128,13 +134,19 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		m_client.setClientStatusHandler(this);
 
 		if (!m_client.isConnected() && !m_client.createConnectionWithServer()) {
-			showInformationMessage("Failed to connect to server! Please check the settings and try again..");
+			showAlertMessage("Failed to connect to server! Please check the settings and try again..");
 			return;
 		}
 
 		displayConnectingWindow();
 	}
 
+	/**
+	 * This method is an listener to on action event of settings button.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
 	@FXML
 	private void onSettingsButtonPressed(ActionEvent event)
 	{
@@ -157,12 +169,21 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			nextStage.showAndWait();
 		}
 		catch (Exception e) {
-			m_logger.log(Level.SEVERE,"Failed on try to load the settings window", e);
-			showInformationMessage("The settings can not be changed at this time..");
+			m_logger.log(Level.SEVERE, "Failed on try to load the settings window", e);
+			showAlertMessage("The settings can not be changed at this time..");
 			return;
 		}
 	}
 
+	/**
+	 * 
+	 * This method set fade in animation to window.
+	 *
+	 * @param currentStage
+	 *            the current stage
+	 * @param stageToAnimate
+	 *            the next stage which will be animated.
+	 */
 	private void setSettingsAnimation(Stage currentStage, Stage stageToAnimate)
 	{
 
@@ -256,6 +277,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		initialzeButtons();
 	}
 
+	/**
+	 * The method initialize all the buttons in the controller.
+	 */
 	private void initialzeButtons()
 	{
 		btn_login.getStyleClass().add("loginButton");
@@ -286,6 +310,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		});
 	}
 
+	/**
+	 * The method initialize all the text fields in the controller.
+	 */
 	private void initializeTextFields()
 	{
 		textField_userName.textProperty().addListener(new ChangeListener<String>() {
@@ -315,6 +342,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		});
 	}
 
+	/**
+	 * The method initialize all the images in the controller.
+	 */
 	private void initializeImages()
 	{
 		InputStream backgoundImage = getClass().getResourceAsStream("/newBoundaries/images/login_background.png");
@@ -388,7 +418,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 		catch (Exception ex) {
 			m_logger.warning("Error when sending get request, excpetion: " + ex.getMessage());
-			showInformationMessage("Could not send message to server at the moment,\nplease try again later.");
+			showAlertMessage("Could not send message to server at the moment,\nplease try again later.");
 		}
 
 	}
@@ -408,7 +438,13 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	/* Private methods region */
 
-	private void showInformationMessage(String message)
+	/**
+	 * The method show dialog message from {@link Alert} type.
+	 *
+	 * @param message
+	 *            the message to show.
+	 */
+	private void showAlertMessage(String message)
 	{
 		if (message == null || message.isEmpty()) {
 			return;
@@ -422,6 +458,13 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		});
 	}
 
+	/**
+	 * 
+	 * The method perform an actions sequence in case of login failure.
+	 *
+	 * @param loginData
+	 *            The received login data.
+	 */
 	private void onLoginFailure(LoginData loginData)
 	{
 		javafx.application.Platform.runLater(() -> {
@@ -429,9 +472,16 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		});
 		m_client.closeConnectionWithServer();
 		m_logger.info("Login failed! Login message: " + loginData.toString());
-		showInformationMessage("Login Failed! Reason:\n" + loginData.getMessage());
+		showAlertMessage("Login Failed! Reason:\n" + loginData.getMessage());
 	}
 
+	/**
+	 * 
+	 * This method try to display the logged on user.
+	 *
+	 * @param userEntity
+	 *            the logged on user.
+	 */
 	private void showUserWindow(User userEntity)
 	{
 		URL url = null;
@@ -491,8 +541,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 		catch (Exception e) {
 			String errorString = "Failed on try to load the next scene";
-			m_logger.log(Level.SEVERE, errorString,e );
-			showInformationMessage(errorString);
+			m_logger.log(Level.SEVERE, errorString, e);
+			showAlertMessage(errorString);
 			return;
 		}
 		if (scene != null) {
@@ -501,6 +551,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	}
 
+	/**
+	 * This method display an connection window with progress icon.
+	 */
 	private void displayConnectingWindow()
 	{
 		if (m_connectingStage == null) {
@@ -540,6 +593,11 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	/* Nested classes region */
 
+	/**
+	 * NextWindowLoader: This {@link Runnable} prepare the next window and run it,
+	 * must be invoked on MAIN thread.
+	 *
+	 */
 	private class NextWindowLoader implements Runnable
 	{
 
@@ -553,6 +611,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			m_baseController = baseController;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void run()
 		{
@@ -571,7 +632,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			catch (Exception e) {
 				String errorString = "Failed on try to load the next window";
 				m_logger.severe(errorString + ", excepion: " + e.getMessage());
-				showInformationMessage(errorString);
+				showAlertMessage(errorString);
 				return;
 			}
 
