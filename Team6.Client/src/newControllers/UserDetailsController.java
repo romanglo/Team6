@@ -92,6 +92,7 @@ public class UserDetailsController implements Initializable
 			break;
 			case ShopManager:
 				priv = "Shop Manager";
+				break;
 			default:
 				priv = " - ";
 			break;
