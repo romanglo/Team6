@@ -58,8 +58,6 @@ public class AdministratorController extends BaseController
 	
 	private @FXML ComboBox<String> comboBox_privillge;
 	
-	private @FXML ComboBox<String> comboBox_branch;
-
 	private @FXML TextField textField_username;
 
 	private @FXML TextField textField_email;
@@ -77,6 +75,10 @@ public class AdministratorController extends BaseController
 	private @FXML Label label_privillege;
 	
 	private @FXML Label label_status;
+	
+	private @FXML Label label_password;
+	
+	private @FXML Label label_email;
 	
 	private User selected_user;
 	
@@ -153,6 +155,14 @@ public class AdministratorController extends BaseController
 		this.title=title;
 		switch (title) {
 			case "User Status":
+				comboBox_user.setValue(null);
+				comboBox_privillge.setValue(null);
+				comboBox_status.setValue(null);
+				comboBox_privillge.setVisible(false);
+				comboBox_status.setVisible(false);
+				label_privillege.setVisible(false);
+				label_status.setVisible(false);
+				button_update1.setVisible(false);
 				anchorpane_option1.setVisible(true);
 				anchorpane_option21.setVisible(false);
 				initializeUsers();
@@ -162,10 +172,16 @@ public class AdministratorController extends BaseController
 			case "User Coordinates":
 				anchorpane_option1.setVisible(false);
 				anchorpane_option21.setVisible(true);
+				textField_username.setText("Enter Username");
+				textField_email.setVisible(false);
+				textField_password.setVisible(false);
 				textField_branch.setVisible(false);
 				textField_shopManagerId.setVisible(false);
+				label_email.setVisible(false);
+				label_password.setVisible(false);
 				label_branch.setVisible(false);
 				label_shopManagerId.setVisible(false);
+				button_update.setVisible(false);
 
 			break;
 
@@ -252,7 +268,8 @@ public class AdministratorController extends BaseController
 	@FXML
 	public void userSelected(ActionEvent event) throws IOException
 	{
-		String username = comboBox_user.getValue();
+		String username = comboBox_user.getValue() == null ? "" :comboBox_user.getValue() ;
+		button_update1.setVisible(true);
 		for (int i = 0; i < arrlist.size(); i++) {
 			if (((User) arrlist.get(i)).getUserName().equals(username)) selected_user = (User) arrlist.get(i);
 		}
@@ -405,6 +422,15 @@ public class AdministratorController extends BaseController
 		String name = textField_username.getText();
 		if(name.equals("")) 
 		{
+			textField_email.setVisible(false);
+			textField_password.setVisible(false);
+			textField_branch.setVisible(false);
+			textField_shopManagerId.setVisible(false);
+			label_email.setVisible(false);
+			label_password.setVisible(false);
+			label_branch.setVisible(false);
+			label_shopManagerId.setVisible(false);
+			button_update.setVisible(false);
 			showInformationMessage("Please enter username");
 		}
 		for(int i=0;i<arrlist.size();i++)
@@ -412,6 +438,11 @@ public class AdministratorController extends BaseController
 			tempEntity = (User) arrlist.get(i);
 			if(tempEntity.getUserName().equals(name))
 			{
+				button_update.setVisible(true);
+				label_password.setVisible(true);
+				label_email.setVisible(true);
+				textField_email.setVisible(true);
+				textField_password.setVisible(true);
 				if(tempEntity.getPrivilege().equals(EntitiesEnums.UserPrivilege.ShopEmployee))
 				{
 					shopEmployee.setUserName(tempEntity.getUserName());
@@ -453,11 +484,22 @@ public class AdministratorController extends BaseController
 					textField_branch.setVisible(false);
 					break;
 				}
+				
+				
 			}
 				
 		}
-		if(!tempEntity.getUserName().equals(name))
+		if(!tempEntity.getUserName().equals(name)&&!name.equals(""))
 		{
+			button_update.setVisible(false);
+			textField_email.setVisible(false);
+			textField_password.setVisible(false);
+			textField_branch.setVisible(false);
+			textField_shopManagerId.setVisible(false);
+			label_email.setVisible(false);
+			label_password.setVisible(false);
+			label_branch.setVisible(false);
+			label_shopManagerId.setVisible(false);
 			showInformationMessage("User don't exist");
 		}
 	}
