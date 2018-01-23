@@ -12,6 +12,7 @@
 
 .header-section .label { 
     -fx-padding: 10.0px;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,2,3 );
 }
 
 .header-section .label .text {
@@ -62,16 +63,15 @@
 .content-section {
     -fx-padding: 10.0 20.0 10.0 20.0;
     -fx-wrap-text: true;
-    -fx-font-size: 16.0px;
 }
 
-.content-section .label
-{
-    -fx-text-fill: black;
+.content-section .label {
+	
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
+    -fx-text-fill: #016565;
+    -fx-effect: dropshadow( gaussian , grey , 0,0,0,1 );
 }
-
 
 .content-section-label .label .text{
     -fx-fill: #ffffff;
