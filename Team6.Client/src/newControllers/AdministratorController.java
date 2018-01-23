@@ -320,6 +320,17 @@ public class AdministratorController extends BaseController
 			if(newValue.length()==21)
 				textField_password.setText(oldValue);
 		});
+		textField_branch.textProperty().addListener((observable,oldValue,newValue) ->
+		{
+			if(newValue.length()==21)
+				textField_branch.setText(oldValue);
+		});
+		textField_shopManagerId.textProperty().addListener((observable,oldValue,newValue) ->
+		{
+			if(!newValue.isEmpty() && !(newValue.charAt(newValue.length()-1)>'0'&&newValue.charAt(newValue.length()-1)<'9'))
+				textField_shopManagerId.setText(oldValue);
+		});
+		
 		for (int i = 0; i < arrlist.size(); i++) {
 			if (((User) arrlist.get(i)).getUserName().equals(username))
 				selected_user = (User) arrlist.get(i);
