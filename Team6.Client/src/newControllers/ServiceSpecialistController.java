@@ -86,7 +86,11 @@ public class ServiceSpecialistController extends BaseController
 	@Override
 	protected void internalInitialize() throws Exception
 	{
-
+		textarea_analysis.textProperty().addListener((observable, old_value, new_value) -> {
+			if (new_value.length() == 501) {
+				textarea_analysis.setText(old_value);
+			}
+		});
 	}
 
 	/**

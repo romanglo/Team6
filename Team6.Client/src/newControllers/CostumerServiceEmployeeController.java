@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,6 +23,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.util.StringConverter;
 import newEntities.Complaint;
 import newEntities.Costumer;
 import newEntities.CostumerServiceEmployee;
@@ -44,8 +46,8 @@ public class CostumerServiceEmployeeController extends BaseController
 {
 	// region Fields
 
-	private final String[] optinons_side = new String[] { "Add complaint", "Treat complaint", "Add surveys",
-			"My complaints" };
+	private final String[] optinons_side = new String[] { "Add complaint",  "Treat complaint","My complaints",
+			"Add surveys" };
 
 	private @FXML AnchorPane anchorpane_addcomplaint;
 
@@ -59,13 +61,13 @@ public class CostumerServiceEmployeeController extends BaseController
 
 	private @FXML TextArea m_addcomplaint_textarea_costumercomplaint;
 
-	private @FXML ComboBox<Integer> combobox_shop;
+	private @FXML ComboBox<String> combobox_shop;
 
 	private List<newEntities.IEntity> m_addcomplaint_shopmanager_array;
 
-	private ArrayList<Integer> m_addcomplaint_managerid_array = new ArrayList<>();
+	private ArrayList<String> m_addcomplaint_managerid_array = new ArrayList<>();
 
-	private ObservableList<Integer> m_addcomplaint_list;
+	private ObservableList<String> m_addcomplaint_list;
 
 	private Complaint m_addcomplaint_selected_complaint;
 
@@ -80,6 +82,8 @@ public class CostumerServiceEmployeeController extends BaseController
 	private @FXML CheckBox m_treatcomplaint_checkbox_financial;
 
 	private @FXML TextField m_treatcomplaint_financial_compensation;
+
+	private @FXML Label date;
 
 	private List<IEntity> m_treatcomplaint_complaint_array;
 
@@ -124,6 +128,12 @@ public class CostumerServiceEmployeeController extends BaseController
 	private int my_id;
 
 	private @FXML Label status;
+	
+	private @FXML Label date_mycomplaints;
+	
+	private @FXML Label mycomplaints_costumername;
+	
+	private ArrayList m_addcomplaint_managername_array=new ArrayList<>();
 
 	// end region-> Open/Close survey fields
 
@@ -139,6 +149,24 @@ public class CostumerServiceEmployeeController extends BaseController
 	{
 		initialize_complaint();
 		initialize_myid();
+		opensurvey_datepicker_enddate.setConverter(new StringConverter<LocalDate>() {
+
+			private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+			@Override
+			public String toString(LocalDate localDate)
+			{
+				if (localDate == null) return "";
+				return dateTimeFormatter.format(localDate);
+			}
+
+			@Override
+			public LocalDate fromString(String dateString)
+			{
+				if (!(dateString != null && dateString.trim().isEmpty())) return null;
+				return LocalDate.parse(dateString, dateTimeFormatter);
+			}
+		});
 	}
 
 	private void initialize_myid()
@@ -169,10 +197,10 @@ public class CostumerServiceEmployeeController extends BaseController
 	{
 		if (m_addcomplaint_textfield_id.getText().equals("")
 				|| m_addcomplaint_textarea_costumercomplaint.getText().equals("")) {
-			showInformationMessage("You left empty fields.");
+			showInformationMessage("Please complete all fields before saving.");
 		} else {
 			m_addcomplaint_selected_complaint = new Complaint();
-			m_addcomplaint_selected_complaint.setShopManagerId(combobox_shop.getValue());
+			m_addcomplaint_selected_complaint.setShopManagerId(Integer.parseInt(combobox_shop.getValue().substring(0, combobox_shop.getValue().indexOf('-')-1)));
 			m_addcomplaint_selected_complaint.setComplaint(m_addcomplaint_textarea_costumercomplaint.getText());
 			m_addcomplaint_selected_complaint.setCreationDate(new Date());
 			m_addcomplaint_selected_complaint.setCostumerServiceEmployeeId(my_id);
@@ -206,6 +234,16 @@ public class CostumerServiceEmployeeController extends BaseController
 		Complaint entity = new Complaint();
 		Message msg = MessagesFactory.createGetAllEntityMessage(entity);
 		m_Client.sendMessageToServer(msg);
+		m_treatcomplaint_textarea_summary.textProperty().addListener((observable, old_value, new_value) -> {
+			if (new_value.length() == 201) {
+				m_treatcomplaint_textarea_summary.setText(old_value);
+			}
+		});
+		m_treatcomplaint_financial_compensation.textProperty().addListener((observable, old_value, new_value) -> {
+			if (new_value.equals("-")) {
+				m_treatcomplaint_financial_compensation.setText(old_value);
+			}
+		});
 	}
 
 	/**
@@ -270,6 +308,7 @@ public class CostumerServiceEmployeeController extends BaseController
 			m_Client.sendMessageToServer(msgg);
 			tri();
 		}
+
 	}
 
 	/**
@@ -301,6 +340,7 @@ public class CostumerServiceEmployeeController extends BaseController
 			if (temp.getId() == id) comp = (Complaint) m_treatcomplaint_complaint_array.get(i);
 		}
 		m_treatcomplaint_textarea_complaint.setText(comp.getComplaint());
+		date.setText(s_dateForamt.format((comp).getCreationDate()));
 	}
 
 	@FXML
@@ -317,6 +357,7 @@ public class CostumerServiceEmployeeController extends BaseController
 		m_treatcomplaint_financial_compensation.clear();
 		m_treatcomplaint_financial_compensation.setDisable(true);
 		m_treatcomplaint_checkbox_financial.setSelected(false);
+		date.setText("");
 	}
 
 	// end region-> Treat complaint methods
@@ -359,13 +400,11 @@ public class CostumerServiceEmployeeController extends BaseController
 	@FXML
 	private void openSurveys_AddSurvey(ActionEvent event)
 	{
-		if(opensurvey_combobox_shopname.getValue()==null)
-		{
-			showInformationMessage("You left empty fields.");
+		if (opensurvey_combobox_shopname.getValue() == null) {
+			showInformationMessage("Please complete all fields before saving.");
 			return;
 		}
-		if(opensurvey_datepicker_enddate.getValue()==null)
-		{
+		if (opensurvey_datepicker_enddate.getValue() == null) {
 			showInformationMessage("You left empty fields.");
 			return;
 		}
@@ -421,6 +460,7 @@ public class CostumerServiceEmployeeController extends BaseController
 		} else {
 			status.setText("Closed");
 		}
+		date_mycomplaints.setText(s_dateForamt.format(c.getCreationDate()));
 	}
 
 	// -----------------------------------------------------End region -> My
@@ -449,7 +489,7 @@ public class CostumerServiceEmployeeController extends BaseController
 			treatComplaint_initializeComplaint();
 
 			return true;
-		} else if (title.equals(optinons_side[2])) {
+		} else if (title.equals(optinons_side[3])) {
 
 			anchorpane_addsurveys.setVisible(true);
 			anchorpane_addcomplaint.setVisible(false);
@@ -462,7 +502,7 @@ public class CostumerServiceEmployeeController extends BaseController
 			opensurvey_textfield_opendate.setText("");
 			openSurveys_initializeshopes();
 			return true;
-		} else if (title.equals(optinons_side[3])) {
+		} else if (title.equals(optinons_side[2])) {
 			anchorpane_addsurveys.setVisible(false);
 			anchorpane_addcomplaint.setVisible(false);
 			anchorpane_treatcomplaint.setVisible(false);
@@ -516,8 +556,10 @@ public class CostumerServiceEmployeeController extends BaseController
 				m_addcomplaint_shopmanager_array = ((EntitiesListData) msg.getMessageData()).getEntities();
 				m_addcomplaint_managerid_array.clear();
 				combobox_shop.getItems().clear();
+				m_addcomplaint_managername_array.clear();
 				for (int i = 0; i < m_addcomplaint_shopmanager_array.size(); i++) {
-					m_addcomplaint_managerid_array.add(((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getId());
+					m_addcomplaint_managerid_array.add(((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getId()+ " -" + 
+						((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getName());
 				}
 				m_addcomplaint_list = FXCollections.observableArrayList(m_addcomplaint_managerid_array);
 				combobox_shop.setItems(m_addcomplaint_list);
@@ -570,7 +612,7 @@ public class CostumerServiceEmployeeController extends BaseController
 					}
 				}
 			}
-		} else if (correct_title.equals(optinons_side[2])) {
+		} else if (correct_title.equals(optinons_side[3])) {
 			int flag = 0;
 			IMessageData messageData = msg.getMessageData();
 			if (messageData instanceof EntitiesListData) {
@@ -632,7 +674,7 @@ public class CostumerServiceEmployeeController extends BaseController
 					// clear();
 				}
 			}
-		} else if (correct_title.equals(optinons_side[3])) {
+		} else if (correct_title.equals(optinons_side[2])) {
 			IMessageData messageData = msg.getMessageData();
 			if (messageData instanceof EntityData) {
 				if (((EntityData) messageData).getEntity() instanceof CostumerServiceEmployee) {
@@ -666,7 +708,7 @@ public class CostumerServiceEmployeeController extends BaseController
 					for (int i = 0; i < complaints.size(); i++) {
 						int time = (int) (((Complaint) complaints.get(i)).getCreationDate().getTime());
 						if ((today - time) / (24 * 60 * 60 * 1000) >= 1) {
-							twentyfour = twentyfour + (((Complaint) complaints.get(i)).getId());
+							twentyfour = twentyfour +" ," + (((Complaint) complaints.get(i)).getId());
 						}
 					}
 					if (!twentyfour.equals("")) {

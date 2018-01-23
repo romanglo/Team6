@@ -67,12 +67,12 @@
 				</AnchorPane>
 				<AnchorPane fx:id="anchorpane_option1" layoutY="79.0" prefHeight="400" prefWidth="450.0" visible="falseS" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
          <children>
-            <TextField fx:id="textfiled_question1" layoutX="76.0" layoutY="130.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
-            <TextField fx:id="textfiled_question2" layoutX="76.0" layoutY="165.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
-            <TextField fx:id="textfiled_question3" layoutX="76.0" layoutY="201.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
-            <TextField fx:id="textfiled_question4" layoutX="76.0" layoutY="233.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
-            <TextField fx:id="textfiled_question5" layoutX="76.0" layoutY="266.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
-            <TextField fx:id="textfiled_question6" layoutX="76.0" layoutY="299.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
+            <TextField fx:id="textfiled_question1" editable="false" layoutX="76.0" layoutY="130.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
+            <TextField fx:id="textfiled_question2" editable="false" layoutX="76.0" layoutY="165.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
+            <TextField fx:id="textfiled_question3" editable="false" layoutX="76.0" layoutY="201.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
+            <TextField fx:id="textfiled_question4" editable="false" layoutX="76.0" layoutY="233.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
+            <TextField fx:id="textfiled_question5" editable="false" layoutX="76.0" layoutY="266.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
+            <TextField fx:id="textfiled_question6" editable="false" layoutX="76.0" layoutY="299.0" prefWidth="400.0" AnchorPane.leftAnchor="65.0" />
             <Label layoutX="22.0" layoutY="134.0" prefHeight="17.0" prefWidth="45.0" text="1." AnchorPane.leftAnchor="50.0" />
             <Label layoutX="22.0" layoutY="169.0" prefHeight="17.0" prefWidth="45.0" text="2." AnchorPane.leftAnchor="50.0" />
             <Label layoutX="22.0" layoutY="205.0" prefHeight="17.0" prefWidth="45.0" text="3." AnchorPane.leftAnchor="50.0" />
