@@ -109,7 +109,7 @@
 										<TableColumn fx:id="tablecolumn_price" editable="false"
 											minWidth="112.5" sortable="false" text="Price" />
 										<TableColumn fx:id="tablecolumn_image" editable="false"
-											minWidth="112.5" sortable="false" text="Image" />
+											minWidth="220" sortable="false" text="Image" />
 									</columns>
 								</TableView>
 								<Button layoutX="20.0" layoutY="270.0" minWidth="200.0"
@@ -117,7 +117,7 @@
 									text="Costumize Item" AnchorPane.bottomAnchor="-1.0658141036401503E-14"
 									AnchorPane.rightAnchor="250.0" />
 								<Button layoutX="270.0" layoutY="270.0" minWidth="200.0"
-									mnemonicParsing="false" onAction="#paymentButtonClick" text="Payment"
+									mnemonicParsing="false" onAction="#paymentButtonClick" text="Show Cart"
 									AnchorPane.bottomAnchor="-1.0658141036401503E-14"
 									AnchorPane.rightAnchor="10.0" />
 							</children>
@@ -129,9 +129,8 @@
 								<Label layoutX="45.0" layoutY="69.0" text="Domain Color" />
 								<Label layoutX="45.0" layoutY="102.0" text="Min Price" />
 								<Label layoutX="44.0" layoutY="137.0" text="Max price" />
-								<TextField fx:id="domain_color" alignment="CENTER"
-									layoutX="156.0" layoutY="65.0" minHeight="25.0" prefHeight="25.0"
-									prefWidth="193.0" />
+								<ComboBox fx:id="domain_color" layoutX="156.0" layoutY="65.0"
+									minHeight="25.0" prefHeight="25.0" prefWidth="193.0" />
 								<TextField fx:id="min_price" alignment="CENTER"
 									layoutX="156.0" layoutY="98.0" minHeight="25.0" prefHeight="25.0"
 									prefWidth="193.0" promptText="Min" />
@@ -150,7 +149,7 @@
 									text="Catalog" AnchorPane.bottomAnchor="10.600000000000012"
 									AnchorPane.rightAnchor="250.0" />
 								<Button layoutX="270.0" layoutY="270.0" minWidth="200.0"
-									mnemonicParsing="false" onAction="#paymentButtonClick" text="Payment"
+									mnemonicParsing="false" onAction="#paymentButtonClick" text="Show Cart"
 									AnchorPane.bottomAnchor="10.600000000000012"
 									AnchorPane.rightAnchor="10.0" />
 							</children>
@@ -168,10 +167,10 @@
 											editable="false" minWidth="50.0" prefWidth="50.0" resizable="false"
 											sortable="false" text="ID" />
 										<TableColumn fx:id="tablecolumn_search_name"
-											editable="false" minWidth="225.0" prefWidth="225.0"
-											resizable="false" sortable="false" text="ID" />
+											editable="false" minWidth="300.0" prefWidth="300.0"
+											resizable="false" sortable="false" text="Name" />
 										<TableColumn fx:id="tablecolumn_search_price"
-											editable="false" minWidth="225.0" prefWidth="225" resizable="false"
+											editable="false" minWidth="295.0" prefWidth="295" resizable="false"
 											sortable="false" text="Price" />
 									</columns>
 								</TableView>
@@ -185,6 +184,10 @@
 							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
 							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
 							<children>
+								<Button layoutX="340.0" layoutY="275.0" minWidth="120"
+									mnemonicParsing="false" onAction="#clearCartButtonClickPaymentType"
+									text="Clear Cart" AnchorPane.rightAnchor="10.0"
+									AnchorPane.topAnchor="0.0" />
 								<TableView fx:id="payment_table" editable="true"
 									layoutX="0.0" layoutY="35.0" minWidth="500" prefHeight="209.0"
 									AnchorPane.bottomAnchor="56.19999999999999"
@@ -195,26 +198,26 @@
 											editable="false" minWidth="50.0" resizable="false" sortable="false"
 											text="ID" />
 										<TableColumn fx:id="tablecolumn_payment_name"
-											editable="false" minWidth="225.0" resizable="false" sortable="false"
+											editable="false" minWidth="275.0" resizable="false" sortable="false"
 											text="Name" />
 										<TableColumn fx:id="tablecolumn_payment_price"
-											editable="false" minWidth="225.0" resizable="false" sortable="false"
+											editable="false" minWidth="290.0" resizable="false" sortable="false"
 											text="Price" />
 									</columns>
 								</TableView>
-								<Button layoutX="230.0" layoutY="275.0" minWidth="100"
-									mnemonicParsing="false" onAction="#catalogButtonClickOnCustomizedType"
-									text="Back" AnchorPane.bottomAnchor="0.6000000000000121"
-									AnchorPane.rightAnchor="120.0" />
 								<Label layoutX="0.0" layoutY="280.0" text="Total Price"
 									AnchorPane.bottomAnchor="3.600000000000012"
 									AnchorPane.leftAnchor="0.0" />
 								<Label fx:id="total_price_label" layoutX="150.0" layoutY="280.0"
 									prefHeight="17.0" prefWidth="81.0" AnchorPane.bottomAnchor="3.600000000000012"
 									AnchorPane.leftAnchor="100.0" />
-								<Button layoutX="340.0" layoutY="275.0" mnemonicParsing="false"
-									onAction="#paymentButtonClickPaymentType" text="Go To Payment"
-									AnchorPane.bottomAnchor="0.6000000000000121"
+								<Button layoutX="150.0" layoutY="275.0" minWidth="120"
+									mnemonicParsing="false" onAction="#catalogButtonClickOnCustomizedType"
+									text="Back" AnchorPane.bottomAnchor="0.6000000000000121"
+									AnchorPane.rightAnchor="150.0" />
+								<Button layoutX="340.0" layoutY="275.0" minWidth="120"
+									mnemonicParsing="false" onAction="#paymentButtonClickPaymentType"
+									text="Go To Payment" AnchorPane.bottomAnchor="0.6000000000000121"
 									AnchorPane.rightAnchor="10.0" />
 							</children>
 						</AnchorPane>
@@ -222,8 +225,8 @@
 							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
 							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
 							<children>
-								<Button layoutX="248.0" layoutY="253.0" mnemonicParsing="false"
-									onAction="#paymentButtonClick" text="Back"
+								<Button layoutX="248.0" layoutY="253.0" minWidth="100"
+									mnemonicParsing="false" onAction="#paymentButtonClick" text="Back"
 									AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="130.0" />
 								<Button layoutX="303.0" layoutY="253.0" minWidth="100.0"
 									mnemonicParsing="false" onAction="#finishButtonClick"
@@ -288,10 +291,10 @@
 											editable="false" minWidth="50.0" prefWidth="50.0" resizable="false"
 											sortable="false" text="ID" />
 										<TableColumn fx:id="tablecolumn_reservation_price"
-											editable="false" minWidth="225.0" prefWidth="225" resizable="false"
+											editable="false" minWidth="290.0" prefWidth="290" resizable="false"
 											sortable="false" text="Price" />
 										<TableColumn fx:id="tablecolumn_reservation_type"
-											prefWidth="225" resizable="false" sortable="false" text="Status" />
+											prefWidth="300" resizable="false" sortable="false" text="Status" />
 									</columns>
 								</TableView>
 							</children>
@@ -300,6 +303,11 @@
 							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
 							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
 							<children>
+								<Label fx:id="cancel_reservation_shop" layoutY="5.0">
+									<font>
+										<Font name="Berlin Sans FB Demi Bold" size="22" />
+									</font>
+								</Label>
 								<TableView fx:id="cancel_table" editable="true"
 									layoutX="0.0" layoutY="35.0" minWidth="500" prefHeight="209.0"
 									AnchorPane.bottomAnchor="56.19999999999999"
@@ -310,27 +318,27 @@
 											editable="false" minWidth="50.0" resizable="false" sortable="false"
 											text="ID" />
 										<TableColumn fx:id="tablecolumn_cancel_name"
-											editable="false" minWidth="225.0" resizable="false" sortable="false"
+											editable="false" minWidth="275.0" resizable="false" sortable="false"
 											text="Name" />
 										<TableColumn fx:id="tablecolumn_cancel_price"
-											editable="false" minWidth="225.0" resizable="false" sortable="false"
+											editable="false" minWidth="280.0" resizable="false" sortable="false"
 											text="Price" />
 									</columns>
 								</TableView>
-								<Button layoutX="230.0" layoutY="275.0" minWidth="100"
+								<Button layoutX="120.0" layoutY="275.0" minWidth="200"
 									mnemonicParsing="false" onAction="#backToReservationsClick"
 									text="Back" AnchorPane.bottomAnchor="5.0"
-									AnchorPane.rightAnchor="120.0" />
+									AnchorPane.rightAnchor="220.0" />
 								<Label layoutX="0.0" layoutY="280.0" text="Total Price"
 									AnchorPane.bottomAnchor="3.600000000000012"
 									AnchorPane.leftAnchor="0.0" />
 								<Label fx:id="cancel_total_price_label" layoutX="150.0"
 									layoutY="280.0" prefHeight="17.0" prefWidth="81.0"
 									AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="100.0" />
-								<Button layoutX="340.0" layoutY="275.0" minWidth="100.0"
+								<Button layoutX="340.0" layoutY="275.0" minWidth="200.0"
 									mnemonicParsing="false" onAction="#cancelButtonClick"
-									prefWidth="100.0" text="Cancel" AnchorPane.bottomAnchor="5.0"
-									AnchorPane.rightAnchor="10.0" />
+									prefWidth="100.0" text="Cancel Reservation"
+									AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
 							</children>
 						</AnchorPane>
 					</children>

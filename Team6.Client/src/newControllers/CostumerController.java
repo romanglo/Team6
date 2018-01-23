@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import com.sun.xml.internal.ws.util.StringUtils;
+
 import boundaries.CatalogItemRow;
 import controllers.Costumer_SavedData;
 import javafx.application.Platform;
@@ -105,7 +107,7 @@ public class CostumerController extends BaseController
 
 	@FXML private ComboBox<String> combo_shop;
 
-	@FXML private TextField domain_color;
+	@FXML private ComboBox<String> domain_color;
 
 	@FXML private TextField min_price;
 
@@ -183,6 +185,8 @@ public class CostumerController extends BaseController
 
 	@FXML private Label cancel_total_price_label;
 
+	@FXML private Label cancel_reservation_shop;
+
 	/* End of -> cancel reservation */
 
 	// end region -> FXML Fields
@@ -198,6 +202,8 @@ public class CostumerController extends BaseController
 	private ObservableList<CatalogItemRow> ItemRow = FXCollections.observableArrayList();
 
 	private ObservableList<CatalogItemRow> paymentList = FXCollections.observableArrayList();
+
+	private ObservableList<String> costumizedColors = FXCollections.observableArrayList();
 
 	private ObservableList<String> hoursList = FXCollections.observableArrayList();
 
@@ -235,6 +241,7 @@ public class CostumerController extends BaseController
 		anchorpane_credit_card.setVisible(false);
 		anchorpane_payment.setVisible(false);
 		anchorpane_search.setVisible(false);
+		initializeCostumized();
 	}
 
 	@FXML
@@ -262,6 +269,14 @@ public class CostumerController extends BaseController
 	@FXML
 	private void paymentButtonClickPaymentType(ActionEvent paymentEvent)
 	{
+		if (Costumer_SavedData.getCostumerReservationList().isEmpty()) {
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Attention");
+			alert.setHeaderText(null);
+			alert.setContentText("The cart is empty.");
+			alert.showAndWait();
+			return;
+		}
 		anchorpane_catalog.setVisible(false);
 		anchorpane_costumized.setVisible(false);
 		anchorpane_payment.setVisible(false);
@@ -283,7 +298,7 @@ public class CostumerController extends BaseController
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Attention");
 			alert.setHeaderText(null);
-			alert.setContentText("You left empty fields.");
+			alert.setContentText("Please fill in all fields to complete the reservation.");
 			alert.show();
 			return;
 		} else if (delivery_radio.isSelected()) {
@@ -292,7 +307,7 @@ public class CostumerController extends BaseController
 				Alert alert = new Alert(AlertType.ERROR);
 				alert.setTitle("Attention");
 				alert.setHeaderText(null);
-				alert.setContentText("You left empty fields.");
+				alert.setContentText("Please fill in all fields to complete the reservation.");
 				alert.show();
 				return;
 			}
@@ -395,6 +410,13 @@ public class CostumerController extends BaseController
 	}
 
 	@FXML
+	private void clearCartButtonClickPaymentType(ActionEvent clearAction)
+	{
+		Costumer_SavedData.setReservationList(new ArrayList<>());
+		initializePayment();
+	}
+
+	@FXML
 	private void shopComboClick(ActionEvent shopEvent)
 	{
 		if (!Costumer_SavedData.getCostumerReservationList().isEmpty()) {
@@ -426,7 +448,7 @@ public class CostumerController extends BaseController
 	@FXML
 	private void searchButtonClickCustomizedType(ActionEvent searchEvent)
 	{
-		if (domain_color.getText().equals("") || min_price.getText().equals("") || max_price.getText().equals("")
+		if ((domain_color.getValue() != null && domain_color.getValue().equals("")) || min_price.getText().equals("") || max_price.getText().equals("")
 				|| item_amount.getText().equals("")) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Attention");
@@ -435,20 +457,30 @@ public class CostumerController extends BaseController
 			alert.show();
 			return;
 		}
+		double min = Double.parseDouble(min_price.getText());
+		double max = Double.parseDouble(max_price.getText());
+		int amount = Integer.parseInt(item_amount.getText());
+
+		if (min < 0 || max < 0 || amount < 1 || max < min) {
+			Alert alert = new Alert(AlertType.ERROR);
+			alert.setTitle("Attention");
+			alert.setHeaderText(null);
+			alert.setContentText("Illigal values entered.");
+			alert.show();
+			return;
+		}
 
 		searchItemsList = FXCollections.observableArrayList();
 		for (Item entity : m_catalogList) {
-			if (entity.getDomainColor().equals(domain_color.getText())
-					&& (entity.getPrice() >= Double.parseDouble(min_price.getText())
-							&& entity.getPrice() <= Double.parseDouble(max_price.getText()))
+			if (entity.getDomainColor().equals(domain_color.getValue().toLowerCase())
+					&& (entity.getPrice() >= min && entity.getPrice() <= max)
 					&& entity.getType() == ProductType.Flower) {
 				// Check the following:
 				// 1. Domain color as requested.
 				// 2. Price is in range.
 				// 3. The entity is of the type 'Flower'.
 				CatalogItemRow catalogItemRow = new CatalogItemRow(entity.getId(), entity.getName(),
-						entity.getType().toString(),
-						(float) (Integer.parseInt(item_amount.getText()) * entity.getPrice()), domain_color.getText());
+						entity.getType().toString(), (float) (amount * entity.getPrice()), domain_color.getValue().toLowerCase());
 				searchItemsList.add(catalogItemRow);
 			}
 		}
@@ -714,6 +746,13 @@ public class CostumerController extends BaseController
 				if (messageData instanceof EntitiesListData) {
 					List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 					if (entities.get(0) instanceof ItemInReservation) {
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Success");
+						alert.setHeaderText(null);
+						alert.setContentText("Reservation completed.");
+						alert.showAndWait();
+						Costumer_SavedData.setReservationList(new ArrayList<>());
+
 						catalogButtonClickOnCustomizedType(new ActionEvent());
 					}
 					return;
@@ -801,25 +840,37 @@ public class CostumerController extends BaseController
 					IEntity entity = ((EntityData) messageData).getEntity();
 					if (entity instanceof Reservation) {
 						Platform.runLater(() -> {
+							Alert alert = new Alert(AlertType.INFORMATION);
+							alert.setTitle("Success");
+							alert.setHeaderText(null);
+							alert.setContentText("Reservation canceled successfully.");
+							alert.showAndWait();
 							backToReservationsClick(new ActionEvent());
 						});
 						return;
 					}
 				}
-				m_Logger.info("Successfully delivered but received data not of the type requested.");
 			}
 			return;
 		}
 
 		if (entitiesListData instanceof EntityData) {
 			IEntity entity = ((EntityData) entitiesListData).getEntity();
-			if (!(entity instanceof Reservation)) {
-				m_Logger.warning(
-						"Received entity not of the type requested, requested: " + Reservation.class.getName());
-				return;
+			if (entity instanceof Reservation) {
+				m_reservationEntity = (Reservation) entity;
+				ShopManager shopManager = new ShopManager();
+				shopManager.setId(m_reservationEntity.getShopManagerId());
+				Message message = MessagesFactory.createGetEntityMessage(shopManager);
+				m_Client.sendMessageToServer(message);
+			} else if (entity instanceof ShopManager) {
+				ShopManager manager = (ShopManager) entity;
+				Platform.runLater(() -> {
+					cancel_reservation_shop.setText("Shop: " + manager.getName());
+				});
+			} else {
+				m_Logger.warning("Received entity not of the type requested.");
 			}
 
-			m_reservationEntity = (Reservation) entity;
 		} else if (entitiesListData instanceof EntitiesListData) {
 			List<IEntity> entities = ((EntitiesListData) entitiesListData).getEntities();
 			cancelItemsList = FXCollections.observableArrayList();
@@ -894,9 +945,23 @@ public class CostumerController extends BaseController
 			tableRow.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
-					if (!rowData.getM_type().equalsIgnoreCase("open")) {
+					if (rowData.getM_type().equalsIgnoreCase("closed")) {
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Attention");
+						alert.setHeaderText(null);
+						alert.setContentText("The reservation is closed.");
+						alert.showAndWait();
 						return;
 					}
+					if (rowData.getM_type().equalsIgnoreCase("canceled")) {
+						Alert alert = new Alert(AlertType.INFORMATION);
+						alert.setTitle("Attention");
+						alert.setHeaderText(null);
+						alert.setContentText("The reservation is canceled.");
+						alert.showAndWait();
+						return;
+					}
+
 					s_reservationId = rowData.getM_id();
 					anchorpane_cancel.setVisible(true);
 					anchorpane_reservations.setVisible(false);
@@ -931,6 +996,11 @@ public class CostumerController extends BaseController
 					itemInReservation.setItemName(rowData.getName());
 
 					Costumer_SavedData.addItemToReservation(itemInReservation);
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Item Added");
+					alert.setHeaderText(null);
+					alert.setContentText("The item was added to the reservation.");
+					alert.showAndWait();
 				}
 			});
 			return tableRow;
@@ -955,6 +1025,32 @@ public class CostumerController extends BaseController
 		ShopCatalogData catalogData = new ShopCatalogData(Costumer_SavedData.getShopManagerId());
 		entityMessage = MessagesFactory.createIMessageDataMessage(catalogData);
 		m_Client.sendMessageToServer(entityMessage);
+	}
+
+	private void initializeCostumized()
+	{
+		costumizedColors = FXCollections.observableArrayList();
+		ArrayList<String> strings = new ArrayList<>();
+
+		for (Item item : m_catalogList) {
+			if (!strings.contains(item.getDomainColor())) {
+				strings.add(item.getDomainColor());
+			}
+		}
+
+		for (String str : strings) {
+			costumizedColors.add(upperCaseFirst(str));
+		}
+
+		domain_color.setItems(costumizedColors);
+		domain_color.getSelectionModel().selectFirst();
+	}
+
+	private String upperCaseFirst(String value)
+	{
+		char[] array = value.toCharArray();
+		array[0] = Character.toUpperCase(array[0]);
+		return new String(array);
 	}
 
 	private void initializePayment()
@@ -996,6 +1092,31 @@ public class CostumerController extends BaseController
 		}
 
 		total_price_label.setText(String.format("%.2f", totalPrice));
+
+		payment_table.setRowFactory(param -> {
+			TableRow<CatalogItemRow> tableRow = new TableRow<>();
+			tableRow.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
+					CatalogItemRow rowData = tableRow.getItem();
+
+					Alert alert = new Alert(AlertType.CONFIRMATION);
+					alert.setTitle("Attention");
+					alert.setHeaderText(null);
+					alert.setContentText("Are you sure you want to remove the item?");
+					Optional<ButtonType> result = alert.showAndWait();
+					if (result.get() != ButtonType.OK) {
+						return;
+					}
+
+					ItemInReservation itemInReservation = new ItemInReservation();
+					itemInReservation.setItemId(rowData.getM_id());
+
+					Costumer_SavedData.removeItemFromReservation(itemInReservation);
+					initializePayment();
+				}
+			});
+			return tableRow;
+		});
 
 		tablecolumn_payment_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
 		tablecolumn_payment_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
@@ -1040,13 +1161,16 @@ public class CostumerController extends BaseController
 		combo_hour.setItems(hoursList);
 		combo_minute.setItems(minutesList);
 
-		int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-		int minute = Calendar.getInstance().get(Calendar.MINUTE);
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.HOUR_OF_DAY, 3);
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		int minute = calendar.get(Calendar.MINUTE);
 		combo_hour.setValue("" + (hour < 10 ? "0" + hour : hour));
 		combo_minute.setValue("" + (minute < 10 ? "0" + minute : minute));
 
 		delivery_radio.setSelected(true);
-		date_pick.setValue(LocalDate.now());
+		date_pick.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
 
 			final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
