@@ -2,7 +2,6 @@
 package newControllers;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javafx.collections.FXCollections;
@@ -24,7 +23,7 @@ import newMessages.RespondMessageData;
 
 /**
  *
- * ExampleController: TODO Yoni
+ * ServiceSpecialistController: manages the service specialist UI.
  * 
  * 
  */
@@ -34,7 +33,7 @@ public class ServiceSpecialistController extends BaseController
 	// region Fields
 
 	private @FXML AnchorPane anchorpane_option1;
-	
+
 	private @FXML ImageView imageview_gif;
 
 	private @FXML ImageView imageview_title;
@@ -66,7 +65,7 @@ public class ServiceSpecialistController extends BaseController
 	private @FXML TextField textfield_answer6;
 
 	private @FXML TextArea textarea_analysis;
-	
+
 	private ObservableList<String> m_list;
 
 	private List<IEntity> m_survey_array;
@@ -74,8 +73,8 @@ public class ServiceSpecialistController extends BaseController
 	private ArrayList<String> m_surveysid_array = new ArrayList<String>();
 
 	private SurveyResult selected_survey;
-	
-	private String[] questions= {"Question1" , "Question2" , "Question3" , "Question4" , "Question5" , "Question6" ,};
+
+	private String[] questions = { "Question1", "Question2", "Question3", "Question4", "Question5", "Question6", };
 
 	// end region -> Fields
 
@@ -99,7 +98,7 @@ public class ServiceSpecialistController extends BaseController
 		switch (title) {
 			case "Add analysis":
 				anchorpane_option1.setVisible(true);
-				javafx.application.Platform.runLater(()-> {
+				javafx.application.Platform.runLater(() -> {
 					initializesurveys();
 				});
 			break;
@@ -113,7 +112,7 @@ public class ServiceSpecialistController extends BaseController
 	@Override
 	protected String[] getSideButtonsNames()
 	{
-		return new String[] { "Add analysis"};
+		return new String[] { "Add analysis" };
 	}
 
 	/**
@@ -128,47 +127,50 @@ public class ServiceSpecialistController extends BaseController
 				m_survey_array = ((EntitiesListData) messageData).getEntities();
 				m_surveysid_array.clear();
 				for (int i = 0; i < m_survey_array.size(); i++) {
-					if (((SurveyResult) m_survey_array.get(i)).getSummary()==null)
+					if (((SurveyResult) m_survey_array.get(i)).getSummary() == null)
 						m_surveysid_array.add(Integer.toString(((SurveyResult) m_survey_array.get(i)).getId()));
 				}
-				javafx.application.Platform.runLater(()-> {
-					setInCombobox();	
+				javafx.application.Platform.runLater(() -> {
+					setInCombobox();
 				});
-				
+
 			}
 		} else {
-				if (messageData instanceof RespondMessageData) {
-					if ((((RespondMessageData) messageData).isSucceed())) {
-						m_Logger.severe("successfully updated");
-						javafx.application.Platform.runLater(()-> {
-							initializesurveys();
-							showInformationMessage("Successfully added");
-						});
-						
-					}
+			if (messageData instanceof RespondMessageData) {
+				if ((((RespondMessageData) messageData).isSucceed())) {
+					m_Logger.severe("successfully updated");
+					javafx.application.Platform.runLater(() -> {
+						initializesurveys();
+						showInformationMessage("Successfully added");
+					});
+
 				}
 			}
+		}
 	}
 
 	// end region -> BaseController Implementation
-	
-	//UI events region
-	
 
+	// UI events region
+
+	/**
+	 * Update the complaints add specialist analysis
+	 *
+	 * @param event
+	 * 			save button clicked.
+	 */
 	@FXML
 	public void saveAnalysis(ActionEvent event)
 	{
 		if ((textarea_analysis.getText().equals("")) || (combobox_id.getValue().equals(""))) {
-			showInformationMessage("Specialist analisys area Or survey id is empty");
+			showInformationMessage("Specialist analisys area and/or survey ID are empty");
 		} else {
-				selected_survey.setSummary(textarea_analysis.getText());
-				//selected_survey.setEnterDate(new Date());
-				Message msg = MessagesFactory.createUpdateEntityMessage(selected_survey);
-				m_Client.sendMessageToServer(msg);
-			
+			selected_survey.setSummary(textarea_analysis.getText());
+			Message msg = MessagesFactory.createUpdateEntityMessage(selected_survey);
+			m_Client.sendMessageToServer(msg);
 		}
 	}
-	
+
 	private void initializesurveys()
 	{
 		textfield_answer1.clear();
@@ -189,29 +191,24 @@ public class ServiceSpecialistController extends BaseController
 		Message msg = MessagesFactory.createGetAllEntityMessage(shopsurvey_entity);
 		m_Client.sendMessageToServer(msg);
 	}
-	
+
 	@FXML
 	private void selectSurvey(ActionEvent event)
-	{	
-		if(combobox_id.getValue()==null)
-		{
+	{
+		if (combobox_id.getValue() == null) {
 			return;
 		}
-		if(combobox_id.getValue().equals(""))
-			return;
-			int id=Integer.parseInt(combobox_id.getValue());			
-			
-		
-		SurveyResult correct_survey=null;
-		for(int i=0;i<m_survey_array.size();i++)
-		{
-			if(((SurveyResult)m_survey_array.get(i)).getId()==id)
-			{
-				correct_survey=(SurveyResult)m_survey_array.get(i);
+		if (combobox_id.getValue().equals("")) return;
+		int id = Integer.parseInt(combobox_id.getValue());
+
+		SurveyResult correct_survey = null;
+		for (int i = 0; i < m_survey_array.size(); i++) {
+			if (((SurveyResult) m_survey_array.get(i)).getId() == id) {
+				correct_survey = (SurveyResult) m_survey_array.get(i);
 			}
 		}
-		
-		selected_survey=correct_survey;
+
+		selected_survey = correct_survey;
 		textfield_answer1.setText(Integer.toString(correct_survey.getFirstAnswer()));
 		textfield_answer2.setText(Integer.toString(correct_survey.getSecondAnswer()));
 		textfield_answer3.setText(Integer.toString(correct_survey.getThirdAnswer()));
@@ -225,15 +222,15 @@ public class ServiceSpecialistController extends BaseController
 		textfield_question5.setText(questions[4]);
 		textfield_question6.setText(questions[5]);
 	}
-	
+
 	private void setInCombobox()
 	{
-		javafx.application.Platform.runLater(()-> {
+		javafx.application.Platform.runLater(() -> {
 			m_list = FXCollections.observableArrayList(m_surveysid_array);
 			combobox_id.getItems().clear();
-			combobox_id.setItems(m_list);					
+			combobox_id.setItems(m_list);
 		});
 	}
-	
-	//End of -> UI event region
+
+	// End of -> UI event region
 }
