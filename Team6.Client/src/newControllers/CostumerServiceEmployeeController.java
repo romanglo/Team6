@@ -384,7 +384,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	@FXML
 	private void openSurveys_selectShop(ActionEvent event)
 	{
-		String shopname = opensurvey_combobox_shopname.getValue().substring(opensurvey_combobox_shopname.getValue().indexOf('-')+1,opensurvey_combobox_shopname.getValue().length());
+		String shopname = opensurvey_combobox_shopname.getValue();
 		shopid = 0;
 		for (int i = 0; i < m_addsurvey_shopmanager_array.size(); i++) {
 			if (((ShopManager) m_addsurvey_shopmanager_array.get(i)).getName().equals(shopname)) {
@@ -619,7 +619,7 @@ public class CostumerServiceEmployeeController extends BaseController
 				if (((EntitiesListData) messageData).getEntities().get(0) instanceof ShopManager) {
 					m_addsurvey_shopmanager_array = ((EntitiesListData) messageData).getEntities();
 					for (int i = 0; i < m_addsurvey_shopmanager_array.size(); i++) {
-						m_addsurvey_names_array.add( ((ShopManager) m_addsurvey_shopmanager_array.get(i)).getId()+ " -"+((ShopManager) m_addsurvey_shopmanager_array.get(i)).getName());
+						m_addsurvey_names_array.add( ((ShopManager) m_addsurvey_shopmanager_array.get(i)).getName());
 					}
 					javafx.application.Platform.runLater(() -> {
 						opensurvey_combobox_shopname.getItems().clear();
