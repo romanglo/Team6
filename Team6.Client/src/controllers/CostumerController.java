@@ -1366,7 +1366,7 @@ public class CostumerController extends BaseController
 		delivery_address.setText("");
 		delivery_name.setText("");
 		delivery_phone.setText("");
-		blessing_card.setText("");
+		blessing_text.setText("");
 		m_useSubscription = false;
 
 		if (Costumer_SavedData.getSubscription() != CostumerSubscription.None) {
