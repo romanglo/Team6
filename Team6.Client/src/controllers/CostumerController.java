@@ -240,6 +240,8 @@ public class CostumerController extends BaseController
 
 	private ArrayList<ShopManager> shopManagerList;
 
+	private ArrayList<ShopCostumer> shopCostumerList;
+
 	private ArrayList<Item> m_catalogList;
 
 	private float m_discount;
@@ -652,10 +654,6 @@ public class CostumerController extends BaseController
 		costumer.setUserName(m_ConnectedUser.getUserName());
 		Message message = MessagesFactory.createGetEntityMessage(costumer);
 		m_Client.sendMessageToServer(message);
-
-		ShopManager shopManager = new ShopManager();
-		message = MessagesFactory.createGetAllEntityMessage(shopManager);
-		m_Client.sendMessageToServer(message);
 	}
 
 	/**
@@ -765,34 +763,64 @@ public class CostumerController extends BaseController
 			costumer.setUser(m_ConnectedUser);
 			Costumer_SavedData.initializeSavedData(costumer);
 			m_ConnectedUser = costumer;
+
+			ShopCostumer shopCostumer = new ShopCostumer();
+			shopCostumer.setCostumerId(Costumer_SavedData.getCostumerId());
+			Message entityMessage = MessagesFactory.createGetAllEntityMessage(shopCostumer);
+			m_Client.sendMessageToServer(entityMessage);
 		} else if (messageData instanceof EntitiesListData) {
 			List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
-			shopManagerList = new ArrayList<>();
-			shops = FXCollections.observableArrayList();
 
-			for (IEntity entity : entities) {
-				if (!(entity instanceof ShopManager)) {
-					m_Logger.warning("Received entity not of the type requested.");
-					return;
-				}
-				ShopManager shopManager = (ShopManager) entity;
-				shops.add(shopManager.getName());
-				shopManagerList.add(shopManager);
-			}
+			if (entities.get(0) instanceof ShopCostumer) {
+				shopCostumerList = new ArrayList<>();
 
-			Platform.runLater(() -> {
-				combo_shop.getItems().clear();
-				if (shops != null && !shops.isEmpty()) {
-					combo_shop.setItems(shops);
-					combo_shop.getSelectionModel().selectFirst();
-					if (combo_shop.getValue() == null) {
+				for (IEntity entity : entities) {
+					if (!(entity instanceof ShopCostumer)) {
+						m_Logger.warning("Received entity not of the type requested.");
 						return;
 					}
-					m_currComboShop = combo_shop.getValue();
-					Costumer_SavedData.setShopManagerId(shopManagerList.get(0).getId());
-					initializeCatalog();
+
+					shopCostumerList.add((ShopCostumer) entity);
 				}
-			});
+				
+				ShopManager shopManager = new ShopManager();
+				Message message = MessagesFactory.createGetAllEntityMessage(shopManager);
+				m_Client.sendMessageToServer(message);
+			} else if (entities.get(0) instanceof ShopManager) {
+				shopManagerList = new ArrayList<>();
+				shops = FXCollections.observableArrayList();
+
+				for (IEntity entity : entities) {
+					if (!(entity instanceof ShopManager)) {
+						m_Logger.warning("Received entity not of the type requested.");
+						return;
+					}
+					ShopManager shopManager = (ShopManager) entity;
+					shopManagerList.add(shopManager);
+					
+					for (ShopCostumer shopCostumer : shopCostumerList) {
+						if (shopCostumer.getShopManagerId() == shopManager.getId()) {
+							shops.add(shopManager.getName());
+							break;
+						}
+					}
+				}
+
+				Platform.runLater(() -> {
+					combo_shop.getItems().clear();
+					if (shops != null && !shops.isEmpty()) {
+						combo_shop.setItems(shops);
+						combo_shop.getSelectionModel().selectFirst();
+						if (combo_shop.getValue() == null) {
+							return;
+						}
+						m_currComboShop = combo_shop.getValue();
+						Costumer_SavedData.setShopManagerId(shopManagerList.get(0).getId());
+						initializeCatalog();
+					}
+				});
+			}
+
 		} else {
 			m_Logger.warning("Received message data not of the type requested.");
 			return;
@@ -1057,6 +1085,7 @@ public class CostumerController extends BaseController
 
 		List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 		m_complaintsList = new ArrayList<>();
+		complaintsTableList.clear();
 		for (IEntity entity : entities) {
 			if (!(entity instanceof Complaint)) {
 				m_Logger.warning("Received entity not of the type requested, requested: " + Complaint.class.getName());
@@ -1231,11 +1260,9 @@ public class CostumerController extends BaseController
 	private void initializeCatalog()
 	{
 		m_currScreen = ScreenType.Catalog;
-		Message entityMessage = MessagesFactory.createGetEntityMessage(Costumer_SavedData.getShopCostumer());
-		m_Client.sendMessageToServer(entityMessage);
 
 		ShopCatalogData catalogData = new ShopCatalogData(Costumer_SavedData.getShopManagerId());
-		entityMessage = MessagesFactory.createIMessageDataMessage(catalogData);
+		Message entityMessage = MessagesFactory.createIMessageDataMessage(catalogData);
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
