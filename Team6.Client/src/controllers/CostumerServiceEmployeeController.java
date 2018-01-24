@@ -27,6 +27,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 import messages.EntitiesListData;
 import messages.EntityData;
@@ -44,7 +45,7 @@ public class CostumerServiceEmployeeController extends BaseController
 {
 	// region Fields
 
-	private final String[] optinons_side = new String[] { "Add Complaint",  "Treat Complaint","My Complaints",
+	private final String[] optinons_side = new String[] { "Add Complaint", "Treat Complaint", "My Complaints",
 			"Add Surveys" };
 
 	private @FXML AnchorPane anchorpane_addcomplaint;
@@ -126,12 +127,12 @@ public class CostumerServiceEmployeeController extends BaseController
 	private int my_id;
 
 	private @FXML Label status;
-	
+
 	private @FXML Label date_mycomplaints;
-	
+
 	private @FXML Label mycomplaints_costumername;
-	
-	private ArrayList<String> m_addcomplaint_managername_array=new ArrayList<>();
+
+	private ArrayList<String> m_addcomplaint_managername_array = new ArrayList<>();
 
 	// end region-> Open/Close survey fields
 
@@ -177,10 +178,11 @@ public class CostumerServiceEmployeeController extends BaseController
 	{
 		if (m_addcomplaint_textfield_id.getText().equals("")
 				|| m_addcomplaint_textarea_costumercomplaint.getText().equals("")) {
-			showInformationMessage("Please complete all fields before saving.");
+			showAlertMessage("Please complete all fields before saving.", AlertType.INFORMATION);
 		} else {
 			m_addcomplaint_selected_complaint = new Complaint();
-			m_addcomplaint_selected_complaint.setShopManagerId(Integer.parseInt(combobox_shop.getValue().substring(0, combobox_shop.getValue().indexOf('-')-1)));
+			m_addcomplaint_selected_complaint.setShopManagerId(
+					Integer.parseInt(combobox_shop.getValue().substring(0, combobox_shop.getValue().indexOf('-') - 1)));
 			m_addcomplaint_selected_complaint.setComplaint(m_addcomplaint_textarea_costumercomplaint.getText());
 			m_addcomplaint_selected_complaint.setCreationDate(new Date());
 			m_addcomplaint_selected_complaint.setCostumerServiceEmployeeId(my_id);
@@ -250,11 +252,11 @@ public class CostumerServiceEmployeeController extends BaseController
 	public void treatComplaint_updateClick(ActionEvent event)
 	{
 		if ((m_treatcomplaint_combobox_id.getValue() == null)) {
-			showInformationMessage("Complaint ID field is empty");
+			showAlertMessage("Complaint ID field is empty", AlertType.WARNING);
 			return;
 		}
 		if (m_treatcomplaint_textarea_summary.getText().equals("")) {
-			showInformationMessage("Summery field is empty");
+			showAlertMessage("Summery field is empty", AlertType.WARNING);
 			return;
 		}
 		int com_id = Integer.parseInt(m_treatcomplaint_combobox_id.getValue());
@@ -265,7 +267,7 @@ public class CostumerServiceEmployeeController extends BaseController
 		((Complaint) m_treatcomplaint_complaint_array.get(i)).setSummary(m_treatcomplaint_textarea_summary.getText());
 		if (!(m_treatcomplaint_financial_compensation.isDisable())) {
 			if (m_treatcomplaint_financial_compensation.getText().equals("")) {
-				showInformationMessage("Refund field is empty, please enter refund or disable it.");
+				showAlertMessage("Refund field is empty, please enter refund or disable it.", AlertType.WARNING);
 				return;
 			}
 			m_treatcomplaint_complaint_fun = (Complaint) m_treatcomplaint_complaint_array.get(i);
@@ -274,7 +276,7 @@ public class CostumerServiceEmployeeController extends BaseController
 				m_treatcomplaint_refund = Float.parseFloat(m_treatcomplaint_financial_compensation.getText());
 			}
 			catch (NumberFormatException e) {
-				showInformationMessage("You entered invalid value.");
+				showAlertMessage("You entered invalid value.", AlertType.WARNING);
 				return;
 			}
 			Costumer cos_entity = new Costumer();
@@ -381,11 +383,11 @@ public class CostumerServiceEmployeeController extends BaseController
 	private void openSurveys_AddSurvey(ActionEvent event)
 	{
 		if (opensurvey_combobox_shopname.getValue() == null) {
-			showInformationMessage("Please complete all fields before saving.");
+			showAlertMessage("Please complete all fields before saving.",AlertType.INFORMATION);
 			return;
 		}
 		if (opensurvey_datepicker_enddate.getValue() == null) {
-			showInformationMessage("You left empty fields.");
+			showAlertMessage("You left empty fields.",AlertType.WARNING);
 			return;
 		}
 		String state = opensurvey_button_openclose_survey.getText();
@@ -522,11 +524,11 @@ public class CostumerServiceEmployeeController extends BaseController
 				if (((RespondMessageData) msg.getMessageData()).getMessageData() instanceof EntityData) {
 					if (((EntityData) ((RespondMessageData) msg.getMessageData()).getMessageData())
 							.getEntity() instanceof Costumer) {
-						showInformationMessage("The costumer doesn't exist.");
+						showAlertMessage("The costumer doesn't exist.",AlertType.WARNING);
 					} else {
 						if (((RespondMessageData) msg.getMessageData()).isSucceed()) {
 							m_Logger.severe("Successfully added complaint");
-							showInformationMessage("Successfully added complaint");
+							showAlertMessage("Successfully added complaint",AlertType.INFORMATION);
 							addcomplaint_initializeShopCombobox();
 						}
 					}
@@ -538,8 +540,8 @@ public class CostumerServiceEmployeeController extends BaseController
 				combobox_shop.getItems().clear();
 				m_addcomplaint_managername_array.clear();
 				for (int i = 0; i < m_addcomplaint_shopmanager_array.size(); i++) {
-					m_addcomplaint_managerid_array.add(((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getId()+ " -" + 
-						((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getName());
+					m_addcomplaint_managerid_array.add(((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getId()
+							+ " -" + ((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getName());
 				}
 				m_addcomplaint_list = FXCollections.observableArrayList(m_addcomplaint_managerid_array);
 				combobox_shop.setItems(m_addcomplaint_list);
@@ -585,9 +587,9 @@ public class CostumerServiceEmployeeController extends BaseController
 				} else {
 					if (flag == false) {
 						m_Logger.severe("Can't Update complaint.");
-						showInformationMessage("Can't Update complaint, please try again");
+						showAlertMessage("Can't Update complaint, please try again",AlertType.WARNING);
 					} else {
-						showInformationMessage("Successfully updated");
+						showAlertMessage("Successfully updated",AlertType.INFORMATION);
 						tri();
 					}
 				}
@@ -599,7 +601,7 @@ public class CostumerServiceEmployeeController extends BaseController
 				if (((EntitiesListData) messageData).getEntities().get(0) instanceof ShopManager) {
 					m_addsurvey_shopmanager_array = ((EntitiesListData) messageData).getEntities();
 					for (int i = 0; i < m_addsurvey_shopmanager_array.size(); i++) {
-						m_addsurvey_names_array.add( ((ShopManager) m_addsurvey_shopmanager_array.get(i)).getName());
+						m_addsurvey_names_array.add(((ShopManager) m_addsurvey_shopmanager_array.get(i)).getName());
 					}
 					javafx.application.Platform.runLater(() -> {
 						opensurvey_combobox_shopname.getItems().clear();
@@ -642,8 +644,8 @@ public class CostumerServiceEmployeeController extends BaseController
 				if (((RespondMessageData) messageData).isSucceed()) {
 					m_Logger.severe("work");
 					if (opensurvey_button_openclose_survey.getText().equals("Open"))
-						showInformationMessage("Successfully added");
-					else showInformationMessage("Successfully updated");
+						showAlertMessage("Successfully added",AlertType.INFORMATION);
+					else showAlertMessage("Successfully updated",AlertType.INFORMATION);
 					javafx.application.Platform.runLater(() -> {
 						opensurvey_button_openclose_survey.setText("Open");
 						opensurvey_combobox_shopname.setValue("");
@@ -687,16 +689,16 @@ public class CostumerServiceEmployeeController extends BaseController
 					int today = (int) new Date().getTime();
 					for (int i = 0; i < complaints.size(); i++) {
 						int time = (int) (((Complaint) complaints.get(i)).getCreationDate().getTime());
-						if((((Complaint) complaints.get(i)).isOpened()))
-						{
-						if ((today - time) / (24 * 60 * 60 * 1000) >= 1) {
-							if(twentyfour.equals("")) twentyfour = twentyfour +" " + (((Complaint) complaints.get(i)).getId());
-							else twentyfour = twentyfour +" ," + (((Complaint) complaints.get(i)).getId());
-						}
+						if ((((Complaint) complaints.get(i)).isOpened())) {
+							if ((today - time) / (24 * 60 * 60 * 1000) >= 1) {
+								if (twentyfour.equals(""))
+									twentyfour = twentyfour + " " + (((Complaint) complaints.get(i)).getId());
+								else twentyfour = twentyfour + " ," + (((Complaint) complaints.get(i)).getId());
+							}
 						}
 					}
 					if (!twentyfour.equals("")) {
-						showInformationMessage("You must treat complaints numbers: " + twentyfour);
+						showAlertMessage("You must treat complaints numbers: " + twentyfour,AlertType.WARNING);
 					}
 				}
 			} else if (messageData instanceof EntityData) {

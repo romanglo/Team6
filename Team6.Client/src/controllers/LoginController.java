@@ -11,6 +11,7 @@ import com.sun.istack.internal.Nullable;
 
 import client.ApplicationEntryPoint;
 import client.Client;
+import common.AlertBuilder;
 import entities.IEntity;
 import entities.User;
 import javafx.animation.Animation;
@@ -116,17 +117,17 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		String pasword = passwordField_userPassword.getText();
 
 		if ((userName == null || userName.isEmpty()) && (pasword == null || pasword.isEmpty())) {
-			showAlertMessage("Please enter your username and password.");
+			showAlertMessage("Please enter your username and password.",AlertType.INFORMATION);
 			return;
 		}
 
 		if (userName == null || userName.isEmpty()) {
-			showAlertMessage("Please enter your username.");
+			showAlertMessage("Please enter your username.",AlertType.INFORMATION);
 			return;
 		}
 
 		if (pasword == null || pasword.isEmpty()) {
-			showAlertMessage("Please enter your password.");
+			showAlertMessage("Please enter your password.",AlertType.INFORMATION);
 			return;
 		}
 
@@ -134,7 +135,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		m_client.setClientStatusHandler(this);
 
 		if (!m_client.isConnected() && !m_client.createConnectionWithServer()) {
-			showAlertMessage("Failed to connect to server! Please check the settings and try again..");
+			showAlertMessage("Failed to connect to server! Please check the settings and try again..",AlertType.ERROR);
 			return;
 		}
 
@@ -176,7 +177,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 		catch (Exception e) {
 			m_logger.log(Level.SEVERE, "Failed on try to load the settings window", e);
-			showAlertMessage("The settings can not be changed at this time..");
+			showAlertMessage("The settings can not be changed at this time..",AlertType.WARNING);
 			return;
 		}
 	}
@@ -424,7 +425,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 		catch (Exception ex) {
 			m_logger.warning("Error when sending get request, excpetion: " + ex.getMessage());
-			showAlertMessage("Could not send message to server at the moment,\nplease try again later.");
+			showAlertMessage("Could not send message to server at the moment,\nplease try again later.",AlertType.WARNING);
 		}
 
 	}
@@ -445,21 +446,18 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	/* Private methods region */
 
 	/**
-	 * The method show dialog message from {@link Alert} type.
+	 * The method show alert message from {@link Alert} type.
 	 *
 	 * @param message
 	 *            the message to show.
 	 */
-	private void showAlertMessage(String message)
+	private void showAlertMessage(String message, AlertType alertType)
 	{
 		if (message == null || message.isEmpty()) {
 			return;
 		}
 		javafx.application.Platform.runLater(() -> {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Information Dialog");
-			alert.setHeaderText(null);
-			alert.setContentText(message);
+			Alert alert = new AlertBuilder().setAlertType(alertType).setContentText(message).build();
 			alert.showAndWait();
 		});
 	}
@@ -475,10 +473,10 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	{
 		javafx.application.Platform.runLater(() -> {
 			passwordField_userPassword.clear();
+			m_client.closeConnectionWithServer();
+			m_logger.info("Login failed! Login message: " + loginData.toString());
+			showAlertMessage("Login Failed! Reason:\n" + loginData.getMessage(),AlertType.ERROR);
 		});
-		m_client.closeConnectionWithServer();
-		m_logger.info("Login failed! Login message: " + loginData.toString());
-		showAlertMessage("Login Failed! Reason:\n" + loginData.getMessage());
 	}
 
 	/**
@@ -548,7 +546,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		catch (Exception e) {
 			String errorString = "Failed on try to load the next scene";
 			m_logger.log(Level.SEVERE, errorString, e);
-			showAlertMessage(errorString);
+			showAlertMessage(errorString,AlertType.ERROR);
 			return;
 		}
 		if (scene != null) {
@@ -644,7 +642,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			catch (Exception e) {
 				String errorString = "Failed on try to load the next window";
 				m_logger.severe(errorString + ", excepion: " + e.getMessage());
-				showAlertMessage(errorString);
+				showAlertMessage(errorString,AlertType.ERROR);
 				return;
 			}
 

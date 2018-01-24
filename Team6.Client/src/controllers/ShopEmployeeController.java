@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import boundaries.CatalogItemRow;
+import common.AlertBuilder;
 import entities.EntitiesEnums;
 import entities.IEntity;
 import entities.Reservation;
@@ -112,7 +113,7 @@ public class ShopEmployeeController extends BaseController
 
 	private @FXML TableColumn<CatalogItemRow, String> tablecolumn_reservation_type;
 
-	private ArrayList<IEntity> closes_reservations=new ArrayList<>();
+	private ArrayList<IEntity> closes_reservations = new ArrayList<>();
 	// end region -> Fields
 
 	// region BaseController Implementation
@@ -186,7 +187,7 @@ public class ShopEmployeeController extends BaseController
 
 					}
 					if (correct_survey == null) {
-						showInformationMessage("There are no surveys for your shop.");
+						showAlertMessage("There are no surveys for your shop.", AlertType.INFORMATION);
 						anchorpane_option1.setVisible(false);
 					} else {
 						textfiled_question1.setText(questions[0]);
@@ -216,7 +217,7 @@ public class ShopEmployeeController extends BaseController
 								combobox_answer4.setValueFactory(svf4);
 								combobox_answer5.setValueFactory(svf5);
 								combobox_answer6.setValueFactory(svf6);
-								showInformationMessage("Successfully added");
+								showAlertMessage("Successfully added", AlertType.INFORMATION);
 							});
 
 						}
@@ -243,7 +244,7 @@ public class ShopEmployeeController extends BaseController
 				}
 			} else if (messageData instanceof RespondMessageData) {
 				if (((RespondMessageData) messageData).isSucceed()) {
-					showInformationMessage("Your reservations have been successfully closed");
+					showAlertMessage("Your reservations have been successfully closed", AlertType.INFORMATION);
 					reservation_list.clear();
 					closes_reservations.clear();
 					drewContantToTable();
@@ -275,7 +276,7 @@ public class ShopEmployeeController extends BaseController
 		combobox_answer5.setValueFactory(svf5);
 		combobox_answer6.setValueFactory(svf6);
 	}
-	
+
 	/**
 	 * Initialize Shop Sales table columns and define action when double click on
 	 * table row.
@@ -288,27 +289,22 @@ public class ShopEmployeeController extends BaseController
 			tableRow.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
-					
-					if(rowData.getType() == "Closed")
-						return;
-					Alert alert = new Alert(AlertType.CONFIRMATION);
-					alert.setTitle("Close Reservation");
-					alert.setHeaderText("Close Reservation");
-					alert.setContentText("Are you sure you want to close the reservation?");
 
+					if (rowData.getType() == "Closed") return;
+
+					Alert alert = new AlertBuilder().setAlertType(AlertType.CONFIRMATION)
+							.setContentText("Are you sure you want to close the reservation?").build();
 					Optional<ButtonType> result = alert.showAndWait();
-					if (result.get() == ButtonType.OK){
-					    rowData.setM_type("Closed");
-					    for(int i=0;i<reservations.size();i++)
-					    {
-					    	if(rowData.getM_id()==((Reservation)reservations.get(i)).getId())
-					    	{
-					    		((Reservation)reservations.get(i)).setType(EntitiesEnums.ReservationType.Closed);
-					    		closes_reservations.add(((Reservation)reservations.get(i)));
-					    	}
-					    }
+					if (result.get() == ButtonType.OK) {
+						rowData.setM_type("Closed");
+						for (int i = 0; i < reservations.size(); i++) {
+							if (rowData.getM_id() == ((Reservation) reservations.get(i)).getId()) {
+								((Reservation) reservations.get(i)).setType(EntitiesEnums.ReservationType.Closed);
+								closes_reservations.add(((Reservation) reservations.get(i)));
+							}
+						}
 					} else {
-					    return;
+						return;
 					}
 					drewContantToTable();
 				}
@@ -323,10 +319,10 @@ public class ShopEmployeeController extends BaseController
 	}
 
 	/**
-	 *  Add survey to shop
+	 * Add survey to shop
 	 *
 	 * @param event
-	 * 			add button clicked
+	 *            add button clicked
 	 */
 	@FXML
 	public void addSurvey(ActionEvent event)
@@ -334,7 +330,7 @@ public class ShopEmployeeController extends BaseController
 		if ((combobox_answer1.getValue() == 0) || (combobox_answer2.getValue() == 0)
 				|| (combobox_answer3.getValue() == 0) || (combobox_answer4.getValue() == 0)
 				|| (combobox_answer5.getValue() == 0) || (combobox_answer6.getValue() == 0)) {
-			showInformationMessage("One or more of the answers are 0 it needs to be at least 1.");
+			showAlertMessage("One or more of the answers are 0 it needs to be at least 1.", AlertType.WARNING);
 		} else {
 			SurveyResult surveyResult = new SurveyResult();
 			surveyResult.setFirstAnswer(combobox_answer1.getValue());
@@ -358,21 +354,16 @@ public class ShopEmployeeController extends BaseController
 		m_Client.sendMessageToServer(msg);
 	}
 
-
-
 	@FXML
 	private void closeReservation(ActionEvent event)
 	{
-		if(closes_reservations.isEmpty())
-		{
-			showInformationMessage("There are no changes.");
+		if (closes_reservations.isEmpty()) {
+			showAlertMessage("There are no changes.", AlertType.INFORMATION);
 			return;
 		}
-		Message msg=MessagesFactory.createUpdateEntitiesMessage(closes_reservations);
+		Message msg = MessagesFactory.createUpdateEntitiesMessage(closes_reservations);
 		m_Client.sendMessageToServer(msg);
 	}
-
-
 
 	/**
 	 * Insert data into table and show the updated table.

@@ -1226,7 +1226,7 @@ public class CompanyEmployeeController extends BaseController
 					if (operation == EntityDataOperation.GetALL) catalog.clear();
 					errorMSG(operation.toString() + " Failed!");
 				} else {
-					showInformationMessage("Catalog update successfully!");
+					showAlertMessage("Catalog update successfully!", AlertType.INFORMATION);
 				}
 			}
 		} else if (anchorpane_shopSales.isVisible()) {
@@ -1265,13 +1265,13 @@ public class CompanyEmployeeController extends BaseController
 					if (((EntityData) respondMessageData.getMessageData()).getEntity() instanceof ItemInShop) {
 						if (!succeed) {
 							Platform.runLater(() -> {
-								showInformationMessage("There are no discounts for this shop");
+								showAlertMessage("There are no discounts for this shop", AlertType.INFORMATION);
 							});
 							shopSales.clear();
 							drawContantToShopSalesTable();
 						}
 					} else {
-						showInformationMessage("Shop sales update successfully!");
+						showAlertMessage("Shop sales update successfully!", AlertType.INFORMATION);
 					}
 				}
 			}

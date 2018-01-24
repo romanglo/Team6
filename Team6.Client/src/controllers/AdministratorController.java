@@ -12,6 +12,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -102,7 +103,6 @@ public class AdministratorController extends BaseController
 		initializeStatus();
 		initializePrivilege();
 	}
-
 
 	/**
 	 * The method ask all users from server.
@@ -344,9 +344,11 @@ public class AdministratorController extends BaseController
 	 */
 	public void updatebtn(ActionEvent event)
 	{
-		if (textField_email.getText().equals("")) showInformationMessage("Please enter email.");
-		else if (textField_password.getText().equals("")) showInformationMessage("Please enter password.");
-		else {
+		if (textField_email.getText().equals("")) {
+			showAlertMessage("Please enter email.", AlertType.INFORMATION);
+		} else if (textField_password.getText().equals("")) {
+			showAlertMessage("Please enter password.", AlertType.INFORMATION);
+		} else {
 			switch (selected_user.getPrivilege()) {
 				case ShopEmployee:
 					ShopEmployee shopEmployeeEntity = new ShopEmployee();
@@ -407,9 +409,9 @@ public class AdministratorController extends BaseController
 			} else if (msg.getMessageData() instanceof RespondMessageData) {
 				RespondMessageData res = (RespondMessageData) msg.getMessageData();
 				if (res.isSucceed()) {
-					showInformationMessage("User update succeed");
+					showAlertMessage("User update succeed", AlertType.INFORMATION);
 				} else if (!res.isSucceed()) {
-					showInformationMessage("User update faild please try again");
+					showAlertMessage("User update faild please try again", AlertType.WARNING);
 					m_Logger.warning("Failed when sending a message to the server.");
 				} else {
 					m_Logger.warning("Received message data not of the type requested, requested: "
@@ -462,9 +464,9 @@ public class AdministratorController extends BaseController
 			else if (msg.getMessageData() instanceof RespondMessageData) {
 				RespondMessageData res = (RespondMessageData) msg.getMessageData();
 				if (res.isSucceed()) {
-					showInformationMessage("User update succeed");
+					showAlertMessage("User update succeed", AlertType.INFORMATION);
 				} else if (!res.isSucceed()) {
-					showInformationMessage("User update faild please try again");
+					showAlertMessage("User update faild please try again", AlertType.WARNING);
 					m_Logger.warning("Failed when sending a message to the server.");
 				} else {
 					m_Logger.warning("Received message data not of the type requested, requested: "

@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import common.AlertBuilder;
 import entities.User;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -333,7 +334,7 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 		}
 		catch (Exception ex) {
 			m_Logger.severe("Failed on try to log out, the application will shut down. exception: " + ex.getMessage());
-			showInformationMessage("Error!\nFailed on try to logout, the aplication shutting down.. ");
+			showAlertMessage("Error!\nFailed on try to logout, the aplication shutting down.. ", AlertType.ERROR);
 		}
 
 		Stage stage = (Stage) borderpain_main_top.getScene().getWindow();
@@ -372,7 +373,7 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 		}
 		catch (Exception e) {
 			m_Logger.severe("Failed on try to load the user details window, excepion: " + e.getMessage());
-			showInformationMessage("Your account details could not be loaded at this time..");
+			showAlertMessage("Your account details could not be loaded at this time..", AlertType.ERROR);
 		}
 	}
 
@@ -455,16 +456,19 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 		}
 	}
 
-	protected void showInformationMessage(String message)
+	/**
+	 * The method show alert message from {@link Alert} type.
+	 *
+	 * @param message
+	 *            the message to show.
+	 */
+	protected void showAlertMessage(String message, AlertType alertType)
 	{
 		if (message == null || message.isEmpty()) {
 			return;
 		}
 		javafx.application.Platform.runLater(() -> {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Information Dialog");
-			alert.setHeaderText(null);
-			alert.setContentText(message);
+			Alert alert = new AlertBuilder().setAlertType(alertType).setContentText(message).build();
 			alert.showAndWait();
 		});
 	}

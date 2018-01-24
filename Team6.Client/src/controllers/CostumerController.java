@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import boundaries.CatalogItemRow;
+import common.AlertBuilder;
 import entities.Complaint;
 import entities.Costumer;
 import entities.IEntity;
@@ -322,7 +323,7 @@ public class CostumerController extends BaseController
 	private void creditCardScreen(ActionEvent paymentEvent)
 	{
 		if (Costumer_SavedData.getCostumerReservationList().isEmpty()) {
-			showInformationPopup("Attention", null, "The cart is empty.");
+			showAlertMessage("The cart is empty.", AlertType.WARNING);
 			return;
 		}
 		anchorpane_catalog.setVisible(false);
@@ -343,12 +344,12 @@ public class CostumerController extends BaseController
 	private void finishButtonClick(ActionEvent finishEvent)
 	{
 		if (!m_useSubscription && credit_card_number.getText().equals("")) {
-			showErrorPopup("Attention", null, "Please fill in all fields to complete the reservation.");
+			showAlertMessage("Please fill in all fields to complete the reservation.", AlertType.WARNING);
 			return;
 		} else if (delivery_radio.isSelected()) {
 			if (delivery_address.getText().equals("") || delivery_name.getText().equals("")
 					|| delivery_phone.getText().equals("")) {
-				showErrorPopup("Attention", null, "Please fill in all fields to complete the reservation.");
+				showAlertMessage("Please fill in all fields to complete the reservation.", AlertType.INFORMATION);
 				return;
 			}
 		}
@@ -356,7 +357,7 @@ public class CostumerController extends BaseController
 			if (date_pick.getValue().isBefore(LocalDate.now())
 					|| (date_pick.getValue().isEqual(LocalDate.now()) && Integer
 							.parseInt(combo_hour.getValue()) < Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 3)) {
-				showErrorPopup("Attention", null, "The date and/or time you picked is invalid, please try again.");
+				showAlertMessage("The date and/or time you picked is invalid, please try again.", AlertType.WARNING);
 				return;
 			}
 		}
@@ -503,10 +504,8 @@ public class CostumerController extends BaseController
 	private void shopComboClick(ActionEvent shopEvent)
 	{
 		if (!Costumer_SavedData.getCostumerReservationList().isEmpty()) {
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Attention");
-			alert.setHeaderText(null);
-			alert.setContentText("You will lose your reservation, are you sure?");
+			Alert alert = new AlertBuilder().setAlertType(AlertType.CONFIRMATION)
+					.setContentText("You will lose your reservation, are you sure?").build();
 			Optional<ButtonType> result = alert.showAndWait();
 			if (result.get() == ButtonType.OK) {
 				Costumer_SavedData.setReservationList(new ArrayList<>());
@@ -540,7 +539,7 @@ public class CostumerController extends BaseController
 	{
 		if ((domain_color.getValue() != null && domain_color.getValue().equals("")) || min_price.getText().equals("")
 				|| max_price.getText().equals("") || item_amount.getText().equals("")) {
-			showErrorPopup("Attention", null, "Please fill in all fields to start a search.");
+			showAlertMessage("Please fill in all fields to start a search.", AlertType.INFORMATION);
 			return;
 		}
 		double min = Double.parseDouble(min_price.getText());
@@ -548,7 +547,7 @@ public class CostumerController extends BaseController
 		int amount = Integer.parseInt(item_amount.getText());
 
 		if (min < 0 || max < 0 || amount < 1 || max < min) {
-			showErrorPopup("Attention", null, "Illigal values entered.");
+			showAlertMessage("Illigal values entered.", AlertType.WARNING);
 			return;
 		}
 
@@ -569,7 +568,7 @@ public class CostumerController extends BaseController
 		}
 
 		if (searchItemsList.isEmpty()) {
-			showInformationPopup("Attention", null, "A match wasn't found, please try again.");
+			showAlertMessage("A match wasn't found, please try again.", AlertType.WARNING);
 		} else {
 			initializeItemSearchTable();
 			anchorpane_search.setVisible(true);
@@ -874,7 +873,7 @@ public class CostumerController extends BaseController
 					List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 					if (entities.get(0) instanceof ItemInReservation) {
 						Platform.runLater(() -> {
-							showInformationPopup("Success", null, "Reservation completed, thanks for choosing us.");
+							showAlertMessage("Reservation completed, thanks for choosing us.", AlertType.INFORMATION);
 						});
 
 						Costumer_SavedData.setReservationList(new ArrayList<>());
@@ -980,7 +979,7 @@ public class CostumerController extends BaseController
 					IEntity entity = ((EntityData) messageData).getEntity();
 					if (entity instanceof Reservation) {
 						Platform.runLater(() -> {
-							showInformationPopup("Success", null, "Reservation canceled successfully.");
+							showAlertMessage("Reservation canceled successfully.", AlertType.INFORMATION);
 							backToReservationsClick(new ActionEvent());
 						});
 						return;
@@ -1095,11 +1094,7 @@ public class CostumerController extends BaseController
 					itemInReservation.setItemName(rowData.getM_name());
 					Costumer_SavedData.addItemToReservation(itemInReservation);
 
-					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("Item Added");
-					alert.setHeaderText(null);
-					alert.setContentText("The item was added to the reservation.");
-					alert.showAndWait();
+					showAlertMessage("The item was added to the reservation.", AlertType.INFORMATION);
 				}
 			});
 			return tableRow;
@@ -1128,11 +1123,11 @@ public class CostumerController extends BaseController
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
 					if (rowData.getM_type().equalsIgnoreCase("closed")) {
-						showInformationPopup("Attention", null, "The reservation is closed.");
+						showAlertMessage("The reservation is closed.", AlertType.INFORMATION);
 						return;
 					}
 					if (rowData.getM_type().equalsIgnoreCase("canceled")) {
-						showInformationPopup("Attention", null, "The reservation is canceled.");
+						showAlertMessage("The reservation is canceled.", AlertType.INFORMATION);
 						return;
 					}
 
@@ -1173,7 +1168,7 @@ public class CostumerController extends BaseController
 					itemInReservation.setItemName(rowData.getName());
 
 					Costumer_SavedData.addItemToReservation(itemInReservation);
-					showInformationPopup("Item Added", null, "The item was added to the reservation.");
+					showAlertMessage("The item was added to the reservation.", AlertType.INFORMATION);
 				}
 			});
 			return tableRow;
@@ -1329,10 +1324,8 @@ public class CostumerController extends BaseController
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
 
-					Alert alert = new Alert(AlertType.CONFIRMATION);
-					alert.setTitle("Attention");
-					alert.setHeaderText(null);
-					alert.setContentText("Are you sure you want to remove the item?");
+					Alert alert = new AlertBuilder().setAlertType(AlertType.CONFIRMATION)
+							.setContentText("Are you sure you want to remove the item?").build();
 					Optional<ButtonType> result = alert.showAndWait();
 					if (result.get() != ButtonType.OK) {
 						return;
@@ -1370,10 +1363,8 @@ public class CostumerController extends BaseController
 		m_useSubscription = false;
 
 		if (Costumer_SavedData.getSubscription() != CostumerSubscription.None) {
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Attention");
-			alert.setHeaderText(null);
-			alert.setContentText("Do you want to use your subscription?");
+			Alert alert = new AlertBuilder().setAlertType(AlertType.CONFIRMATION)
+					.setContentText("Do you want to use your subscription?").build();
 			Optional<ButtonType> result = alert.showAndWait();
 			m_useSubscription = result.get() == ButtonType.OK;
 			if (m_useSubscription) {
@@ -1560,46 +1551,4 @@ public class CostumerController extends BaseController
 		m_Client.sendMessageToServer(entityMessage);
 	}
 	// end region -> Initializing methods
-
-	// region Alert pop ups
-
-	/**
-	 * Method displays a pop up message for information.
-	 *
-	 * @param title
-	 *            The title of the message.
-	 * @param header
-	 *            The header line of the message.
-	 * @param content
-	 *            The message.
-	 */
-	private void showInformationPopup(String title, String header, String content)
-	{
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		alert.setContentText(content);
-		alert.showAndWait();
-	}
-
-	/**
-	 * Method displays a pop up message for error.
-	 *
-	 * @param title
-	 *            The title of the message.
-	 * @param header
-	 *            The header line of the message.
-	 * @param content
-	 *            The message.
-	 */
-	private void showErrorPopup(String title, String header, String content)
-	{
-		Alert alert = new Alert(AlertType.ERROR);
-		alert.setTitle(title);
-		alert.setHeaderText(header);
-		alert.setContentText(content);
-		alert.showAndWait();
-	}
-
-	// end region -> Alert pop ups
 }

@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import common.AlertBuilder;
 import configurations.ConnectivityConfiguration;
 import configurations.DbConfiguration;
 import configurations.ServerConfiguration;
@@ -132,12 +133,12 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			Image image = new Image(serverGif);
 			imageview_gif.setImage(image);
 		}
-		
+
 		RadialGradient dbRed = new RadialGradient(0, .1, circle_db_off.getCenterX(), circle_db_off.getCenterY(),
 				circle_db_off.getRadius(), false, CycleMethod.NO_CYCLE, new Stop(0, Color.ORANGERED),
 				new Stop(1, Color.RED));
 		circle_db_off.setFill(dbRed);
-		
+
 		RadialGradient connectivityRed = new RadialGradient(0, .1, circle_connectivity_off.getCenterX(),
 				circle_connectivity_off.getCenterY(), circle_connectivity_off.getRadius(), false, CycleMethod.NO_CYCLE,
 				new Stop(0, Color.ORANGERED), new Stop(1, Color.RED));
@@ -177,7 +178,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 							m_server.setPort(port);
 							if (m_server.isListening()) {
 								showAlertMessage(
-										"Attention: You must reopen application connection for the changes to take effect!");
+										"Attention: You must reopen application connection for the changes to take effect!",
+										AlertType.WARNING);
 							}
 						} catch (NumberFormatException e) {
 							return;
@@ -186,7 +188,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 						m_configuration.getDbConfiguration().updateValueByName(rowData.getSetting(), resultString);
 						if (m_dbContoller.isRunning()) {
 							showAlertMessage(
-									"Attention: You must reopen database connection for the changes to take effect!");
+									"Attention: You must reopen database connection for the changes to take effect!",
+									AlertType.WARNING);
 						}
 					}
 					rowData.setValue(resultString);
@@ -358,14 +361,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		String loggerPath = LogManager.getLoggerPath();
 		if (!(loggerPath != null && !loggerPath.isEmpty())) {
 			m_logger.warning("'Show Text Log' button while the log path not initialized.");
-			showAlertMessage("Text log file did not initialized.");
+			showAlertMessage("Text log file did not initialized.", AlertType.ERROR);
 			return;
 		}
 
 		File file = new File(loggerPath);
 		if (!file.exists()) {
 			m_logger.warning("There is not a log in the receiving log path: " + loggerPath);
-			showAlertMessage("Text logger did not initialized.");
+			showAlertMessage("Text logger did not initialized.", AlertType.ERROR);
 			return;
 		}
 
@@ -374,7 +377,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			m_logger.info(
 					"'Desktop Platform' is not supported in this computer, so it is impossible to open text log file.");
 			showAlertMessage("Error:\nFiles opening platfron are not supported in this computer!\nLog path: \""
-					+ loggerPath + "\"");
+					+ loggerPath + "\"", AlertType.ERROR);
 			return;
 
 		}
@@ -385,7 +388,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			desktop.open(file);
 		} catch (IOException ex) {
 			m_logger.severe("Failed on try to open the text logger file! Exception: " + ex.getMessage());
-			showAlertMessage("Some error occured on try to open the text log file!\nLog path: \"" + loggerPath + "\"");
+			showAlertMessage("Some error occured on try to open the text log file!\nLog path: \"" + loggerPath + "\"",
+					AlertType.ERROR);
 		}
 	}
 
@@ -418,23 +422,19 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	}
 
 	/**
-	 * The method show dialog message from {@link Alert} type.
+	 * The method show alert message from {@link Alert} type.
 	 *
 	 * @param message
 	 *            the message to show.
 	 */
-	private void showAlertMessage(String message) {
+	private void showAlertMessage(String message, AlertType alertType) {
 		if (message == null || message.isEmpty()) {
 			return;
 		}
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-
-		alert.showAndWait();
-
-		addMessageToLog(message);
+		javafx.application.Platform.runLater(() -> {
+			Alert alert = new AlertBuilder().setAlertType(alertType).setContentText(message).build();
+			alert.showAndWait();
+		});
 	}
 
 	/**
@@ -505,7 +505,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				circle_connectivity_on.getCenterY(), circle_connectivity_on.getRadius(), false, CycleMethod.NO_CYCLE,
 				new Stop(0, Color.GREENYELLOW), new Stop(1, Color.GREEN));
 		circle_connectivity_on.setFill(green);
-		
+
 		addMessageToLog("TCP\\IP connection opened successfully");
 
 		resetUsersStatus();
@@ -525,7 +525,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				circle_connectivity_off.getCenterY(), circle_connectivity_off.getRadius(), false, CycleMethod.NO_CYCLE,
 				new Stop(0, Color.ORANGERED), new Stop(1, Color.RED));
 		circle_connectivity_off.setFill(red);
-		
+
 		addMessageToLog("TCP\\IP connection closed successfully");
 	}
 

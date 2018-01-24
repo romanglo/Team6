@@ -10,6 +10,7 @@ import boundaries.SettingsRow;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import common.AlertBuilder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -119,7 +120,7 @@ public class LoginSettingsController implements Initializable
 							long count = resultString.chars().filter(ch -> ch == '.').count();
 							if (!resultString.equalsIgnoreCase("localhost") && count != 3) {
 								wrongInput = true;
-								showAlertMessage("Please enter valid IP address!");
+								showAlertMessage("Please enter valid IP address!",AlertType.INFORMATION);
 								break;
 							}
 
@@ -150,7 +151,7 @@ public class LoginSettingsController implements Initializable
 								wrongInput = true;
 							}
 							if (wrongInput) {
-								showAlertMessage("The port must be an number between 0 to 65535!");
+								showAlertMessage("The port must be an number between 0 to 65535!",AlertType.WARNING);
 							}
 						break;
 
@@ -195,23 +196,22 @@ public class LoginSettingsController implements Initializable
 		setting_table.setItems(settings);
 	}
 
+
 	/**
-	 * The method show dialog message from {@link Alert} type.
+	 * The method show alert message from {@link Alert} type.
 	 *
 	 * @param message
 	 *            the message to show.
 	 */
-	private void showAlertMessage(String message)
+	protected void showAlertMessage(String message, AlertType alertType)
 	{
 		if (message == null || message.isEmpty()) {
 			return;
 		}
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-
-		alert.showAndWait();
+		javafx.application.Platform.runLater(() -> {
+			Alert alert = new AlertBuilder().setAlertType(alertType).setContentText(message).build();
+			alert.showAndWait();
+		});
 	}
 	
 	// end region -> Private methods

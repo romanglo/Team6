@@ -407,7 +407,7 @@ public class ShopManagerController extends BaseController
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					ShopCostumerRow rowData = tableRow.getItem();
 					if (rowData.getShopCostumerSubscription() != EntitiesEnums.CostumerSubscription.None.toString()) {
-						showInformationMessage("Client already have subscirption.");
+						showAlertMessage("Client already have subscirption.", AlertType.WARNING);
 						return;
 					}
 					String optionalCreditCard = null;
@@ -421,14 +421,15 @@ public class ShopManagerController extends BaseController
 						Optional<String> result = addCreditCard.showAndWait();
 						if (result.isPresent()) {
 							if (result.get().isEmpty()) {
-								showInformationMessage("Please fill Credit Card filed in order to continue.");
+								showAlertMessage("Please fill Credit Card field in order to continue.",
+										AlertType.WARNING);
 								return;
 							}
 							optionalCreditCard = result.get();
 							if (optionalCreditCard.length() > 16)
 								optionalCreditCard = optionalCreditCard.substring(0, 16);
 						} else {
-							showInformationMessage("Costumer subscription required valid credit card.");
+							showAlertMessage("Costumer subscription required valid credit card.",AlertType.WARNING);
 							return;
 						}
 						System.out.println(optionalCreditCard);
@@ -1084,7 +1085,7 @@ public class ShopManagerController extends BaseController
 			return;
 		}
 		if (checkIfShopCostumerAlreadyExist(costumerId)) {
-			showInformationMessage("Costumer already sign up!");
+			showAlertMessage("Costumer already sign up!",AlertType.INFORMATION);
 			textField_addShopCostumer.clear();
 			textFiled_costumerDetails.clear();
 			return;
@@ -1429,7 +1430,7 @@ public class ShopManagerController extends BaseController
 						else {
 							m_surveyReport = null;
 							if (m_shopManagerUserID != null) {
-								showInformationMessage("No report for current shop.");
+								showAlertMessage("No report for current shop.",AlertType.INFORMATION);
 							} else {
 								String title = barChart_currentChart.getTitle();
 								final String shop = getShopName(comboBox_selectionStore.getValue());
@@ -1476,10 +1477,10 @@ public class ShopManagerController extends BaseController
 			} else {
 				if (m_shopManagerUserID != null && anchorpane_shopCostumerManagement.isVisible()) {
 					if (msgData.getOperation() == EntityDataOperation.Update) {
-						showInformationMessage("Successfull Update.");
+						showAlertMessage("Successfull Update.",AlertType.INFORMATION);
 						updateTable((ShopCostumer) entity);
 					} else if (msgData.getOperation() == EntityDataOperation.Add) {
-						showInformationMessage("Successfull New Costumer Add.");
+						showAlertMessage("Successfull New Costumer Add.",AlertType.INFORMATION);
 						ShopCostumer shopCostumer = (ShopCostumer) entity;
 						ShopCostumerRow shopCostumerRow = costumerRowInit(shopCostumer);
 						costumerInShop.add(shopCostumerRow);

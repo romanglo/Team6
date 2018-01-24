@@ -208,13 +208,13 @@ public class ApplicationEntryPoint extends Application
 			primaryStage.setTitle("Zer-Li");
 			primaryStage.setResizable(false);
 			controller.intializeKeyHandler(scene);
-			
+
 			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
 			if (iconResource != null) {
 				Image icon = new Image(iconResource);
 				primaryStage.getIcons().add(icon);
 			}
-			
+
 			primaryStage.show();
 		}
 		catch (Exception e) {
@@ -300,6 +300,6 @@ public class ApplicationEntryPoint extends Application
 			Client.sendMessageToServer(logoutMessage);
 		}
 	}
-	
+
 	/* End of --> Private disposing methods region */
 }
