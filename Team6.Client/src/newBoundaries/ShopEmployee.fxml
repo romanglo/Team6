@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.TextField?>
@@ -90,6 +91,15 @@
                   <Spinner fx:id="combobox_answer6" layoutX="260.0" layoutY="299.0" prefHeight="25.0" prefWidth="51.0" AnchorPane.leftAnchor="470.0" />
                   
          </children></AnchorPane>
+         <AnchorPane fx:id="anchorpane_option2" layoutY="79.0" prefHeight="368.0" prefWidth="450.0" visible="falseS" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
+					<children>
+						<Label layoutX="73.0" layoutY="64.0" prefHeight="17.0" prefWidth="107.0" text="Resrvation ID:" AnchorPane.leftAnchor="16.0" />
+						<ComboBox fx:id="combo_reservations" layoutX="129.0" layoutY="60.0" onAction="#reservationSelected" prefWidth="100.0" AnchorPane.leftAnchor="150.0" />
+						<Label prefHeight="17.0" prefWidth="167.0" text="Delivery date:" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="150.0" />
+						<Label fx:id="enter_date" layoutX="214.0" layoutY="95.0" prefHeight="17.0" prefWidth="167.0" text="" AnchorPane.leftAnchor="150.0" AnchorPane.topAnchor="150.0" />
+					<Button layoutX="76.0" layoutY="335.0" mnemonicParsing="false" onAction="#closeReservation" prefWidth="100.0" text="Close Reservation" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="5.0" />
+					</children>
+				</AnchorPane>
 			</children>
 			<BorderPane.margin>
 				<Insets left="5.0" top="5.0" />

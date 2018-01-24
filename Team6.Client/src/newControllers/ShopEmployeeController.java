@@ -1,24 +1,36 @@
 
 package newControllers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.sun.corba.se.spi.activation.InitialNameServiceOperations;
+
+import boundaries.ShopCostumerRow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import newEntities.EntitiesEnums;
 import newEntities.IEntity;
+import newEntities.Reservation;
 import newEntities.ShopEmployee;
 import newEntities.Survey;
 import newEntities.SurveyResult;
 import newMessages.EntitiesListData;
 import newMessages.EntityData;
+import newMessages.EntityDataOperation;
 import newMessages.IMessageData;
 import newMessages.Message;
 import newMessages.MessagesFactory;
@@ -36,6 +48,10 @@ public class ShopEmployeeController extends BaseController
 	// region Fields
 
 	private @FXML AnchorPane anchorpane_option1;
+	
+	private @FXML AnchorPane anchorpane_option2;
+	
+	private String correct_title;
 
 	@FXML private TextField textfiled_id;
 
@@ -80,6 +96,22 @@ public class ShopEmployeeController extends BaseController
 	private SpinnerValueFactory svf5 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
 
 	private SpinnerValueFactory svf6 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
+		
+	List<IEntity> reservations;
+	
+	ArrayList<String> open_reservations_id=new ArrayList<>() ;
+	
+	private @FXML ComboBox<String> combo_reservations;
+	
+	private ObservableList<String> reservation_list;
+	
+	private int selected_reservation_id;
+	
+	private Reservation selected_res;
+	
+	private @FXML Label enter_date;
+	
+	private static final DateFormat s_dateForamt = new SimpleDateFormat("dd-MM-yyyy");
 
 	// end region -> Fields
 
@@ -100,12 +132,18 @@ public class ShopEmployeeController extends BaseController
 	@Override
 	protected boolean onSelection(String title)
 	{
+		correct_title=title;
 		switch (title) {
 			case "Add survey":
 				anchorpane_option1.setVisible(true);
+				anchorpane_option2.setVisible(false);
 				initializesurveys();
 			break;
-
+			case "Close Reservations":
+				anchorpane_option1.setVisible(false);
+				anchorpane_option2.setVisible(true);
+				initialReservations();
+				break;
 			default:
 				return false;
 		}
@@ -118,7 +156,7 @@ public class ShopEmployeeController extends BaseController
 	@Override
 	protected String[] getSideButtonsNames()
 	{
-		return new String[] { "Add survey" };
+		return new String[] { "Add survey", "Close Reservations" };
 	}
 
 	/**
@@ -128,6 +166,8 @@ public class ShopEmployeeController extends BaseController
 	public void onMessageReceived(Message msg) throws Exception
 	{
 		IMessageData messageData = msg.getMessageData();
+		if(correct_title.equals("Add survey"))
+		{
 		if (messageData instanceof EntityData) {
 			if (((EntityData) messageData).getEntity() instanceof ShopEmployee) {
 				manager_id = ((ShopEmployee) ((EntityData) messageData).getEntity()).getShopManagerId();
@@ -184,6 +224,40 @@ public class ShopEmployeeController extends BaseController
 				}
 			}
 		}
+		}
+		else
+			if(correct_title.equals("Close Reservations"))
+			{
+				if(messageData instanceof EntitiesListData)
+				{
+					if(((EntitiesListData) messageData).getEntities().get(0) instanceof Reservation )
+					{
+						reservations= ((EntitiesListData) messageData).getEntities();
+						for(int i=0;i<reservations.size();i++)
+						{
+							if(((Reservation)reservations.get(i)).getType().equals(EntitiesEnums.ReservationType.Open))
+							{
+								open_reservations_id.add(Integer.toString(((Reservation)reservations.get(i)).getId()));
+							}
+						}
+						reservation_list = FXCollections.observableArrayList(open_reservations_id);
+						combo_reservations.setItems(reservation_list);
+						
+					}
+				}
+				else 
+					if(messageData instanceof RespondMessageData)
+					{
+						if(((RespondMessageData) messageData).isSucceed())
+						{
+							showInformationMessage("Your reservation has been successfully closed");
+							javafx.application.Platform.runLater(() -> {
+								cleanTheFields();
+							});
+							
+						}
+					}
+			}
 	}
 
 	// end region -> BaseController Implementation
@@ -230,6 +304,46 @@ public class ShopEmployeeController extends BaseController
 			Message msg = MessagesFactory.createAddEntityMessage(surveyResult);
 			m_Client.sendMessageToServer(msg);
 		}
+	}
+	
+	
+	private void initialReservations()
+	{
+		Reservation res= new Reservation();
+		Message msg=MessagesFactory.createGetAllEntityMessage(res);
+		m_Client.sendMessageToServer(msg);
+	}
+	
+	@FXML
+	private void reservationSelected(ActionEvent event)
+	{
+		if(combo_reservations.getValue()==null)
+			return;
+		selected_reservation_id=Integer.parseInt(combo_reservations.getValue());
+		for(int i=0;i<reservations.size();i++)
+		{
+			if(((Reservation)reservations.get(i)).getId()==selected_reservation_id)
+			{
+				selected_res=(Reservation)reservations.get(i);
+			}
+		}
+			enter_date.setText(s_dateForamt.format(selected_res.getDeliveryDate()));	
+	}
+	
+	@FXML
+	private void closeReservation(ActionEvent event)
+	{
+		selected_res.setType(EntitiesEnums.ReservationType.Closed);
+		Message msg=MessagesFactory.createUpdateEntityMessage(selected_res);
+		m_Client.sendMessageToServer(msg);
+	}
+	
+	private void cleanTheFields()
+	{
+		enter_date.setText("");
+		combo_reservations.getItems().clear();
+		open_reservations_id.clear();
+		initialReservations();
 	}
 
 	// end region -> BUI event region
