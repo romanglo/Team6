@@ -273,7 +273,7 @@ public class QueryGenerator {
 			return selectAllReservationsReportQuery((ReservationsReport) entity);
 		}
 		if (entityType.equals(ShopCostumer.class)) {
-			return selectAllShopCostumerQuery();
+			return selectAllShopCostumerQuery((ShopCostumer) entity);
 		}
 		if (entityType.equals(ShopEmployee.class)) {
 			return selectAllShopEmployeeQuery();
@@ -1264,10 +1264,22 @@ public class QueryGenerator {
 		int costumerId = shopCostumer.getCostumerId();
 		int shopManagerId = shopCostumer.getShopManagerId();
 
-		if (shopManagerId < 1 && costumerId < 1) {
+		if (shopManagerId < 1 || costumerId < 1) {
 			logMessage("Received request to select shop costumer entity with impossiable ID's: costumer ID = "
 					+ costumerId + ", shop manager ID=" + shopManagerId);
 			return null;
+		}
+
+		return "SELECT * FROM costumers_in_shops WHERE cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
+
+	}
+
+	private static String selectAllShopCostumerQuery(ShopCostumer shopCostumer) {
+		int costumerId = shopCostumer.getCostumerId();
+		int shopManagerId = shopCostumer.getShopManagerId();
+
+		if (shopManagerId < 1 && costumerId < 1) {
+			return "SELECT * FROM costumers_in_shops;";
 		}
 
 		if (costumerId < 1) {
@@ -1278,11 +1290,6 @@ public class QueryGenerator {
 			return "SELECT * FROM costumers_in_shops WHERE cId = " + costumerId + " ;";
 		}
 		return "SELECT * FROM costumers_in_shops WHERE cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
-
-	}
-
-	private static String selectAllShopCostumerQuery() {
-		return "SELECT * FROM costumers_in_shops;";
 	}
 
 	private static String insertShopCostumerQuery(ShopCostumer shopCostumer) {
