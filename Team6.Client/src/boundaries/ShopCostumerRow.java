@@ -1,6 +1,7 @@
 
 package boundaries;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -22,6 +23,8 @@ public class ShopCostumerRow
 	private String m_creditCard;
 
 	private Float m_cumulativePrice;
+
+	SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
 	// end region -> Fields
 
 	// region Getters
@@ -51,9 +54,10 @@ public class ShopCostumerRow
 	 *
 	 * @return shop costumer Subscription Start Date
 	 */
-	public Date getSubscriptionStartDate()
+	public String getSubscriptionStartDate()
 	{
-		return m_subscriptionStartDate;
+		if (m_subscriptionStartDate == null) return "";
+		return format.format(m_subscriptionStartDate);
 	}
 
 	/**
@@ -164,7 +168,7 @@ public class ShopCostumerRow
 		super();
 		m_shopCostumerID = shopCostumerID;
 		m_shopCostumerSubscription = shopCostumerSubscription;
-		m_subscriptionStartDate = new Date();
+		m_subscriptionStartDate = null;
 		m_creditCard = "None";
 		m_cumulativePrice = cumulativePrice;
 	}
@@ -188,7 +192,7 @@ public class ShopCostumerRow
 		super();
 		m_shopCostumerID = shopCostumerID;
 		m_shopCostumerSubscription = shopCostumerSubscription;
-		m_subscriptionStartDate = new Date();
+		m_subscriptionStartDate = null;
 		m_creditCard = creditCard;
 		m_cumulativePrice = cumulativePrice;
 	}

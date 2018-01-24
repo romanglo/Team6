@@ -59,9 +59,6 @@ import messages.RespondMessageData;
 public class CompanyEmployeeController extends BaseController
 {
 
-	// TODO : Show message in Edit Catalog about add or remove item
-	// success or failed.
-
 	// region Actors Panes
 	private @FXML AnchorPane anchorpane_editCatalog;
 
@@ -1219,10 +1216,15 @@ public class CompanyEmployeeController extends BaseController
 			} else if (messageData instanceof RespondMessageData) {
 				RespondMessageData respondMessageData = (RespondMessageData) messageData;
 				boolean succeed = respondMessageData.isSucceed();
-				EntityData respondedMessageData = (EntityData) respondMessageData.getMessageData();
+				EntityDataOperation operation;
+				if (respondMessageData.getMessageData() instanceof EntitiesListData) {
+					operation = ((EntitiesListData) respondMessageData.getMessageData()).getOperation();
+				} else {
+					operation = ((EntityData) respondMessageData.getMessageData()).getOperation();
+				}
 				if (!succeed) {
-					if (respondedMessageData.getOperation() == EntityDataOperation.GetALL) catalog.clear();
-					errorMSG(respondedMessageData.getOperation().toString() + " Failed!");
+					if (operation == EntityDataOperation.GetALL) catalog.clear();
+					errorMSG(operation.toString() + " Failed!");
 				} else {
 					showInformationMessage("Catalog update successfully!");
 				}

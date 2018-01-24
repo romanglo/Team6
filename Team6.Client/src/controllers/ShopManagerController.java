@@ -210,7 +210,7 @@ public class ShopManagerController extends BaseController
 
 	@FXML private TableColumn<ShopCostumerRow, String> tableColumn_shopCostumerSubscription;
 
-	@FXML private TableColumn<ShopCostumerRow, Date> tableColumn_shopCostumerSubscriptionStartDate;
+	@FXML private TableColumn<ShopCostumerRow, String> tableColumn_shopCostumerSubscriptionStartDate;
 
 	@FXML private TableColumn<ShopCostumerRow, String> tableColumn_shopCostumerCreditCard;
 
@@ -459,7 +459,7 @@ public class ShopManagerController extends BaseController
 		tableColumn_shopCostumerSubscription
 				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, String>("ShopCostumerSubscription"));
 		tableColumn_shopCostumerSubscriptionStartDate
-				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, Date>("SubscriptionStartDate"));
+				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, String>("SubscriptionStartDate"));
 		tableColumn_shopCostumerCreditCard
 				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, String>("CreditCard"));
 		tableColumn_shopCostumerCumulativePrice

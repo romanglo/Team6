@@ -79,11 +79,11 @@
 						</Label>
 					</VBox>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorPane_mainStage"
-					nodeOrientation="LEFT_TO_RIGHT" visible="falseS"
-					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
-					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0"
-					xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+				<AnchorPane fx:id="anchorPane_mainStage" nodeOrientation="LEFT_TO_RIGHT"
+					visible="falseS" AnchorPane.bottomAnchor="5.0"
+					AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+					AnchorPane.topAnchor="5.0" xmlns="http://javafx.com/javafx/9.0.1"
+					xmlns:fx="http://javafx.com/fxml/1">
 					<children>
 
 						<AnchorPane fx:id="anchorPane_viewStage" layoutY="95.0"
@@ -146,7 +146,7 @@
 							</font>
 						</Label>
 						<Button fx:id="button_addShopCostumer" mnemonicParsing="false"
-							onAction="#addShopCostumer" prefWidth="155.0" text="Add Shop Costumer"
+							onAction="#addShopCostumer" text="Add Costumer To Shop"
 							AnchorPane.leftAnchor="225.0" AnchorPane.topAnchor="61.0" />
 						<TextField fx:id="textField_addShopCostumer" prefWidth="200.0"
 							promptText="Enter Costumer ID" AnchorPane.leftAnchor="10.0"
