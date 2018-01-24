@@ -53,8 +53,7 @@
 		<VBox fx:id="vbox_sidebar" styleClass="sidebar-section" />
 	</left>
 	<center>
-		<AnchorPane styleClass="center-section"
-			BorderPane.alignment="TOP_LEFT">
+		<AnchorPane BorderPane.alignment="TOP_LEFT">
 			<children>
 				<AnchorPane fx:id="anchorpane_welcome">
 					<ImageView fx:id="imageview_welcome" fitHeight="300"
@@ -80,9 +79,9 @@
 					</VBox>
 				</AnchorPane>
 				<AnchorPane fx:id="anchorpane_create_reservation"
-					visible="false" AnchorPane.bottomAnchor="4.800000000000011"
-					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-5.0"
-					AnchorPane.topAnchor="0.0">
+					styleClass="content-section" visible="false"
+					AnchorPane.bottomAnchor="4.800000000000011" AnchorPane.leftAnchor="0.0"
+					AnchorPane.rightAnchor="-5.0" AnchorPane.topAnchor="0.0">
 					<children>
 						<AnchorPane fx:id="anchorpane_catalog" visible="false"
 							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.39999999999997726"
@@ -274,9 +273,9 @@
 					</children>
 				</AnchorPane>
 				<AnchorPane fx:id="anchorpane_cancel_reservation"
-					visible="false" AnchorPane.bottomAnchor="4.800000000000011"
-					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-					AnchorPane.topAnchor="0.0">
+					styleClass="content-section" visible="false"
+					AnchorPane.bottomAnchor="4.800000000000011" AnchorPane.leftAnchor="0.0"
+					AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 					<children>
 						<AnchorPane fx:id="anchorpane_reservations" visible="false"
 							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
@@ -344,8 +343,9 @@
 					</children>
 				</AnchorPane>
 				<AnchorPane fx:id="anchorpane_complaints" visible="false"
-					AnchorPane.bottomAnchor="4.800000000000011" AnchorPane.leftAnchor="0.0"
-					AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+					styleClass="content-section" AnchorPane.bottomAnchor="4.800000000000011"
+					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+					AnchorPane.topAnchor="0.0">
 					<children>
 						<AnchorPane fx:id="anchorpane_complaints_display"
 							visible="false" AnchorPane.bottomAnchor="5.0"

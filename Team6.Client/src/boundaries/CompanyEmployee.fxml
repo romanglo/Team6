@@ -47,8 +47,7 @@
 		<VBox fx:id="vbox_sidebar" styleClass="sidebar-section" />
 	</left>
 	<center>
-		<AnchorPane styleClass="center-section"
-			BorderPane.alignment="TOP_LEFT">
+		<AnchorPane BorderPane.alignment="TOP_LEFT">
 			<children>
 				<AnchorPane fx:id="anchorpane_welcome"
 					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0"
@@ -75,7 +74,7 @@
 						</Label>
 					</VBox>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_editCatalog"
+				<AnchorPane fx:id="anchorpane_editCatalog" styleClass="content-section"
 					nodeOrientation="LEFT_TO_RIGHT" visible="falseS"
 					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
 					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0"
@@ -120,10 +119,11 @@
 							AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="114.0" />
 					</children>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_shopSales" visible="falseS"
-					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
-					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0"
-					xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1">
+				<AnchorPane fx:id="anchorpane_shopSales" visible="false"
+					styleClass="content-section" AnchorPane.bottomAnchor="5.0"
+					AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+					AnchorPane.topAnchor="5.0" xmlns="http://javafx.com/javafx/9.0.1"
+					xmlns:fx="http://javafx.com/fxml/1">
 					<children>
 						<TableView fx:id="tableView_shopSales" layoutX="14.0"
 							layoutY="75.0" AnchorPane.bottomAnchor="40.0"

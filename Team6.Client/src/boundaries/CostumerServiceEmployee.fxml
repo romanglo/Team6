@@ -49,8 +49,7 @@
 		<VBox fx:id="vbox_sidebar" styleClass="sidebar-section" />
 	</left>
 	<center>
-		<AnchorPane styleClass="center-section"
-			BorderPane.alignment="TOP_LEFT">
+		<AnchorPane BorderPane.alignment="TOP_LEFT">
 			<children>
 				<AnchorPane fx:id="anchorpane_welcome">
 					<ImageView fx:id="imageview_welcome" fitHeight="300"
@@ -75,8 +74,8 @@
 						</Label>
 					</VBox>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_addcomplaint" layoutY="79.0"
-					visible="falseS" AnchorPane.bottomAnchor="0.0"
+				<AnchorPane fx:id="anchorpane_addcomplaint" styleClass="content-section"
+					layoutY="79.0" visible="falseS" AnchorPane.bottomAnchor="0.0"
 					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
 					AnchorPane.topAnchor="0.0">
 					<children>
@@ -103,8 +102,8 @@
 							prefWidth="150.0" AnchorPane.topAnchor="72.0" />
 					</children>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_mycompliants" layoutY="79.0"
-					prefHeight="368.0" prefWidth="450.0" visible="falseS"
+				<AnchorPane fx:id="anchorpane_mycompliants" styleClass="content-section"
+					layoutY="79.0" prefHeight="368.0" prefWidth="450.0" visible="falseS"
 					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
 					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
 					<children>
@@ -126,8 +125,8 @@
 							AnchorPane.leftAnchor="175.0" AnchorPane.topAnchor="100.0" />
 					</children>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_treatcomplaint" layoutY="79.0"
-					prefHeight="368.0" prefWidth="450.0" visible="falseS"
+				<AnchorPane fx:id="anchorpane_treatcomplaint" styleClass="content-section"
+					layoutY="79.0" prefHeight="368.0" prefWidth="450.0" visible="falseS"
 					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
 					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
 					<children>
@@ -170,8 +169,8 @@
 
 					</children>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_addsurveys" layoutY="79.0"
-					visible="falseS" AnchorPane.bottomAnchor="0.0"
+				<AnchorPane fx:id="anchorpane_addsurveys" styleClass="content-section"
+					layoutY="79.0" visible="falseS" AnchorPane.bottomAnchor="0.0"
 					AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
 					AnchorPane.topAnchor="0.0">
 					<children>

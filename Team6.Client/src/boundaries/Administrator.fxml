@@ -46,20 +46,20 @@
 		<VBox fx:id="vbox_sidebar" styleClass="sidebar-section" />
 	</left>
 	<center>
-		<AnchorPane styleClass="center-section"
-			BorderPane.alignment="TOP_LEFT">
+		<AnchorPane BorderPane.alignment="TOP_LEFT">
 			<children>
 				<AnchorPane fx:id="anchorpane_welcome">
 					<ImageView fx:id="imageview_welcome" fitHeight="300"
 						pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0"
 						AnchorPane.leftAnchor="210.0" AnchorPane.rightAnchor="0.0" />
-					<VBox styleClass="content-section-label" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+					<VBox styleClass="content-section-label"
+						AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
 						<Label text="Welcome">
 							<font>
 								<Font name="Berlin Sans FB Demi Bold" size="52" />
 							</font>
 						</Label>
-						<Label  text="Back,">
+						<Label text="Back,">
 							<font>
 								<Font name="Berlin Sans FB Demi Bold" size="52" />
 							</font>
@@ -71,36 +71,51 @@
 						</Label>
 					</VBox>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_option1" visible="false">
+				<AnchorPane fx:id="anchorpane_option1" visible="false"
+					styleClass="content-section">
 					<children>
-						<ComboBox fx:id="comboBox_user" layoutX="170.0" layoutY="70.0" onAction="#userSelected" prefWidth="150.0" promptText="Select username" />
-				        <ComboBox fx:id="comboBox_status" layoutX="170.0" layoutY="120.0" prefWidth="150.0" />
-						<ComboBox fx:id="comboBox_privillge" layoutX="170.0" layoutY="170.0" prefWidth="150.0" />
-					    <Button fx:id="button_update1" layoutX="170.0" layoutY="220.0" mnemonicParsing="false" onAction="#updatebtn1" text="Update" />			
+						<ComboBox fx:id="comboBox_user" layoutX="170.0" layoutY="70.0"
+							onAction="#userSelected" prefWidth="150.0" promptText="Select username" />
+						<ComboBox fx:id="comboBox_status" layoutX="170.0"
+							layoutY="120.0" prefWidth="150.0" />
+						<ComboBox fx:id="comboBox_privillge" layoutX="170.0"
+							layoutY="170.0" prefWidth="150.0" />
+						<Button fx:id="button_update1" layoutX="170.0" layoutY="220.0"
+							mnemonicParsing="false" onAction="#updatebtn1" text="Update" />
 						<Label layoutX="40.0" layoutY="75.0" text="Username" />
-     			        <Label fx:id="label_status" layoutX="40.0" layoutY="125.0" text="Status" />
-            			<Label fx:id="label_privillege" layoutX="40.0" layoutY="175.0" text="Privilege" />
+						<Label fx:id="label_status" layoutX="40.0" layoutY="125.0"
+							text="Status" />
+						<Label fx:id="label_privillege" layoutX="40.0" layoutY="175.0"
+							text="Privilege" />
 						<Label text="Update User Status">
 							<font>
 								<Font name="Berlin Sans FB Demi Bold" size="36" />
 							</font>
 						</Label>
-						
+
 					</children>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_option21" visible="false">
+				<AnchorPane fx:id="anchorpane_option21" visible="false"
+					styleClass="content-section">
 					<children>
-						<ComboBox fx:id="comboBox_user1" layoutX="170.0" layoutY="70.0" onAction="#userSelected1" prefWidth="150.0" promptText="Select username" />
-						<Button text="Update" layoutX="170.0" layoutY="270" mnemonicParsing="false" fx:id="button_update" onAction="#updatebtn" />			
-						<TextField fx:id="textField_email" layoutX="170" layoutY="120.0" />
-						<TextField fx:id="textField_password" layoutX="170" layoutY="170.0" />
-						<TextField fx:id="textField_branch" layoutX="170" layoutY="220.0" />
-						<TextField fx:id="textField_shopManagerId" layoutX="170" layoutY="220.0" />
+						<ComboBox fx:id="comboBox_user1" layoutX="170.0" layoutY="70.0"
+							onAction="#userSelected1" prefWidth="150.0" promptText="Select username" />
+						<Button text="Update" layoutX="170.0" layoutY="270"
+							mnemonicParsing="false" fx:id="button_update" onAction="#updatebtn" />
+						<TextField fx:id="textField_email" layoutX="170"
+							layoutY="120.0" />
+						<TextField fx:id="textField_password" layoutX="170"
+							layoutY="170.0" />
+						<TextField fx:id="textField_branch" layoutX="170"
+							layoutY="220.0" />
+						<TextField fx:id="textField_shopManagerId" layoutX="170"
+							layoutY="220.0" />
 						<Label text="Username" layoutX="40" layoutY="75.0" />
 						<Label text="Email" layoutX="40" layoutY="125.0" fx:id="label_email" />
 						<Label text="Password" layoutX="40" layoutY="175.0" fx:id="label_password" />
 						<Label text="Branch" layoutX="40" layoutY="225.0" fx:id="label_branch" />
-						<Label text="Shop manager ID" layoutX="40" layoutY="225.0" fx:id="label_shopManagerId" />
+						<Label text="Shop manager ID" layoutX="40" layoutY="225.0"
+							fx:id="label_shopManagerId" />
 						<Label text="Update User Coordinates">
 							<font>
 								<Font name="Berlin Sans FB Demi Bold" size="36" />
