@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import com.sun.istack.internal.Nullable;
 
 import common.UncaughetExceptions;
-import newControllers.LoginController;
+import controllers.LoginController;
 import newEntities.User;
 import newMessages.Message;
 import newMessages.MessagesFactory;
@@ -197,11 +197,11 @@ public class ApplicationEntryPoint extends Application
 	public void start(Stage primaryStage)
 	{
 		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/newBoundaries/Login.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/Login.fxml"));
 			Parent root = (Parent) loader.load();
 			LoginController controller = (LoginController) loader.getController();
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("/newBoundaries/login.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/login.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.setWidth(700);
 			primaryStage.setHeight(500);
@@ -209,7 +209,7 @@ public class ApplicationEntryPoint extends Application
 			primaryStage.setResizable(false);
 			controller.intializeKeyHandler(scene);
 			
-			InputStream iconResource = getClass().getResourceAsStream("/newBoundaries/images/icon.png");
+			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
 			if (iconResource != null) {
 				Image icon = new Image(iconResource);
 				primaryStage.getIcons().add(icon);

@@ -1,5 +1,5 @@
 
-package newControllers;
+package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -228,13 +228,13 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 
 	private void initializeTopBar()
 	{
-		InputStream account = getClass().getResourceAsStream("/newBoundaries/images/account.png");
+		InputStream account = getClass().getResourceAsStream("/boundaries/images/account.png");
 		if (account != null) {
 			Image accountImage = new Image(account);
 			imageview_account_button.setImage(accountImage);
 		}
 
-		InputStream logout = getClass().getResourceAsStream("/newBoundaries/images/logout.png");
+		InputStream logout = getClass().getResourceAsStream("/boundaries/images/logout.png");
 		if (logout != null) {
 			Image logoutImage = new Image(logout);
 			imageview_logout_button.setImage(logoutImage);
@@ -243,7 +243,7 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 
 	private void initializeContent()
 	{
-		InputStream tulips = getClass().getResourceAsStream("/newBoundaries/images/tulips.jpg");
+		InputStream tulips = getClass().getResourceAsStream("/boundaries/images/tulips.jpg");
 		if (tulips != null) {
 			Image image = new Image(tulips);
 			imageview_welcome.setImage(image);
@@ -312,18 +312,18 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 			m_Client.setClientStatusHandler(null);
 			m_Client.closeConnection();
 
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/newBoundaries/Login.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/Login.fxml"));
 			Parent root = (Parent) loader.load();
 			LoginController controller = (LoginController) loader.getController();
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("/newBoundaries/login.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/login.css").toExternalForm());
 			Stage loginStage = new Stage();
 			loginStage.setScene(scene);
 			loginStage.setWidth(700);
 			loginStage.setHeight(500);
 			loginStage.setTitle("Zer-Li");
 			loginStage.setResizable(false);
-			InputStream iconResource = getClass().getResourceAsStream("/newBoundaries/images/icon.png");
+			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
 			if (iconResource != null) {
 				Image icon = new Image(iconResource);
 				loginStage.getIcons().add(icon);
@@ -349,21 +349,21 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	{
 		try {
 			Stage currentStage = (Stage) borderpain_main_top.getScene().getWindow();
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/newBoundaries/UserDetails.FXML"));
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/boundaries/UserDetails.FXML"));
 			Parent parent = (Parent) fxmlLoader.load();
 			FadeTransition ft = new FadeTransition(Duration.seconds(1.5), parent);
 			ft.setFromValue(0.0);
 			ft.setToValue(1.0);
 			ft.play();
 			Scene scene = new Scene(parent);
-			scene.getStylesheets().add(getClass().getResource("/newBoundaries/application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 			Stage nextStage = new Stage();
 			nextStage.setScene(scene);
 			nextStage.setResizable(false);
 			nextStage.initModality(Modality.WINDOW_MODAL);
 			nextStage.initStyle(StageStyle.DECORATED);
 			nextStage.initOwner(currentStage);
-			InputStream iconResource = getClass().getResourceAsStream("/newBoundaries/images/icon.png");
+			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
 			if (iconResource != null) {
 				Image icon = new Image(iconResource);
 				nextStage.getIcons().add(icon);

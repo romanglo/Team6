@@ -1,12 +1,12 @@
 
-package newControllers;
+package controllers;
 
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import newBoundaries.SettingsRow;
+import boundaries.SettingsRow;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;

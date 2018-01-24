@@ -10,7 +10,7 @@
 
 <AnchorPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="500"
 	prefWidth="700" xmlns="http://javafx.com/javafx/8.0.152" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="newControllers.LoginController">
+	fx:controller="controllers.LoginController">
 	<children>
 		<ImageView fx:id="imageview_background" fitHeight="500"
 			fitWidth="700" pickOnBounds="true" preserveRatio="false"

@@ -1,5 +1,5 @@
 
-package newControllers;
+package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -81,7 +81,7 @@ public class UserDetailsController implements Initializable
 	 */
 	private void intializeUserDefaultImage()
 	{
-		InputStream user = getClass().getResourceAsStream("/newBoundaries/images/user2.png");
+		InputStream user = getClass().getResourceAsStream("/boundaries/images/user2.png");
 		if (user != null) {
 			Image accountImage = new Image(user);
 			imageview_user.setImage(accountImage);

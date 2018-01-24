@@ -1,5 +1,5 @@
 
-package newControllers;
+package controllers;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.event.ChangeEvent;
-
+import boundaries.CatalogItemRow;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -39,7 +38,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
-import newBoundaries.CatalogItemRow;
 import newEntities.Complaint;
 import newEntities.Costumer;
 import newEntities.EntitiesEnums.CostumerSubscription;

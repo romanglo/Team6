@@ -14,8 +14,8 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="newControllers.CompanyEmployeeController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.152"
+	xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CompanyEmployeeController">
 	<top>
 		<BorderPane fx:id="borderpain_main_top" styleClass="header-section">
 			<left>

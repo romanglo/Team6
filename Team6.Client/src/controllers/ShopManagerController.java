@@ -1,5 +1,5 @@
 
-package newControllers;
+package controllers;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +7,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import boundaries.ShopCostumerRow;
+import boundaries.ToggleSwitch;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -37,8 +39,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import newBoundaries.ShopCostumerRow;
-import newBoundaries.ToggleSwitch;
 import newEntities.ComplaintsReport;
 import newEntities.Costumer;
 import newEntities.EntitiesEnums;
@@ -415,7 +415,7 @@ public class ShopManagerController extends BaseController
 					if (rowData.getCreditCard() == "None") {
 						TextInputDialog addCreditCard = new TextInputDialog();
 						addCreditCard.setTitle("Add Costumer Credit Card");
-						addCreditCard.setHeaderText("Add credit cart to Costumer ID -> " + rowData.getID());
+						addCreditCard.setHeaderText("Add credit card to Costumer ID -> " + rowData.getShopCostumerID());
 						addCreditCard.setContentText("Credit Card Number: ");
 						addCreditCard.contentTextProperty().addListener((obs, oldValue, newValue) -> {
 							if (newValue.length() == 17) addCreditCard.setContentText(oldValue);
@@ -439,7 +439,7 @@ public class ShopManagerController extends BaseController
 
 					ChoiceDialog<String> dialog = new ChoiceDialog<>("None", choices);
 					dialog.setTitle("Edit Costumer Subscription");
-					dialog.setHeaderText("Change Subscription To Costumer ID -> " + rowData.getID());
+					dialog.setHeaderText("Change Subscription To Costumer ID -> " + rowData.getShopCostumerID());
 					dialog.setContentText("Choose costumer new subscription:");
 					// Traditional way to get the response value.
 					Optional<String> result = dialog.showAndWait();
@@ -489,7 +489,7 @@ public class ShopManagerController extends BaseController
 	private void updateTable(ShopCostumer updatedShopCostumer)
 	{
 		for (ShopCostumerRow rowData : costumerInShop)
-			if (rowData.getID() == updatedShopCostumer.getCostumerId()) {
+			if (rowData.getShopCostumerID() == updatedShopCostumer.getCostumerId()) {
 				rowData.setShopCostumerSubscription(updatedShopCostumer.getCostumerSubscription().toString());
 				rowData.setSubscriptionStartDate(updatedShopCostumer.getSubscriptionStartDate());
 			}
@@ -507,7 +507,7 @@ public class ShopManagerController extends BaseController
 	private boolean checkIfShopCostumerAlreadyExist(int costumerID)
 	{
 		for (ShopCostumerRow rowData : costumerInShop)
-			if (rowData.getID() == costumerID) return true;
+			if (rowData.getShopCostumerID() == costumerID) return true;
 		return false;
 	}
 

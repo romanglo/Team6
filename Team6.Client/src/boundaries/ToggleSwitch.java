@@ -1,5 +1,5 @@
 
-package newBoundaries;
+package boundaries;
 
 import com.sun.istack.internal.Nullable;
 

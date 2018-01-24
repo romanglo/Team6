@@ -1,5 +1,5 @@
 
-package newControllers;
+package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -155,17 +155,17 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			btn_settings.setRotate(0);
 			Stage currentStage = (Stage) btn_login.getScene().getWindow();
 
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/newBoundaries/LoginSettings.fxml"));
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/boundaries/LoginSettings.fxml"));
 			Parent parent = (Parent) fxmlLoader.load();
 			Scene scene = new Scene(parent);
-			scene.getStylesheets().add(getClass().getResource("/newBoundaries/login.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/login.css").toExternalForm());
 			Stage nextStage = new Stage();
 			nextStage.setScene(scene);
 			nextStage.setTitle("Zer-Li Settings");
 			nextStage.setResizable(false);
 			nextStage.initModality(Modality.WINDOW_MODAL);
 			nextStage.initOwner(currentStage);
-			InputStream iconResource = getClass().getResourceAsStream("/newBoundaries/images/icon.png");
+			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
 			if (iconResource != null) {
 				Image icon = new Image(iconResource);
 				nextStage.getIcons().add(icon);
@@ -353,12 +353,12 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	 */
 	private void initializeImages()
 	{
-		InputStream backgoundImage = getClass().getResourceAsStream("/newBoundaries/images/login_background.png");
+		InputStream backgoundImage = getClass().getResourceAsStream("/boundaries/images/login_background.png");
 		if (backgoundImage != null) {
 			Image image = new Image(backgoundImage);
 			imageview_background.setImage(image);
 		}
-		InputStream settingsImage = getClass().getResourceAsStream("/newBoundaries/images/settings.png");
+		InputStream settingsImage = getClass().getResourceAsStream("/boundaries/images/settings.png");
 		if (settingsImage != null) {
 			Image image = new Image(settingsImage);
 			btn_imageview_settings.setImage(image);
@@ -494,32 +494,32 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 		switch (userEntity.getPrivilege()) {
 			case Administrator:
-				url = getClass().getResource("/newBoundaries/Administrator.fxml");
+				url = getClass().getResource("/boundaries/Administrator.fxml");
 			break;
 
 			case CompanyEmployee:
-				url = getClass().getResource("/newBoundaries/CompanyEmployee.fxml");
+				url = getClass().getResource("/boundaries/CompanyEmployee.fxml");
 			break;
 
 			case Costumer:
-				url = getClass().getResource("/newBoundaries/Costumer.fxml");
+				url = getClass().getResource("/boundaries/Costumer.fxml");
 			break;
 
 			case CostumerService:
-				url = getClass().getResource("/newBoundaries/CostumerServiceEmployee.fxml");
+				url = getClass().getResource("/boundaries/CostumerServiceEmployee.fxml");
 			break;
 
 			case ServiceSpecialist:
-				url = getClass().getResource("/newBoundaries/ServiceSpecialist.fxml");
+				url = getClass().getResource("/boundaries/ServiceSpecialist.fxml");
 			break;
 
 			case ShopEmployee:
-				url = getClass().getResource("/newBoundaries/ShopEmployee.fxml");
+				url = getClass().getResource("/boundaries/ShopEmployee.fxml");
 			break;
 
 			case ChainManager:
 			case ShopManager:
-				url = getClass().getResource("/newBoundaries/ShopManager.fxml");
+				url = getClass().getResource("/boundaries/ShopManager.fxml");
 			break;
 
 			default:
@@ -543,7 +543,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				baseController = (BaseController) controller;
 			}
 			scene = new Scene(parent);
-			scene.getStylesheets().add(getClass().getResource("/newBoundaries/application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 		}
 		catch (Exception e) {
 			String errorString = "Failed on try to load the next scene";
@@ -629,7 +629,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				nextStage.setScene(m_nextScene);
 				nextStage.setTitle("Zer-Li");
 				InputStream iconResource = LoginController.this.getClass()
-						.getResourceAsStream("/newBoundaries/images/icon.png");
+						.getResourceAsStream("/boundaries/images/icon.png");
 				if (iconResource != null) {
 					Image icon = new Image(iconResource);
 					nextStage.getIcons().add(icon);

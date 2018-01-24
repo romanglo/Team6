@@ -1,5 +1,5 @@
 
-package newBoundaries;
+package boundaries;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -80,7 +80,7 @@ public class CatalogItemRow
 		this.m_type = m_type;
 		this.m_price = m_price;
 		this.m_domainColor = domainColor;
-		InputStream defualt = getClass().getResourceAsStream("/newBoundaries/images/no_image.png");
+		InputStream defualt = getClass().getResourceAsStream("/boundaries/images/no_image.png");
 		this.m_image = ResizeImage(new Image(defualt));
 	}
 
@@ -131,7 +131,7 @@ public class CatalogItemRow
 		this.m_type = type;
 		this.m_price = price;
 		this.m_domainColor = domainColor;
-		InputStream defualt = getClass().getResourceAsStream("/newBoundaries/images/no_image.png");
+		InputStream defualt = getClass().getResourceAsStream("/boundaries/images/no_image.png");
 		this.m_image = ResizeImage(new Image(defualt));
 	}
 	

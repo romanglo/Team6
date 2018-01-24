@@ -13,7 +13,7 @@
 <AnchorPane maxHeight="355.0" maxWidth="300.0" minHeight="355"
 	minWidth="300.0" pickOnBounds="true" prefHeight="355" prefWidth="300.0"
 	styleClass="user-details" xmlns="http://javafx.com/javafx/8.0.152"
-	xmlns:fx="http://javafx.com/fxml/1" fx:controller="newControllers.UserDetailsController">
+	xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.UserDetailsController">
 	<children>
 		<Rectangle arcHeight="5.0" arcWidth="5.0" fill="TRANSPARENT"
 			height="355.0" pickOnBounds="true" stroke="TEAL" strokeType="INSIDE"

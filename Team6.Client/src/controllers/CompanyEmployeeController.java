@@ -1,5 +1,5 @@
 
-package newControllers;
+package controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.imageio.ImageIO;
+
+import boundaries.CatalogItemRow;
 import newEntities.EntitiesEnums;
 import newEntities.IEntity;
 import newEntities.Item;
@@ -48,7 +50,6 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
-import newBoundaries.CatalogItemRow;
 
 /**
  * CompanyEmployeeController : Managed the Company Employee UI.

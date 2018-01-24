@@ -1,4 +1,4 @@
-package newBoundaries;
+package boundaries;
 
 import java.util.Date;
 
@@ -25,27 +25,6 @@ public class ShopCostumerRow
 
 	// region Getters
 	
-	public Integer getID()
-	{
-		return m_shopCostumerID;
-	}
-	
-	public String getSubscription()
-	{
-		return m_shopCostumerSubscription;
-	}
-	
-	public Date getStartDate()
-	{
-		return m_subscriptionStartDate;
-	}
-	
-	public String CreditCard()
-	{
-		return m_creditCard;
-	}
-	
-
 	/**
 	 * Get shop costumer ID
 	 *
