@@ -1,13 +1,10 @@
 
 package controllers;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
 import boundaries.CatalogItemRow;
 import entities.EntitiesEnums;
 import entities.IEntity;
@@ -105,13 +102,7 @@ public class ShopEmployeeController extends BaseController
 
 	private ObservableList<CatalogItemRow> reservation_list = FXCollections.observableArrayList();
 
-	private int selected_reservation_id;
-
-	private Reservation selected_res;
-
 	private @FXML Label enter_date;
-
-	private static final DateFormat s_dateForamt = new SimpleDateFormat("dd-MM-yyyy");
 
 	private @FXML TableView<CatalogItemRow> reservation_table;
 
@@ -277,7 +268,6 @@ public class ShopEmployeeController extends BaseController
 		for (int i = 1; i < 11; i++) {
 			answers.add(i);
 		}
-		ObservableList<Integer> list = FXCollections.observableArrayList(answers);
 		combobox_answer1.setValueFactory(svf1);
 		combobox_answer2.setValueFactory(svf2);
 		combobox_answer3.setValueFactory(svf3);
@@ -332,6 +322,12 @@ public class ShopEmployeeController extends BaseController
 		drewContantToTable();
 	}
 
+	/**
+	 *  Add survey to shop
+	 *
+	 * @param event
+	 * 			add button clicked
+	 */
 	@FXML
 	public void addSurvey(ActionEvent event)
 	{
@@ -367,6 +363,11 @@ public class ShopEmployeeController extends BaseController
 	@FXML
 	private void closeReservation(ActionEvent event)
 	{
+		if(closes_reservations.isEmpty())
+		{
+			showInformationMessage("There are no changes.");
+			return;
+		}
 		Message msg=MessagesFactory.createUpdateEntitiesMessage(closes_reservations);
 		m_Client.sendMessageToServer(msg);
 	}

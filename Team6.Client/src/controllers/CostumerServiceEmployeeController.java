@@ -5,7 +5,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +28,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.StringConverter;
 import messages.EntitiesListData;
 import messages.EntityData;
 import messages.IMessageData;
@@ -46,8 +44,8 @@ public class CostumerServiceEmployeeController extends BaseController
 {
 	// region Fields
 
-	private final String[] optinons_side = new String[] { "Add complaint",  "Treat complaint","My complaints",
-			"Add surveys" };
+	private final String[] optinons_side = new String[] { "Add Complaint",  "Treat Complaint","My Complaints",
+			"Add Surveys" };
 
 	private @FXML AnchorPane anchorpane_addcomplaint;
 
@@ -133,7 +131,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	
 	private @FXML Label mycomplaints_costumername;
 	
-	private ArrayList m_addcomplaint_managername_array=new ArrayList<>();
+	private ArrayList<String> m_addcomplaint_managername_array=new ArrayList<>();
 
 	// end region-> Open/Close survey fields
 
@@ -149,24 +147,6 @@ public class CostumerServiceEmployeeController extends BaseController
 	{
 		initialize_complaint();
 		initialize_myid();
-		opensurvey_datepicker_enddate.setConverter(new StringConverter<LocalDate>() {
-
-			private DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-
-			@Override
-			public String toString(LocalDate localDate)
-			{
-				if (localDate == null) return "";
-				return dateTimeFormatter.format(localDate);
-			}
-
-			@Override
-			public LocalDate fromString(String dateString)
-			{
-				if (!(dateString != null && dateString.trim().isEmpty())) return null;
-				return LocalDate.parse(dateString, dateTimeFormatter);
-			}
-		});
 	}
 
 	private void initialize_myid()
