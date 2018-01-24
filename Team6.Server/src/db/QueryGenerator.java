@@ -813,7 +813,7 @@ public class QueryGenerator {
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO complaints (cId,smId,cseId,coDate,coComplaint,coSummary,coOpened) VALUES (");
+		stringBuilder.append("INSERT INTO complaints (cId,smId,cseId,coDate,coComplaint,coOpened) VALUES (");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
@@ -823,8 +823,6 @@ public class QueryGenerator {
 		stringBuilder.append(s_dateFormat.format(complaint.getCreationDate()));
 		stringBuilder.append("','");
 		stringBuilder.append(complaint.getComplaint());
-		stringBuilder.append("','");
-		stringBuilder.append(complaint.getSummary());
 		stringBuilder.append("',");
 		stringBuilder.append(complaint.isOpened() ? 1 : 0);
 		stringBuilder.append(");");
