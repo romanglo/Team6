@@ -47,13 +47,8 @@ public class UserDetailsController implements Initializable
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void initialize(URL arg0, ResourceBundle arg1)
+	public void initialize(URL url, ResourceBundle bundle)
 	{
-		InputStream user = getClass().getResourceAsStream("/newBoundaries/images/user2.png");
-		if (user != null) {
-			Image accountImage = new Image(user);
-			imageview_user.setImage(accountImage);
-		}
 
 		User connectedUser = ApplicationEntryPoint.ConnectedUser;
 		if (connectedUser == null) {
@@ -61,12 +56,41 @@ public class UserDetailsController implements Initializable
 			label_password.setText(" - ");
 			label_email.setText(" - ");
 			label_privilege.setText(" - ");
+			intializeUserDefaultImage();
 			return;
 		}
+
 		label_username.setText(connectedUser.getUserName());
 		label_password.setText(connectedUser.getPassword());
 		label_email.setText(connectedUser.getEmail());
 
+		if (connectedUser.getImage() == null) {
+			intializeUserDefaultImage();
+		} else {
+			imageview_user.setImage(connectedUser.getImage());
+
+		}
+
+		initializeUserPrivilage(connectedUser);
+	}
+
+	/**
+	 * 
+	 * The method initialize default image to {@link User}s without image.
+	 *
+	 */
+	private void intializeUserDefaultImage()
+	{
+		InputStream user = getClass().getResourceAsStream("/newBoundaries/images/user2.png");
+		if (user != null) {
+			Image accountImage = new Image(user);
+			imageview_user.setImage(accountImage);
+		}
+
+	}
+
+	private void initializeUserPrivilage(User connectedUser)
+	{
 		String priv;
 		switch (connectedUser.getPrivilege()) {
 			case Administrator:
@@ -92,7 +116,7 @@ public class UserDetailsController implements Initializable
 			break;
 			case ShopManager:
 				priv = "Shop Manager";
-				break;
+			break;
 			default:
 				priv = " - ";
 			break;

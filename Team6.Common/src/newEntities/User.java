@@ -1,7 +1,12 @@
 
 package newEntities;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Serializable;
+
+import javafx.scene.image.Image;
+import utilities.ImageUtilities;
 
 /**
  *
@@ -26,6 +31,10 @@ public class User implements IEntity
 	private EntitiesEnums.UserPrivilege m_privilege;
 
 	private EntitiesEnums.UserStatus m_status;
+
+	private transient Image m_image;
+
+	private byte[] m_imageInBytes;
 
 	/**
 	 * @return the userName
@@ -111,22 +120,90 @@ public class User implements IEntity
 	{
 		m_status = status;
 	}
-	
+
+	/**
+	 * @param image
+	 *            the new {@link Image} to set.
+	 */
+	public void setImage(Image image)
+	{
+		if (image == null) {
+			m_image = null;
+			m_imageInBytes = null;
+		}
+		m_image = image;
+		m_imageInBytes = ImageUtilities.ImageToByteArray(image, "jpeg", null);
+	}
+
+	/**
+	 * 
+	 * @param inputStream
+	 *            the {@link Image} in {@link InputStream} format to set.
+	 */
+	public void setImage(InputStream inputStream)
+	{
+		if (inputStream == null) {
+			m_image = null;
+			m_imageInBytes = null;
+		}
+		m_image = ImageUtilities.InputStreamToImage(inputStream, null);
+		m_imageInBytes = ImageUtilities.ImageToByteArray(m_image, "jpeg", null);
+	}
+
+	/**
+	 * @param bytes
+	 *            the {@link Image} in byte array format to set
+	 */
+	public void setImage(byte[] bytes)
+	{
+		if (bytes == null) {
+			m_image = null;
+			m_imageInBytes = null;
+		}
+		m_image = ImageUtilities.ByteArrayToImage(bytes, null);
+		m_imageInBytes = bytes;
+	}
+
+	/**
+	 * @return the m_inputStream
+	 */
+	public InputStream getInputStream()
+	{
+		if (m_imageInBytes == null) {
+			return null;
+		}
+		return new ByteArrayInputStream(m_imageInBytes);
+	}
+
+	/**
+	 * @return The contained {@link Image} in the class.
+	 */
+	public Image getImage()
+	{
+		if (m_image == null && m_imageInBytes != null) {
+			m_image = ImageUtilities.ByteArrayToImage(m_imageInBytes, null);
+		}
+		return m_image;
+	}
+
 	/**
 	 *
-	 * @param user 
-	 * 			set user data.
+	 * @param user
+	 *            set user data.
 	 */
-	public void setUser(User user) {
-		if(user == null) {
+	public void setUser(User user)
+	{
+		if (user == null) {
 			return;
 		}
-		
-		m_userName = user.getUserName();
-		m_password = user.getPassword();
-		m_privilege = user.getPrivilege();
-		m_email = user.getEmail();
-		m_status = user.getStatus();
+
+		m_userName = user.m_userName;
+		m_password = user.m_password;
+		m_privilege = user.m_privilege;
+		m_email = user.m_email;
+		m_status = user.m_status;
+		m_image = user.m_image;
+		m_imageInBytes = user.m_imageInBytes;
 	}
 
 	/**
@@ -136,7 +213,8 @@ public class User implements IEntity
 	public String toString()
 	{
 		return "User [userName=" + m_userName + ", password=" + m_password + ", email=" + m_email + ", privilege="
-				+ m_privilege + ", status=" + m_status + "]";
+				+ m_privilege + ", status=" + m_status + ", existImage="
+				+ (m_image != null || (m_imageInBytes != null && m_imageInBytes.length != 0)) + "]";
 	}
 
 	/**

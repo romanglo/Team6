@@ -592,11 +592,8 @@ public class MessagesResolver implements Server.MessagesHandler {
 				return null;
 			}
 			List<IEntity> entities = EntitiesResolver.resultSetToEntity(queryResult, expectedType);
-			if (entities == null) {
-				m_logger.warning("Failed on try to reslove ResultSet to " + expectedType.getName());
-				return null;
-			}
-			return entities.isEmpty() ? null : new EntitiesListData(EntityDataOperation.None, entities);
+			return entities != null && !entities.isEmpty() ? new EntitiesListData(EntityDataOperation.None, entities)
+					: null;
 
 		} catch (Exception e) {
 			m_logger.warning(

@@ -835,6 +835,11 @@ public class EntitiesResolver {
 					user.setEmail(resultSet.getString(3));
 					user.setPrivilege(Enum.valueOf(UserPrivilege.class, resultSet.getString(4)));
 					user.setStatus(Enum.valueOf(UserStatus.class, resultSet.getString(5)));
+					Blob blob = resultSet.getBlob(6);
+					if (blob != null) {
+						InputStream inputStream = blob.getBinaryStream();
+						user.setImage(inputStream);
+					}
 					userEntities.add(user);
 				} catch (Exception ignored) {
 					failedResolve++;
