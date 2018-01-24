@@ -41,6 +41,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
+import newEntities.Complaint;
 import newEntities.Costumer;
 import newEntities.EntitiesEnums.CostumerSubscription;
 import newEntities.EntitiesEnums.ProductType;
@@ -72,7 +73,7 @@ public class CostumerController extends BaseController
 	 * ScreenType: Screen display enumeration.
 	 */
 	private enum ScreenType {
-		None, Catalog, Costumized, Payment, CreditCard, Reservations, Cancel
+		None, Catalog, Costumized, Payment, CreditCard, Reservations, Cancel, Complaints
 	}
 
 	// region FXML Fields
@@ -80,6 +81,8 @@ public class CostumerController extends BaseController
 	@FXML private AnchorPane anchorpane_create_reservation;
 
 	@FXML private AnchorPane anchorpane_cancel_reservation;
+
+	@FXML private AnchorPane anchorpane_complaints;
 
 	/* Create reservation */
 
@@ -193,6 +196,20 @@ public class CostumerController extends BaseController
 
 	/* End of -> cancel reservation */
 
+	/* complaints tracker */
+
+	@FXML private AnchorPane anchorpane_complaints_display;
+
+	@FXML private TableView<CatalogItemRow> compaints_table;
+
+	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_compaints_id;
+
+	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_compaints_date;
+
+	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_compaints_type;
+
+	/* End of -> complaints tracker */
+
 	// end region -> FXML Fields
 
 	// region Fields
@@ -225,7 +242,11 @@ public class CostumerController extends BaseController
 
 	private ObservableList<CatalogItemRow> reservationTableList = FXCollections.observableArrayList();
 
+	private ObservableList<CatalogItemRow> complaintsTableList = FXCollections.observableArrayList();
+
 	private ArrayList<Reservation> m_reservationList;
+
+	private ArrayList<Complaint> m_complaintsList;
 
 	private int s_reservationId;
 
@@ -298,11 +319,7 @@ public class CostumerController extends BaseController
 	private void creditCardScreen(ActionEvent paymentEvent)
 	{
 		if (Costumer_SavedData.getCostumerReservationList().isEmpty()) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Attention");
-			alert.setHeaderText(null);
-			alert.setContentText("The cart is empty.");
-			alert.showAndWait();
+			showInformationPopup("Attention", null, "The cart is empty.");
 			return;
 		}
 		anchorpane_catalog.setVisible(false);
@@ -323,20 +340,12 @@ public class CostumerController extends BaseController
 	private void finishButtonClick(ActionEvent finishEvent)
 	{
 		if (!m_useSubscription && credit_card_number.getText().equals("")) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Attention");
-			alert.setHeaderText(null);
-			alert.setContentText("Please fill in all fields to complete the reservation.");
-			alert.show();
+			showErrorPopup("Attention", null, "Please fill in all fields to complete the reservation.");
 			return;
 		} else if (delivery_radio.isSelected()) {
 			if (delivery_address.getText().equals("") || delivery_name.getText().equals("")
 					|| delivery_phone.getText().equals("")) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Attention");
-				alert.setHeaderText(null);
-				alert.setContentText("Please fill in all fields to complete the reservation.");
-				alert.show();
+				showErrorPopup("Attention", null, "Please fill in all fields to complete the reservation.");
 				return;
 			}
 		}
@@ -344,11 +353,7 @@ public class CostumerController extends BaseController
 			if (date_pick.getValue().isBefore(LocalDate.now())
 					|| (date_pick.getValue().isEqual(LocalDate.now()) && Integer
 							.parseInt(combo_hour.getValue()) < Calendar.getInstance().get(Calendar.HOUR_OF_DAY) + 3)) {
-				Alert alert = new Alert(AlertType.ERROR);
-				alert.setTitle("Attention");
-				alert.setHeaderText(null);
-				alert.setContentText("The date and/or time you picked is invalid, please try again.");
-				alert.show();
+				showErrorPopup("Attention", null, "The date and/or time you picked is invalid, please try again.");
 				return;
 			}
 		}
@@ -528,11 +533,7 @@ public class CostumerController extends BaseController
 	{
 		if ((domain_color.getValue() != null && domain_color.getValue().equals("")) || min_price.getText().equals("")
 				|| max_price.getText().equals("") || item_amount.getText().equals("")) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Attention");
-			alert.setHeaderText(null);
-			alert.setContentText("You left empty fields.");
-			alert.show();
+			showErrorPopup("Attention", null, "Please fill in all fields to start a search.");
 			return;
 		}
 		double min = Double.parseDouble(min_price.getText());
@@ -540,11 +541,7 @@ public class CostumerController extends BaseController
 		int amount = Integer.parseInt(item_amount.getText());
 
 		if (min < 0 || max < 0 || amount < 1 || max < min) {
-			Alert alert = new Alert(AlertType.ERROR);
-			alert.setTitle("Attention");
-			alert.setHeaderText(null);
-			alert.setContentText("Illigal values entered.");
-			alert.show();
+			showErrorPopup("Attention", null, "Illigal values entered.");
 			return;
 		}
 
@@ -558,18 +555,14 @@ public class CostumerController extends BaseController
 				// 2. Price is in range.
 				// 3. The entity is of the type 'Flower'.
 				CatalogItemRow catalogItemRow = new CatalogItemRow(entity.getId(), entity.getName(),
-						entity.getType().toString(), (float) (amount * entity.getPrice()),
-						domain_color.getValue().toLowerCase());
+						(float) (amount * entity.getPrice()), null, domain_color.getValue().toLowerCase(),
+						entity.getType().toString());
 				searchItemsList.add(catalogItemRow);
 			}
 		}
 
 		if (searchItemsList.isEmpty()) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Attention");
-			alert.setHeaderText(null);
-			alert.setContentText("A match wasn't found, please try again.");
-			alert.showAndWait();
+			showInformationPopup("Attention", null, "A match wasn't found, please try again.");
 		} else {
 			initializeItemSearchTable();
 			anchorpane_search.setVisible(true);
@@ -670,6 +663,7 @@ public class CostumerController extends BaseController
 				initializeCatalog();
 				anchorpane_create_reservation.setVisible(true);
 				anchorpane_cancel_reservation.setVisible(false);
+				anchorpane_complaints_display.setVisible(false);
 				anchorpane_catalog.setVisible(true);
 				anchorpane_costumized.setVisible(false);
 				anchorpane_credit_card.setVisible(false);
@@ -680,8 +674,17 @@ public class CostumerController extends BaseController
 				initializeReservations();
 				anchorpane_create_reservation.setVisible(false);
 				anchorpane_cancel_reservation.setVisible(true);
+				anchorpane_complaints_display.setVisible(false);
 				anchorpane_cancel.setVisible(false);
 				anchorpane_reservations.setVisible(true);
+			break;
+
+			case "Complaint Tracker":
+				initializeComplaints();
+				anchorpane_create_reservation.setVisible(false);
+				anchorpane_cancel_reservation.setVisible(false);
+				anchorpane_complaints_display.setVisible(true);
+			/* TODO Yoni: Add visibility for new anchor. */
 			break;
 
 			default:
@@ -696,7 +699,7 @@ public class CostumerController extends BaseController
 	@Override
 	protected String[] getSideButtonsNames()
 	{
-		return new String[] { "Create Reservation", "Cancel Reservation" };
+		return new String[] { "Create Reservation", "Cancel Reservation", "Complaint Tracker" };
 	}
 
 	/**
@@ -721,6 +724,9 @@ public class CostumerController extends BaseController
 			case Cancel:
 				onMessageReceivedCancelType(msg);
 			break;
+			case Complaints:
+				onMessageReceivedComplaintsType(msg);
+			break;
 			default:
 				m_Logger.warning("Screen type is not recognized.");
 		}
@@ -738,9 +744,6 @@ public class CostumerController extends BaseController
 		if (messageData instanceof RespondMessageData) {
 			if (!((RespondMessageData) messageData).isSucceed()) {
 				m_Logger.warning("Failed when sending a message to the server.");
-			} else {
-				m_Logger.warning(
-						"Received message data not of the type requested, requested: " + EntityData.class.getName());
 			}
 			return;
 		}
@@ -863,11 +866,10 @@ public class CostumerController extends BaseController
 				if (messageData instanceof EntitiesListData) {
 					List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 					if (entities.get(0) instanceof ItemInReservation) {
-						Alert alert = new Alert(AlertType.INFORMATION);
-						alert.setTitle("Success");
-						alert.setHeaderText(null);
-						alert.setContentText("Reservation completed.");
-						alert.showAndWait();
+						Platform.runLater(() -> {
+							showInformationPopup("Success", null, "Reservation completed, thanks for choosing us.");
+						});
+
 						Costumer_SavedData.setReservationList(new ArrayList<>());
 
 						catalogScreen(new ActionEvent());
@@ -971,11 +973,7 @@ public class CostumerController extends BaseController
 					IEntity entity = ((EntityData) messageData).getEntity();
 					if (entity instanceof Reservation) {
 						Platform.runLater(() -> {
-							Alert alert = new Alert(AlertType.INFORMATION);
-							alert.setTitle("Success");
-							alert.setHeaderText(null);
-							alert.setContentText("Reservation canceled successfully.");
-							alert.showAndWait();
+							showInformationPopup("Success", null, "Reservation canceled successfully.");
 							backToReservationsClick(new ActionEvent());
 						});
 						return;
@@ -1029,6 +1027,45 @@ public class CostumerController extends BaseController
 		}
 	}
 
+	/**
+	 * Method handles a message that has been received from the server on cancel
+	 * reservation screen.
+	 *
+	 * @param msg
+	 *            The message from the server.
+	 */
+	private void onMessageReceivedComplaintsType(Message msg)
+	{
+		IMessageData messageData = msg.getMessageData();
+		if (messageData instanceof RespondMessageData) {
+			if (!((RespondMessageData) messageData).isSucceed()) {
+				m_Logger.warning("Failed when sending a message to the server.");
+			}
+			return;
+		}
+
+		if (!(messageData instanceof EntitiesListData)) {
+			m_Logger.warning("Received message data not of the type requested.");
+			return;
+		}
+
+		List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
+		m_complaintsList = new ArrayList<>();
+		for (IEntity entity : entities) {
+			if (!(entity instanceof Complaint)) {
+				m_Logger.warning("Received entity not of the type requested, requested: " + Complaint.class.getName());
+				return;
+			}
+
+			Complaint complaint = (Complaint) entity;
+			m_complaintsList.add(complaint);
+			CatalogItemRow catalogItemRow = new CatalogItemRow(complaint.getId(),
+					complaint.getCreationDate().toString(), complaint.isOpened() ? "Open" : "Closed", null, "");
+			complaintsTableList.add(catalogItemRow);
+		}
+		
+		initializeComplaintsTable();
+	}
 	// end region -> BaseController Implementation
 
 	// region Initializing methods
@@ -1083,19 +1120,11 @@ public class CostumerController extends BaseController
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
 					if (rowData.getM_type().equalsIgnoreCase("closed")) {
-						Alert alert = new Alert(AlertType.INFORMATION);
-						alert.setTitle("Attention");
-						alert.setHeaderText(null);
-						alert.setContentText("The reservation is closed.");
-						alert.showAndWait();
+						showInformationPopup("Attention", null, "The reservation is closed.");
 						return;
 					}
 					if (rowData.getM_type().equalsIgnoreCase("canceled")) {
-						Alert alert = new Alert(AlertType.INFORMATION);
-						alert.setTitle("Attention");
-						alert.setHeaderText(null);
-						alert.setContentText("The reservation is canceled.");
-						alert.showAndWait();
+						showInformationPopup("Attention", null, "The reservation is canceled.");
 						return;
 					}
 
@@ -1136,11 +1165,7 @@ public class CostumerController extends BaseController
 					itemInReservation.setItemName(rowData.getName());
 
 					Costumer_SavedData.addItemToReservation(itemInReservation);
-					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("Item Added");
-					alert.setHeaderText(null);
-					alert.setContentText("The item was added to the reservation.");
-					alert.showAndWait();
+					showInformationPopup("Item Added", null, "The item was added to the reservation.");
 				}
 			});
 			return tableRow;
@@ -1153,6 +1178,41 @@ public class CostumerController extends BaseController
 		Platform.runLater(() -> {
 			search_table.setItems(searchItemsList);
 			search_table.refresh();
+		});
+	}
+
+	/**
+	 * Method that initializes the reservations table.
+	 */
+	private void initializeComplaintsTable()
+	{
+		compaints_table.setRowFactory(param -> {
+			TableRow<CatalogItemRow> tableRow = new TableRow<>();
+			tableRow.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
+					CatalogItemRow rowData = tableRow.getItem();
+					Complaint selectedComplaint;
+					
+					for (Complaint complaint : m_complaintsList) {
+						if (complaint.getId() == rowData.getM_id()) {
+							selectedComplaint = complaint;
+							break;
+						}
+					}
+					
+					/* TODO Yoni: Update Screen. */
+				}
+			});
+			return tableRow;
+		});
+
+		tablecolumn_compaints_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
+		tablecolumn_compaints_date.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
+		tablecolumn_compaints_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
+
+		Platform.runLater(() -> {
+			reservation_table.setItems(complaintsTableList);
+			reservation_table.refresh();
 		});
 	}
 
@@ -1365,7 +1425,7 @@ public class CostumerController extends BaseController
 			}
 		});
 		blessing_text.setDisable(true);
-		
+
 		credit_card_number.textProperty().addListener(new ChangeListener<String>() {
 
 			@Override
@@ -1378,7 +1438,7 @@ public class CostumerController extends BaseController
 				}
 			}
 		});
-		
+
 		delivery_address.textProperty().addListener(new ChangeListener<String>() {
 
 			@Override
@@ -1391,7 +1451,7 @@ public class CostumerController extends BaseController
 				}
 			}
 		});
-		
+
 		delivery_name.textProperty().addListener(new ChangeListener<String>() {
 
 			@Override
@@ -1404,7 +1464,7 @@ public class CostumerController extends BaseController
 				}
 			}
 		});
-		
+
 		delivery_phone.textProperty().addListener(new ChangeListener<String>() {
 
 			@Override
@@ -1417,7 +1477,7 @@ public class CostumerController extends BaseController
 				}
 			}
 		});
-		
+
 		blessing_text.textProperty().addListener(new ChangeListener<String>() {
 
 			@Override
@@ -1463,5 +1523,60 @@ public class CostumerController extends BaseController
 		message = MessagesFactory.createGetAllEntityMessage(itemInReservation);
 		m_Client.sendMessageToServer(message);
 	}
+
+	/**
+	 * Method that initializes the cancel complaint tracker screen.
+	 */
+	private void initializeComplaints()
+	{
+		m_currScreen = ScreenType.Complaints;
+
+		Complaint complaint = new Complaint();
+		complaint.setCostumerId(Costumer_SavedData.getCostumerId());
+		Message entityMessage = MessagesFactory.createGetAllEntityMessage(complaint);
+		m_Client.sendMessageToServer(entityMessage);
+	}
 	// end region -> Initializing methods
+
+	// region Alert pop ups
+
+	/**
+	 * Method displays a pop up message for information.
+	 *
+	 * @param title
+	 *            The title of the message.
+	 * @param header
+	 *            The header line of the message.
+	 * @param content
+	 *            The message.
+	 */
+	private void showInformationPopup(String title, String header, String content)
+	{
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
+
+	/**
+	 * Method displays a pop up message for error.
+	 *
+	 * @param title
+	 *            The title of the message.
+	 * @param header
+	 *            The header line of the message.
+	 * @param content
+	 *            The message.
+	 */
+	private void showErrorPopup(String title, String header, String content)
+	{
+		Alert alert = new Alert(AlertType.ERROR);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(content);
+		alert.showAndWait();
+	}
+
+	// end region -> Alert pop ups
 }
