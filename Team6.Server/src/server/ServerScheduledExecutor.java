@@ -22,9 +22,9 @@ import configurations.TimeConfiguration;
 import db.DbController;
 import db.EntitiesResolver;
 import db.QueryGenerator;
+import entities.IEntity;
+import entities.ShopManager;
 import logger.LogManager;
-import newEntities.IEntity;
-import newEntities.ShopManager;
 
 /**
  *

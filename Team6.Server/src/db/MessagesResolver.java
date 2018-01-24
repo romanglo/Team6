@@ -9,27 +9,27 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import connectivity.Server;
+import entities.Complaint;
+import entities.IEntity;
+import entities.Item;
+import entities.ItemInReservation;
+import entities.ItemInShop;
+import entities.Reservation;
+import entities.ShopCatalogData;
+import entities.ShopCostumer;
+import entities.Survey;
+import entities.SurveyResult;
+import entities.User;
+import entities.EntitiesEnums.UserStatus;
 import logger.LogManager;
-import newEntities.Complaint;
-import newEntities.EntitiesEnums.UserStatus;
-import newEntities.IEntity;
-import newEntities.Item;
-import newEntities.ItemInReservation;
-import newEntities.ItemInShop;
-import newEntities.Reservation;
-import newEntities.ShopCatalogData;
-import newEntities.ShopCostumer;
-import newEntities.Survey;
-import newEntities.SurveyResult;
-import newEntities.User;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.EntityDataCollection;
-import newMessages.EntityDataOperation;
-import newMessages.IMessageData;
-import newMessages.LoginData;
-import newMessages.Message;
-import newMessages.RespondMessageData;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.EntityDataCollection;
+import messages.EntityDataOperation;
+import messages.IMessageData;
+import messages.LoginData;
+import messages.Message;
+import messages.RespondMessageData;
 
 /**
  *

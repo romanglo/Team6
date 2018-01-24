@@ -6,25 +6,25 @@ import java.util.logging.Logger;
 
 import com.sun.istack.internal.NotNull;
 
+import entities.Complaint;
+import entities.ComplaintsReport;
+import entities.Costumer;
+import entities.CostumerServiceEmployee;
+import entities.IEntity;
+import entities.IncomesReport;
+import entities.Item;
+import entities.ItemInReservation;
+import entities.ItemInShop;
+import entities.Reservation;
+import entities.ReservationsReport;
+import entities.ShopCostumer;
+import entities.ShopEmployee;
+import entities.ShopManager;
+import entities.Survey;
+import entities.SurveyResult;
+import entities.SurveysReport;
+import entities.User;
 import logger.LogManager;
-import newEntities.Complaint;
-import newEntities.ComplaintsReport;
-import newEntities.Costumer;
-import newEntities.CostumerServiceEmployee;
-import newEntities.IEntity;
-import newEntities.IncomesReport;
-import newEntities.Item;
-import newEntities.ItemInReservation;
-import newEntities.ItemInShop;
-import newEntities.Reservation;
-import newEntities.ReservationsReport;
-import newEntities.ShopCostumer;
-import newEntities.ShopEmployee;
-import newEntities.ShopManager;
-import newEntities.Survey;
-import newEntities.SurveyResult;
-import newEntities.SurveysReport;
-import newEntities.User;
 
 /**
  *

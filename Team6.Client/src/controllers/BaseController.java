@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import entities.User;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
@@ -42,9 +43,8 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import logger.LogManager;
-import newEntities.User;
-import newMessages.Message;
-import newMessages.MessagesFactory;
+import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *

@@ -9,33 +9,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import entities.Complaint;
+import entities.ComplaintsReport;
+import entities.Costumer;
+import entities.CostumerServiceEmployee;
+import entities.IEntity;
+import entities.IncomesReport;
+import entities.Item;
+import entities.ItemInReservation;
+import entities.ItemInShop;
+import entities.Reservation;
+import entities.ReservationsReport;
+import entities.ShopCostumer;
+import entities.ShopEmployee;
+import entities.ShopManager;
+import entities.Survey;
+import entities.SurveyResult;
+import entities.SurveysReport;
+import entities.User;
+import entities.EntitiesEnums.CostumerSubscription;
+import entities.EntitiesEnums.ProductType;
+import entities.EntitiesEnums.ReservationDeliveryType;
+import entities.EntitiesEnums.ReservationType;
+import entities.EntitiesEnums.UserPrivilege;
+import entities.EntitiesEnums.UserStatus;
 import logger.LogManager;
-
-import newEntities.EntitiesEnums.CostumerSubscription;
-import newEntities.EntitiesEnums.ProductType;
-import newEntities.EntitiesEnums.ReservationDeliveryType;
-import newEntities.EntitiesEnums.ReservationType;
-import newEntities.EntitiesEnums.UserPrivilege;
-import newEntities.EntitiesEnums.UserStatus;
-
-import newEntities.IEntity;
-import newEntities.IncomesReport;
-import newEntities.Item;
-import newEntities.ItemInReservation;
-import newEntities.ItemInShop;
-import newEntities.Complaint;
-import newEntities.ComplaintsReport;
-import newEntities.Costumer;
-import newEntities.CostumerServiceEmployee;
-import newEntities.Reservation;
-import newEntities.ReservationsReport;
-import newEntities.ShopCostumer;
-import newEntities.ShopEmployee;
-import newEntities.ShopManager;
-import newEntities.SurveyResult;
-import newEntities.Survey;
-import newEntities.SurveysReport;
-import newEntities.User;
 
 /**
  *

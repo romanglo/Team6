@@ -3,17 +3,11 @@ package controllers;
 
 import javafx.fxml.FXML;
 import javafx.scene.layout.AnchorPane;
-import newMessages.Message;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.EntityDataOperation;
-import newMessages.IMessageData;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
+
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -22,11 +16,11 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 
 import boundaries.CatalogItemRow;
-import newEntities.EntitiesEnums;
-import newEntities.IEntity;
-import newEntities.Item;
-import newEntities.ItemInShop;
-import newEntities.ShopManager;
+import entities.EntitiesEnums;
+import entities.IEntity;
+import entities.Item;
+import entities.ItemInShop;
+import entities.ShopManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -50,6 +44,13 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.EntityDataOperation;
+import messages.IMessageData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
  * CompanyEmployeeController : Managed the Company Employee UI.

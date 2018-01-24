@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 import boundaries.CatalogItemRow;
+import entities.EntitiesEnums;
+import entities.IEntity;
+import entities.Reservation;
+import entities.ShopEmployee;
+import entities.Survey;
+import entities.SurveyResult;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -25,18 +31,12 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
-import newEntities.EntitiesEnums;
-import newEntities.IEntity;
-import newEntities.Reservation;
-import newEntities.ShopEmployee;
-import newEntities.Survey;
-import newEntities.SurveyResult;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.IMessageData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.IMessageData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
  *

@@ -4,6 +4,8 @@ package controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import entities.IEntity;
+import entities.SurveyResult;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -13,13 +15,11 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import newEntities.IEntity;
-import newEntities.SurveyResult;
-import newMessages.EntitiesListData;
-import newMessages.IMessageData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
+import messages.EntitiesListData;
+import messages.IMessageData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
  *

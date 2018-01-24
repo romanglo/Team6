@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import entities.Complaint;
+import entities.Costumer;
+import entities.CostumerServiceEmployee;
+import entities.IEntity;
+import entities.ShopManager;
+import entities.Survey;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,18 +30,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
-import newEntities.Complaint;
-import newEntities.Costumer;
-import newEntities.CostumerServiceEmployee;
-import newEntities.IEntity;
-import newEntities.ShopManager;
-import newEntities.Survey;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.IMessageData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.IMessageData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
  *
@@ -63,7 +63,7 @@ public class CostumerServiceEmployeeController extends BaseController
 
 	private @FXML ComboBox<String> combobox_shop;
 
-	private List<newEntities.IEntity> m_addcomplaint_shopmanager_array;
+	private List<entities.IEntity> m_addcomplaint_shopmanager_array;
 
 	private ArrayList<String> m_addcomplaint_managerid_array = new ArrayList<>();
 

@@ -11,6 +11,8 @@ import com.sun.istack.internal.Nullable;
 
 import client.ApplicationEntryPoint;
 import client.Client;
+import entities.IEntity;
+import entities.User;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -50,13 +52,11 @@ import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import logger.LogManager;
-import newEntities.IEntity;
-import newEntities.User;
-import newMessages.EntityData;
-import newMessages.IMessageData;
-import newMessages.LoginData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
+import messages.EntityData;
+import messages.IMessageData;
+import messages.LoginData;
+import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *

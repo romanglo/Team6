@@ -4,15 +4,15 @@ package controllers;
 import java.util.ArrayList;
 import java.util.Date;
 
-import newEntities.Costumer;
-import newEntities.EntitiesEnums.CostumerSubscription;
-import newEntities.EntitiesEnums.ReservationDeliveryType;
-import newEntities.EntitiesEnums.ReservationType;
-import newEntities.IEntity;
-import newEntities.Item;
-import newEntities.ItemInReservation;
-import newEntities.Reservation;
-import newEntities.ShopCostumer;
+import entities.Costumer;
+import entities.IEntity;
+import entities.Item;
+import entities.ItemInReservation;
+import entities.Reservation;
+import entities.ShopCostumer;
+import entities.EntitiesEnums.CostumerSubscription;
+import entities.EntitiesEnums.ReservationDeliveryType;
+import entities.EntitiesEnums.ReservationType;
 
 /**
  *

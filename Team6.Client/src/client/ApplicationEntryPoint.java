@@ -17,9 +17,7 @@ import com.sun.istack.internal.Nullable;
 
 import common.UncaughetExceptions;
 import controllers.LoginController;
-import newEntities.User;
-import newMessages.Message;
-import newMessages.MessagesFactory;
+import entities.User;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,6 +25,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import logger.LogManager;
+import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *

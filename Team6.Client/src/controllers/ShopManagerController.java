@@ -9,6 +9,16 @@ import java.util.Optional;
 
 import boundaries.ShopCostumerRow;
 import boundaries.ToggleSwitch;
+import entities.ComplaintsReport;
+import entities.Costumer;
+import entities.EntitiesEnums;
+import entities.IEntity;
+import entities.IncomesReport;
+import entities.Report;
+import entities.ReservationsReport;
+import entities.ShopCostumer;
+import entities.ShopManager;
+import entities.SurveysReport;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -39,23 +49,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import newEntities.ComplaintsReport;
-import newEntities.Costumer;
-import newEntities.EntitiesEnums;
-import newEntities.IEntity;
-import newEntities.IncomesReport;
-import newEntities.Report;
-import newEntities.ReservationsReport;
-import newEntities.ShopCostumer;
-import newEntities.ShopManager;
-import newEntities.SurveysReport;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.EntityDataOperation;
-import newMessages.IMessageData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.EntityDataOperation;
+import messages.IMessageData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
  * ShopManagerController : Managed the Shop Manager and Chain Manager UI.

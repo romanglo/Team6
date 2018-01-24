@@ -1,6 +1,6 @@
 package connectivity;
 
-import newMessages.Message;
+import messages.Message;
 import ocsf.server.ConnectionToClient;
 
 /**

@@ -4,6 +4,11 @@ package controllers;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import entities.EntitiesEnums;
+import entities.IEntity;
+import entities.ShopEmployee;
+import entities.ShopManager;
+import entities.User;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -15,16 +20,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
-import newEntities.EntitiesEnums;
-import newEntities.IEntity;
-import newEntities.ShopEmployee;
-import newEntities.ShopManager;
-import newEntities.User;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
  *
