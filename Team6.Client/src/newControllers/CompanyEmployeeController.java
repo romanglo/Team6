@@ -57,8 +57,7 @@ import javafx.util.Callback;
 public class CompanyEmployeeController extends BaseController
 {
 
-	// TODO : Check Shop Sales message received , Add and Remove discount button if
-	// message not success, Show message in Edit Catalog about add or remove item
+	// TODO : Show message in Edit Catalog about add or remove item
 	// success or failed.
 
 	// region Actors Panes
@@ -582,6 +581,108 @@ public class CompanyEmployeeController extends BaseController
 		salesRemoved.clear();
 	}
 
+	/**
+	 * Create error window for user.
+	 *
+	 * @param errorType
+	 *            The error.
+	 */
+	private void errorMSG(String errorType)
+	{
+		Platform.runLater(() -> {
+			Alert errorMessage = new Alert(AlertType.ERROR);
+			errorMessage.setTitle("Error Message");
+			errorMessage.setContentText(errorType);
+			errorMessage.show();
+		});
+	}
+
+	/**
+	 * Check that all fields are filed and valid.
+	 *
+	 * @param name
+	 *            The item name.
+	 * @param price
+	 *            The item price.
+	 * @param domainColor
+	 *            The item domain color.
+	 * @return <code>true</code> if the item exist in company catalog,
+	 *         <code>false</code> otherwise.
+	 */
+	private boolean checkAddNewCatalogItemFields(TextField name, TextField price, TextField domainColor)
+	{
+		String inputedName, inputedPrice, inputedDomainColor;
+		inputedName = name.getText();
+		inputedPrice = price.getText();
+		inputedDomainColor = domainColor.getText();
+
+		if (inputedName == null || inputedPrice == null || inputedDomainColor == null) return false;
+		if (inputedName.isEmpty() || inputedPrice.isEmpty() || inputedDomainColor.isEmpty()) return false;
+		try {
+			Float.parseFloat(inputedPrice);
+		}
+		catch (Exception ex) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Able access to save\reset buttons.
+	 * 
+	 */
+	private void catalogChanged()
+	{
+		button_saveCatalogChanges.setDisable(false);
+		button_resetCatalogChanges.setDisable(false);
+	}
+
+	/**
+	 * Clean saved data arrays and disable access to save\reset button.
+	 * 
+	 */
+	private void cleanSavedDataArray()
+	{
+		button_resetCatalogChanges.setDisable(true);
+		button_saveCatalogChanges.setDisable(true);
+		itemsCatalogAdded.clear();
+		itemsCatalogChanged.clear();
+		itemsCatalogRemoved.clear();
+	}
+
+	/**
+	 * Initialize company catalog values.
+	 *
+	 * @param catalogItems
+	 *            The catalog items.
+	 */
+	private void companyCatalogInit(List<IEntity> catalogItems)
+	{
+		for (IEntity entity : catalogItems) {
+			if (!(entity instanceof Item)) {
+				m_Logger.warning("Received entity not of the type requested.");
+				return;
+			}
+			Item item = (Item) entity;
+			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getType().toString(),
+					item.getPrice(), item.getDomainColor(), item.getImage());
+			catalog.add(itemRow);
+		}
+	}
+
+	/**
+	 * Parse the shop full name to shop ID.
+	 *
+	 * @param shopID
+	 *            The shop full name.
+	 * @return The shop ID.
+	 */
+	private int stringShopIdToInt(String shopID)
+	{
+		shopID = shopID.substring(0, shopID.indexOf(' '));
+		return Integer.parseInt(shopID);
+	}
+
 	// ----------------------------------------------------------------------------PRIVATE-------------------------------------------------------------
 
 	// ----------------------------------------------------------------------------FXML-------------------------------------------------------------
@@ -1020,108 +1121,6 @@ public class CompanyEmployeeController extends BaseController
 	// ----------------------------------------------------------------------------SERVER-COMMUNICATION---------------------------------------------
 
 	/**
-	 * Create error window for user.
-	 *
-	 * @param errorType
-	 *            The error.
-	 */
-	private void errorMSG(String errorType)
-	{
-		Platform.runLater(() -> {
-			Alert errorMessage = new Alert(AlertType.ERROR);
-			errorMessage.setTitle("Error Message");
-			errorMessage.setContentText(errorType);
-			errorMessage.show();
-		});
-	}
-
-	/**
-	 * Check that all fields are filed and valid.
-	 *
-	 * @param name
-	 *            The item name.
-	 * @param price
-	 *            The item price.
-	 * @param domainColor
-	 *            The item domain color.
-	 * @return <code>true</code> if the item exist in company catalog,
-	 *         <code>false</code> otherwise.
-	 */
-	private boolean checkAddNewCatalogItemFields(TextField name, TextField price, TextField domainColor)
-	{
-		String inputedName, inputedPrice, inputedDomainColor;
-		inputedName = name.getText();
-		inputedPrice = price.getText();
-		inputedDomainColor = domainColor.getText();
-
-		if (inputedName == null || inputedPrice == null || inputedDomainColor == null) return false;
-		if (inputedName.isEmpty() || inputedPrice.isEmpty() || inputedDomainColor.isEmpty()) return false;
-		try {
-			Float.parseFloat(inputedPrice);
-		}
-		catch (Exception ex) {
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * Able access to save\reset buttons.
-	 * 
-	 */
-	private void catalogChanged()
-	{
-		button_saveCatalogChanges.setDisable(false);
-		button_resetCatalogChanges.setDisable(false);
-	}
-
-	/**
-	 * Clean saved data arrays and disable access to save\reset button.
-	 * 
-	 */
-	private void cleanSavedDataArray()
-	{
-		button_resetCatalogChanges.setDisable(true);
-		button_saveCatalogChanges.setDisable(true);
-		itemsCatalogAdded.clear();
-		itemsCatalogChanged.clear();
-		itemsCatalogRemoved.clear();
-	}
-
-	/**
-	 * Initialize company catalog values.
-	 *
-	 * @param catalogItems
-	 *            The catalog items.
-	 */
-	private void companyCatalogInit(List<IEntity> catalogItems)
-	{
-		for (IEntity entity : catalogItems) {
-			if (!(entity instanceof Item)) {
-				m_Logger.warning("Received entity not of the type requested.");
-				return;
-			}
-			Item item = (Item) entity;
-			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getType().toString(),
-					item.getPrice(), item.getDomainColor(), item.getImage());
-			catalog.add(itemRow);
-		}
-	}
-
-	/**
-	 * Parse the shop full name to shop ID.
-	 *
-	 * @param shopID
-	 *            The shop full name.
-	 * @return The shop ID.
-	 */
-	private int stringShopIdToInt(String shopID)
-	{
-		shopID = shopID.substring(0, shopID.indexOf(' '));
-		return Integer.parseInt(shopID);
-	}
-
-	/**
 	 * Send get all message to server for all store company.
 	 *
 	 */
@@ -1218,10 +1217,12 @@ public class CompanyEmployeeController extends BaseController
 			} else if (messageData instanceof RespondMessageData) {
 				RespondMessageData respondMessageData = (RespondMessageData) messageData;
 				boolean succeed = respondMessageData.isSucceed();
+				EntityData respondedMessageData = (EntityData) respondMessageData.getMessageData();
 				if (!succeed) {
-					EntityData respondedMessageData = (EntityData) respondMessageData.getMessageData();
 					if (respondedMessageData.getOperation() == EntityDataOperation.GetALL) catalog.clear();
 					errorMSG(respondedMessageData.getOperation().toString() + " Failed!");
+				} else {
+					showInformationMessage("Catalog update successfully!");
 				}
 			}
 		} else if (anchorpane_shopSales.isVisible()) {
@@ -1265,6 +1266,8 @@ public class CompanyEmployeeController extends BaseController
 							shopSales.clear();
 							drawContantToShopSalesTable();
 						}
+					} else {
+						showInformationMessage("Shop sales update successfully!");
 					}
 				}
 			}

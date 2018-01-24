@@ -30,6 +30,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
@@ -409,6 +410,28 @@ public class ShopManagerController extends BaseController
 						showInformationMessage("Client already have subscirption.");
 						return;
 					}
+					String optionalCreditCard = null;
+					if (rowData.getCreditCard() == "None") {
+						TextInputDialog addCreditCard = new TextInputDialog();
+						addCreditCard.setTitle("Add Costumer Credit Card");
+						addCreditCard.setHeaderText("Add credit cart to Costumer ID -> " + rowData.getID());
+						addCreditCard.setContentText("Credit Card Number: ");
+						addCreditCard.contentTextProperty().addListener((obs, oldValue, newValue) -> {
+							if (newValue.length() == 17) addCreditCard.setContentText(oldValue);
+						});
+						// Traditional way to get the response value.
+						Optional<String> result = addCreditCard.showAndWait();
+						if (result.isPresent()) {
+							if (result.get().isEmpty()) {
+								showInformationMessage("Please fill Credit Card filed in order to continue.");
+								return;
+							}
+							optionalCreditCard = result.get();
+						} else {
+							showInformationMessage("Costumer subscription required valid credit card.");
+							return;
+						}
+					}
 					List<String> choices = new ArrayList<>();
 					choices.add("Monthly");
 					choices.add("Yearly");
@@ -421,6 +444,7 @@ public class ShopManagerController extends BaseController
 					Optional<String> result = dialog.showAndWait();
 					if (result.isPresent()) {
 						if (result.get().equals("None")) return;
+						if (optionalCreditCard != null) rowData.setCreditCard(optionalCreditCard);
 						saveShopCostumerSubscription(rowData, result.get());
 					}
 					drewContantToTable();
@@ -632,6 +656,7 @@ public class ShopManagerController extends BaseController
 	private void showRequestedReport(String reportTypeName, BarChart<String, Number> barToChange, String store,
 			String year, String quarter, Report reportData)
 	{
+		if (reportData == null) return;
 		switch (reportTypeName) {
 			case "Financial Incomes Report":
 				showFinancialIncomesOrComplaintsReport("Financial Incomes", barToChange, store, year, quarter,
@@ -1199,6 +1224,8 @@ public class ShopManagerController extends BaseController
 		shopCostumer.setCostumerSubscription(Enum.valueOf(EntitiesEnums.CostumerSubscription.class, newSubscription));
 		shopCostumer.setShopManagerId(m_shopManagerUserID);
 		shopCostumer.setSubscriptionStartDate(currentDate);
+		if (changedShopCostumer.getCreditCard() != "None")
+			shopCostumer.setCreditCard(changedShopCostumer.getCreditCard());
 		Message msg = MessagesFactory.createUpdateEntityMessage(shopCostumer);
 		m_Client.sendMessageToServer(msg);
 	}
