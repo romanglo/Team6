@@ -327,7 +327,7 @@ public class AdministratorController extends BaseController
 		});
 		textField_shopManagerId.textProperty().addListener((observable,oldValue,newValue) ->
 		{
-			if(!newValue.isEmpty() && !(newValue.charAt(newValue.length()-1)>'0'&&newValue.charAt(newValue.length()-1)<'9'))
+			if(!newValue.isEmpty() && !(newValue.charAt(newValue.length()-1)>='0'&&newValue.charAt(newValue.length()-1)<='9'))
 				textField_shopManagerId.setText(oldValue);
 		});
 		
