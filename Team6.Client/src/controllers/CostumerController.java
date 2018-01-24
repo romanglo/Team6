@@ -1,6 +1,8 @@
 
 package controllers;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -204,9 +206,9 @@ public class CostumerController extends BaseController
 	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_complaints_date;
 
 	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_complaints_type;
-	
+
 	@FXML private TextArea textarea_complaint;
-	
+
 	@FXML private TextArea textarea_summary;
 
 	/* End of -> complaints tracker */
@@ -459,6 +461,10 @@ public class CostumerController extends BaseController
 		delivery_address.setDisable(true);
 		delivery_phone.setDisable(true);
 		delivery_name.setDisable(true);
+
+		delivery_address.setText("");
+		delivery_name.setText("");
+		delivery_phone.setText("");
 	}
 
 	/**
@@ -1058,13 +1064,14 @@ public class CostumerController extends BaseController
 				return;
 			}
 
+			DateFormat dateForamt = new SimpleDateFormat("dd/MM/yyyy");
 			Complaint complaint = (Complaint) entity;
 			m_complaintsList.add(complaint);
 			CatalogItemRow catalogItemRow = new CatalogItemRow(complaint.getId(),
-					complaint.getCreationDate().toString(), complaint.isOpened() ? "Open" : "Closed", null, "");
+					dateForamt.format(complaint.getCreationDate()), complaint.isOpened() ? "Open" : "Closed", null, "");
 			complaintsTableList.add(catalogItemRow);
 		}
-		
+
 		initializeComplaintsTable();
 	}
 	// end region -> BaseController Implementation
@@ -1193,7 +1200,7 @@ public class CostumerController extends BaseController
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
 					Complaint selectedComplaint = null;
-					
+
 					for (Complaint complaint : m_complaintsList) {
 						if (complaint.getId() == rowData.getM_id()) {
 							selectedComplaint = complaint;
@@ -1205,7 +1212,7 @@ public class CostumerController extends BaseController
 					}
 					String complaint = selectedComplaint.getComplaint();
 					String summary = selectedComplaint.getSummary();
-					
+
 					textarea_complaint.setText(complaint == null ? "" : complaint);
 					textarea_summary.setText(summary == null ? "" : summary);
 				}
@@ -1355,7 +1362,13 @@ public class CostumerController extends BaseController
 	{
 		m_currScreen = ScreenType.CreditCard;
 
+		credit_card_number.setText("");
+		delivery_address.setText("");
+		delivery_name.setText("");
+		delivery_phone.setText("");
+		blessing_card.setText("");
 		m_useSubscription = false;
+
 		if (Costumer_SavedData.getSubscription() != CostumerSubscription.None) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
 			alert.setTitle("Attention");
@@ -1366,6 +1379,9 @@ public class CostumerController extends BaseController
 			if (m_useSubscription) {
 				credit_card_label.setVisible(false);
 				credit_card_number.setVisible(false);
+			} else {
+				credit_card_label.setVisible(true);
+				credit_card_number.setVisible(true);
 			}
 		}
 
