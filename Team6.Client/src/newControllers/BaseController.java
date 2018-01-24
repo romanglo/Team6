@@ -100,9 +100,9 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	private ToggleButton m_currentPressedButton = null;
 
 	private RadialGradient m_redGradient;
-	
+
 	private RadialGradient m_greenGradient;
-	
+
 	private Tooltip m_connectedToolTip;
 
 	private Tooltip m_disconnectedToolTip;
@@ -187,9 +187,11 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 		double centerX = circle_connection_status.getCenterX();
 		double centerY = circle_connection_status.getCenterY();
 		double radius = circle_connection_status.getRadius();
-		m_redGradient = new RadialGradient(0,.1,centerX,centerY,radius,false,CycleMethod.NO_CYCLE,new Stop(0, Color.ORANGERED),new Stop(1, Color.RED));
-		m_greenGradient =new RadialGradient(0,.1,centerX,centerY,radius,false,CycleMethod.NO_CYCLE,new Stop(0, Color.GREENYELLOW),new Stop(1, Color.GREEN));
-		
+		m_redGradient = new RadialGradient(0, .1, centerX, centerY, radius, false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.ORANGERED), new Stop(1, Color.RED));
+		m_greenGradient = new RadialGradient(0, .1, centerX, centerY, radius, false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.GREENYELLOW), new Stop(1, Color.GREEN));
+
 		m_connectedToolTip = new Tooltip();
 		m_connectedToolTip.setText("Connected to server.");
 		m_disconnectedToolTip = new Tooltip();
@@ -321,6 +323,11 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 			loginStage.setHeight(500);
 			loginStage.setTitle("Zer-Li");
 			loginStage.setResizable(false);
+			InputStream iconResource = getClass().getResourceAsStream("/newBoundaries/images/icon.png");
+			if (iconResource != null) {
+				Image icon = new Image(iconResource);
+				loginStage.getIcons().add(icon);
+			}
 			controller.intializeKeyHandler(scene);
 			loginStage.show();
 		}
@@ -356,6 +363,11 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 			nextStage.initModality(Modality.WINDOW_MODAL);
 			nextStage.initStyle(StageStyle.DECORATED);
 			nextStage.initOwner(currentStage);
+			InputStream iconResource = getClass().getResourceAsStream("/newBoundaries/images/icon.png");
+			if (iconResource != null) {
+				Image icon = new Image(iconResource);
+				nextStage.getIcons().add(icon);
+			}
 			nextStage.showAndWait();
 		}
 		catch (Exception e) {

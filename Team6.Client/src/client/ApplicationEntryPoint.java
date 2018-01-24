@@ -3,6 +3,7 @@ package client;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -23,6 +24,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import logger.LogManager;
 
@@ -206,6 +208,13 @@ public class ApplicationEntryPoint extends Application
 			primaryStage.setTitle("Zer-Li");
 			primaryStage.setResizable(false);
 			controller.intializeKeyHandler(scene);
+			
+			InputStream iconResource = getClass().getResourceAsStream("/newBoundaries/images/icon.png");
+			if (iconResource != null) {
+				Image icon = new Image(iconResource);
+				primaryStage.getIcons().add(icon);
+			}
+			
 			primaryStage.show();
 		}
 		catch (Exception e) {

@@ -165,7 +165,13 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			nextStage.setResizable(false);
 			nextStage.initModality(Modality.WINDOW_MODAL);
 			nextStage.initOwner(currentStage);
+			InputStream iconResource = getClass().getResourceAsStream("/newBoundaries/images/icon.png");
+			if (iconResource != null) {
+				Image icon = new Image(iconResource);
+				nextStage.getIcons().add(icon);
+			}
 			setSettingsAnimation(currentStage, nextStage);
+
 			nextStage.showAndWait();
 		}
 		catch (Exception e) {
@@ -622,6 +628,12 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				nextStage = new Stage();
 				nextStage.setScene(m_nextScene);
 				nextStage.setTitle("Zer-Li");
+				InputStream iconResource = LoginController.this.getClass()
+						.getResourceAsStream("/newBoundaries/images/icon.png");
+				if (iconResource != null) {
+					Image icon = new Image(iconResource);
+					nextStage.getIcons().add(icon);
+				}
 				if (m_baseController != null) {
 					nextStage.setOnHidden(e -> m_baseController.dispose());
 				}
