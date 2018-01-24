@@ -123,7 +123,7 @@ public class AdministratorController extends BaseController
 	{
 		ArrayList<String> al = new ArrayList<String>();
 		al.add("Blocked");
-		al.add("Actived");
+		al.add("Activated");
 		list = FXCollections.observableArrayList(al);
 		comboBox_status.setItems(list);
 		comboBox_status.setVisible(false);
@@ -234,25 +234,25 @@ public class AdministratorController extends BaseController
 		}
 
 		String privilege = comboBox_privillge.getValue().toString();
-		if(privilege=="administrator")
+		if(privilege=="Administrator")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.Administrator);
-		else if(privilege=="costumer")
+		else if(privilege=="Costumer")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.Costumer);
-		else if(privilege=="shop employee")
+		else if(privilege=="Shop employee")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ShopEmployee);
-		else if(privilege=="chain manager")
+		else if(privilege=="Chain manager")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ChainManager);
-		else if(privilege=="shop manager"||privilege=="ShopManager")
+		else if(privilege=="Shop manager"||privilege=="ShopManager")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ShopManager);
-		else if(privilege=="service specialist")
+		else if(privilege=="Service specialist")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.ServiceSpecialist);
-		else if(privilege=="company employee")
+		else if(privilege=="Company employee")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.CompanyEmployee);
-		else if(privilege=="costumer service")
+		else if(privilege=="Costumer service")
 			selected_user.setPrivilege(EntitiesEnums.UserPrivilege.CostumerService);	
 		
 		String status = comboBox_status.getValue().toString();
-		if(status.equals("Actived")) {
+		if(status.equals("Activated")) {
 			if(selected_user.getStatus().equals(EntitiesEnums.UserStatus.Blocked))
 			selected_user.setStatus(EntitiesEnums.UserStatus.Disconnected);
 		}
@@ -277,7 +277,7 @@ public class AdministratorController extends BaseController
 		}
 		comboBox_privillge.setValue((selected_user.getPrivilege().toString()));
 		if(selected_user.getStatus().equals(EntitiesEnums.UserStatus.Connected)||selected_user.getStatus().equals(EntitiesEnums.UserStatus.Disconnected))
-			comboBox_status.setValue("Actived");
+			comboBox_status.setValue("Activated");
 		else
 			comboBox_status.setValue("Blocked");
 		comboBox_status.setVisible(true);
