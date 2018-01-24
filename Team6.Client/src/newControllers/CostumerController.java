@@ -13,8 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.event.ChangeEvent;
 
-import boundaries.CatalogItemRow;
-import controllers.Costumer_SavedData;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -41,6 +39,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.StringConverter;
+import newBoundaries.CatalogItemRow;
 import newEntities.Complaint;
 import newEntities.Costumer;
 import newEntities.EntitiesEnums.CostumerSubscription;

@@ -25,7 +25,6 @@ import newEntities.IEntity;
 import newEntities.Item;
 import newEntities.ItemInShop;
 import newEntities.ShopManager;
-import boundaries.CatalogItemRow;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -49,6 +48,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import newBoundaries.CatalogItemRow;
 
 /**
  * CompanyEmployeeController : Managed the Company Employee UI.

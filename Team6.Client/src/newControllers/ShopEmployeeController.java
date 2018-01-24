@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import boundaries.CatalogItemRow;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -25,6 +24,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import newBoundaries.CatalogItemRow;
 import newEntities.EntitiesEnums;
 import newEntities.IEntity;
 import newEntities.Reservation;
