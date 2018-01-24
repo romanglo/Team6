@@ -24,11 +24,11 @@
 			height="344.0" stroke="TEAL" strokeType="INSIDE" strokeWidth="3"
 			width="290.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0"
 			AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-		<VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="14.0"
+		<VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="16.0"
 			prefHeight="336.0" prefWidth="281.0">
 			<children>
 				<ImageView fx:id="imageview_user" fitHeight="150.0"
-					fitWidth="150.0" preserveRatio="true">
+					fitWidth="150.0">
 					<VBox.margin>
 						<Insets bottom="10.0" />
 					</VBox.margin>

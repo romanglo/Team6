@@ -3,6 +3,7 @@ package controllers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,6 +27,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Tooltip;
@@ -302,6 +304,12 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	@FXML
 	private void onLogoutButtonPressed(ActionEvent event)
 	{
+		Alert alert = new AlertBuilder().setAlertType(AlertType.CONFIRMATION)
+				.setContentText("Do you really want to log out?").build();
+		Optional<ButtonType> confirmationResult = alert.showAndWait();
+		if (confirmationResult.get() != ButtonType.OK) {
+			return;
+		}
 		try {
 			if (m_ConnectedUser != null) {
 				Message logoutMessage = MessagesFactory.createLogoutMessage(m_ConnectedUser.getUserName(),
@@ -442,7 +450,6 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	 */
 	public final void dispose()
 	{
-
 		try {
 			if (m_timer != null) {
 				m_timer.cancel();
