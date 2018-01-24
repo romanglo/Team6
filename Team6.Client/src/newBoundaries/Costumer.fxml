@@ -352,21 +352,34 @@
 							AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
 							AnchorPane.topAnchor="0.0">
 							<children>
-								<TableView fx:id="reservation_table" editable="true"
+								<TableView fx:id="complaints_table" editable="true"
 									layoutX="-7.0" layoutY="35.0" prefHeight="150.0" prefWidth="500.0"
 									AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
-									AnchorPane.topAnchor="35.0">
+									AnchorPane.topAnchor="20.0">
 									<columns>
-										<TableColumn fx:id="tablecolumn_reservation_id"
+										<TableColumn fx:id="tablecolumn_complaints_id"
 											editable="false" minWidth="50.0" prefWidth="50.0" resizable="false"
 											sortable="false" text="ID" />
-										<TableColumn fx:id="tablecolumn_reservation_price"
+										<TableColumn fx:id="tablecolumn_complaints_date"
 											editable="false" minWidth="290.0" prefWidth="290" resizable="false"
-											sortable="false" text="Price" />
-										<TableColumn fx:id="tablecolumn_reservation_type"
+											sortable="false" text="Open Date" />
+										<TableColumn fx:id="tablecolumn_complaints_type"
 											prefWidth="300" resizable="false" sortable="false" text="Status" />
 									</columns>
 								</TableView>
+								<VBox prefHeight="80.0" AnchorPane.leftAnchor="5.0"
+									AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="180.0">
+									<Label prefHeight="17.0" prefWidth="180.0" text="Costumer complaint:" />
+									<TextArea fx:id="textarea_complaint" editable="false"
+										layoutY="117.0" prefWidth="295.0" />
+								</VBox>
+								<VBox prefHeight="80.0" prefWidth="534.0"
+									AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+									AnchorPane.topAnchor="270.0">
+									<Label prefHeight="17.0" prefWidth="167.0" text="Complaint summary:" />
+									<TextArea fx:id="textarea_summary" prefWidth="325.0"
+										editable="false" />
+								</VBox>
 							</children>
 						</AnchorPane>
 					</children>

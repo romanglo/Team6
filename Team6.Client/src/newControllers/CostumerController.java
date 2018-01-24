@@ -200,13 +200,17 @@ public class CostumerController extends BaseController
 
 	@FXML private AnchorPane anchorpane_complaints_display;
 
-	@FXML private TableView<CatalogItemRow> compaints_table;
+	@FXML private TableView<CatalogItemRow> complaints_table;
 
-	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_compaints_id;
+	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_complaints_id;
 
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_compaints_date;
+	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_complaints_date;
 
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_compaints_type;
+	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_complaints_type;
+	
+	@FXML private TextArea textarea_complaint;
+	
+	@FXML private TextArea textarea_summary;
 
 	/* End of -> complaints tracker */
 
@@ -663,7 +667,7 @@ public class CostumerController extends BaseController
 				initializeCatalog();
 				anchorpane_create_reservation.setVisible(true);
 				anchorpane_cancel_reservation.setVisible(false);
-				anchorpane_complaints_display.setVisible(false);
+				anchorpane_complaints.setVisible(false);
 				anchorpane_catalog.setVisible(true);
 				anchorpane_costumized.setVisible(false);
 				anchorpane_credit_card.setVisible(false);
@@ -674,7 +678,7 @@ public class CostumerController extends BaseController
 				initializeReservations();
 				anchorpane_create_reservation.setVisible(false);
 				anchorpane_cancel_reservation.setVisible(true);
-				anchorpane_complaints_display.setVisible(false);
+				anchorpane_complaints.setVisible(false);
 				anchorpane_cancel.setVisible(false);
 				anchorpane_reservations.setVisible(true);
 			break;
@@ -684,7 +688,7 @@ public class CostumerController extends BaseController
 				anchorpane_create_reservation.setVisible(false);
 				anchorpane_cancel_reservation.setVisible(false);
 				anchorpane_complaints_display.setVisible(true);
-			/* TODO Yoni: Add visibility for new anchor. */
+				anchorpane_complaints.setVisible(true);
 			break;
 
 			default:
@@ -1186,12 +1190,12 @@ public class CostumerController extends BaseController
 	 */
 	private void initializeComplaintsTable()
 	{
-		compaints_table.setRowFactory(param -> {
+		complaints_table.setRowFactory(param -> {
 			TableRow<CatalogItemRow> tableRow = new TableRow<>();
 			tableRow.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
 					CatalogItemRow rowData = tableRow.getItem();
-					Complaint selectedComplaint;
+					Complaint selectedComplaint = null;
 					
 					for (Complaint complaint : m_complaintsList) {
 						if (complaint.getId() == rowData.getM_id()) {
@@ -1199,20 +1203,26 @@ public class CostumerController extends BaseController
 							break;
 						}
 					}
+					if (selectedComplaint == null) {
+						return;
+					}
+					String complaint = selectedComplaint.getComplaint();
+					String summary = selectedComplaint.getSummary();
 					
-					/* TODO Yoni: Update Screen. */
+					textarea_complaint.setText(complaint == null ? "" : complaint);
+					textarea_summary.setText(summary == null ? "" : summary);
 				}
 			});
 			return tableRow;
 		});
 
-		tablecolumn_compaints_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
-		tablecolumn_compaints_date.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
-		tablecolumn_compaints_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
+		tablecolumn_complaints_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
+		tablecolumn_complaints_date.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
+		tablecolumn_complaints_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
 
 		Platform.runLater(() -> {
-			reservation_table.setItems(complaintsTableList);
-			reservation_table.refresh();
+			complaints_table.setItems(complaintsTableList);
+			complaints_table.refresh();
 		});
 	}
 
