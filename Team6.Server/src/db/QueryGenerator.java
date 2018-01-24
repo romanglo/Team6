@@ -252,7 +252,7 @@ public class QueryGenerator {
 			return selectAllItemQuery();
 		}
 		if (entityType.equals(Reservation.class)) {
-			return selectAllReservationQuery();
+			return selectAllReservationQuery((Reservation) entity);
 		}
 		if (entityType.equals(Complaint.class)) {
 			return selectAllComplaintQuery((Complaint) entity);
@@ -618,7 +618,19 @@ public class QueryGenerator {
 		return "SELECT * FROM reservations WHERE rId = " + id + ';';
 	}
 
-	private static String selectAllReservationQuery() {
+	private static String selectAllReservationQuery(Reservation reservation) {
+		int costumerId = reservation.getCostumerId();
+		int shopManagerId = reservation.getShopManagerId();
+
+		if (costumerId > 0 && shopManagerId > 0) {
+			return "SELECT * FROM reservations cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
+		}
+		if (costumerId > 0) {
+			return "SELECT * FROM reservations cId = " + costumerId + " ;";
+		}
+		if (shopManagerId > 0) {
+			return "SELECT * FROM reservations smId = " + shopManagerId + " ;";
+		}
 		return "SELECT * FROM reservations ;";
 
 	}
