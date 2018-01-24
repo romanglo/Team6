@@ -31,7 +31,6 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
@@ -429,7 +428,7 @@ public class ShopManagerController extends BaseController
 							if (optionalCreditCard.length() > 16)
 								optionalCreditCard = optionalCreditCard.substring(0, 16);
 						} else {
-							showAlertMessage("Costumer subscription required valid credit card.",AlertType.WARNING);
+							showAlertMessage("Costumer subscription required valid credit card.", AlertType.WARNING);
 							return;
 						}
 						System.out.println(optionalCreditCard);
@@ -991,20 +990,6 @@ public class ShopManagerController extends BaseController
 	}
 
 	/**
-	 * Create error window for user.
-	 * 
-	 */
-	private void errorMSG(String errorType)
-	{
-		Platform.runLater(() -> {
-			Alert errorMessage = new Alert(AlertType.ERROR);
-			errorMessage.setTitle("Error Message");
-			errorMessage.setContentText(errorType);
-			errorMessage.show();
-		});
-	}
-
-	/**
 	 * Parse string to the month number.
 	 * 
 	 * @param monthString
@@ -1073,19 +1058,19 @@ public class ShopManagerController extends BaseController
 			costumerId = Integer.parseInt(textField_addShopCostumer.getText());
 		}
 		catch (Exception ex) {
-			errorMSG("Invalid ID!");
+			showAlertMessage("Invalid ID!", AlertType.ERROR);
 			textField_addShopCostumer.clear();
 			textFiled_costumerDetails.clear();
 			return;
 		}
 		if ((costumerIndexInArray = checkIfCostumerExist(costumerId)) == -1) {
-			errorMSG("Costumer doesn't exist in the system.");
+			showAlertMessage("Costumer doesn't exist in the system.", AlertType.ERROR);
 			textField_addShopCostumer.clear();
 			textFiled_costumerDetails.clear();
 			return;
 		}
 		if (checkIfShopCostumerAlreadyExist(costumerId)) {
-			showAlertMessage("Costumer already sign up!",AlertType.INFORMATION);
+			showAlertMessage("Costumer already sign up!", AlertType.INFORMATION);
 			textField_addShopCostumer.clear();
 			textFiled_costumerDetails.clear();
 			return;
@@ -1106,7 +1091,7 @@ public class ShopManagerController extends BaseController
 		int costumerId;
 		String costumerDetails = textFiled_costumerDetails.getText();
 		if (costumerDetails.isEmpty()) {
-			errorMSG("Enter Costumer ID!");
+			showAlertMessage("Enter Costumer ID!", AlertType.ERROR);
 			return;
 		}
 		costumerDetails = costumerDetails.substring(costumerDetails.indexOf(":") + 2, costumerDetails.indexOf(",") - 1);
@@ -1338,20 +1323,25 @@ public class ShopManagerController extends BaseController
 				Calendar year = Calendar.getInstance();
 				year.setTime(report.getYear());
 				if (regularReport) {
-					if (entity instanceof IncomesReport) m_incomesReport = (IncomesReport) entity;
-					else if (entity instanceof ReservationsReport) m_reservationsReport = (ReservationsReport) entity;
-					else if (entity instanceof ComplaintsReport) m_complaintsReport = (ComplaintsReport) entity;
-					else {
+					if (entity instanceof IncomesReport) {
+						m_incomesReport = (IncomesReport) entity;
+					} else if (entity instanceof ReservationsReport) {
+						m_reservationsReport = (ReservationsReport) entity;
+					} else if (entity instanceof ComplaintsReport) {
+						m_complaintsReport = (ComplaintsReport) entity;
+					} else {
 						m_surveyReport = (SurveysReport) entity;
 						Platform.runLater(
 								() -> reportToShow(comboBox_selectionReportType.getValue(), "Regular Report"));
 					}
 				} else {
-					if (entity instanceof IncomesReport) m_compareIncomesReport = (IncomesReport) entity;
-					else if (entity instanceof ReservationsReport)
+					if (entity instanceof IncomesReport) {
+						m_compareIncomesReport = (IncomesReport) entity;
+					} else if (entity instanceof ReservationsReport) {
 						m_compareReservationsReport = (ReservationsReport) entity;
-					else if (entity instanceof ComplaintsReport) m_compareComplaintsReport = (ComplaintsReport) entity;
-					else {
+					} else if (entity instanceof ComplaintsReport) {
+						m_compareComplaintsReport = (ComplaintsReport) entity;
+					} else {
 						m_compareSurveyReport = (SurveysReport) entity;
 						Platform.runLater(() -> reportToShow(secondReportType.getText(), "Compare Report"));
 					}
@@ -1430,7 +1420,7 @@ public class ShopManagerController extends BaseController
 						else {
 							m_surveyReport = null;
 							if (m_shopManagerUserID != null) {
-								showAlertMessage("No report for current shop.",AlertType.INFORMATION);
+								showAlertMessage("No report for current shop.", AlertType.INFORMATION);
 							} else {
 								String title = barChart_currentChart.getTitle();
 								final String shop = getShopName(comboBox_selectionStore.getValue());
@@ -1445,17 +1435,23 @@ public class ShopManagerController extends BaseController
 										barChart_currentChart.setTitle(reportType + shop + " Report");
 									}
 								});
-								if (!firstTime) errorMSG("There are no reports for:\n" + shop + " Store, "
-										+ comboBox_selectionQuarter.getValue() + " Quarter in "
-										+ spinner_selectionYear.getValue());
-								else firstTime = false;
+								if (!firstTime) {
+									showAlertMessage("There are no reports for:\n" + shop + " Store, "
+											+ comboBox_selectionQuarter.getValue() + " Quarter in "
+											+ spinner_selectionYear.getValue(), AlertType.ERROR);
+								} else {
+									firstTime = false;
+								}
 							}
 						}
 					} else {
-						if (entity instanceof IncomesReport) m_compareIncomesReport = null;
-						else if (entity instanceof ReservationsReport) m_compareReservationsReport = null;
-						else if (entity instanceof ComplaintsReport) m_compareComplaintsReport = null;
-						else {
+						if (entity instanceof IncomesReport) {
+							m_compareIncomesReport = null;
+						} else if (entity instanceof ReservationsReport) {
+							m_compareReservationsReport = null;
+						} else if (entity instanceof ComplaintsReport) {
+							m_compareComplaintsReport = null;
+						} else {
 							m_compareSurveyReport = null;
 							String title = compareChart.getTitle();
 							final String shop = getShopName(secondReportStore.getValue());
@@ -1469,18 +1465,19 @@ public class ShopManagerController extends BaseController
 									compareChart.setTitle(reportType + shop + " Report");
 								}
 							});
-							errorMSG("There are no reports for:\n" + shop + " Store, " + secondReportQuarter.getValue()
-									+ " Quarter in " + secondReportYear.getValue());
+							showAlertMessage("There are no reports for:\n" + shop + " Store, "
+									+ secondReportQuarter.getValue() + " Quarter in " + secondReportYear.getValue(),
+									AlertType.ERROR);
 						}
 					}
 				}
 			} else {
 				if (m_shopManagerUserID != null && anchorpane_shopCostumerManagement.isVisible()) {
 					if (msgData.getOperation() == EntityDataOperation.Update) {
-						showAlertMessage("Successfull Update.",AlertType.INFORMATION);
+						showAlertMessage("Successfull Update.", AlertType.INFORMATION);
 						updateTable((ShopCostumer) entity);
 					} else if (msgData.getOperation() == EntityDataOperation.Add) {
-						showAlertMessage("Successfull New Costumer Add.",AlertType.INFORMATION);
+						showAlertMessage("Successfull New Costumer Add.", AlertType.INFORMATION);
 						ShopCostumer shopCostumer = (ShopCostumer) entity;
 						ShopCostumerRow shopCostumerRow = costumerRowInit(shopCostumer);
 						costumerInShop.add(shopCostumerRow);

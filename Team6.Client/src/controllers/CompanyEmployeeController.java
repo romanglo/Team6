@@ -28,7 +28,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -202,7 +201,7 @@ public class CompanyEmployeeController extends BaseController
 							case "Price":
 								Float price = Float.parseFloat(resultString);
 								if (price <= 0) {
-									errorMSG("The price you entered lower then 0");
+									showAlertMessage("The price you entered lower then 0",AlertType.ERROR);
 									return;
 								} else {
 									rowData.setM_price(price);
@@ -322,11 +321,11 @@ public class CompanyEmployeeController extends BaseController
 						discountedPrice = Float.parseFloat(resultString);
 					}
 					catch (Exception e) {
-						errorMSG("Invalid discounted price!");
+						showAlertMessage("Invalid discounted price!",AlertType.ERROR);
 						return;
 					}
 					if (discountedPrice <= 0) {
-						errorMSG("The price you entered lower then 0");
+						showAlertMessage("The price you entered lower then 0",AlertType.ERROR);
 						return;
 					} else {
 						rowData.setM_price(discountedPrice);
@@ -477,11 +476,11 @@ public class CompanyEmployeeController extends BaseController
 		inputedDiscountedPrice = discountedPrice.getText();
 
 		if (inputedID == null || inputedDiscountedPrice == null) {
-			errorMSG("One or more fields are empty");
+			showAlertMessage("One or more fields are empty",AlertType.ERROR);
 			return false;
 		}
 		if (inputedID.isEmpty() || inputedDiscountedPrice.isEmpty()) {
-			errorMSG("One or more fields are empty");
+			showAlertMessage("One or more fields are empty",AlertType.ERROR);
 			return false;
 		}
 
@@ -492,24 +491,24 @@ public class CompanyEmployeeController extends BaseController
 			newPrice = Float.parseFloat(inputedDiscountedPrice);
 		}
 		catch (Exception ex) {
-			errorMSG("Invalid input!");
+			showAlertMessage("Invalid input!",AlertType.ERROR);
 			return false;
 		}
 
 		if (itemID <= 0) {
-			errorMSG("The ID you entered lower then 0");
+			showAlertMessage("The ID you entered lower then 0",AlertType.ERROR);
 			return false;
 		}
 
 		for (CatalogItemRow item : shopSales) {
 			if (item.getM_id() == itemID) {
-				errorMSG("Item discount already exist!");
+				showAlertMessage("Item discount already exist!",AlertType.WARNING);
 				return false;
 			}
 		}
 
 		if (newPrice <= 0) {
-			errorMSG("The price you entered lower then 0");
+			showAlertMessage("The price you entered lower then 0",AlertType.ERROR);
 			return false;
 		}
 		return true;
@@ -527,7 +526,7 @@ public class CompanyEmployeeController extends BaseController
 	{
 		for (CatalogItemRow item : catalog)
 			if (itemID.equals(item.getId())) return true;
-		errorMSG("Item ID doesn't exist in catalog!");
+		showAlertMessage("Item ID doesn't exist in catalog!",AlertType.WARNING);
 		return false;
 	}
 
@@ -578,22 +577,6 @@ public class CompanyEmployeeController extends BaseController
 		salesAdded.clear();
 		salesChanged.clear();
 		salesRemoved.clear();
-	}
-
-	/**
-	 * Create error window for user.
-	 *
-	 * @param errorType
-	 *            The error.
-	 */
-	private void errorMSG(String errorType)
-	{
-		Platform.runLater(() -> {
-			Alert errorMessage = new Alert(AlertType.ERROR);
-			errorMessage.setTitle("Error Message");
-			errorMessage.setContentText(errorType);
-			errorMessage.show();
-		});
 	}
 
 	/**
@@ -706,13 +689,13 @@ public class CompanyEmployeeController extends BaseController
 		String resultString = result.get();
 
 		if (resultString == null || resultString.isEmpty()) {
-			errorMSG("Invalid Input");
+			showAlertMessage("Invalid Input",AlertType.ERROR);
 			return;
 		}
 
 		Integer idToRemove = Integer.parseInt(resultString);
 		if (idToRemove <= 0) {
-			errorMSG("Invalid ID");
+			showAlertMessage("Invalid ID",AlertType.ERROR);
 			return;
 		}
 
@@ -736,7 +719,7 @@ public class CompanyEmployeeController extends BaseController
 				return;
 			}
 		}
-		errorMSG("Item ID doesn't exist");
+		showAlertMessage("Item ID doesn't exist",AlertType.ERROR);
 	}
 
 	/**
@@ -813,17 +796,17 @@ public class CompanyEmployeeController extends BaseController
 							if (!((textFieldPrice.getText()).isEmpty())) {
 								Float floatPrice = Float.parseFloat(textFieldPrice.getText());
 								if (floatPrice <= 0) {
-									errorMSG("The entered price lower than 0!");
+									showAlertMessage("The entered price lower than 0!",AlertType.ERROR);
 									return null;
 								}
 
 							}
 						}
 						catch (Exception ex) {
-							errorMSG("Invalid price!");
+							showAlertMessage("Invalid price!",AlertType.ERROR);
 							return null;
 						}
-						errorMSG("One or more of fields is empty!");
+						showAlertMessage("One or more of fields is empty!",AlertType.ERROR);
 						return null;
 					}
 					CatalogItemRow newItem;
@@ -963,13 +946,13 @@ public class CompanyEmployeeController extends BaseController
 		String resultString = result.get();
 
 		if (resultString == null || resultString.isEmpty()) {
-			errorMSG("Invalid Input");
+			showAlertMessage("Invalid Input",AlertType.ERROR);
 			return;
 		}
 
 		Integer idToRemove = Integer.parseInt(resultString);
 		if (idToRemove <= 0) {
-			errorMSG("Invalid ID");
+			showAlertMessage("Invalid ID",AlertType.ERROR);
 			return;
 		}
 
@@ -990,7 +973,7 @@ public class CompanyEmployeeController extends BaseController
 				return;
 			}
 		}
-		errorMSG("Item ID doesn't exist");
+		showAlertMessage("Item ID doesn't exist",AlertType.ERROR);
 	}
 
 	/**
@@ -1224,7 +1207,7 @@ public class CompanyEmployeeController extends BaseController
 				}
 				if (!succeed) {
 					if (operation == EntityDataOperation.GetALL) catalog.clear();
-					errorMSG(operation.toString() + " Failed!");
+					showAlertMessage(operation.toString() + " Failed!",AlertType.ERROR);
 				} else {
 					showAlertMessage("Catalog update successfully!", AlertType.INFORMATION);
 				}
