@@ -50,10 +50,12 @@
 	<center>
 		<AnchorPane BorderPane.alignment="TOP_LEFT">
 			<children>
-				<AnchorPane fx:id="anchorpane_welcome">
+				<AnchorPane fx:id="anchorpane_welcome"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0"
+					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
 					<ImageView fx:id="imageview_welcome" fitHeight="300"
 						pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0"
-						AnchorPane.leftAnchor="210.0" AnchorPane.rightAnchor="0.0" />
+						AnchorPane.rightAnchor="0.0" />
 					<VBox styleClass="content-section-label"
 						AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
 						<Label text="Welcome">
@@ -145,14 +147,17 @@
 							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="20.0">
 							<columns>
 								<TableColumn fx:id="tablecolumn_reservation_id"
-									editable="false" minWidth="50.0" prefWidth="50.0" resizable="false"
-									sortable="false" text="ID" />
+									editable="false" minWidth="50.0" prefWidth="60.0" sortable="false"
+									text="ID" />
 								<TableColumn fx:id="tablecolumn_reservation_price"
-									editable="false" minWidth="290.0" prefWidth="290" resizable="false"
-									sortable="false" text="Price" />
+									editable="false" minWidth="290.0" prefWidth="290" sortable="false"
+									text="Price" />
 								<TableColumn fx:id="tablecolumn_reservation_type"
-									prefWidth="300" resizable="false" sortable="false" text="Status" />
+									minWidth="100" prefWidth="300" sortable="false" text="Status" />
 							</columns>
+							<columnResizePolicy>
+								<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+							</columnResizePolicy>
 						</TableView>
 					</children>
 				</AnchorPane>

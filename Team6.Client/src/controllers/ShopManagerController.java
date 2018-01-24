@@ -315,8 +315,7 @@ public class ShopManagerController extends BaseController
 
 		secondReportQuarter.setPrefWidth(93);
 		secondReportYear.setPrefWidth(69);
-		secondReportType.setPrefWidth(80);
-		secondReportType.setPrefWidth(175);
+		secondReportType.setPrefWidth(178);
 		secondReportStore.setPrefWidth(120);
 		secondSubmitButton.setPrefWidth(100);
 		secondSubmitButton.setPrefHeight(25);
@@ -343,11 +342,11 @@ public class ShopManagerController extends BaseController
 
 		anchorPane_viewStage.getChildren().addAll(secondReportQuarter, secondReportYear, secondReportType,
 				secondReportStore, secondSubmitButton);
-		AnchorPane.setTopAnchor(((Node) secondReportQuarter), 50.0);
-		AnchorPane.setTopAnchor(((Node) secondReportYear), 50.0);
-		AnchorPane.setTopAnchor(((Node) secondReportType), 50.0);
-		AnchorPane.setTopAnchor(((Node) secondReportStore), 50.0);
-		AnchorPane.setTopAnchor(((Node) secondSubmitButton), 50.0);
+		AnchorPane.setTopAnchor(((Node) secondReportQuarter), 55.0);
+		AnchorPane.setTopAnchor(((Node) secondReportYear), 55.0);
+		AnchorPane.setTopAnchor(((Node) secondReportType), 55.0);
+		AnchorPane.setTopAnchor(((Node) secondReportStore), 55.0);
+		AnchorPane.setTopAnchor(((Node) secondSubmitButton), 52.0);
 		AnchorPane.setLeftAnchor(((Node) secondReportQuarter), 12.0);
 		AnchorPane.setLeftAnchor(((Node) secondReportYear), 112.0);
 		AnchorPane.setLeftAnchor(((Node) secondReportType), 187.0);
@@ -415,11 +414,9 @@ public class ShopManagerController extends BaseController
 					if (rowData.getCreditCard() == "None") {
 						TextInputDialog addCreditCard = new TextInputDialog();
 						addCreditCard.setTitle("Add Costumer Credit Card");
-						addCreditCard.setHeaderText("Add credit card to Costumer ID -> " + rowData.getShopCostumerID());
+						addCreditCard.setHeaderText("Add credit card to Costumer ID -> " + rowData.getShopCostumerID()
+								+ "\nThe first 16th charters saves.");
 						addCreditCard.setContentText("Credit Card Number: ");
-						addCreditCard.contentTextProperty().addListener((obs, oldValue, newValue) -> {
-							if (newValue.length() == 17) addCreditCard.setContentText(oldValue);
-						});
 						// Traditional way to get the response value.
 						Optional<String> result = addCreditCard.showAndWait();
 						if (result.isPresent()) {
@@ -428,10 +425,13 @@ public class ShopManagerController extends BaseController
 								return;
 							}
 							optionalCreditCard = result.get();
+							if (optionalCreditCard.length() > 16)
+								optionalCreditCard = optionalCreditCard.substring(0, 16);
 						} else {
 							showInformationMessage("Costumer subscription required valid credit card.");
 							return;
 						}
+						System.out.println(optionalCreditCard);
 					}
 					List<String> choices = new ArrayList<>();
 					choices.add("Monthly");
@@ -454,11 +454,12 @@ public class ShopManagerController extends BaseController
 			return tableRow;
 		});
 
-		tableColumn_shopCostumerID.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, Integer>("ID"));
+		tableColumn_shopCostumerID
+				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, Integer>("ShopCostumerID"));
 		tableColumn_shopCostumerSubscription
-				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, String>("Subscription"));
+				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, String>("ShopCostumerSubscription"));
 		tableColumn_shopCostumerSubscriptionStartDate
-				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, Date>("StartDate"));
+				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, Date>("SubscriptionStartDate"));
 		tableColumn_shopCostumerCreditCard
 				.setCellValueFactory(new PropertyValueFactory<ShopCostumerRow, String>("CreditCard"));
 		tableColumn_shopCostumerCumulativePrice
@@ -533,7 +534,7 @@ public class ShopManagerController extends BaseController
 	private void compareReportsNewStage()
 	{
 		AnchorPane.setRightAnchor(((Node) pane_dataPane), 380.0);
-		AnchorPane.setTopAnchor(((Node) pane_dataPane), 75.0);
+		AnchorPane.setTopAnchor(((Node) pane_dataPane), 80.0);
 
 		CategoryAxis xAxis = new CategoryAxis();
 		NumberAxis yAxis = new NumberAxis();
@@ -928,11 +929,12 @@ public class ShopManagerController extends BaseController
 	 */
 	private void reprotStageChange(boolean isOn)
 	{
+		Stage primaryStage = (Stage) button_submit.getScene().getWindow();
 		if (isOn) {
-			Stage primaryStage = (Stage) button_submit.getScene().getWindow();
 			Platform.runLater(() -> {
-				primaryStage.setMinWidth(885);
-				primaryStage.setMinHeight(600);
+				primaryStage.setMinWidth(1100);
+				primaryStage.setMinHeight(700);
+				primaryStage.centerOnScreen();
 			});
 			compareReportsNewStage();
 			secondReportQuarter.setVisible(true);
@@ -941,6 +943,10 @@ public class ShopManagerController extends BaseController
 			secondReportYear.setVisible(true);
 			secondSubmitButton.setVisible(true);
 		} else {
+			Platform.runLater(() -> {
+				primaryStage.setMinWidth(875);
+				primaryStage.setMinHeight(600);
+			});
 			secondReportQuarter.setVisible(false);
 			secondReportStore.setVisible(false);
 			secondReportType.setVisible(false);

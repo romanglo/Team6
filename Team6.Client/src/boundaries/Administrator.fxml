@@ -48,10 +48,12 @@
 	<center>
 		<AnchorPane BorderPane.alignment="TOP_LEFT">
 			<children>
-				<AnchorPane fx:id="anchorpane_welcome">
+				<AnchorPane fx:id="anchorpane_welcome"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0"
+					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
 					<ImageView fx:id="imageview_welcome" fitHeight="300"
 						pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0"
-						AnchorPane.leftAnchor="210.0" AnchorPane.rightAnchor="0.0" />
+						AnchorPane.rightAnchor="0.0" />
 					<VBox styleClass="content-section-label"
 						AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
 						<Label text="Welcome">
