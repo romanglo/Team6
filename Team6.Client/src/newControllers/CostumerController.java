@@ -11,11 +11,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import com.sun.xml.internal.ws.util.StringUtils;
+import javax.swing.event.ChangeEvent;
 
 import boundaries.CatalogItemRow;
 import controllers.Costumer_SavedData;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -60,13 +62,15 @@ import newMessages.RespondMessageData;
 
 /**
  *
- * CostumerController: Manage the costumer functionalities.
- * 
+ * CostumerController: Manage the costumer UI functionalities.
  * 
  */
 public class CostumerController extends BaseController
 {
 
+	/**
+	 * ScreenType: Screen display enumeration.
+	 */
 	private enum ScreenType {
 		None, Catalog, Costumized, Payment, CreditCard, Reservations, Cancel
 	}
@@ -233,8 +237,14 @@ public class CostumerController extends BaseController
 
 	// region Events listeners
 
+	/**
+	 * Listener method to change the screen to customized item screen.
+	 * 
+	 * @param costumizedEvent
+	 *            Action event of the button click.
+	 */
 	@FXML
-	private void costumizedButtonClickOnCatalogType(ActionEvent costumizedEvent)
+	private void costumizedItemScreen(ActionEvent costumizedEvent)
 	{
 		anchorpane_catalog.setVisible(false);
 		anchorpane_costumized.setVisible(true);
@@ -244,8 +254,14 @@ public class CostumerController extends BaseController
 		initializeCostumized();
 	}
 
+	/**
+	 * Listener method to change the screen to catalog screen.
+	 *
+	 * @param catalogEvent
+	 *            Action event of the button click.
+	 */
 	@FXML
-	private void catalogButtonClickOnCustomizedType(ActionEvent costumizedEvent)
+	private void catalogScreen(ActionEvent catalogEvent)
 	{
 		anchorpane_catalog.setVisible(true);
 		anchorpane_costumized.setVisible(false);
@@ -255,8 +271,14 @@ public class CostumerController extends BaseController
 		initializeCatalog();
 	}
 
+	/**
+	 * Listener method to change the screen to reservation list screen.
+	 *
+	 * @param paymentEvent
+	 *            Action event of the button click.
+	 */
 	@FXML
-	private void paymentButtonClick(ActionEvent paymentEvent)
+	private void paymentScreen(ActionEvent paymentEvent)
 	{
 		anchorpane_catalog.setVisible(false);
 		anchorpane_costumized.setVisible(false);
@@ -266,8 +288,14 @@ public class CostumerController extends BaseController
 		initializePayment();
 	}
 
+	/**
+	 * Listener method to change the screen to payment screen.
+	 *
+	 * @param paymentEvent
+	 *            Action event of the button click.
+	 */
 	@FXML
-	private void paymentButtonClickPaymentType(ActionEvent paymentEvent)
+	private void creditCardScreen(ActionEvent paymentEvent)
 	{
 		if (Costumer_SavedData.getCostumerReservationList().isEmpty()) {
 			Alert alert = new Alert(AlertType.INFORMATION);
@@ -340,15 +368,27 @@ public class CostumerController extends BaseController
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
+	/**
+	 * Method that updates the saved data of the costumer in order to save the
+	 * reservation details.
+	 */
 	private void updateFieldsWithData()
 	{
 		Costumer_SavedData.setCreditCard(m_useSubscription ? "" : credit_card_number.getText());
 		Costumer_SavedData.setBalance(Costumer_SavedData.getCostumerBalance() - m_discount);
-		Costumer_SavedData.setTotalPrice(Float.parseFloat(total_price_label.getText()));
+
 		float cumulativePrice = Costumer_SavedData.getCumulativePrice();
 		Costumer_SavedData
 				.setCumulativePrice(cumulativePrice + (m_useSubscription ? Costumer_SavedData.getTotalPrice() : 0));
 
+		/* Add delivery payment if needed. */
+		float totalPrice = Float.parseFloat(total_price_label.getText());
+		if (delivery_radio.isSelected()) {
+			totalPrice += 30;
+		}
+		Costumer_SavedData.setTotalPrice(totalPrice);
+
+		/* Add date of reservation to be ready. */
 		Date date;
 		Calendar calendar = Calendar.getInstance();
 		if (immidiate_delivery.isSelected()) {
@@ -383,6 +423,12 @@ public class CostumerController extends BaseController
 		}
 	}
 
+	/**
+	 * Listener to change fields states to enable when choosing delivery.
+	 *
+	 * @param deliveryAction
+	 *            Action event for the button click.
+	 */
 	@FXML
 	private void deliveryButtonClick(ActionEvent deliveryAction)
 	{
@@ -393,6 +439,12 @@ public class CostumerController extends BaseController
 		delivery_name.setDisable(false);
 	}
 
+	/**
+	 * Listener to change fields states to disable when choosing self pick-up.
+	 *
+	 * @param pickupAction
+	 *            Action event for the button click.
+	 */
 	@FXML
 	private void pickupButtonClick(ActionEvent pickupAction)
 	{
@@ -403,12 +455,25 @@ public class CostumerController extends BaseController
 		delivery_name.setDisable(true);
 	}
 
+	/**
+	 * Listener to change fields states to disable / enable when choosing self
+	 * pick-up.
+	 *
+	 * @param blessingAction
+	 *            Action event for the button click.
+	 */
 	@FXML
 	private void blessingButtonClick(ActionEvent blessingAction)
 	{
 		blessing_text.setDisable(!blessing_card.isSelected());
 	}
 
+	/**
+	 * Listener to clear the reservation list from items. pick-up.
+	 *
+	 * @param clearAction
+	 *            Action event for the button click.
+	 */
 	@FXML
 	private void clearCartButtonClickPaymentType(ActionEvent clearAction)
 	{
@@ -416,6 +481,12 @@ public class CostumerController extends BaseController
 		initializePayment();
 	}
 
+	/**
+	 * Listener to update the catalog with the chosen shop.
+	 *
+	 * @param shopEvent
+	 *            Action event for the button click.
+	 */
 	@FXML
 	private void shopComboClick(ActionEvent shopEvent)
 	{
@@ -445,11 +516,18 @@ public class CostumerController extends BaseController
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
+	/**
+	 * Listener that creates a list of items that match the requested details
+	 * entered for customized item.
+	 *
+	 * @param searchEvent
+	 *            Action event for button click.
+	 */
 	@FXML
 	private void searchButtonClickCustomizedType(ActionEvent searchEvent)
 	{
-		if ((domain_color.getValue() != null && domain_color.getValue().equals("")) || min_price.getText().equals("") || max_price.getText().equals("")
-				|| item_amount.getText().equals("")) {
+		if ((domain_color.getValue() != null && domain_color.getValue().equals("")) || min_price.getText().equals("")
+				|| max_price.getText().equals("") || item_amount.getText().equals("")) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Attention");
 			alert.setHeaderText(null);
@@ -480,7 +558,8 @@ public class CostumerController extends BaseController
 				// 2. Price is in range.
 				// 3. The entity is of the type 'Flower'.
 				CatalogItemRow catalogItemRow = new CatalogItemRow(entity.getId(), entity.getName(),
-						entity.getType().toString(), (float) (amount * entity.getPrice()), domain_color.getValue().toLowerCase());
+						entity.getType().toString(), (float) (amount * entity.getPrice()),
+						domain_color.getValue().toLowerCase());
 				searchItemsList.add(catalogItemRow);
 			}
 		}
@@ -498,6 +577,12 @@ public class CostumerController extends BaseController
 		}
 	}
 
+	/**
+	 * Listener that updates the reservation displayed with canceled type.
+	 *
+	 * @param cancelEvent
+	 *            Action event of button click.
+	 */
 	@FXML
 	private void cancelButtonClick(ActionEvent cancelEvent)
 	{
@@ -512,6 +597,12 @@ public class CostumerController extends BaseController
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
+	/**
+	 * Listener that changes the screen to the reservations list screen.
+	 *
+	 * @param backEvent
+	 *            Action event of button click.
+	 */
 	@FXML
 	private void backToReservationsClick(ActionEvent backEvent)
 	{
@@ -520,6 +611,12 @@ public class CostumerController extends BaseController
 		initializeReservations();
 	}
 
+	/**
+	 * Method calculates the refund that the costumer is supposed to get when
+	 * canceling a reservation.
+	 *
+	 * @return The refund for the costumer.
+	 */
 	private float calculateRefund()
 	{
 		Date firstDate = m_reservationEntity.getDeliveryDate();
@@ -629,6 +726,12 @@ public class CostumerController extends BaseController
 		}
 	}
 
+	/**
+	 * Method handles a message that has been received from the server on start up.
+	 *
+	 * @param msg
+	 *            The message from the server.
+	 */
 	private void onMessageReceivedNoneType(Message msg)
 	{
 		IMessageData messageData = msg.getMessageData();
@@ -687,6 +790,13 @@ public class CostumerController extends BaseController
 		}
 	}
 
+	/**
+	 * Method handles a message that has been received from the server on catalog
+	 * screen.
+	 *
+	 * @param msg
+	 *            The message from the server.
+	 */
 	private void onMessageReceivedCatalogType(Message msg)
 	{
 		IMessageData messageData = msg.getMessageData();
@@ -734,6 +844,13 @@ public class CostumerController extends BaseController
 		}
 	}
 
+	/**
+	 * Method handles a message that has been received from the server on credit
+	 * card screen.
+	 *
+	 * @param msg
+	 *            The message from the server.
+	 */
 	private void onMessageReceivedCreditCardType(Message msg)
 	{
 		IMessageData entitiesListData = msg.getMessageData();
@@ -753,7 +870,7 @@ public class CostumerController extends BaseController
 						alert.showAndWait();
 						Costumer_SavedData.setReservationList(new ArrayList<>());
 
-						catalogButtonClickOnCustomizedType(new ActionEvent());
+						catalogScreen(new ActionEvent());
 					}
 					return;
 				}
@@ -791,6 +908,13 @@ public class CostumerController extends BaseController
 		}
 	}
 
+	/**
+	 * Method handles a message that has been received from the server on
+	 * reservations list screen.
+	 *
+	 * @param msg
+	 *            The message from the server.
+	 */
 	private void onMessageReceivedReservationType(Message msg)
 	{
 		IMessageData entitiesListData = msg.getMessageData();
@@ -828,6 +952,13 @@ public class CostumerController extends BaseController
 		initializeReservationsTable();
 	}
 
+	/**
+	 * Method handles a message that has been received from the server on cancel
+	 * reservation screen.
+	 *
+	 * @param msg
+	 *            The message from the server.
+	 */
 	private void onMessageReceivedCancelType(Message msg)
 	{
 		IMessageData entitiesListData = msg.getMessageData();
@@ -902,6 +1033,9 @@ public class CostumerController extends BaseController
 
 	// region Initializing methods
 
+	/**
+	 * Method that initializes the catalog table.
+	 */
 	private void initializeTableCatalogType()
 	{
 		catalog_table.setRowFactory(param -> {
@@ -938,6 +1072,9 @@ public class CostumerController extends BaseController
 		});
 	}
 
+	/**
+	 * Method that initializes the reservations table.
+	 */
 	private void initializeReservationsTable()
 	{
 		reservation_table.setRowFactory(param -> {
@@ -981,6 +1118,9 @@ public class CostumerController extends BaseController
 		});
 	}
 
+	/**
+	 * Method that initializes the customized item search table.
+	 */
 	private void initializeItemSearchTable()
 	{
 		search_table.setRowFactory(param -> {
@@ -1016,6 +1156,9 @@ public class CostumerController extends BaseController
 		});
 	}
 
+	/**
+	 * Method that initializes the catalog screen.
+	 */
 	private void initializeCatalog()
 	{
 		m_currScreen = ScreenType.Catalog;
@@ -1027,6 +1170,9 @@ public class CostumerController extends BaseController
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
+	/**
+	 * Method that initializes the customized screen.
+	 */
 	private void initializeCostumized()
 	{
 		costumizedColors = FXCollections.observableArrayList();
@@ -1046,6 +1192,13 @@ public class CostumerController extends BaseController
 		domain_color.getSelectionModel().selectFirst();
 	}
 
+	/**
+	 * Method changes the word with capital letter.
+	 *
+	 * @param value
+	 *            The string to change.
+	 * @return Changed string.
+	 */
 	private String upperCaseFirst(String value)
 	{
 		char[] array = value.toCharArray();
@@ -1053,6 +1206,9 @@ public class CostumerController extends BaseController
 		return new String(array);
 	}
 
+	/**
+	 * Method that initializes the reservation list screen.
+	 */
 	private void initializePayment()
 	{
 		m_currScreen = ScreenType.Payment;
@@ -1125,6 +1281,9 @@ public class CostumerController extends BaseController
 		payment_table.setItems(paymentList);
 	}
 
+	/**
+	 * Method that initializes the payment screen.
+	 */
 	private void initializeCreditCard()
 	{
 		m_currScreen = ScreenType.CreditCard;
@@ -1206,8 +1365,76 @@ public class CostumerController extends BaseController
 			}
 		});
 		blessing_text.setDisable(true);
+		
+		credit_card_number.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(final ObservableValue<? extends String> ov, final String oldValue,
+					final String newValue)
+			{
+				if (credit_card_number.getText().length() > 16) {
+					String s = credit_card_number.getText().substring(0, 16);
+					credit_card_number.setText(s);
+				}
+			}
+		});
+		
+		delivery_address.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(final ObservableValue<? extends String> ov, final String oldValue,
+					final String newValue)
+			{
+				if (delivery_address.getText().length() > 50) {
+					String s = delivery_address.getText().substring(0, 50);
+					delivery_address.setText(s);
+				}
+			}
+		});
+		
+		delivery_name.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(final ObservableValue<? extends String> ov, final String oldValue,
+					final String newValue)
+			{
+				if (delivery_name.getText().length() > 20) {
+					String s = delivery_name.getText().substring(0, 20);
+					delivery_name.setText(s);
+				}
+			}
+		});
+		
+		delivery_phone.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(final ObservableValue<? extends String> ov, final String oldValue,
+					final String newValue)
+			{
+				if (delivery_phone.getText().length() > 10) {
+					String s = delivery_phone.getText().substring(0, 10);
+					delivery_phone.setText(s);
+				}
+			}
+		});
+		
+		blessing_text.textProperty().addListener(new ChangeListener<String>() {
+
+			@Override
+			public void changed(final ObservableValue<? extends String> ov, final String oldValue,
+					final String newValue)
+			{
+				if (blessing_text.getText().length() > 100) {
+					String s = blessing_text.getText().substring(0, 100);
+					blessing_text.setText(s);
+				}
+			}
+		});
 	}
 
+	/**
+	 * Method that initializes the reservations list screen.
+	 */
 	private void initializeReservations()
 	{
 		m_currScreen = ScreenType.Reservations;
@@ -1218,6 +1445,9 @@ public class CostumerController extends BaseController
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
+	/**
+	 * Method that initializes the cancel reservation screen.
+	 */
 	private void initializeCancel()
 	{
 		m_currScreen = ScreenType.Cancel;
