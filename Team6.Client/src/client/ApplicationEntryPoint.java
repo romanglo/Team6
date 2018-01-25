@@ -77,7 +77,7 @@ public class ApplicationEntryPoint extends Application
 			if (s_lockFile == null) {
 				// File is locked by other application
 				s_fileChannel.close();
-				System.out.println("Only one instance of Server can run at the same time.");
+				System.out.println("Only one instance of Client can run at the same time.");
 				System.exit(1);
 			}
 

@@ -172,16 +172,25 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 					}
 					if (rowData.getType().equals(ConnectivityConfiguration.CONFIGURATION_TYPE_NAME)) {
 						int port;
+						boolean wrongInput = false;
 						try {
 							port = Integer.parseInt(resultString);
-							m_configuration.getConnectivityConfiguration().setPort(port);
-							m_server.setPort(port);
-							if (m_server.isListening()) {
-								showAlertMessage(
-										"Attention: You must reopen application connection for the changes to take effect!",
-										AlertType.WARNING);
+							if (port >= 0 && port <= 65636) {
+								m_configuration.getConnectivityConfiguration().setPort(port);
+								m_server.setPort(port);
+								if (m_server.isListening()) {
+									showAlertMessage(
+											"Attention: You must reopen application connection for the changes to take effect!",
+											AlertType.WARNING);
+								}
+							} else {
+								wrongInput = true;
 							}
 						} catch (NumberFormatException e) {
+							wrongInput = true;
+						}
+						if (wrongInput) {
+							showAlertMessage("The port must be an number between 0 to 65535!", AlertType.ERROR);
 							return;
 						}
 					} else {

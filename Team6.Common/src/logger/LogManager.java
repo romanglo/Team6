@@ -74,7 +74,7 @@ public class LogManager
 			// set log name
 			LocalDateTime localDateTime = LocalDateTime.now();
 			LocalDate localDate = localDateTime.toLocalDate();
-			String logName = "client-" + localDate.toString() + ".log";
+			String logName = "log-" + localDate.toString() + ".log";
 
 			// Creating formatter
 			Formatter formatter = new LogFormatter();
