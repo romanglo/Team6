@@ -91,17 +91,21 @@ public class CompanyEmployeeController extends BaseController
 	/* End of --> Action catalog buttons */
 
 	/* View and changes savers lists declaration */
-	ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
+	
+	private ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
 
-	ArrayList<Item> itemsCatalogAdded = new ArrayList<>();
+	private ArrayList<Item> itemsCatalogAdded = new ArrayList<>();
 
-	ArrayList<Item> itemsCatalogRemoved = new ArrayList<>();
+	private ArrayList<Item> itemsCatalogRemoved = new ArrayList<>();
 
-	ArrayList<Item> itemsCatalogChanged = new ArrayList<>();
+	private ArrayList<Item> itemsCatalogChanged = new ArrayList<>();
+	
 	/* End of --> View and changes savers lists declaration */
+	
 	// end region -> Fields Edit Catalog Stage
 
 	// region Fields Shop Sales Stage
+	
 	/* Catalog table declaration */
 	@FXML private TableView<CatalogItemRow> tableView_shopSales;
 
@@ -124,16 +128,18 @@ public class CompanyEmployeeController extends BaseController
 	/* End of --> Action catalog buttons */
 
 	/* View and changes savers lists declaration */
-	ObservableList<CatalogItemRow> shopSales = FXCollections.observableArrayList();
+	private ObservableList<CatalogItemRow> shopSales = FXCollections.observableArrayList();
 
-	ObservableList<String> stores = FXCollections.observableArrayList();
+	private ObservableList<String> stores = FXCollections.observableArrayList();
 
-	ArrayList<ItemInShop> salesAdded = new ArrayList<>();
+	private ArrayList<ItemInShop> salesAdded = new ArrayList<>();
 
-	ArrayList<ItemInShop> salesRemoved = new ArrayList<>();
+	private ArrayList<ItemInShop> salesRemoved = new ArrayList<>();
 
-	ArrayList<ItemInShop> salesChanged = new ArrayList<>();
+	private ArrayList<ItemInShop> salesChanged = new ArrayList<>();
+
 	/* End of --> View and changes savers lists declaration */
+
 	// end region -> Fields Shop Sales Stage
 
 	// region BaseController Implementation
@@ -200,12 +206,18 @@ public class CompanyEmployeeController extends BaseController
 								rowData.setM_name(resultString);
 							break;
 							case "Price":
-								Float price = Float.parseFloat(resultString);
-								if (price <= 0) {
-									showAlertMessage("The price you entered lower then 0",AlertType.ERROR);
+								try {
+									Float price = Float.parseFloat(resultString);
+									if (price <= 0) {
+										showAlertMessage("The price you entered lower then 0", AlertType.ERROR);
+										return;
+									} else {
+										rowData.setM_price(price);
+									}
+								}
+								catch (Exception ignored) {
+									showAlertMessage("Invalid price! Please enter a number.", AlertType.ERROR);
 									return;
-								} else {
-									rowData.setM_price(price);
 								}
 						}
 						addEditedItemToArray(rowData);
@@ -322,11 +334,11 @@ public class CompanyEmployeeController extends BaseController
 						discountedPrice = Float.parseFloat(resultString);
 					}
 					catch (Exception e) {
-						showAlertMessage("Invalid discounted price!",AlertType.ERROR);
+						showAlertMessage("Invalid discounted price!", AlertType.ERROR);
 						return;
 					}
 					if (discountedPrice <= 0) {
-						showAlertMessage("The price you entered lower then 0",AlertType.ERROR);
+						showAlertMessage("The price you entered lower then 0", AlertType.ERROR);
 						return;
 					} else {
 						rowData.setM_price(discountedPrice);
@@ -477,11 +489,11 @@ public class CompanyEmployeeController extends BaseController
 		inputedDiscountedPrice = discountedPrice.getText();
 
 		if (inputedID == null || inputedDiscountedPrice == null) {
-			showAlertMessage("One or more fields are empty",AlertType.ERROR);
+			showAlertMessage("One or more fields are empty", AlertType.ERROR);
 			return false;
 		}
 		if (inputedID.isEmpty() || inputedDiscountedPrice.isEmpty()) {
-			showAlertMessage("One or more fields are empty",AlertType.ERROR);
+			showAlertMessage("One or more fields are empty", AlertType.ERROR);
 			return false;
 		}
 
@@ -492,24 +504,24 @@ public class CompanyEmployeeController extends BaseController
 			newPrice = Float.parseFloat(inputedDiscountedPrice);
 		}
 		catch (Exception ex) {
-			showAlertMessage("Invalid input!",AlertType.ERROR);
+			showAlertMessage("Invalid input!", AlertType.ERROR);
 			return false;
 		}
 
 		if (itemID <= 0) {
-			showAlertMessage("The ID you entered lower then 0",AlertType.ERROR);
+			showAlertMessage("The ID you entered lower then 0", AlertType.ERROR);
 			return false;
 		}
 
 		for (CatalogItemRow item : shopSales) {
 			if (item.getM_id() == itemID) {
-				showAlertMessage("Item discount already exist!",AlertType.WARNING);
+				showAlertMessage("Item discount already exist!", AlertType.WARNING);
 				return false;
 			}
 		}
 
 		if (newPrice <= 0) {
-			showAlertMessage("The price you entered lower then 0",AlertType.ERROR);
+			showAlertMessage("The price you entered lower then 0", AlertType.ERROR);
 			return false;
 		}
 		return true;
@@ -527,7 +539,7 @@ public class CompanyEmployeeController extends BaseController
 	{
 		for (CatalogItemRow item : catalog)
 			if (itemID.equals(item.getId())) return true;
-		showAlertMessage("Item ID doesn't exist in catalog!",AlertType.WARNING);
+		showAlertMessage("Item ID doesn't exist in catalog!", AlertType.WARNING);
 		return false;
 	}
 
@@ -585,24 +597,26 @@ public class CompanyEmployeeController extends BaseController
 	 *
 	 * @param name
 	 *            The item name.
-	 * @param price
+	 * @param priceText
 	 *            The item price.
 	 * @param domainColor
 	 *            The item domain color.
 	 * @return <code>true</code> if the item exist in company catalog,
 	 *         <code>false</code> otherwise.
 	 */
-	private boolean checkAddNewCatalogItemFields(TextField name, TextField price, TextField domainColor)
+	private boolean checkAddNewCatalogItemFields(TextField name, TextField priceText, TextField domainColor)
 	{
 		String inputedName, inputedPrice, inputedDomainColor;
 		inputedName = name.getText();
-		inputedPrice = price.getText();
+		inputedPrice = priceText.getText();
 		inputedDomainColor = domainColor.getText();
 
 		if (inputedName == null || inputedPrice == null || inputedDomainColor == null) return false;
 		if (inputedName.isEmpty() || inputedPrice.isEmpty() || inputedDomainColor.isEmpty()) return false;
 		try {
-			Float.parseFloat(inputedPrice);
+			Float price = Float.parseFloat(inputedPrice);
+			if(price <= 0)
+				return false;
 		}
 		catch (Exception ex) {
 			return false;
@@ -690,13 +704,13 @@ public class CompanyEmployeeController extends BaseController
 		String resultString = result.get();
 
 		if (resultString == null || resultString.isEmpty()) {
-			showAlertMessage("Invalid Input",AlertType.ERROR);
+			showAlertMessage("Invalid Input", AlertType.ERROR);
 			return;
 		}
 
 		Integer idToRemove = Integer.parseInt(resultString);
 		if (idToRemove <= 0) {
-			showAlertMessage("Invalid ID",AlertType.ERROR);
+			showAlertMessage("Invalid ID", AlertType.ERROR);
 			return;
 		}
 
@@ -720,7 +734,7 @@ public class CompanyEmployeeController extends BaseController
 				return;
 			}
 		}
-		showAlertMessage("Item ID doesn't exist",AlertType.ERROR);
+		showAlertMessage("Item ID doesn't exist", AlertType.ERROR);
 	}
 
 	/**
@@ -793,21 +807,7 @@ public class CompanyEmployeeController extends BaseController
 			{
 				if (b == buttonTypeOk) {
 					if (!(checkAddNewCatalogItemFields(textFieldName, textFieldPrice, textFieldDomainColor))) {
-						try {
-							if (!((textFieldPrice.getText()).isEmpty())) {
-								Float floatPrice = Float.parseFloat(textFieldPrice.getText());
-								if (floatPrice <= 0) {
-									showAlertMessage("The entered price lower than 0!",AlertType.ERROR);
-									return null;
-								}
-
-							}
-						}
-						catch (Exception ex) {
-							showAlertMessage("Invalid price!",AlertType.ERROR);
-							return null;
-						}
-						showAlertMessage("One or more of fields is empty!",AlertType.ERROR);
+						showAlertMessage("Item adding failed due to invalid input!", AlertType.ERROR);
 						return null;
 					}
 					CatalogItemRow newItem;
@@ -947,13 +947,13 @@ public class CompanyEmployeeController extends BaseController
 		String resultString = result.get();
 
 		if (resultString == null || resultString.isEmpty()) {
-			showAlertMessage("Invalid Input",AlertType.ERROR);
+			showAlertMessage("Invalid Input", AlertType.ERROR);
 			return;
 		}
 
 		Integer idToRemove = Integer.parseInt(resultString);
 		if (idToRemove <= 0) {
-			showAlertMessage("Invalid ID",AlertType.ERROR);
+			showAlertMessage("Invalid ID", AlertType.ERROR);
 			return;
 		}
 
@@ -974,7 +974,7 @@ public class CompanyEmployeeController extends BaseController
 				return;
 			}
 		}
-		showAlertMessage("Item ID doesn't exist",AlertType.ERROR);
+		showAlertMessage("Item ID doesn't exist", AlertType.ERROR);
 	}
 
 	/**
@@ -1208,7 +1208,7 @@ public class CompanyEmployeeController extends BaseController
 				}
 				if (!succeed) {
 					if (operation == EntityDataOperation.GetALL) catalog.clear();
-					showAlertMessage(operation.toString() + " Failed!",AlertType.ERROR);
+					showAlertMessage(operation.toString() + " Failed!", AlertType.ERROR);
 				} else {
 					showAlertMessage("Catalog update successfully!", AlertType.INFORMATION);
 				}
