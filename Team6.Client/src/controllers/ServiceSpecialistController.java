@@ -76,7 +76,11 @@ public class ServiceSpecialistController extends BaseController
 
 	private SurveyResult selected_survey;
 
-	private String[] questions = { "Question1", "Question2", "Question3", "Question4", "Question5", "Question6", };
+	private String[] questions = { "How likely is it that you would recommended our company?",
+			"How well do our porducts meet your needs?", "How would you rate the quality of our products?",
+			"How would you rate the value for money of the product?",
+			"How likely are you to purchase any of our products again?",
+			"How would you rate the shopping experience in our shop?" };
 
 	// end region -> Fields
 
@@ -166,7 +170,7 @@ public class ServiceSpecialistController extends BaseController
 	 *            save button clicked.
 	 */
 	@FXML
-	public void saveAnalysis(ActionEvent event)
+	private void saveAnalysis(ActionEvent event)
 	{
 		if ((textarea_analysis.getText().equals("")) || (combobox_id.getValue().equals(""))) {
 			showAlertMessage("Specialist analisys area and/or survey ID are empty", AlertType.WARNING);

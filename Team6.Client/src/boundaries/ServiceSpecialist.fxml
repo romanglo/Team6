@@ -14,7 +14,8 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.152" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ServiceSpecialistController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.152"
+	xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.ServiceSpecialistController">
 	<top>
 		<BorderPane fx:id="borderpain_main_top" styleClass="header-section">
 			<left>
@@ -28,12 +29,14 @@
 				<VBox>
 					<Button onAction="#onLogoutButtonPressed" text="Logout">
 						<graphic>
-							<ImageView fx:id="imageview_logout_button" fitHeight="24" fitWidth="24" pickOnBounds="true" preserveRatio="true" />
+							<ImageView fx:id="imageview_logout_button" fitHeight="24"
+								fitWidth="24" pickOnBounds="true" preserveRatio="true" />
 						</graphic>
 					</Button>
 					<Button onAction="#onAccountButtonPressed" text="Account">
 						<graphic>
-							<ImageView fx:id="imageview_account_button" fitHeight="24" fitWidth="24" pickOnBounds="true" preserveRatio="true" />
+							<ImageView fx:id="imageview_account_button" fitHeight="24"
+								fitWidth="24" pickOnBounds="true" preserveRatio="true" />
 						</graphic>
 					</Button>
 				</VBox>
@@ -46,9 +49,14 @@
 	<center>
 		<AnchorPane BorderPane.alignment="TOP_LEFT">
 			<children>
-				<AnchorPane fx:id="anchorpane_welcome" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
-					<ImageView fx:id="imageview_welcome" fitHeight="300" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-					<VBox styleClass="content-section-label" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+				<AnchorPane fx:id="anchorpane_welcome"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0"
+					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+					<ImageView fx:id="imageview_welcome" fitHeight="300"
+						pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0"
+						AnchorPane.rightAnchor="0.0" />
+					<VBox styleClass="content-section-label"
+						AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
 						<Label text="Welcome">
 							<font>
 								<Font name="Berlin Sans FB Demi Bold" size="52" />
@@ -66,37 +74,84 @@
 						</Label>
 					</VBox>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_option1" layoutY="79.0" prefHeight="368.0" prefWidth="450.0" styleClass="content-section" visible="falseS" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+				<AnchorPane fx:id="anchorpane_option1" layoutY="79.0"
+					prefHeight="368.0" prefWidth="450.0" styleClass="content-section"
+					visible="falseS" AnchorPane.bottomAnchor="5.0"
+					AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+					AnchorPane.topAnchor="5.0">
 					<children>
-						<ComboBox fx:id="combobox_id" layoutX="120.0" layoutY="28.0" onAction="#selectSurvey" prefWidth="150.0" AnchorPane.leftAnchor="175.0" />
-						<Label layoutX="4.0" layoutY="80.0" prefHeight="17.0" prefWidth="184.0" text="Question 1:" AnchorPane.leftAnchor="10.0" />
-						<Label layoutX="3.0" layoutY="111.0" prefHeight="17.0" prefWidth="184.0" text="Question 2:" AnchorPane.leftAnchor="10.0" />
-						<Label layoutX="3.0" layoutY="204.0" prefHeight="17.0" prefWidth="184.0" text="Question 5:" AnchorPane.leftAnchor="10.0" />
-						<Label layoutX="3.0" layoutY="174.0" prefHeight="17.0" prefWidth="184.0" text="Question 4:" AnchorPane.leftAnchor="10.0" />
-						<Label layoutX="3.0" layoutY="143.0" prefHeight="17.0" prefWidth="184.0" text="Question 3:" AnchorPane.leftAnchor="10.0" />
-						<Label layoutX="3.0" layoutY="233.0" prefHeight="17.0" prefWidth="184.0" text="Question 6:" AnchorPane.leftAnchor="10.0" />
-						<TextField fx:id="textfield_question1" editable="false" layoutX="93.0" layoutY="76.0" prefWidth="250.0" AnchorPane.leftAnchor="110.0" />
-						<TextField fx:id="textfield_question2" editable="false" layoutX="93.0" layoutY="107.0" prefWidth="250.0" AnchorPane.leftAnchor="110.0" />
-						<TextField fx:id="textfield_question3" editable="false" layoutX="93.0" layoutY="139.0" prefWidth="250.0" AnchorPane.leftAnchor="110.0" />
-						<TextField fx:id="textfield_question4" editable="false" layoutX="93.0" layoutY="170.0" prefWidth="250.0" AnchorPane.leftAnchor="110.0" />
-						<TextField fx:id="textfield_question5" editable="false" layoutX="93.0" layoutY="200.0" prefWidth="250.0" AnchorPane.leftAnchor="110.0" />
-						<TextField fx:id="textfield_question6" editable="false" layoutX="93.0" layoutY="229.0" prefWidth="250.0" AnchorPane.leftAnchor="110.0" />
-						<Label layoutX="246.0" layoutY="80.0" prefHeight="17.0" prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="370.0" />
-						<Label layoutX="246.0" layoutY="111.0" prefHeight="17.0" prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="370.0" />
-						<Label layoutX="246.0" layoutY="143.0" prefHeight="17.0" prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="370.0" />
-						<Label layoutX="246.0" layoutY="174.0" prefHeight="17.0" prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="370.0" />
-						<Label layoutX="246.0" layoutY="204.0" prefHeight="17.0" prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="370.0" />
-						<Label layoutX="245.0" layoutY="233.0" prefHeight="17.0" prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="370.0" />
-						<TextField fx:id="textfield_answer1" editable="false" layoutX="311.0" layoutY="76.0" prefHeight="25.0" prefWidth="68.0" AnchorPane.leftAnchor="450.0" />
-						<TextField fx:id="textfield_answer2" editable="false" layoutX="312.0" layoutY="107.0" prefHeight="25.0" prefWidth="68.0" AnchorPane.leftAnchor="450.0" />
-						<TextField fx:id="textfield_answer3" editable="false" layoutX="312.0" layoutY="139.0" prefHeight="25.0" prefWidth="68.0" AnchorPane.leftAnchor="450.0" />
-						<TextField fx:id="textfield_answer4" editable="false" layoutX="311.0" layoutY="170.0" prefHeight="25.0" prefWidth="68.0" AnchorPane.leftAnchor="450.0" />
-						<TextField fx:id="textfield_answer5" editable="false" layoutX="312.0" layoutY="200.0" prefHeight="25.0" prefWidth="68.0" AnchorPane.leftAnchor="450.0" />
-						<TextField fx:id="textfield_answer6" editable="false" layoutX="312.0" layoutY="229.0" prefHeight="25.0" prefWidth="68.0" AnchorPane.leftAnchor="450.0" />
-						<Label layoutX="128.0" layoutY="277.0" prefHeight="17.0" prefWidth="184.0" text="Specialist analysis:" AnchorPane.leftAnchor="55.0" />
-						<TextArea fx:id="textarea_analysis" layoutY="302.0" prefHeight="71.0" prefWidth="500.0" AnchorPane.leftAnchor="25.0" />
-						<Button layoutX="80.0" layoutY="381.0" mnemonicParsing="false" onAction="#saveAnalysis" prefWidth="100.0" text="Save" AnchorPane.leftAnchor="450.0" />
-						<Label layoutX="29.0" layoutY="30.0" prefHeight="17.0" prefWidth="154.0" text="Survey id:" AnchorPane.leftAnchor="80.0" />
+						<ComboBox fx:id="combobox_id" layoutX="120.0" layoutY="28.0"
+							onAction="#selectSurvey" prefWidth="150.0" AnchorPane.leftAnchor="105.0" />
+						<Label layoutX="4.0" layoutY="75.0" prefHeight="17.0"
+							prefWidth="184.0" text="Question 1:" AnchorPane.leftAnchor="10.0" />
+						<Label layoutX="3.0" layoutY="106.0" prefHeight="17.0"
+							prefWidth="184.0" text="Question 2:" AnchorPane.leftAnchor="10.0" />
+						<Label layoutX="3.0" layoutY="199.0" prefHeight="17.0"
+							prefWidth="184.0" text="Question 5:" AnchorPane.leftAnchor="10.0" />
+						<Label layoutX="3.0" layoutY="169.0" prefHeight="17.0"
+							prefWidth="184.0" text="Question 4:" AnchorPane.leftAnchor="10.0" />
+						<Label layoutX="3.0" layoutY="138.0" prefHeight="17.0"
+							prefWidth="184.0" text="Question 3:" AnchorPane.leftAnchor="10.0" />
+						<Label layoutX="3.0" layoutY="228.0" prefHeight="17.0"
+							prefWidth="184.0" text="Question 6:" AnchorPane.leftAnchor="10.0" />
+						<TextField fx:id="textfield_question1" editable="false"
+							layoutX="93.0" layoutY="76.0" prefWidth="350.0"
+							AnchorPane.leftAnchor="110.0" />
+						<TextField fx:id="textfield_question2" editable="false"
+							layoutX="93.0" layoutY="107.0" prefWidth="350.0"
+							AnchorPane.leftAnchor="110.0" />
+						<TextField fx:id="textfield_question3" editable="false"
+							layoutX="93.0" layoutY="139.0" prefWidth="350.0"
+							AnchorPane.leftAnchor="110.0" />
+						<TextField fx:id="textfield_question4" editable="false"
+							layoutX="93.0" layoutY="170.0" prefWidth="350.0"
+							AnchorPane.leftAnchor="110.0" />
+						<TextField fx:id="textfield_question5" editable="false"
+							layoutX="93.0" layoutY="200.0" prefWidth="350.0"
+							AnchorPane.leftAnchor="110.0" />
+						<TextField fx:id="textfield_question6" editable="false"
+							layoutX="93.0" layoutY="229.0" prefWidth="350.0"
+							AnchorPane.leftAnchor="110.0" />
+						<Label layoutX="246.0" layoutY="75.0" prefHeight="17.0"
+							prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="470.0" />
+						<Label layoutX="246.0" layoutY="106.0" prefHeight="17.0"
+							prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="470.0" />
+						<Label layoutX="246.0" layoutY="138.0" prefHeight="17.0"
+							prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="470.0" />
+						<Label layoutX="246.0" layoutY="169.0" prefHeight="17.0"
+							prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="470.0" />
+						<Label layoutX="246.0" layoutY="199.0" prefHeight="17.0"
+							prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="470.0" />
+						<Label layoutX="245.0" layoutY="228.0" prefHeight="17.0"
+							prefWidth="184.0" text="Answer:" AnchorPane.leftAnchor="470.0" />
+						<TextField fx:id="textfield_answer1" editable="false"
+							layoutX="311.0" layoutY="76.0" prefHeight="25.0" prefWidth="68.0"
+							AnchorPane.leftAnchor="550.0" />
+						<TextField fx:id="textfield_answer2" editable="false"
+							layoutX="312.0" layoutY="107.0" prefHeight="25.0" prefWidth="68.0"
+							AnchorPane.leftAnchor="550.0" />
+						<TextField fx:id="textfield_answer3" editable="false"
+							layoutX="312.0" layoutY="139.0" prefHeight="25.0" prefWidth="68.0"
+							AnchorPane.leftAnchor="550.0" />
+						<TextField fx:id="textfield_answer4" editable="false"
+							layoutX="311.0" layoutY="170.0" prefHeight="25.0" prefWidth="68.0"
+							AnchorPane.leftAnchor="550.0" />
+						<TextField fx:id="textfield_answer5" editable="false"
+							layoutX="312.0" layoutY="200.0" prefHeight="25.0" prefWidth="68.0"
+							AnchorPane.leftAnchor="550.0" />
+						<TextField fx:id="textfield_answer6" editable="false"
+							layoutX="312.0" layoutY="229.0" prefHeight="25.0" prefWidth="68.0"
+							AnchorPane.leftAnchor="550.0" />
+						<Label layoutX="128.0" layoutY="277.0" prefHeight="17.0"
+							prefWidth="184.0" text="Specialist analysis:"
+							AnchorPane.leftAnchor="10.0" />
+						<TextArea fx:id="textarea_analysis" layoutY="302.0"
+							prefHeight="71.0" prefWidth="600.0" AnchorPane.leftAnchor="25.0" />
+						<Button layoutX="80.0" layoutY="381.0" mnemonicParsing="false"
+							onAction="#saveAnalysis" prefWidth="100.0" text="Save"
+							AnchorPane.leftAnchor="525.0" />
+						<Label layoutX="29.0" layoutY="30.0" prefHeight="17.0"
+							prefWidth="154.0" text="Survey id:" AnchorPane.leftAnchor="10.0" />
 					</children>
 				</AnchorPane>
 			</children>
@@ -115,7 +170,8 @@
 				</Label>
 			</center>
 			<right>
-				<Circle fx:id="circle_connection_status" fill="GREY" radius="12" stroke="BLACK" strokeType="INSIDE">
+				<Circle fx:id="circle_connection_status" fill="GREY" radius="12"
+					stroke="BLACK" strokeType="INSIDE">
 					<effect>
 						<DropShadow color="#00000084" />
 					</effect>
