@@ -23,7 +23,7 @@ public class Reservation implements IEntity
 	 */
 	private static final long serialVersionUID = 7931281117302239308L;
 
-	private static final DateFormat s_dateForamt = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+	private static final DateFormat s_dateForamt = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
 
 	private int m_id;
 

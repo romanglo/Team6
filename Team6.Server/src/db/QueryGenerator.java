@@ -52,7 +52,7 @@ public class QueryGenerator {
 
 	private final static SimpleDateFormat s_dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-	private final static SimpleDateFormat s_dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	private final static SimpleDateFormat s_dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static Logger s_logger = null;
 

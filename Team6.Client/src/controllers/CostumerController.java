@@ -255,7 +255,7 @@ public class CostumerController extends BaseController
 
 	private ArrayList<Complaint> m_complaintsList;
 
-	private int s_reservationId;
+	private int m_reservationId;
 
 	private ObservableList<CatalogItemRow> cancelItemsList = FXCollections.observableArrayList();
 
@@ -406,17 +406,29 @@ public class CostumerController extends BaseController
 				.setCumulativePrice(cumulativePrice + (m_useSubscription ? Costumer_SavedData.getTotalPrice() : 0));
 
 		/* Add date of reservation to be ready. */
-		Date date;
 		Calendar calendar = Calendar.getInstance();
 		if (immidiate_delivery.isSelected()) {
-			date = new Date();
-			calendar.setTime(date);
 			calendar.add(Calendar.HOUR_OF_DAY, 3);
-			date = calendar.getTime();
 		} else {
 			LocalDate localDate = date_pick.getValue();
-			date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			Date chosenDate = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			calendar.setTime(chosenDate);
+			String hoursString = combo_hour.getValue();
+			String minutsString = combo_minute.getValue();
+
+			try {
+				int hours = Integer.parseInt(hoursString);
+				calendar.add(Calendar.HOUR, hours);
+				int minuts = Integer.parseInt(minutsString);
+				calendar.add(Calendar.MINUTE, minuts);
+			}
+			catch (Exception ignored) {
+				// This exception should never be thrown.
+			}
 		}
+
+		Date date = calendar.getTime();
+
 		Costumer_SavedData.setDeliveryDate(date);
 
 		if (delivery_radio.isSelected()) {
@@ -480,13 +492,49 @@ public class CostumerController extends BaseController
 	 * Listener to change fields states to disable / enable when choosing self
 	 * pick-up.
 	 *
-	 * @param blessingAction
+	 * @param event
 	 *            Action event for the button click.
 	 */
 	@FXML
-	private void blessingButtonClick(ActionEvent blessingAction)
+	private void blessingButtonClick(ActionEvent event)
 	{
-		blessing_text.setDisable(!blessing_card.isSelected());
+		boolean notSelected = !blessing_card.isSelected();
+		blessing_text.setDisable(notSelected);
+		if (notSelected) {
+			blessing_text.clear();
+		}
+	}
+
+	/**
+	 * Listener to change fields states to disable / enable when choosing immediate
+	 * delivery pick-up.
+	 *
+	 * @param event
+	 *            Action event for the button click.
+	 */
+	@FXML
+	private void immediateDeliveryClick(ActionEvent event)
+	{
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(new Date());
+		calendar.add(Calendar.HOUR_OF_DAY, 3);
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		int minute = calendar.get(Calendar.MINUTE);
+		combo_hour.setValue("" + (hour < 10 ? "0" + hour : hour));
+		combo_minute.setValue("" + (minute < 10 ? "0" + minute : minute));
+		delivery_radio.setSelected(true);
+		pickup_radio.setSelected(false);
+		date_pick.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+		
+		if (immidiate_delivery.isSelected()) {
+			combo_hour.setDisable(true);
+			combo_minute.setDisable(true);
+			date_pick.setDisable(true);
+		} else {
+			combo_hour.setDisable(false);
+			combo_minute.setDisable(false);
+			date_pick.setDisable(false);
+		}
 	}
 
 	/**
@@ -667,6 +715,24 @@ public class CostumerController extends BaseController
 		costumer.setUserName(m_ConnectedUser.getUserName());
 		Message message = MessagesFactory.createGetEntityMessage(costumer);
 		m_Client.sendMessageToServer(message);
+
+		for (int i = 0; i < 24; i++) {
+			if (i < 10) {
+				hoursList.add("0" + i);
+			} else {
+				hoursList.add("" + i);
+			}
+		}
+		for (int i = 0; i < 60; i++) {
+			if (i < 10) {
+				minutesList.add("0" + i);
+			} else {
+				minutesList.add("" + i);
+			}
+		}
+
+		combo_hour.setItems(hoursList);
+		combo_minute.setItems(minutesList);
 	}
 
 	/**
@@ -1106,7 +1172,7 @@ public class CostumerController extends BaseController
 
 		List<IEntity> entities = ((EntitiesListData) messageData).getEntities();
 		m_complaintsList = new ArrayList<>();
-		complaintsTableList.clear();
+		Platform.runLater(() -> complaintsTableList.clear());
 		for (IEntity entity : entities) {
 			if (!(entity instanceof Complaint)) {
 				m_Logger.warning("Received entity not of the type requested, requested: " + Complaint.class.getName());
@@ -1118,7 +1184,7 @@ public class CostumerController extends BaseController
 			m_complaintsList.add(complaint);
 			CatalogItemRow catalogItemRow = new CatalogItemRow(complaint.getId(),
 					dateForamt.format(complaint.getCreationDate()), complaint.isOpened() ? "Open" : "Closed", null, "");
-			complaintsTableList.add(catalogItemRow);
+			Platform.runLater(() -> complaintsTableList.add(catalogItemRow));
 		}
 
 		initializeComplaintsTable();
@@ -1181,7 +1247,7 @@ public class CostumerController extends BaseController
 						return;
 					}
 
-					s_reservationId = rowData.getM_id();
+					m_reservationId = rowData.getM_id();
 					anchorpane_cancel.setVisible(true);
 					anchorpane_reservations.setVisible(false);
 					initializeCancel();
@@ -1403,6 +1469,10 @@ public class CostumerController extends BaseController
 	{
 		m_currScreen = ScreenType.CreditCard;
 
+		combo_hour.setDisable(false);
+		combo_minute.setDisable(false);
+		date_pick.setDisable(false);
+		
 		credit_card_number.setText("");
 		delivery_address.setText("");
 		delivery_name.setText("");
@@ -1423,24 +1493,6 @@ public class CostumerController extends BaseController
 				credit_card_number.setVisible(true);
 			}
 		}
-
-		for (int i = 0; i < 24; i++) {
-			if (i < 10) {
-				hoursList.add("0" + i);
-			} else {
-				hoursList.add("" + i);
-			}
-		}
-		for (int i = 0; i < 60; i++) {
-			if (i < 10) {
-				minutesList.add("0" + i);
-			} else {
-				minutesList.add("" + i);
-			}
-		}
-
-		combo_hour.setItems(hoursList);
-		combo_minute.setItems(minutesList);
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(new Date());
@@ -1583,12 +1635,12 @@ public class CostumerController extends BaseController
 
 		Reservation reservation = new Reservation();
 		reservation.setCostumerId(Costumer_SavedData.getCostumerId());
-		reservation.setId(s_reservationId);
+		reservation.setId(m_reservationId);
 		Message message = MessagesFactory.createGetEntityMessage(reservation);
 		m_Client.sendMessageToServer(message);
 
 		ItemInReservation itemInReservation = new ItemInReservation();
-		itemInReservation.setReservationId(s_reservationId);
+		itemInReservation.setReservationId(m_reservationId);
 		message = MessagesFactory.createGetAllEntityMessage(itemInReservation);
 		m_Client.sendMessageToServer(message);
 	}

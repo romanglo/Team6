@@ -255,9 +255,10 @@
 									prefHeight="25.0" prefWidth="59.0" />
 								<ComboBox fx:id="combo_minute" layoutX="291.0" layoutY="101.0"
 									prefHeight="25.0" prefWidth="59.0" />
-								<Label layoutX="284.0" layoutY="105.0" text=":" />
-								<CheckBox fx:id="immidiate_delivery" layoutX="41.20000000000002"
-									layoutY="135.0" mnemonicParsing="false" text="As Soon As Possible" />
+								<Label layoutX="284.0" layoutY="103.0" text=":" />
+								<CheckBox fx:id="immidiate_delivery" layoutX="38"
+									onAction="#immediateDeliveryClick" layoutY="130"
+									mnemonicParsing="false" text="As Soon As Possible" />
 								<CheckBox fx:id="blessing_card" layoutX="40.19999999999999"
 									layoutY="265.0" mnemonicParsing="false" onAction="#blessingButtonClick"
 									text="Add Blessing Card" />
