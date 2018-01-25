@@ -120,7 +120,7 @@ public class LoginSettingsController implements Initializable
 							long count = resultString.chars().filter(ch -> ch == '.').count();
 							if (!resultString.equalsIgnoreCase("localhost") && count != 3) {
 								wrongInput = true;
-								showAlertMessage("Please enter valid IP address!",AlertType.INFORMATION);
+								showAlertMessage("Please enter valid IP address!", AlertType.INFORMATION);
 								break;
 							}
 
@@ -151,7 +151,7 @@ public class LoginSettingsController implements Initializable
 								wrongInput = true;
 							}
 							if (wrongInput) {
-								showAlertMessage("The port must be an number between 0 to 65535!",AlertType.WARNING);
+								showAlertMessage("The port must be an number between 0 to 65535!", AlertType.WARNING);
 							}
 						break;
 
@@ -196,12 +196,14 @@ public class LoginSettingsController implements Initializable
 		setting_table.setItems(settings);
 	}
 
-
 	/**
 	 * The method show alert message from {@link Alert} type.
 	 *
 	 * @param message
 	 *            the message to show.
+	 * @param alertType
+	 *            the type of the alert, selected type determinate ton the title and
+	 *            the image.
 	 */
 	protected void showAlertMessage(String message, AlertType alertType)
 	{
@@ -213,6 +215,6 @@ public class LoginSettingsController implements Initializable
 			alert.showAndWait();
 		});
 	}
-	
+
 	// end region -> Private methods
 }

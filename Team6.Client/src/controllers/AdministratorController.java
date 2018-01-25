@@ -25,8 +25,9 @@ import messages.MessagesFactory;
 import messages.RespondMessageData;
 
 /**
- *
+ * AdministratorController : Managed the Administrator UI.
  * 
+ * @see BaseController
  * 
  */
 public class AdministratorController extends BaseController
@@ -397,8 +398,6 @@ public class AdministratorController extends BaseController
 
 	/**
 	 * {@inheritDoc}
-	 * 
-	 * @return: return if the window opened for the firs time
 	 */
 	@Override
 	public void onMessageReceived(Message msg) throws Exception

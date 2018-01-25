@@ -26,6 +26,7 @@ import messages.RespondMessageData;
  *
  * ServiceSpecialistController: manages the service specialist UI.
  * 
+ * @see BaseController
  * 
  */
 public class ServiceSpecialistController extends BaseController
@@ -146,7 +147,7 @@ public class ServiceSpecialistController extends BaseController
 					m_Logger.severe("successfully updated");
 					javafx.application.Platform.runLater(() -> {
 						initializesurveys();
-						showAlertMessage("Successfully added",AlertType.INFORMATION);
+						showAlertMessage("Successfully added", AlertType.INFORMATION);
 					});
 
 				}
@@ -162,13 +163,13 @@ public class ServiceSpecialistController extends BaseController
 	 * Update the complaints add specialist analysis
 	 *
 	 * @param event
-	 * 			save button clicked.
+	 *            save button clicked.
 	 */
 	@FXML
 	public void saveAnalysis(ActionEvent event)
 	{
 		if ((textarea_analysis.getText().equals("")) || (combobox_id.getValue().equals(""))) {
-			showAlertMessage("Specialist analisys area and/or survey ID are empty",AlertType.WARNING);
+			showAlertMessage("Specialist analisys area and/or survey ID are empty", AlertType.WARNING);
 		} else {
 			selected_survey.setSummary(textarea_analysis.getText());
 			Message msg = MessagesFactory.createUpdateEntityMessage(selected_survey);

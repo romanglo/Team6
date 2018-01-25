@@ -59,6 +59,8 @@ import messages.RespondMessageData;
 /**
  * ShopManagerController : Managed the Shop Manager and Chain Manager UI.
  * 
+ * @see BaseController
+ * 
  */
 public class ShopManagerController extends BaseController
 {

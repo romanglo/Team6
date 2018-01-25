@@ -81,8 +81,7 @@ public class ScheduledExecutor extends Startable
 	/**
 	 * 
 	 * Create instance that execute schedule tasks in fixed rate with result. The
-	 * execution will happen every {@value ScheduledExecutor#DEFAULT_PERIOD}
-	 * {@value ScheduledExecutor#DEFAULT_TIMEUNIT}.
+	 * execution rate will happen every default time.
 	 * 
 	 * @see IStartable
 	 * @param throwable

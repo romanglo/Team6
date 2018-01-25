@@ -54,6 +54,7 @@ import messages.RespondMessageData;
 /**
  * CompanyEmployeeController : Managed the Company Employee UI.
  * 
+ * @see BaseController
  */
 public class CompanyEmployeeController extends BaseController
 {

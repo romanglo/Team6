@@ -468,6 +468,10 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	 *
 	 * @param message
 	 *            the message to show.
+	 * 
+	 * @param alertType
+	 *            the type of the alert, selected type determinate ton the title and
+	 *            the image.
 	 */
 	protected void showAlertMessage(String message, AlertType alertType)
 	{
@@ -486,7 +490,11 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 
 	/**
 	 * The method called when the controller initialized. The default implementation
-	 * does nothing, it may be overridden by extending class.
+	 * does nothing, it may be overridden by extending class. The method called from
+	 * exception safe scope.
+	 * 
+	 * @throws Exception
+	 *             an exception if the initial stop failed.
 	 */
 	protected abstract void internalInitialize() throws Exception;
 
@@ -527,7 +535,11 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	/**
 	 * Event method called after the connection has been closed due to an method
 	 * calling or exception. The default implementation does nothing. The default
-	 * implementation does nothing, it may be overridden by extending class.
+	 * implementation does nothing, it may be overridden by extending class. This
+	 * method called from exception safe scope.
+	 * 
+	 * @throws Exception
+	 *             an exception if the initial stop failed.
 	 */
 	protected void onDisconnectFromServer() throws Exception
 	{

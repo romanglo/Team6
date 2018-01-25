@@ -40,6 +40,8 @@ import messages.RespondMessageData;
  *
  * CostumerServiceEmployeeController: Manages the costumer service employee UI.
  * 
+ * @see BaseController
+ * 
  */
 public class CostumerServiceEmployeeController extends BaseController
 {
@@ -383,11 +385,11 @@ public class CostumerServiceEmployeeController extends BaseController
 	private void openSurveys_AddSurvey(ActionEvent event)
 	{
 		if (opensurvey_combobox_shopname.getValue() == null) {
-			showAlertMessage("Please complete all fields before saving.",AlertType.INFORMATION);
+			showAlertMessage("Please complete all fields before saving.", AlertType.INFORMATION);
 			return;
 		}
 		if (opensurvey_datepicker_enddate.getValue() == null) {
-			showAlertMessage("You left empty fields.",AlertType.WARNING);
+			showAlertMessage("You left empty fields.", AlertType.WARNING);
 			return;
 		}
 		String state = opensurvey_button_openclose_survey.getText();
@@ -524,11 +526,11 @@ public class CostumerServiceEmployeeController extends BaseController
 				if (((RespondMessageData) msg.getMessageData()).getMessageData() instanceof EntityData) {
 					if (((EntityData) ((RespondMessageData) msg.getMessageData()).getMessageData())
 							.getEntity() instanceof Costumer) {
-						showAlertMessage("The costumer doesn't exist.",AlertType.WARNING);
+						showAlertMessage("The costumer doesn't exist.", AlertType.WARNING);
 					} else {
 						if (((RespondMessageData) msg.getMessageData()).isSucceed()) {
 							m_Logger.severe("Successfully added complaint");
-							showAlertMessage("Successfully added complaint",AlertType.INFORMATION);
+							showAlertMessage("Successfully added complaint", AlertType.INFORMATION);
 							addcomplaint_initializeShopCombobox();
 						}
 					}
@@ -587,9 +589,9 @@ public class CostumerServiceEmployeeController extends BaseController
 				} else {
 					if (flag == false) {
 						m_Logger.severe("Can't Update complaint.");
-						showAlertMessage("Can't Update complaint, please try again",AlertType.WARNING);
+						showAlertMessage("Can't Update complaint, please try again", AlertType.WARNING);
 					} else {
-						showAlertMessage("Successfully updated",AlertType.INFORMATION);
+						showAlertMessage("Successfully updated", AlertType.INFORMATION);
 						tri();
 					}
 				}
@@ -644,8 +646,8 @@ public class CostumerServiceEmployeeController extends BaseController
 				if (((RespondMessageData) messageData).isSucceed()) {
 					m_Logger.severe("work");
 					if (opensurvey_button_openclose_survey.getText().equals("Open"))
-						showAlertMessage("Successfully added",AlertType.INFORMATION);
-					else showAlertMessage("Successfully updated",AlertType.INFORMATION);
+						showAlertMessage("Successfully added", AlertType.INFORMATION);
+					else showAlertMessage("Successfully updated", AlertType.INFORMATION);
 					javafx.application.Platform.runLater(() -> {
 						opensurvey_button_openclose_survey.setText("Open");
 						opensurvey_combobox_shopname.setValue("");
@@ -698,7 +700,7 @@ public class CostumerServiceEmployeeController extends BaseController
 						}
 					}
 					if (!twentyfour.equals("")) {
-						showAlertMessage("You must treat complaints numbers: " + twentyfour,AlertType.WARNING);
+						showAlertMessage("You must treat complaints numbers: " + twentyfour, AlertType.WARNING);
 					}
 				}
 			} else if (messageData instanceof EntityData) {

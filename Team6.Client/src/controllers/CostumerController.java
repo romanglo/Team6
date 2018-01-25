@@ -65,6 +65,7 @@ import messages.RespondMessageData;
  *
  * CostumerController: Manage the costumer UI functionalities.
  * 
+ * @see BaseController
  */
 public class CostumerController extends BaseController
 {

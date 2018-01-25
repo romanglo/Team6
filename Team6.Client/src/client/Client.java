@@ -15,8 +15,8 @@ import ocsf.client.AbstractClient;
 
 /**
  *
- * Client: Implement connection to a sever and transfer data.
- * 
+ * Client: Implementation of {@link AbstractClient} that can receive and send
+ * {@link Message} type message.
  */
 public class Client extends AbstractClient
 {
@@ -40,7 +40,7 @@ public class Client extends AbstractClient
 		 *             The method can throw any kind of exception, this method call
 		 *             surround with try/catch.
 		 * 
-		 * @see {@link Message} the received type.
+		 * @see Message the received type.
 		 */
 		void onMessageReceived(Message msg) throws Exception;
 	}
@@ -194,6 +194,12 @@ public class Client extends AbstractClient
 		}
 	}
 
+	/**
+	 * Handles a message sent from the server to this client.
+	 *
+	 * @param obj
+	 *            the received message from server.
+	 */
 	@Override
 	public void handleMessageFromServer(Object obj)
 	{
@@ -249,6 +255,10 @@ public class Client extends AbstractClient
 
 	// region Protected Methods
 
+	/**
+	 * Hook method called after a connection has been established. The method invoke
+	 * the {@link ClientStatusHandler#onClientConnected()} if it exists.
+	 */
 	@Override
 	protected void connectionEstablished()
 	{
@@ -263,6 +273,10 @@ public class Client extends AbstractClient
 
 	}
 
+	/**
+	 * Hook method called after the connection has been closed. The method invoke
+	 * the {@link ClientStatusHandler#onClientDisconnected()} if it exists.
+	 */
 	@Override
 	protected void connectionClosed()
 	{
@@ -277,6 +291,14 @@ public class Client extends AbstractClient
 		}
 	}
 
+	/**
+	 * Hook method called each time an exception is thrown by the client's thread
+	 * that is waiting for messages from the server. This method call
+	 * {@link #connectionClosed()} if the connection with the server closed.
+	 *
+	 * @param exception
+	 *            the exception raised.
+	 */
 	@Override
 	protected void connectionException(Exception exception)
 	{

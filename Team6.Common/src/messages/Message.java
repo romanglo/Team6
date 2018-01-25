@@ -75,8 +75,8 @@ public class Message implements Serializable
 
 	/**
 	 * 
-	 * Create instance of class that implements {@link IMessage}. Auto generation of
-	 * message ID based on {@link UUID}, and time in UTC format.
+	 * Create instance of message. Auto generation of message ID based on
+	 * {@link UUID}, and time in UTC format.
 	 * 
 	 * @param messageData
 	 *            The actual data of the message.
@@ -97,9 +97,9 @@ public class Message implements Serializable
 
 	/**
 	 * 
-	 * Create instance of class that implements {@link IMessage}. Auto generation of
-	 * message ID based on {@link UUID}, and time in UTC format. The message have
-	 * null {@link IMessageData}.
+	 * Create instance of message. Auto generation of message ID based on
+	 * {@link UUID}, and time in UTC format. The message have null
+	 * {@link IMessageData}.
 	 * 
 	 */
 	Message()

@@ -56,14 +56,14 @@ public class Server extends AbstractServer {
 	public interface ServerStatusHandler {
 
 		/**
-		 * Method called when the server starts listening for connections, this method called from
-		 * exception unsafe scope.
+		 * Method called when the server starts listening for connections, this method
+		 * called from exception unsafe scope.
 		 */
 		void onServerStarted();
 
 		/**
-		 * Method called when the server stops accepting connections, this method called from
-		 * exception unsafe scope.
+		 * Method called when the server stops accepting connections, this method called
+		 * from exception unsafe scope.
 		 */
 		void onServerStopped();
 
@@ -206,7 +206,13 @@ public class Server extends AbstractServer {
 	// region AbstractServer Methods Override
 
 	/**
-	 * {@inheritDoc}
+	 * Handles a command sent from one client to the server. This method is called
+	 * by a synchronized method so it is also implicitly synchronized.
+	 *
+	 * @param obj
+	 *            the received message from client.
+	 * @param client
+	 *            the connection connected to the client that sent the message.
 	 */
 	@Override
 	protected void handleMessageFromClient(Object obj, ConnectionToClient client) {
@@ -218,8 +224,8 @@ public class Server extends AbstractServer {
 		}
 		if (!(obj instanceof Message)) {
 			m_logger.info(
-					"A message has been received from client, but the message type is not inherit from Message. Message type: " 
-					+ obj.getClass().getName() + "The Client: " + clientDetails);
+					"A message has been received from client, but the message type is not inherit from Message. Message type: "
+							+ obj.getClass().getName() + "The Client: " + clientDetails);
 			return;
 		}
 
@@ -241,7 +247,9 @@ public class Server extends AbstractServer {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Hook method called when the server starts listening for connections. The
+	 * method invoke the {@link ServerStatusHandler#onServerStarted()} if it
+	 * exists.
 	 */
 	@Override
 	protected void serverStarted() {
@@ -263,7 +271,8 @@ public class Server extends AbstractServer {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Hook method called when the server stops accepting connections. The method
+	 * invoke the {@link ServerStatusHandler#onServerStopped()} if it exists.
 	 */
 	@Override
 	protected void serverStopped() {
@@ -293,7 +302,12 @@ public class Server extends AbstractServer {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Hook method called each time a new client connection is accepted. The method
+	 * invoke the {@link ClientConnectionHandler#onClientConnected(String, int)} if
+	 * it exists.
+	 * 
+	 * @param client
+	 *            the connection connected to the client.
 	 */
 	@Override
 	protected void clientConnected(ConnectionToClient client) {
@@ -307,7 +321,12 @@ public class Server extends AbstractServer {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Hook method called each time a client disconnects.The method invoke the
+	 * {@link ClientConnectionHandler#onClientDisconnected(String, int)} if it
+	 * exists.
+	 *
+	 * @param client
+	 *            the connection with the client.
 	 */
 	@Override
 	protected synchronized void clientDisconnected(ConnectionToClient client) {
@@ -324,13 +343,21 @@ public class Server extends AbstractServer {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Hook method called each time an exception is thrown in a ConnectionToClient
+	 * thread. The method call {@link Server#serverStopped()} if the server has
+	 * stopped, also the method call
+	 * {@link Server#clientDisconnected(ConnectionToClient)}.
+	 *
+	 * @param client
+	 *            the client that raised the exception.
+	 * @param throwable
+	 *            the exception thrown.
 	 */
 	@Override
-	protected synchronized void clientException(ConnectionToClient client, Throwable exception) {
+	protected synchronized void clientException(ConnectionToClient client, Throwable throwable) {
 		String clientDetails = client == null ? "null" : client.toString();
 		m_logger.warning("Received exception on ConnectionToClient thread! Failed client: " + clientDetails
-				+ ", exception: " + exception.getMessage());
+				+ ", exception: " + throwable.getMessage());
 		if (!isListening()) {
 			serverStopped();
 		}
@@ -339,7 +366,12 @@ public class Server extends AbstractServer {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Hook method called when the server stops accepting connections because an
+	 * exception has been raised. The method call {@link Server#serverStopped()} if
+	 * the server has stopped.
+	 * 
+	 * @param exception
+	 *            the exception raised.
 	 */
 	@Override
 	protected void listeningException(Throwable exception) {

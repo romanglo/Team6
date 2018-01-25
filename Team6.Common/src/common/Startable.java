@@ -59,7 +59,7 @@ public abstract class Startable implements IStartable
 	 * Create instance of {@link ScheduledExecutor}, get logger from
 	 * {@link LogManager#getLogger()}.
 	 * 
-	 * @see {@link Startable#Startable(boolean, Logger)}
+	 * @see Startable#Startable(boolean, Logger)
 	 * @see IStartable
 	 * 
 	 * @param throwable
@@ -76,7 +76,7 @@ public abstract class Startable implements IStartable
 	 * Create instance of {@link ScheduledExecutor}. This instance would not throws
 	 * exceptions in {@link IStartable#Start()} method.
 	 * 
-	 * @see {@link Startable#Startable(boolean, Logger)}
+	 * @see Startable#Startable(boolean, Logger)
 	 * @param logger
 	 *            A logger to write to it.
 	 */
@@ -91,7 +91,7 @@ public abstract class Startable implements IStartable
 	 * {@link LogManager#getLogger()}. This instance would not throws exceptions in
 	 * {@link IStartable#Start()} method.
 	 * 
-	 * @see {@link Startable#Startable(boolean, Logger)}
+	 * @see Startable#Startable(boolean, Logger)
 	 * 
 	 * @see IStartable
 	 * 
@@ -183,12 +183,18 @@ public abstract class Startable implements IStartable
 	// region Abstract Methods
 
 	/**
-	 * The method contain the real login in stop operation.
+	 * The method contain the real login in stop operation, this method called from exception safe scope.
+	 * 
+	 * @throws Exception
+	 *             an exception if the initial stop failed.
 	 */
 	protected abstract void initialStop() throws Exception;
 
 	/**
 	 * The method contain the real login in start operation.
+	 * 
+	 * @throws Exception
+	 *             an exception if the initial start failed, this method called from exception safe scope.
 	 */
 	protected abstract void initialStart() throws Exception;
 

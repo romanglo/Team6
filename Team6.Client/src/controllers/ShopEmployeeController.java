@@ -40,6 +40,7 @@ import messages.RespondMessageData;
  *
  * ShopEmployeeController: Manages shop employee UI.
  * 
+ * @see BaseController
  * 
  */
 public class ShopEmployeeController extends BaseController
