@@ -10,7 +10,7 @@
 		<password>123456</password>
 	</db>
 	<time>
-		<LastSubscriptionCheckDate>01-01-2018</LastSubscriptionCheckDate>
-	    <LastGenerationDate>31-12-2017</LastGenerationDate>
+		<LastSubscriptionCheckDate>31-01-2018</LastSubscriptionCheckDate>
+	    <LastGenerationDate>01-01-2018</LastGenerationDate>
 	</time>
 </configuration>

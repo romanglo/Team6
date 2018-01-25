@@ -358,7 +358,7 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	{
 		try {
 			Stage currentStage = (Stage) borderpain_main_top.getScene().getWindow();
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/boundaries/UserDetails.FXML"));
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/boundaries/UserDetails.fxml"));
 			Parent parent = (Parent) fxmlLoader.load();
 			FadeTransition ft = new FadeTransition(Duration.seconds(1.5), parent);
 			ft.setFromValue(0.0);

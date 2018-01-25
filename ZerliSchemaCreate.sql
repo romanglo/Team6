@@ -293,7 +293,7 @@ BEGIN
 					AND YEAR(coDate) = in_year AND MONTH(coDate) = (end_month - 1)),
 			   (SELECT COUNT(*) FROM complaints WHERE smId = shop_manager_id
 					AND YEAR(coDate) = in_year AND MONTH(coDate) = end_month)
-		FROM complaints;
+		FROM complaints GROUP BY shop_manager_id;
 		    		   
 END; //
 
@@ -312,7 +312,7 @@ BEGIN
 			   rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = (end_month - 1)),
 			   (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
 			   rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = end_month)
-	    FROM reservations;
+	    FROM reservations GROUP BY shop_manager_id;
 		    		   
 END; //
 
@@ -688,103 +688,371 @@ LOCK TABLES shop_employees WRITE;
 LOCK TABLES users WRITE;
 INSERT INTO users (uUserName,uPassword,uEmail,uPrivilege) VALUES 
 ('companyemployee','companyemployee','companyemployee@local','CompanyEmployee'),
+('companyemployee2','companyemployee2','companyemployee2@local','CompanyEmployee'),
+('companyemployee3','companyemployee3','companyemployee3@local','CompanyEmployee'),
 ('shopmanager','shopmanager','shopmanager@local','ShopManager'),
 ('shopmanager2','shopmanager2','shopmanager@local','ShopManager'),
 ('shopmanager3','shopmanager3','shopmanager@local','ShopManager'),
+('shopmanager4','shopmanager4','shopmanager@local','ShopManager'),
+('shopmanager5','shopmanager5','shopmanager@local','ShopManager'),
 ('chainmanager','chainmanager','chainmanager@local','ChainManager'),
 ('administrator','administrator','administrator@local','Administrator'),
 ('shopemployee','shopemployee','shopemployee@local','ShopEmployee'),
+('moshe','123','moshe@local','ShopEmployee'),
+('dolev','123','dolev@local','ShopEmployee'),
+('kobe','123','kobe@local','ShopEmployee'),
+('idan','123','idan@local','ShopEmployee'),
+('gaya','123','gaya@local','ShopEmployee'),
+('shahar','123','shahar@local','ShopEmployee'),
+('sahar','123','sahar@local','ShopEmployee'),
+('roman','123','roman@local','ShopEmployee'),
+('petrick','123','petrick@local','ShopEmployee'),
+('alis','123','alis@local','ShopEmployee'),
+('ester','123','ester@local','ShopEmployee'),
+('bob','123','bob@local','ShopEmployee'),
+('tal','123','tal@local','ShopEmployee'),
+('david','123','david@local','ShopEmployee'),
+('ariel','123','ariel@local','ShopEmployee'),
+('may','123','may@local','ShopEmployee'),
+('sapir','123','sapir@local','ShopEmployee'),
+('ofek','123','ofek@local','ShopEmployee'),
+('reuven','123','reuven@local','ShopEmployee'),
 ('costumerservice','costumerservice','costumerservice@local','CostumerService'),
 ('costumer','costumer','costumer@local','Costumer'),
-('servicespecialist','servicespecialist','servicespecialist@local','ServiceSpecialist');
+('jake','123','jake@gmail.com','Costumer'),
+('adam','123','adam@gmail.com','Costumer'),
+('kate','123','kate@gmail.com','Costumer'),
+('josh','123','josh@gmail.com','Costumer'),
+('drake','123','drake@gmail.com','Costumer'),
+('specialist1','specialist1','specialist1@local','ServiceSpecialist');
 
-UPDATE shop_employees SET smId = 1 WHERE uUserName = 'shopemployee';
+UPDATE shop_employees SET smId = 1 WHERE uUserName = 'moshe';
+UPDATE shop_employees SET smId = 1 WHERE uUserName = 'dolev';
+UPDATE shop_employees SET smId = 1 WHERE uUserName = 'kobe';
+UPDATE shop_employees SET smId = 1 WHERE uUserName = 'idan';
+UPDATE shop_employees SET smId = 1 WHERE uUserName = 'gaya';
+UPDATE shop_employees SET smId = 2 WHERE uUserName = 'shaha';
+UPDATE shop_employees SET smId = 2 WHERE uUserName = 'sahar';
+UPDATE shop_employees SET smId = 2 WHERE uUserName = 'roman';
+UPDATE shop_employees SET smId = 2 WHERE uUserName = 'petri';
+UPDATE shop_employees SET smId = 3 WHERE uUserName = 'alis';
+UPDATE shop_employees SET smId = 3 WHERE uUserName = 'ester';
+UPDATE shop_employees SET smId = 3 WHERE uUserName = 'bob';
+UPDATE shop_employees SET smId = 3 WHERE uUserName = 'tal';
+UPDATE shop_employees SET smId = 4 WHERE uUserName = 'david';
+UPDATE shop_employees SET smId = 4 WHERE uUserName = 'ariel';
+UPDATE shop_employees SET smId = 4 WHERE uUserName = 'may';
+UPDATE shop_employees SET smId = 4 WHERE uUserName = 'sapir';
+UPDATE shop_employees SET smId = 5 WHERE uUserName = 'ofek';
+UPDATE shop_employees SET smId = 5 WHERE uUserName = 'reuven';
+UPDATE shop_employees SET smId = 5 WHERE uUserName = 'moshe';
+UPDATE shop_employees SET smId = 5 WHERE uUserName = 'dolev';
 UPDATE shop_managers SET smName = 'Haifa' WHERE  smId = 1;
 UPDATE shop_managers SET smName = 'Karmiel' WHERE smId = 2;
 UPDATE shop_managers SET smName = 'Akko' WHERE smId = 3;
-
-LOCK TABLES items WRITE;
-INSERT INTO items (iName,iType,iPrice,iDomainColor) VALUES 
-('Rose','Flower',9.0,'red'),
-('Sunflower','Flower',15.0,'yellow'),
-('Lily','Flower',3.0,'white'),
-('Anemone','Flower',5.0,'red'),
-('Aconite','Flower',5.0, 'purple'),
-('Balloon Flower','Flower',78.0,'purple'),
-('Canterbury Bells','Flower',12.0,'pink'),
-('Dusty Miller','Flower',8.0,'white'),
-('Epimedium','Flower',9.0,'yellow'),
-('Fennel','Flower',10.0,'white'),
-('Gaillardia','Flower',11.0,'yellow'),
-('Hepatica','Flower',12.0,'purple'),
-('Iris','Flower',13.0,'purple'),
-('Lavender','Flower',14.0,'purple'),
-('Marigold','Flower',15.0,'orange'),
-('Orchid','Flower',16.0,'pink');
-
-LOCK TABLES items_in_shops WRITE;
-INSERT INTO items_in_shops (smId,iId,isDiscountedPrice) VALUES 
-(1,1,5),
-(1,2,5),
-(1,10,5);
+UPDATE shop_managers SET smName = 'Bat-Yam' WHERE smId = 4;
+UPDATE shop_managers SET smName = 'Afula' WHERE smId = 5;
 
 LOCK TABLES costumers_in_shops WRITE;
 INSERT INTO costumers_in_shops (cId,smId) VALUES
-(1,1);
+(1,1),
+(2,1),
+(2,2),
+(3,3),
+(4,2),
+(4,1),
+(5,3),
+(6,3),
+(1,4),
+(2,5),
+(3,5),
+(4,4),
+(5,4),
+(6,5);
+
+TRUNCATE TABLE surveys;
 
 LOCK TABLES surveys WRITE;
 INSERT INTO surveys (smId,suStartDate,suEndDate) VALUES
-(1,'2017-01-01', '2017-01-31'),
-(2,'2017-01-01', '2017-01-31'),
-(3,'2017-01-01', '2017-01-31'),
-(1,'2017-03-01', '2017-03-31'),
-(2,'2017-03-01', '2017-03-31'),
-(3,'2017-03-01', '2017-03-31');
+(1,'2017-01-01', '2017-02-28'),
+(2,'2017-01-01', '2017-02-28'),
+(3,'2017-01-01', '2017-02-28'),
+(4,'2017-01-01', '2017-02-28'),
+(5,'2017-01-01', '2017-02-28'),
+(1,'2017-03-01', '2017-05-31'),
+(2,'2017-03-01', '2017-05-31'),
+(3,'2017-03-01', '2017-05-31'),
+(4,'2017-03-01', '2017-05-31'),
+(5,'2017-03-01', '2017-05-31'),
+(1,'2017-06-01', '2017-08-31'),
+(2,'2017-06-01', '2017-08-31'),
+(3,'2017-06-01', '2017-08-31'),
+(4,'2017-06-01', '2017-08-31'),
+(5,'2017-06-01', '2017-08-31'),
+(1,'2017-09-01', '2017-11-30'),
+(2,'2017-09-01', '2017-11-30'),
+(3,'2017-09-01', '2017-11-30'),
+(4,'2017-09-01', '2017-11-30'),
+(5,'2017-09-01', '2017-11-30');
 
 
 LOCK TABLES survey_results WRITE;
 
 INSERT INTO survey_results (suId,srEnterDate,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES
-(1,'2017-01-02',4,4,4,4,4,4),
-(1,'2017-01-04',2,2,2,2,2,2),
-(2,'2017-01-02',4,4,4,4,4,4),
-(2,'2017-01-02',4,4,4,4,4,4),
-(3,'2017-01-02',4,4,4,4,4,4),
-(3,'2017-01-02',4,4,4,4,4,4),
-(3,'2017-01-02',4,4,4,4,4,4),
-(3,'2017-01-02',4,4,4,4,4,4);
+(1,'2017-01-01',10,8,7,6,5,4),
+(1,'2017-01-02',2,3,4,6,9,9),
+(1,'2017-01-03',1,2,3,6,9,8),
+(1,'2017-01-04',4,3,3,2,2,2),
+(1,'2017-01-05',7,7,8,3,1,2),
+(1,'2017-01-06',2,9,8,7,6,6),
+(1,'2017-01-07',2,3,5,7,8,1),
+(1,'2017-01-08',8,3,4,9,10,10),
+(1,'2017-01-09',10,10,10,6,3,2),
+(1,'2017-01-10',1,1,1,2,3,4),
+(2,'2017-01-11',4,3,2,1,8,9),
+(2,'2017-01-12',4,10,4,10,4,10),
+(2,'2017-01-13',3,8,4,2,9,1),
+(2,'2017-01-14',3,3,3,1,2,5),
+(2,'2017-01-15',9,7,1,2,9,8),
+(2,'2017-01-16',1,2,3,4,5,6),
+(2,'2017-01-17',7,8,9,9,8,7),
+(2,'2017-01-18',10,9,3,4,2,4),
+(2,'2017-01-19',3,9,9,4,1,4),
+(2,'2017-01-20',9,5,1,4,4,2),
+(3,'2017-01-21',7,7,7,4,7,10),
+(3,'2017-01-22',9,8,4,4,2,10),
+(3,'2017-01-23',10,3,4,4,2,4),
+(3,'2017-01-24',9,8,7,2,1,10),
+(3,'2017-01-25',8,7,10,1,2,4),
+(3,'2017-01-26',5,4,5,6,5,7),
+(3,'2017-01-27',9,10,10,9,8,7),
+(3,'2017-01-28',8,2,8,1,8,1),
+(3,'2017-01-29',4,7,2,4,1,9),
+(3,'2017-01-30',4,8,10,4,2,8),
+(4,'2017-02-01',4,1,5,4,4,7),
+(4,'2017-02-02',4,4,6,4,9,6),
+(4,'2017-02-03',1,4,2,4,4,2),
+(4,'2017-02-04',8,7,4,3,2,1),
+(4,'2017-02-05',9,8,7,7,8,9),
+(4,'2017-02-06',5,4,3,3,4,5),
+(4,'2017-02-07',2,4,6,8,10,1),
+(4,'2017-02-08',8,3,5,7,9,10),
+(4,'2017-02-09',7,8,4,4,10,4),
+(4,'2017-02-10',6,2,8,10,4,6),
+(5,'2017-02-11',4,4,10,8,2,4),
+(5,'2017-02-12',4,10,4,4,8,7),
+(5,'2017-02-13',10,4,2,3,4,8),
+(5,'2017-02-14',9,3,9,2,1,6),
+(5,'2017-02-15',9,1,2,6,2,6),
+(5,'2017-02-16',9,9,9,9,9,9),
+(5,'2017-02-17',4,2,7,4,8,8),
+(5,'2017-02-18',2,4,4,8,4,1),
+(5,'2017-02-19',4,2,8,4,7,4),
+(5,'2017-02-20',7,8,4,4,4,7),
+(6,'2017-04-01',1,2,3,4,5,6),
+(6,'2017-04-02',8,7,6,4,1,1),
+(6,'2017-04-03',9,8,7,4,1,2),
+(6,'2017-04-04',6,7,7,8,8,8),
+(6,'2017-04-05',3,3,2,7,9,8),
+(6,'2017-04-06',8,1,2,3,4,4),
+(6,'2017-04-07',8,7,5,3,2,9),
+(6,'2017-04-08',2,7,6,2,1,1),
+(6,'2017-04-09',1,1,1,3,2,9),
+(6,'2017-04-10',9,9,9,8,7,6),
+(7,'2017-04-11',2,2,4,2,1,9),
+(7,'2017-04-12',4,1,4,1,4,1),
+(7,'2017-04-13',7,2,6,5,2,9),
+(7,'2017-04-14',7,7,7,9,1,5),
+(7,'2017-04-15',9,7,1,2,9,8),
+(7,'2017-04-16',8,8,2,1,9,9),
+(7,'2017-04-17',3,2,1,1,2,3),
+(7,'2017-04-18',1,1,7,6,8,6),
+(7,'2017-04-19',7,1,1,6,9,6),
+(7,'2017-04-20',1,5,9,6,6,8),
+(8,'2017-04-21',3,3,3,6,3,1),
+(8,'2017-04-22',1,2,6,6,8,1),
+(8,'2017-04-23',1,9,9,6,5,4),
+(8,'2017-04-24',9,2,3,8,9,1),
+(8,'2017-04-25',2,3,1,9,8,6),
+(8,'2017-04-26',5,5,5,5,5,5),
+(8,'2017-04-27',1,1,1,1,2,3),
+(8,'2017-04-28',2,8,2,10,2,10),
+(8,'2017-04-29',6,3,8,6,9,10),
+(8,'2017-04-30',6,2,10,6,8,2),
+(9,'2017-05-01',6,9,5,6,6,3),
+(9,'2017-05-02',4,3,2,6,1,4),
+(9,'2017-05-03',9,6,8,6,5,8),
+(9,'2017-05-04',2,3,6,7,8,9),
+(9,'2017-05-05',1,7,3,3,2,10),
+(9,'2017-05-06',2,6,6,8,8,10),
+(9,'2017-05-07',7,5,1,5,1,7),
+(9,'2017-05-08',2,7,5,3,1,10),
+(9,'2017-05-09',7,8,4,4,10,4),
+(9,'2017-05-10',6,2,8,10,4,6),
+(10,'2017-05-11',4,4,10,8,2,4),
+(10,'2017-05-12',4,10,4,4,8,7),
+(10,'2017-05-13',10,4,2,3,4,8),
+(10,'2017-05-14',9,3,9,2,1,6),
+(10,'2017-05-15',9,1,2,6,2,6),
+(10,'2017-05-16',9,9,9,9,9,9),
+(10,'2017-05-17',4,2,7,4,8,8),
+(10,'2017-05-18',2,4,4,8,4,1),
+(10,'2017-05-19',4,2,8,4,7,4),
+(10,'2017-05-20',7,8,4,4,4,7),
+(11,'2017-07-01',9,9,9,9,9,9),
+(11,'2017-07-02',9,7,7,7,7,7),
+(11,'2017-07-03',9,7,1,2,9,8),
+(11,'2017-07-04',8,8,2,1,9,9),
+(11,'2017-07-05',3,2,1,1,2,3),
+(11,'2017-07-06',1,1,7,6,8,6),
+(11,'2017-07-07',7,1,1,6,9,6),
+(11,'2017-07-08',1,5,9,6,6,8),
+(11,'2017-07-09',3,3,3,6,3,1),
+(11,'2017-07-10',1,2,6,6,8,1),
+(12,'2017-07-11',1,9,9,6,5,4),
+(12,'2017-07-12',9,2,3,8,9,1),
+(12,'2017-07-13',2,3,1,9,8,6),
+(12,'2017-07-14',5,5,5,5,5,5),
+(12,'2017-07-15',1,1,1,1,2,3),
+(12,'2017-07-16',2,8,2,10,2,10),
+(12,'2017-07-17',10,8,7,6,5,4),
+(12,'2017-07-18',2,3,4,6,9,9),
+(12,'2017-07-19',1,2,3,6,9,8),
+(12,'2017-07-20',4,3,3,2,2,2),
+(13,'2017-07-21',7,7,8,3,1,2),
+(13,'2017-07-22',2,9,8,7,6,6),
+(13,'2017-07-23',2,3,5,7,8,1),
+(13,'2017-07-24',8,3,4,9,10,10),
+(13,'2017-07-25',10,10,10,6,3,2),
+(13,'2017-07-26',1,1,1,2,3,4),
+(13,'2017-07-27',1,1,1,1,2,3),
+(13,'2017-07-28',2,7,5,3,1,10),
+(13,'2017-07-29',7,8,4,4,10,4),
+(13,'2017-07-30',6,2,8,10,4,6),
+(14,'2017-08-01',4,4,10,8,2,4),
+(14,'2017-08-02',4,10,4,4,8,7),
+(14,'2017-08-03',10,4,2,3,4,8),
+(14,'2017-08-04',9,3,9,2,1,6),
+(14,'2017-08-05',9,1,2,6,2,6),
+(14,'2017-08-06',9,9,9,9,9,9),
+(14,'2017-08-07',4,2,7,4,8,8),
+(14,'2017-08-08',2,4,4,8,4,1),
+(14,'2017-08-09',2,2,4,2,1,9),
+(14,'2017-08-10',4,1,4,1,4,1),
+(15,'2017-08-11',7,2,6,5,2,9),
+(15,'2017-08-12',7,7,7,9,1,5),
+(15,'2017-08-13',9,7,1,2,9,8),
+(15,'2017-08-14',8,8,2,1,9,9),
+(15,'2017-08-15',3,2,1,1,2,3),
+(15,'2017-08-16',1,1,7,6,8,6),
+(15,'2017-08-17',7,1,1,6,9,6),
+(15,'2017-08-18',1,5,9,6,6,8),
+(15,'2017-08-19',3,3,3,6,3,1),
+(15,'2017-08-20',1,2,6,6,8,1),
+(16,'2017-10-01',9,8,7,4,3,2),
+(16,'2017-10-02',9,2,2,1,3,9),
+(16,'2017-10-03',9,8,2,7,9,1),
+(16,'2017-10-04',7,7,3,2,1,9),
+(16,'2017-10-05',2,2,2,2,2,2),
+(16,'2017-10-06',2,1,3,6,8,9),
+(16,'2017-10-07',8,1,3,6,8,9),
+(16,'2017-10-08',10,8,7,6,5,4),
+(16,'2017-10-09',2,3,4,6,9,9),
+(16,'2017-10-10',1,2,3,6,9,8),
+(17,'2017-10-11',4,3,3,2,2,2),
+(17,'2017-10-12',7,7,8,3,1,2),
+(17,'2017-10-13',2,9,8,7,6,6),
+(17,'2017-10-14',2,3,5,7,8,1),
+(17,'2017-10-15',1,1,1,1,2,3),
+(17,'2017-10-16',2,8,7,9,2,10),
+(17,'2017-10-17',10,8,7,6,5,4),
+(17,'2017-10-18',2,3,4,6,9,9),
+(17,'2017-10-19',1,2,3,6,9,8),
+(17,'2017-10-20',4,3,3,2,2,2),
+(18,'2017-10-21',7,7,8,3,1,2),
+(18,'2017-10-22',2,9,8,9,6,6),
+(18,'2017-10-23',2,3,5,7,8,1),
+(18,'2017-10-24',8,3,4,9,10,10),
+(18,'2017-10-25',10,10,10,6,3,2),
+(18,'2017-10-26',1,1,2,2,3,4),
+(18,'2017-10-27',1,1,1,1,2,3),
+(18,'2017-10-28',2,7,5,3,1,10),
+(18,'2017-10-29',7,3,4,4,10,4),
+(18,'2017-10-30',6,2,8,10,4,6),
+(19,'2017-11-01',4,4,10,8,2,4),
+(19,'2017-11-02',4,10,4,4,8,7),
+(19,'2017-11-03',10,4,2,3,4,8),
+(19,'2017-11-04',9,3,9,2,1,6),
+(19,'2017-11-05',9,1,2,6,2,6),
+(19,'2017-11-06',9,9,9,9,9,9),
+(19,'2017-11-07',4,2,7,4,8,8),
+(19,'2017-11-08',2,4,1,8,9,1),
+(19,'2017-11-09',2,2,4,2,1,9),
+(19,'2017-11-10',4,1,2,1,3,1),
+(20,'2017-11-11',7,2,6,5,2,9),
+(20,'2017-11-12',7,7,7,9,1,5),
+(20,'2017-11-13',9,7,6,2,9,8),
+(20,'2017-11-14',8,8,2,1,9,9),
+(20,'2017-11-15',3,2,6,1,2,3),
+(20,'2017-11-16',1,1,7,6,8,6),
+(20,'2017-11-17',7,1,2,6,9,6),
+(20,'2017-11-18',1,5,9,6,6,8),
+(20,'2017-11-19',3,3,7,6,3,1),
+(20,'2017-11-20',1,2,9,2,8,1);
 
-LOCK TABLES reservations WRITE;
-INSERT INTO reservations (cId, smId,rCreditCard, rType, rNumberOfItems, rPrice, rBlessingCard, rDeliveryType, rDeliveryAddress, rDeliveryPhone, rDeliveryName) VALUES 
-(1,1,'1234123412341234','Closed',2,10, 'Happy Birthday', 'Immidiate','Ort Braude','049981111','Dolev');
-
-LOCK TABLES items_in_reservations WRITE;
-INSERT INTO items_in_reservations (rId, iId, iName, irQuantity, irPrice) VALUES 
-(1,4,'Anemone',1,5),
-(1,5,'Aconite',1,5);
 
 LOCK TABLES complaints WRITE;
-INSERT INTO complaints (cId,smId,cseId ,coComplaint ) VALUES 
-(1,1,1,'The received product is not as orders.');
-
-LOCK TABLES complaints_reports WRITE;
-INSERT INTO complaints_reports (smId ,crYear, crQuarter, crMonth1, crMonth2, crMonth3) VALUES 
-(1,'2017',1,0,0,1),
-(2,'2017',1,1,1,0);
-
-LOCK TABLES surveys_reports WRITE;
-INSERT INTO surveys_reports (smId ,srYear, srQuarter, srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES 
-(1,'2017',1,0,0,1,1,1,1),
-(2,'2017',1,1,1,0,1,1,1);
-
-LOCK TABLES incomes_reports WRITE;
-INSERT INTO incomes_reports (smId ,irYear, irQuarter, irMonth1, irMonth2, irMonth3) VALUES 
-(1,'2017',1,0,0,1),
-(2,'2017',2,1,4124,0);
-
-LOCK TABLES reservations_reports WRITE;
-INSERT INTO reservations_reports (smId ,rrYear, rrQuarter,rrMonth1_Flower, rrMonth1_FlowerPot, rrMonth1_FlowerArrangement,rrMonth1_BridalBouquet,rrMonth2_Flower,rrMonth2_FlowerPot,rrMonth2_FlowerArrangement,rrMonth2_BridalBouquet, rrMonth3_Flower, rrMonth3_FlowerPot ,rrMonth3_FlowerArrangement,rrMonth3_BridalBouquet) VALUES 
-(1,'2017',1,0,0,1,1,0,0,1,1,0,0,1,1),
-(2,'2017',1,1,1,0,1,1,1,0,0,1,1,0,0);
+INSERT INTO complaints (cId,smId,cseId ,coComplaint,coDate ) VALUES 
+(1,1,1,'This is the worst customer service Ive ever encountered', '2017-01-19'),
+(2,1,2,'This company seems to be an internet scam--I placed an order with them for same day delivery. The flowers were never delivered, and Ive called twice now with no response.', '2017-02-01'),
+(3,1,3,'Horrible business practices and customer service', '2017-04-02'),
+(4,1,1,' dont answer the phone or any feedback', '2017-05-06'),
+(5,1,2,'I ordered a lovely arrangement from the website and what was received was nothing like the online picture.', '2017-07-29'),
+(6,1,3,'We ordered bereavement flowers a week ago tomorrow and my credit card has been charged $125', '2017-08-21'),
+(1,1,1,' cancelled my ORDER at 1:30 PM.', '2017-10-22'),
+(2,1,2,'This is the worst customer service Ive ever encountered', '2017-11-15'),
+(3,1,3,'poor quality. poor service. not professional. ', '2017-03-12'),
+(4,1,1,'My orchid bouquet had so many holes and was half-wilted.', '2017-01-19'),
+(5,2,2,' dont answer the phone or any feedback', '2017-01-01'),
+(6,2,3,'We ordered bereavement flowers a week ago tomorrow and my credit card has been charged $125', '2017-04-02'),
+(1,2,1,'The received product is not as orders.', '2017-12-06'),
+(2,2,2,'This is the worst customer service Ive ever encountered', '2017-12-29'),
+(3,2,3,'The received product is not as orders.', '2017-11-21'),
+(4,2,1,'My orchid bouquet had so many holes and was half-wilted.', '2017-10-22'),
+(5,2,2,' dont answer the phone or any feedback', '2017-09-15'),
+(6,2,3,'The received product is not as orders.', '2017-09-12'),
+(1,2,1,'This is the worst customer service Ive ever encountered', '2017-09-05'),
+(2,2,2,'The received product is not as orders.', '2017-09-06'),
+(3,3,3,'We ordered bereavement flowers a week ago tomorrow and my credit card has been charged $125', '2017-03-19'),
+(4,3,1,'Horrible business practices and customer service', '2017-03-01'),
+(5,3,2,'The received product is not as orders.', '2017-08-02'),
+(6,3,3,'This is the worst customer service Ive ever encountered', '2017-02-06'),
+(1,3,1,'The received product is not as orders.', '2017-01-29'),
+(2,3,2,'My orchid bouquet had so many holes and was half-wilted.', '2017-01-21'),
+(3,3,3,'The received product is not as orders.', '2017-01-22'),
+(4,3,1,'Horrible business practices and customer service', '2017-03-15'),
+(5,3,2,'The received product is not as orders.', '2017-09-12'),
+(6,3,3,' dont answer the phone or any feedback', '2017-12-05'),
+(1,4,1,'The received product is not as orders.', '2017-01-19'),
+(2,4,2,'This is the worst customer service Ive ever encountered', '2017-02-01'),
+(3,4,3,'We ordered bereavement flowers a week ago tomorrow and my credit card has been charged $125', '2017-03-02'),
+(4,4,1,'My orchid bouquet had so many holes and was half-wilted.', '2017-05-06'),
+(5,4,2,'The received product is not as orders.', '2017-07-29'),
+(6,4,3,'We ordered bereavement flowers a week ago tomorrow and my credit card has been charged $125', '2017-09-21'),
+(1,4,1,'The received product is not as orders.', '2017-10-22'),
+(2,4,2,' dont answer the phone or any feedback', '2017-12-15'),
+(3,4,3,'The received product is not as orders.', '2017-04-12'),
+(4,4,1,'Horrible business practices and customer service', '2017-05-05'),
+(5,5,2,'My orchid bouquet had so many holes and was half-wilted.', '2017-01-19'),
+(6,5,3,'The received product is not as orders.', '2017-02-01'),
+(1,5,1,'The received product is not as orders.', '2017-04-02'),
+(2,5,2,'This is the worst customer service Ive ever encountered', '2017-05-06'),
+(3,5,3,'The received product is not as orders.', '2017-07-29'),
+(4,5,1,'My orchid bouquet had so many holes and was half-wilted.', '2017-08-21'),
+(5,5,2,'The received product is not as orders.', '2017-10-22'),
+(6,5,3,'We ordered bereavement flowers a week ago tomorrow and my credit card has been charged $125', '2017-11-15'),
+(1,5,1,'The received product is not as orders.', '2017-06-12'),
+(2,5,2,'My orchid bouquet had so many holes and was half-wilted.', '2017-12-05'),
+(3,5,3,'The received product is not as orders.', '2017-02-18');
 
 UNLOCK TABLES;

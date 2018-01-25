@@ -41,6 +41,11 @@
 	-fx-background-color: transparent ;
 }
 
+.text-field{
+	-fx-border-radius: 10.0 10.0 10.0 10.0;
+  	-fx-background-radius: 10.0 10.0 10.0 10.0;
+} 
+
 .label
 {
     -fx-text-fill: white;

@@ -125,7 +125,7 @@ public class LoginSettingsController implements Initializable
 							}
 
 							resultString = resultString.toLowerCase();
-							m_logger.info(String.format("The properry:\"%s\" updated from %s to %s",
+							m_logger.info(String.format("The property:\"%s\" updated from %s to %s",
 									ClientConfiguration.PROPERTY_NAME_IP, m_configuration.getIp(), resultString));
 
 							m_client.setHost(resultString);
@@ -138,7 +138,7 @@ public class LoginSettingsController implements Initializable
 							try {
 								int port = Integer.parseInt(resultString);
 								if (port >= 0 && port <= 65636) {
-									m_logger.info(String.format("The properry:\"%s\" updated from %d to %d",
+									m_logger.info(String.format("The property:\"%s\" updated from %d to %d",
 											ClientConfiguration.PROPERTY_NAME_PORT, m_configuration.getPort(), port));
 									m_client.setPort(port);
 									m_configuration.setPort(port);
