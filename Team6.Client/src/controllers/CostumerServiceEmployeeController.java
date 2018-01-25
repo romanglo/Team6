@@ -176,7 +176,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	 *            Save button clicked.
 	 */
 	@FXML
-	public void addComplaint_saveButtonClick(ActionEvent event)
+	private void addComplaint_saveButtonClick(ActionEvent event)
 	{
 		if (m_addcomplaint_textfield_id.getText().equals("")
 				|| m_addcomplaint_textarea_costumercomplaint.getText().equals("")) {
@@ -237,7 +237,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	 *            check box clicked
 	 */
 	@FXML
-	public void treatComplaint_financialCompensation(ActionEvent event)
+	private void treatComplaint_financialCompensation(ActionEvent event)
 	{
 		if (m_treatcomplaint_financial_compensation.isDisable())
 			m_treatcomplaint_financial_compensation.setDisable(false);
@@ -245,13 +245,13 @@ public class CostumerServiceEmployeeController extends BaseController
 	}
 
 	/**
-	 * TODO Send message to server with the update complain.
+	 * Send message to server with the update complain.
 	 *
 	 * @param event
 	 *            Update button clicked
 	 */
 	@FXML
-	public void treatComplaint_updateClick(ActionEvent event)
+	private void treatComplaint_updateClick(ActionEvent event)
 	{
 		if ((m_treatcomplaint_combobox_id.getValue() == null)) {
 			showAlertMessage("Complaint ID field is empty", AlertType.WARNING);
@@ -285,12 +285,12 @@ public class CostumerServiceEmployeeController extends BaseController
 			cos_entity.setId(m_treatcomplaint_complaint_fun.getCostumerId());
 			Message msg = MessagesFactory.createGetEntityMessage(cos_entity);
 			m_Client.sendMessageToServer(msg);
-			tri();
+			clean();
 		} else {
 			((Complaint) m_treatcomplaint_complaint_array.get(i)).setOpened(false);
 			Message msgg = MessagesFactory.createUpdateEntityMessage(m_treatcomplaint_complaint_array.get(i));
 			m_Client.sendMessageToServer(msgg);
-			tri();
+			clean();
 		}
 
 	}
@@ -300,7 +300,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	 *
 	 */
 	@FXML
-	public void treatComplaint_setIdInCombobox()
+	private void treatComplaint_setIdInCombobox()
 	{
 		m_treatcomplaint_list = FXCollections.observableArrayList(m_treatcomplaint_id_array);
 		m_treatcomplaint_combobox_id.setItems(m_treatcomplaint_list);
@@ -313,7 +313,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	 *            combo box click.
 	 */
 	@FXML
-	public void treatComplaint_chooseComplaint(ActionEvent event)
+	private void treatComplaint_chooseComplaint(ActionEvent event)
 	{
 		if ((m_treatcomplaint_combobox_id.getValue() == null) || (m_treatcomplaint_combobox_id.getValue().equals("")))
 			return;
@@ -328,7 +328,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	}
 
 	@FXML
-	private void tri()
+	private void clean()
 	{
 		m_treatcomplaint_combobox_id.setDisable(true);
 		m_treatcomplaint_combobox_id.getItems().clear();
@@ -429,7 +429,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	 *            on combo box clicked.
 	 */
 	@FXML
-	public void onComplaintSelection(ActionEvent event)
+	private void onComplaintSelection(ActionEvent event)
 	{
 		if (combobox_mycomplaints.getValue() == null) return;
 		int comp_id = combobox_mycomplaints.getValue();
@@ -592,7 +592,7 @@ public class CostumerServiceEmployeeController extends BaseController
 						showAlertMessage("Can't Update complaint, please try again", AlertType.WARNING);
 					} else {
 						showAlertMessage("Successfully updated", AlertType.INFORMATION);
-						tri();
+						clean();
 					}
 				}
 			}
@@ -644,7 +644,6 @@ public class CostumerServiceEmployeeController extends BaseController
 				}
 			} else if (messageData instanceof RespondMessageData) {
 				if (((RespondMessageData) messageData).isSucceed()) {
-					m_Logger.severe("work");
 					if (opensurvey_button_openclose_survey.getText().equals("Open"))
 						showAlertMessage("Successfully added", AlertType.INFORMATION);
 					else showAlertMessage("Successfully updated", AlertType.INFORMATION);

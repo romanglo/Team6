@@ -16,7 +16,8 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.152" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CostumerServiceEmployeeController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.152"
+	xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.CostumerServiceEmployeeController">
 	<top>
 		<BorderPane fx:id="borderpain_main_top" styleClass="header-section">
 			<left>
@@ -30,12 +31,14 @@
 				<VBox>
 					<Button onAction="#onLogoutButtonPressed" text="Logout">
 						<graphic>
-							<ImageView fx:id="imageview_logout_button" fitHeight="24" fitWidth="24" pickOnBounds="true" preserveRatio="true" />
+							<ImageView fx:id="imageview_logout_button" fitHeight="24"
+								fitWidth="24" pickOnBounds="true" preserveRatio="true" />
 						</graphic>
 					</Button>
 					<Button onAction="#onAccountButtonPressed" text="Account">
 						<graphic>
-							<ImageView fx:id="imageview_account_button" fitHeight="24" fitWidth="24" pickOnBounds="true" preserveRatio="true" />
+							<ImageView fx:id="imageview_account_button" fitHeight="24"
+								fitWidth="24" pickOnBounds="true" preserveRatio="true" />
 						</graphic>
 					</Button>
 				</VBox>
@@ -48,9 +51,14 @@
 	<center>
 		<AnchorPane BorderPane.alignment="TOP_LEFT">
 			<children>
-				<AnchorPane fx:id="anchorpane_welcome" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
-					<ImageView fx:id="imageview_welcome" fitHeight="300" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-					<VBox styleClass="content-section-label" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+				<AnchorPane fx:id="anchorpane_welcome"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0"
+					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+					<ImageView fx:id="imageview_welcome" fitHeight="300"
+						pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0"
+						AnchorPane.rightAnchor="0.0" />
+					<VBox styleClass="content-section-label"
+						AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
 						<Label text="Welcome">
 							<font>
 								<Font name="Berlin Sans FB Demi Bold" size="52" />
@@ -68,58 +76,129 @@
 						</Label>
 					</VBox>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_addcomplaint" layoutY="79.0" styleClass="content-section" visible="falseS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+				<AnchorPane fx:id="anchorpane_addcomplaint" layoutY="79.0"
+					styleClass="content-section" visible="falseS"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+					AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 					<children>
-						<Label layoutX="24.0" layoutY="41.0" prefHeight="17.0" prefWidth="149.0" text="Costumer id:" AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="41.0" />
-						<TextField fx:id="m_addcomplaint_textfield_id" layoutX="154.0" layoutY="37.0" AnchorPane.topAnchor="37.0" />
-						<TextArea fx:id="m_addcomplaint_textarea_costumercomplaint" layoutX="-5.0" layoutY="129.0" prefWidth="395.0" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="140.0" />
-						<Label layoutX="109.0" layoutY="150.0" prefHeight="17.0" prefWidth="271.0" text="Enter costumer comlaint:" AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="112.0" />
-						<Button layoutX="63.0" layoutY="50.0" mnemonicParsing="false" onAction="#addComplaint_saveButtonClick" prefHeight="25.0" prefWidth="100.0" text="Save" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
-						<Label layoutX="24.0" layoutY="76.0" prefHeight="17.0" prefWidth="149.0" text="Shop:" AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="76.0" />
-						<ComboBox fx:id="combobox_shop" layoutX="154.0" layoutY="72.0" prefWidth="150.0" AnchorPane.topAnchor="72.0" />
+						<Label layoutX="24.0" layoutY="41.0" prefHeight="17.0"
+							prefWidth="149.0" text="Costumer id:" AnchorPane.leftAnchor="24.0"
+							AnchorPane.topAnchor="41.0" />
+						<TextField fx:id="m_addcomplaint_textfield_id" layoutX="154.0"
+							layoutY="37.0" AnchorPane.topAnchor="37.0" />
+						<TextArea fx:id="m_addcomplaint_textarea_costumercomplaint"
+							layoutX="-5.0" layoutY="129.0" prefWidth="395.0"
+							AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="5.0"
+							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="140.0" />
+						<Label layoutX="109.0" layoutY="150.0" prefHeight="17.0"
+							prefWidth="271.0" text="Enter costumer comlaint:"
+							AnchorPane.leftAnchor="24.0" AnchorPane.topAnchor="112.0" />
+						<Button layoutX="63.0" layoutY="50.0" mnemonicParsing="false"
+							onAction="#addComplaint_saveButtonClick" prefHeight="25.0"
+							prefWidth="100.0" text="Save" AnchorPane.bottomAnchor="5.0"
+							AnchorPane.rightAnchor="10.0" />
+						<Label layoutX="24.0" layoutY="76.0" prefHeight="17.0"
+							prefWidth="149.0" text="Shop:" AnchorPane.leftAnchor="24.0"
+							AnchorPane.topAnchor="76.0" />
+						<ComboBox fx:id="combobox_shop" layoutX="154.0" layoutY="72.0"
+							prefWidth="150.0" AnchorPane.topAnchor="72.0" />
 					</children>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_mycompliants" layoutY="79.0" prefHeight="368.0" prefWidth="450.0" styleClass="content-section" visible="falseS" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
+				<AnchorPane fx:id="anchorpane_mycompliants" layoutY="79.0"
+					prefHeight="368.0" prefWidth="450.0" styleClass="content-section"
+					visible="falseS" AnchorPane.bottomAnchor="5.0"
+					AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+					AnchorPane.topAnchor="75.0">
 					<children>
-						<Label fx:id="date_mycomplaints" prefHeight="17.0" prefWidth="167.0" AnchorPane.leftAnchor="175.0" AnchorPane.topAnchor="150.0" />
-						<Label layoutX="73.0" layoutY="64.0" prefHeight="17.0" prefWidth="107.0" text="Id:" AnchorPane.leftAnchor="16.0" />
-						<ComboBox fx:id="combobox_mycomplaints" layoutX="129.0" layoutY="60.0" onAction="#onComplaintSelection" prefWidth="100.0" AnchorPane.leftAnchor="150.0" />
-						<Label layoutX="16.0" layoutY="95.0" prefHeight="17.0" prefWidth="180.0" text="Complaint status:" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="100.0" />
-						<Label prefHeight="17.0" prefWidth="167.0" text="Enterd date:" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="150.0" />
-						<Label fx:id="status" layoutX="214.0" layoutY="95.0" prefHeight="17.0" prefWidth="167.0" text="" AnchorPane.leftAnchor="175.0" AnchorPane.topAnchor="100.0" />
+						<Label fx:id="date_mycomplaints" prefHeight="17.0"
+							prefWidth="167.0" AnchorPane.leftAnchor="175.0"
+							AnchorPane.topAnchor="150.0" />
+						<Label layoutX="73.0" layoutY="64.0" prefHeight="17.0"
+							prefWidth="107.0" text="Id:" AnchorPane.leftAnchor="16.0" />
+						<ComboBox fx:id="combobox_mycomplaints" layoutX="129.0"
+							layoutY="60.0" onAction="#onComplaintSelection" prefWidth="100.0"
+							AnchorPane.leftAnchor="150.0" />
+						<Label layoutX="16.0" layoutY="95.0" prefHeight="17.0"
+							prefWidth="180.0" text="Complaint status:" AnchorPane.leftAnchor="16.0"
+							AnchorPane.topAnchor="100.0" />
+						<Label prefHeight="17.0" prefWidth="167.0" text="Enterd date:"
+							AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="150.0" />
+						<Label fx:id="status" layoutX="214.0" layoutY="95.0"
+							prefHeight="17.0" prefWidth="167.0" text=""
+							AnchorPane.leftAnchor="175.0" AnchorPane.topAnchor="100.0" />
 					</children>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_treatcomplaint" layoutY="79.0" prefHeight="368.0" prefWidth="450.0" styleClass="content-section" visible="falseS" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+				<AnchorPane fx:id="anchorpane_treatcomplaint" layoutY="79.0"
+					prefHeight="368.0" prefWidth="450.0" styleClass="content-section"
+					visible="falseS" AnchorPane.bottomAnchor="5.0"
+					AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+					AnchorPane.topAnchor="5.0">
 					<children>
-						<Label prefHeight="17.0" prefWidth="167.0" text="Enterd date:" AnchorPane.leftAnchor="450.0" AnchorPane.topAnchor="65.0" />
-						<Label fx:id="date" prefHeight="17.0" prefWidth="167.0" AnchorPane.leftAnchor="550.0" AnchorPane.topAnchor="65.0" />
-						<Label layoutX="73.0" layoutY="64.0" prefHeight="17.0" prefWidth="107.0" text="Complaint ID:" AnchorPane.leftAnchor="80.0" AnchorPane.topAnchor="60.0" />
-						<ComboBox fx:id="m_treatcomplaint_combobox_id" layoutX="129.0" layoutY="60.0" onAction="#treatComplaint_chooseComplaint" prefWidth="200.0" AnchorPane.leftAnchor="205.0" AnchorPane.topAnchor="60.0" />
-						<Button layoutX="78.0" layoutY="257.0" mnemonicParsing="false" onAction="#treatComplaint_updateClick" prefWidth="100.0" text="Update" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
-						<CheckBox fx:id="m_treatcomplaint_checkbox_financial" layoutX="23.0" layoutY="222.0" mnemonicParsing="false" onAction="#treatComplaint_financialCompensation" text="Financial compensation" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" />
-						<TextField fx:id="m_treatcomplaint_financial_compensation" disable="true" layoutX="176.0" layoutY="218.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="170.0" />
-						<VBox prefHeight="120.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="100.0">
+						<Label prefHeight="17.0" prefWidth="167.0" text="Enterd date:"
+							AnchorPane.leftAnchor="450.0" AnchorPane.topAnchor="65.0" />
+						<Label fx:id="date" prefHeight="17.0" prefWidth="167.0"
+							AnchorPane.leftAnchor="550.0" AnchorPane.topAnchor="65.0" />
+						<Label layoutX="73.0" layoutY="64.0" prefHeight="17.0"
+							prefWidth="107.0" text="Complaint ID:" AnchorPane.leftAnchor="80.0"
+							AnchorPane.topAnchor="60.0" />
+						<ComboBox fx:id="m_treatcomplaint_combobox_id" layoutX="129.0"
+							layoutY="60.0" onAction="#treatComplaint_chooseComplaint"
+							prefWidth="200.0" AnchorPane.leftAnchor="205.0"
+							AnchorPane.topAnchor="60.0" />
+						<Button layoutX="78.0" layoutY="257.0" mnemonicParsing="false"
+							onAction="#treatComplaint_updateClick" prefWidth="100.0" text="Update"
+							AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="10.0" />
+						<CheckBox fx:id="m_treatcomplaint_checkbox_financial"
+							layoutX="23.0" layoutY="222.0" mnemonicParsing="false"
+							onAction="#treatComplaint_financialCompensation" text="Financial compensation"
+							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" />
+						<TextField fx:id="m_treatcomplaint_financial_compensation"
+							disable="true" layoutX="176.0" layoutY="218.0"
+							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="170.0" />
+						<VBox prefHeight="120.0" AnchorPane.leftAnchor="5.0"
+							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="100.0">
 							<Label prefHeight="17.0" prefWidth="180.0" text="Costumer complaint:" />
-							<TextArea fx:id="m_treatcomplaint_textarea_complaint" editable="false" layoutY="117.0" prefWidth="295.0" />
+							<TextArea fx:id="m_treatcomplaint_textarea_complaint"
+								editable="false" layoutY="117.0" prefWidth="295.0" />
 						</VBox>
-						<VBox prefHeight="120.0" prefWidth="534.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="240.0">
+						<VBox prefHeight="120.0" prefWidth="534.0"
+							AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
+							AnchorPane.topAnchor="240.0">
 							<Label prefHeight="17.0" prefWidth="167.0" text="Complaint summary:" />
-							<TextArea fx:id="m_treatcomplaint_textarea_summary" prefWidth="325.0" />
+							<TextArea fx:id="m_treatcomplaint_textarea_summary"
+								prefWidth="325.0" />
 
 						</VBox>
 
 
 					</children>
 				</AnchorPane>
-				<AnchorPane fx:id="anchorpane_addsurveys" layoutY="79.0" styleClass="content-section" visible="falseS" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+				<AnchorPane fx:id="anchorpane_addsurveys" layoutY="79.0"
+					styleClass="content-section" visible="falseS"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+					AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 					<children>
-						<DatePicker fx:id="opensurvey_datepicker_enddate" editable="false" layoutX="146.0" layoutY="149.0" prefWidth="150.0" AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="185.0" />
-						<ComboBox fx:id="opensurvey_combobox_shopname" layoutX="96" layoutY="78.0" onAction="#openSurveys_selectShop" prefWidth="150.0" AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="78.0" />
-						<Label layoutX="60.0" layoutY="82.0" text="Shop names:" AnchorPane.leftAnchor="120.0" AnchorPane.topAnchor="82.0" />
-						<Label layoutX="60.0" layoutY="190.0" prefHeight="17.0" prefWidth="148.0" text="End date::" AnchorPane.leftAnchor="150.0" AnchorPane.topAnchor="190.0" />
-						<TextField fx:id="opensurvey_textfield_opendate" layoutX="130.0" layoutY="149.0" prefWidth="150.0" AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="149.0" />
-						<Button fx:id="opensurvey_button_openclose_survey" layoutX="92.0" layoutY="250.0" mnemonicParsing="false" onAction="#openSurveys_AddSurvey" prefWidth="150.0" text="Open" AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="250.0" />
-						<Label layoutX="60.0" layoutY="153.0" prefHeight="17.0" prefWidth="148.0" text="Start date:" AnchorPane.leftAnchor="150.0" AnchorPane.topAnchor="153.0" />
+						<DatePicker fx:id="opensurvey_datepicker_enddate"
+							editable="false" layoutX="146.0" layoutY="149.0" prefWidth="150.0"
+							AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="185.0" />
+						<ComboBox fx:id="opensurvey_combobox_shopname" layoutX="96"
+							layoutY="78.0" onAction="#openSurveys_selectShop" prefWidth="150.0"
+							AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="78.0" />
+						<Label layoutX="60.0" layoutY="82.0" text="Shop names:"
+							AnchorPane.leftAnchor="120.0" AnchorPane.topAnchor="82.0" />
+						<Label layoutX="60.0" layoutY="190.0" prefHeight="17.0"
+							prefWidth="148.0" text="End date::" AnchorPane.leftAnchor="150.0"
+							AnchorPane.topAnchor="190.0" />
+						<TextField fx:id="opensurvey_textfield_opendate"
+							layoutX="130.0" layoutY="149.0" prefWidth="150.0"
+							AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="149.0" />
+						<Button fx:id="opensurvey_button_openclose_survey" layoutX="92.0"
+							layoutY="250.0" mnemonicParsing="false" onAction="#openSurveys_AddSurvey"
+							prefWidth="150.0" text="Open" AnchorPane.leftAnchor="240.0"
+							AnchorPane.topAnchor="250.0" />
+						<Label layoutX="60.0" layoutY="153.0" prefHeight="17.0"
+							prefWidth="148.0" text="Start date:" AnchorPane.leftAnchor="150.0"
+							AnchorPane.topAnchor="153.0" />
 					</children>
 				</AnchorPane>
 			</children>
@@ -138,7 +217,8 @@
 				</Label>
 			</center>
 			<right>
-				<Circle fx:id="circle_connection_status" fill="GREY" radius="12" stroke="BLACK" strokeType="INSIDE">
+				<Circle fx:id="circle_connection_status" fill="GREY" radius="12"
+					stroke="BLACK" strokeType="INSIDE">
 					<effect>
 						<DropShadow color="#00000084" />
 					</effect>
