@@ -426,9 +426,15 @@ public class ShopManagerController extends BaseController
 										AlertType.WARNING);
 								return;
 							}
-							optionalCreditCard = result.get();
-							if (optionalCreditCard.length() > 16)
+							optionalCreditCard = result.get().trim();
+							if (optionalCreditCard.length() > 16) {
 								optionalCreditCard = optionalCreditCard.substring(0, 16);
+							}
+							if (!optionalCreditCard.matches("[0-9]+")) {
+								showAlertMessage("A credit card can only contain numbers.", AlertType.WARNING);
+								return;
+							}
+
 						} else {
 							showAlertMessage("Costumer subscription required valid credit card.", AlertType.WARNING);
 							return;
@@ -1283,7 +1289,7 @@ public class ShopManagerController extends BaseController
 				anchorpane_shopCostumerManagement.setVisible(false);
 			break;
 
-			case "Costumers\nManagement":
+			case "  Costumers\nManagement":
 				anchorPane_mainStage.setVisible(false);
 				anchorpane_shopCostumerManagement.setVisible(true);
 			break;
@@ -1300,7 +1306,7 @@ public class ShopManagerController extends BaseController
 	@Override
 	protected String[] getSideButtonsNames()
 	{
-		return new String[] { "Reports", "Costumers\nManagement" };
+		return new String[] { "Reports", "  Costumers\nManagement" };
 	}
 
 	/**
