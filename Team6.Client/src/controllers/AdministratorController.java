@@ -362,6 +362,11 @@ public class AdministratorController extends BaseController
 					shopEmployeeEntity.setId(shopEmployee.getId());
 					Message shopEmployeeEntityMessage = MessagesFactory.createUpdateEntityMessage(shopEmployeeEntity);
 					m_Client.sendMessageToServer(shopEmployeeEntityMessage);
+					
+					selected_user.setEmail(textField_email.getText());
+					selected_user.setPassword(textField_password.getText());
+					Message entityMessage = MessagesFactory.createUpdateEntityMessage(selected_user);
+					m_Client.sendMessageToServer(entityMessage);
 				break;
 				case ShopManager:
 					shopManager.setUserName(selected_user.getUserName());
@@ -372,12 +377,17 @@ public class AdministratorController extends BaseController
 					shopManager.setStatus(selected_user.getStatus());
 					Message shopManagerEntityMessage = MessagesFactory.createUpdateEntityMessage(shopManager);
 					m_Client.sendMessageToServer(shopManagerEntityMessage);
+					
+					selected_user.setEmail(textField_email.getText());
+					selected_user.setPassword(textField_password.getText());
+					Message entityMessage1 = MessagesFactory.createUpdateEntityMessage(selected_user);
+					m_Client.sendMessageToServer(entityMessage1);
 				break;
 				default:
 					selected_user.setEmail(textField_email.getText());
 					selected_user.setPassword(textField_password.getText());
-					Message entityMessage = MessagesFactory.createUpdateEntityMessage(selected_user);
-					m_Client.sendMessageToServer(entityMessage);
+					Message entityMessage2 = MessagesFactory.createUpdateEntityMessage(selected_user);
+					m_Client.sendMessageToServer(entityMessage2);
 				break;
 
 			}
@@ -457,6 +467,7 @@ public class AdministratorController extends BaseController
 					al.add(user.getUserName());
 				}
 				javafx.application.Platform.runLater(() -> {
+					comboBox_user1.getItems().clear();
 					list = FXCollections.observableArrayList(al);
 					if (list != null) comboBox_user1.setItems(list);
 				});
@@ -465,7 +476,24 @@ public class AdministratorController extends BaseController
 			else if (msg.getMessageData() instanceof RespondMessageData) {
 				RespondMessageData res = (RespondMessageData) msg.getMessageData();
 				if (res.isSucceed()) {
-					showAlertMessage("User update succeed", AlertType.INFORMATION);
+					if(res.getMessageData() instanceof EntityData)
+					{
+						if((((EntityData)res.getMessageData()).getEntity() instanceof ShopManager))
+						{
+							showAlertMessage("Shop Manger update succeed",AlertType.INFORMATION);
+						}
+						else if((((EntityData)res.getMessageData()).getEntity() instanceof ShopEmployee))
+						{
+							showAlertMessage("Shop Employee update succeed",AlertType.INFORMATION);
+						}
+						else if((((EntityData)res.getMessageData()).getEntity() instanceof User))
+						{
+							showAlertMessage("User update succeed", AlertType.INFORMATION);
+						}
+					User entity= new User();
+					msg=MessagesFactory.createGetAllEntityMessage(entity);
+					m_Client.sendMessageToServer(msg);
+					}
 				} else if (!res.isSucceed()) {
 					showAlertMessage("User update faild please try again", AlertType.WARNING);
 					m_Logger.warning("Failed when sending a message to the server.");
