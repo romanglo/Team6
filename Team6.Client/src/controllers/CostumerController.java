@@ -346,7 +346,8 @@ public class CostumerController extends BaseController
 	@FXML
 	private void finishButtonClick(ActionEvent finishEvent)
 	{
-		if (!m_useSubscription && credit_card_number.getText().equals("")) {
+		String creditCard = credit_card_number.getText().trim();
+		if (!m_useSubscription && creditCard.equals("")) {
 			showAlertMessage("Please fill in all fields to complete the reservation.", AlertType.WARNING);
 			return;
 		} else if (delivery_radio.isSelected()) {
@@ -363,6 +364,10 @@ public class CostumerController extends BaseController
 				showAlertMessage("The date and/or time you picked is invalid, please try again.", AlertType.WARNING);
 				return;
 			}
+		}
+		if (!m_useSubscription && !creditCard.matches("[0-9]+")) {
+			showAlertMessage("A credit card can only contain numbers.", AlertType.ERROR);
+			return;
 		}
 
 		updateFieldsWithData();
@@ -395,7 +400,7 @@ public class CostumerController extends BaseController
 			totalPrice += 30;
 		}
 		Costumer_SavedData.setTotalPrice(totalPrice);
-		
+
 		float cumulativePrice = Costumer_SavedData.getCumulativePrice();
 		Costumer_SavedData
 				.setCumulativePrice(cumulativePrice + (m_useSubscription ? Costumer_SavedData.getTotalPrice() : 0));
@@ -1021,7 +1026,9 @@ public class CostumerController extends BaseController
 					IEntity entity = ((EntityData) messageData).getEntity();
 					if (entity instanceof Reservation) {
 						Platform.runLater(() -> {
-							showAlertMessage("Reservation canceled successfully.", AlertType.INFORMATION);
+							float refund = calculateRefund();
+							showAlertMessage("Reservation canceled successfully.\nPayback: " + refund,
+									AlertType.INFORMATION);
 							backToReservationsClick(new ActionEvent());
 						});
 						return;
