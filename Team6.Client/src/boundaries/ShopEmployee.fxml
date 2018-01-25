@@ -129,9 +129,23 @@
 							prefHeight="25.0" prefWidth="51.0" AnchorPane.leftAnchor="470.0" />
 						<Spinner fx:id="combobox_answer6" layoutX="260.0" layoutY="299.0"
 							prefHeight="25.0" prefWidth="51.0" AnchorPane.leftAnchor="470.0" />
-
 					</children>
 				</AnchorPane>
+
+				<AnchorPane fx:id="anchorpane_dino" styleClass="content-section"
+					layoutY="79.0" prefHeight="400" prefWidth="450.0" visible="false"
+					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
+					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+					<children>
+						<Label
+							text="It is possible to add survey results only when there are surveys open to the store"
+							AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+						<ImageView fx:id="imageview_dino" fitHeight="50"
+							fitWidth="50" pickOnBounds="true" preserveRatio="true"
+							AnchorPane.leftAnchor="0.0" AnchorPane.bottomAnchor="0.0" />
+					</children>
+				</AnchorPane>
+
 				<AnchorPane fx:id="anchorpane_option2" styleClass="content-section"
 					layoutY="79.0" prefHeight="368.0" prefWidth="450.0" visible="falseS"
 					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"

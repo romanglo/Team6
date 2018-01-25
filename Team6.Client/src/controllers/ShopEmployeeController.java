@@ -1,6 +1,7 @@
 
 package controllers;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,6 +29,8 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import messages.EntitiesListData;
 import messages.EntityData;
@@ -51,6 +54,10 @@ public class ShopEmployeeController extends BaseController
 	private @FXML AnchorPane anchorpane_option1;
 
 	private @FXML AnchorPane anchorpane_option2;
+
+	private @FXML AnchorPane anchorpane_dino;
+
+	private @FXML ImageView imageview_dino;
 
 	private String correct_title;
 
@@ -84,7 +91,11 @@ public class ShopEmployeeController extends BaseController
 
 	private Survey correct_survey;
 
-	private String[] questions = { "Question1", "Question2", "Question3", "Question4", "Question5", "Question6" };
+	private String[] questions = { "How likely is it that you would recommended our company?",
+			"How well do our porducts meet your needs?", "How would you rate the quality of our products?",
+			"How would you rate the value for money of the product?",
+			"How likely are you to purchase any of our products again?",
+			"How would you rate the shopping experience in our shop?" };
 
 	private SpinnerValueFactory<Integer> svf1 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
 
@@ -98,9 +109,9 @@ public class ShopEmployeeController extends BaseController
 
 	private SpinnerValueFactory<Integer> svf6 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
 
-	List<IEntity> reservations;
+	private List<IEntity> reservations;
 
-	ArrayList<CatalogItemRow> open_reservations = new ArrayList<>();
+	private ArrayList<CatalogItemRow> open_reservations = new ArrayList<>();
 
 	private ObservableList<CatalogItemRow> reservation_list = FXCollections.observableArrayList();
 
@@ -115,6 +126,7 @@ public class ShopEmployeeController extends BaseController
 	private @FXML TableColumn<CatalogItemRow, String> tablecolumn_reservation_type;
 
 	private ArrayList<IEntity> closes_reservations = new ArrayList<>();
+
 	// end region -> Fields
 
 	// region BaseController Implementation
@@ -126,6 +138,12 @@ public class ShopEmployeeController extends BaseController
 	protected void internalInitialize() throws Exception
 	{
 		initializeConfigurationShopSalesTable();
+
+		InputStream dinoResource = getClass().getResourceAsStream("/boundaries/images/dino.gif");
+		if (dinoResource != null) {
+			Image image = new Image(dinoResource);
+			imageview_dino.setImage(image);
+		}
 	}
 
 	/**
@@ -137,13 +155,15 @@ public class ShopEmployeeController extends BaseController
 		correct_title = title;
 		switch (title) {
 			case "Add survey":
-				anchorpane_option1.setVisible(true);
+				anchorpane_option1.setVisible(false);
 				anchorpane_option2.setVisible(false);
+				anchorpane_dino.setVisible(false);
 				initializesurveys();
 			break;
 			case "Close Reservations":
 				anchorpane_option1.setVisible(false);
 				anchorpane_option2.setVisible(true);
+				anchorpane_dino.setVisible(false);
 				initialReservations();
 			break;
 			default:
@@ -189,8 +209,9 @@ public class ShopEmployeeController extends BaseController
 					}
 					if (correct_survey == null) {
 						showAlertMessage("There are no surveys for your shop.", AlertType.INFORMATION);
-						anchorpane_option1.setVisible(false);
+						anchorpane_dino.setVisible(true);
 					} else {
+						anchorpane_option1.setVisible(true);
 						textfiled_question1.setText(questions[0]);
 						textfiled_question2.setText(questions[1]);
 						textfiled_question3.setText(questions[2]);
@@ -326,7 +347,7 @@ public class ShopEmployeeController extends BaseController
 	 *            add button clicked
 	 */
 	@FXML
-	public void addSurvey(ActionEvent event)
+	private void addSurvey(ActionEvent event)
 	{
 		if ((combobox_answer1.getValue() == 0) || (combobox_answer2.getValue() == 0)
 				|| (combobox_answer3.getValue() == 0) || (combobox_answer4.getValue() == 0)
