@@ -271,11 +271,11 @@
 								<Label layoutX="40.0" layoutY="196.0" text="Phone Number" />
 								<Label layoutX="40.0" layoutY="225.0" text="Name" />
 								<TextField fx:id="delivery_address" alignment="CENTER"
-									layoutX="147.0" layoutY="163.0" prefHeight="25.0" prefWidth="203.0" />
+									layoutX="167.0" layoutY="163.0" prefHeight="25.0" prefWidth="183.0" />
 								<TextField fx:id="delivery_phone" alignment="CENTER"
-									layoutX="147.0" layoutY="192.0" prefHeight="25.0" prefWidth="203.0" />
+									layoutX="167.0" layoutY="192.0" prefHeight="25.0" prefWidth="183.0" />
 								<TextField fx:id="delivery_name" alignment="CENTER"
-									layoutX="146.0" layoutY="221.0" prefHeight="25.0" prefWidth="203.0" />
+									layoutX="166.0" layoutY="221.0" prefHeight="25.0" prefWidth="183.0" />
 							</children>
 						</AnchorPane>
 					</children>

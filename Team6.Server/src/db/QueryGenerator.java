@@ -623,13 +623,13 @@ public class QueryGenerator {
 		int shopManagerId = reservation.getShopManagerId();
 
 		if (costumerId > 0 && shopManagerId > 0) {
-			return "SELECT * FROM reservations cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
+			return "SELECT * FROM reservations WHERE cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
 		}
 		if (costumerId > 0) {
-			return "SELECT * FROM reservations cId = " + costumerId + " ;";
+			return "SELECT * FROM reservations WHERE cId = " + costumerId + " ;";
 		}
 		if (shopManagerId > 0) {
-			return "SELECT * FROM reservations smId = " + shopManagerId + " ;";
+			return "SELECT * FROM reservations WHERE smId = " + shopManagerId + " ;";
 		}
 		return "SELECT * FROM reservations ;";
 

@@ -388,16 +388,16 @@ public class CostumerController extends BaseController
 		Costumer_SavedData.setCreditCard(m_useSubscription ? "" : credit_card_number.getText());
 		Costumer_SavedData.setBalance(Costumer_SavedData.getCostumerBalance() - m_discount);
 
-		float cumulativePrice = Costumer_SavedData.getCumulativePrice();
-		Costumer_SavedData
-				.setCumulativePrice(cumulativePrice + (m_useSubscription ? Costumer_SavedData.getTotalPrice() : 0));
-
 		/* Add delivery payment if needed. */
 		float totalPrice = Float.parseFloat(total_price_label.getText());
 		if (delivery_radio.isSelected()) {
 			totalPrice += 30;
 		}
 		Costumer_SavedData.setTotalPrice(totalPrice);
+		
+		float cumulativePrice = Costumer_SavedData.getCumulativePrice();
+		Costumer_SavedData
+				.setCumulativePrice(cumulativePrice + (m_useSubscription ? Costumer_SavedData.getTotalPrice() : 0));
 
 		/* Add date of reservation to be ready. */
 		Date date;
@@ -520,6 +520,13 @@ public class CostumerController extends BaseController
 		for (ShopManager manager : shopManagerList) {
 			if (manager.getName().equals(combo_shop.getValue())) {
 				Costumer_SavedData.setShopManagerId(manager.getId());
+				break;
+			}
+		}
+
+		for (ShopCostumer shopCostumer : shopCostumerList) {
+			if (Costumer_SavedData.getShopManagerId() == shopCostumer.getShopManagerId()) {
+				Costumer_SavedData.setShopCostumer(shopCostumer);
 				break;
 			}
 		}
@@ -782,7 +789,7 @@ public class CostumerController extends BaseController
 
 					shopCostumerList.add((ShopCostumer) entity);
 				}
-				
+
 				ShopManager shopManager = new ShopManager();
 				Message message = MessagesFactory.createGetAllEntityMessage(shopManager);
 				m_Client.sendMessageToServer(message);
@@ -797,7 +804,7 @@ public class CostumerController extends BaseController
 					}
 					ShopManager shopManager = (ShopManager) entity;
 					shopManagerList.add(shopManager);
-					
+
 					for (ShopCostumer shopCostumer : shopCostumerList) {
 						if (shopCostumer.getShopManagerId() == shopManager.getId()) {
 							shops.add(shopManager.getName());
@@ -816,6 +823,12 @@ public class CostumerController extends BaseController
 						}
 						m_currComboShop = combo_shop.getValue();
 						Costumer_SavedData.setShopManagerId(shopManagerList.get(0).getId());
+						for (ShopCostumer shopCostumer : shopCostumerList) {
+							if (Costumer_SavedData.getShopManagerId() == shopCostumer.getShopManagerId()) {
+								Costumer_SavedData.setShopCostumer(shopCostumer);
+								break;
+							}
+						}
 						initializeCatalog();
 					}
 				});
@@ -1430,6 +1443,13 @@ public class CostumerController extends BaseController
 		combo_minute.setValue("" + (minute < 10 ? "0" + minute : minute));
 
 		delivery_radio.setSelected(true);
+		pickup_radio.setSelected(false);
+		immidiate_delivery.setSelected(false);
+		delivery_address.setDisable(false);
+		delivery_name.setDisable(false);
+		delivery_phone.setDisable(false);
+		blessing_card.setSelected(false);
+		blessing_text.setDisable(true);
 		date_pick.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 		StringConverter<LocalDate> converter = new StringConverter<LocalDate>() {
 
