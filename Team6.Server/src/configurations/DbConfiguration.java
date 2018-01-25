@@ -57,7 +57,7 @@ public class DbConfiguration {
 	/**
 	 * Default database password.
 	 */
-	public final static String DEFAULT_PASSWORD = "123456";
+	public final static String DEFAULT_PASSWORD = "Braude";
 
 	// end region -> Constants
 
