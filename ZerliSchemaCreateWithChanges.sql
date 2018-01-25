@@ -312,7 +312,7 @@ BEGIN
 			   rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = (end_month - 1)),
 			   (SELECT SUM(rPrice) FROM reservations WHERE smId = shop_manager_id AND
 			   rType = 'Closed' AND YEAR(rDeliveryDate) = in_year AND MONTH(rDeliveryDate) = end_month)
-	    FROM reservations;
+	    FROM reservations GROUP BY shop_manager_id;
 		    		   
 END; //
 
@@ -762,7 +762,13 @@ INSERT INTO costumers_in_shops (cId,smId) VALUES
 (4,2),
 (4,1),
 (5,3),
-(6,3);
+(6,3),
+(1,4),
+(2,5),
+(3,5),
+(4,4),
+(5,4),
+(6,5);
 
 TRUNCATE TABLE surveys;
 
