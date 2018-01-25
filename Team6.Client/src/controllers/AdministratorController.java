@@ -102,6 +102,7 @@ public class AdministratorController extends BaseController
 	{
 		initializeStatus();
 		initializePrivilege();
+		
 	}
 
 	/**
@@ -112,6 +113,20 @@ public class AdministratorController extends BaseController
 		User tempEntity = new User();
 		Message msg = MessagesFactory.createGetAllEntityMessage(tempEntity);
 		m_Client.sendMessageToServer(msg);
+		textField_email.textProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue.length() == 41) textField_email.setText(oldValue);
+		});
+		textField_password.textProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue.length() == 21) textField_password.setText(oldValue);
+		});
+		textField_branch.textProperty().addListener((observable, oldValue, newValue) -> {
+			if (newValue.length() == 21) textField_branch.setText(oldValue);
+		});
+		textField_shopManagerId.textProperty().addListener((observable, oldValue, newValue) -> {
+			if (!newValue.isEmpty() && !(newValue.charAt(newValue.length() - 1) >= '0'
+					&& newValue.charAt(newValue.length() - 1) <= '9'))
+				textField_shopManagerId.setText(oldValue);
+		});
 	}
 
 	/**
@@ -289,20 +304,6 @@ public class AdministratorController extends BaseController
 		label_email.setVisible(true);
 		textField_email.setVisible(true);
 		textField_password.setVisible(true);
-		textField_email.textProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue.length() == 41) textField_email.setText(oldValue);
-		});
-		textField_password.textProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue.length() == 21) textField_password.setText(oldValue);
-		});
-		textField_branch.textProperty().addListener((observable, oldValue, newValue) -> {
-			if (newValue.length() == 21) textField_branch.setText(oldValue);
-		});
-		textField_shopManagerId.textProperty().addListener((observable, oldValue, newValue) -> {
-			if (!newValue.isEmpty() && !(newValue.charAt(newValue.length() - 1) >= '0'
-					&& newValue.charAt(newValue.length() - 1) <= '9'))
-				textField_shopManagerId.setText(oldValue);
-		});
 
 		for (int i = 0; i < arrlist.size(); i++) {
 			if (((User) arrlist.get(i)).getUserName().equals(username)) selected_user = (User) arrlist.get(i);
