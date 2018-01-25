@@ -103,7 +103,7 @@ public class AdministratorController extends BaseController
 	{
 		initializeStatus();
 		initializePrivilege();
-		
+
 	}
 
 	/**
@@ -339,12 +339,8 @@ public class AdministratorController extends BaseController
 
 	}
 
-	/**
-	 *
-	 * @param event
-	 *            : send update message to the server when update button pressed
-	 */
-	public void updatebtn(ActionEvent event)
+	@FXML
+	private void updatebtn(ActionEvent event)
 	{
 		if (textField_email.getText().equals("")) {
 			showAlertMessage("Please enter email.", AlertType.INFORMATION);
@@ -363,7 +359,7 @@ public class AdministratorController extends BaseController
 					shopEmployeeEntity.setId(shopEmployee.getId());
 					Message shopEmployeeEntityMessage = MessagesFactory.createUpdateEntityMessage(shopEmployeeEntity);
 					m_Client.sendMessageToServer(shopEmployeeEntityMessage);
-					
+
 					selected_user.setEmail(textField_email.getText());
 					selected_user.setPassword(textField_password.getText());
 					Message entityMessage = MessagesFactory.createUpdateEntityMessage(selected_user);
@@ -378,7 +374,7 @@ public class AdministratorController extends BaseController
 					shopManager.setStatus(selected_user.getStatus());
 					Message shopManagerEntityMessage = MessagesFactory.createUpdateEntityMessage(shopManager);
 					m_Client.sendMessageToServer(shopManagerEntityMessage);
-					
+
 					selected_user.setEmail(textField_email.getText());
 					selected_user.setPassword(textField_password.getText());
 					Message entityMessage1 = MessagesFactory.createUpdateEntityMessage(selected_user);
@@ -475,23 +471,17 @@ public class AdministratorController extends BaseController
 			else if (msg.getMessageData() instanceof RespondMessageData) {
 				RespondMessageData res = (RespondMessageData) msg.getMessageData();
 				if (res.isSucceed()) {
-					if(res.getMessageData() instanceof EntityData)
-					{
-						if((((EntityData)res.getMessageData()).getEntity() instanceof ShopManager))
-						{
-							showAlertMessage("Shop Manger update succeed",AlertType.INFORMATION);
-						}
-						else if((((EntityData)res.getMessageData()).getEntity() instanceof ShopEmployee))
-						{
-							showAlertMessage("Shop Employee update succeed",AlertType.INFORMATION);
-						}
-						else if((((EntityData)res.getMessageData()).getEntity() instanceof User))
-						{
+					if (res.getMessageData() instanceof EntityData) {
+						if ((((EntityData) res.getMessageData()).getEntity() instanceof ShopManager)) {
+							showAlertMessage("Shop Manger update succeed", AlertType.INFORMATION);
+						} else if ((((EntityData) res.getMessageData()).getEntity() instanceof ShopEmployee)) {
+							showAlertMessage("Shop Employee update succeed", AlertType.INFORMATION);
+						} else if ((((EntityData) res.getMessageData()).getEntity() instanceof User)) {
 							showAlertMessage("User update succeed", AlertType.INFORMATION);
 						}
-					User entity= new User();
-					msg=MessagesFactory.createGetAllEntityMessage(entity);
-					m_Client.sendMessageToServer(msg);
+						User entity = new User();
+						msg = MessagesFactory.createGetAllEntityMessage(entity);
+						m_Client.sendMessageToServer(msg);
 					}
 				} else if (!res.isSucceed()) {
 					showAlertMessage("User update faild please try again", AlertType.WARNING);
