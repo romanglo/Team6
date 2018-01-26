@@ -268,6 +268,7 @@ public class ShopEmployeeController extends BaseController
 					javafx.application.Platform.runLater(() -> {
 						drewContantToTable();
 					});
+					needToBeClosed();
 				}
 			} else if (messageData instanceof RespondMessageData) {
 				if (((RespondMessageData) messageData).isSucceed()) {
@@ -409,5 +410,32 @@ public class ShopEmployeeController extends BaseController
 		reservation_table.refresh();
 	}
 
+	private void needToBeClosed()
+	{
+		String string_toclose="";
+		Date today=new Date();
+		for(int i=0;i<reservations.size();i++)
+		{
+			Reservation res=(Reservation)reservations.get(i);
+			if((res.getType().equals(EntitiesEnums.ReservationType.Open))&&(res.getDeliveryDate().getTime()<today.getTime()))
+			{
+				Date delivery=res.getDeliveryDate();
+				if(string_toclose.equals(""))
+				{
+					string_toclose=string_toclose+" "+res.getId();
+					
+				}
+				else
+				{
+					string_toclose=string_toclose+" , "+res.getId();
+				}
+				delivery.getTime();
+			}
+		}
+		if(!(string_toclose.equals("")))
+		{
+			showAlertMessage("The following reservations require yours attention: " + string_toclose + " Since their delivery time has already passed!", AlertType.INFORMATION);
+		}
+	}
 	// end region -> BUI event region
 }
