@@ -309,7 +309,7 @@ public class AdministratorController extends BaseController
 		for (int i = 0; i < arrlist.size(); i++) {
 			if (((User) arrlist.get(i)).getUserName().equals(username)) selected_user = (User) arrlist.get(i);
 		}
-		if (username != null) {
+		if (selected_user != null) {
 			textField_email.setText(selected_user.getEmail());
 			textField_password.setText(selected_user.getPassword());
 			if (selected_user.getPrivilege().equals(EntitiesEnums.UserPrivilege.ShopManager)) {
@@ -342,11 +342,37 @@ public class AdministratorController extends BaseController
 	@FXML
 	private void updatebtn(ActionEvent event)
 	{
+		if(comboBox_user1.getValue()==null)
+		{
+			return;
+		}
+		if(comboBox_user1.getValue().equals("Select username"))
+		{
+			showAlertMessage("Please select user.", AlertType.INFORMATION);
+			return;
+		}
 		if (textField_email.getText().equals("")) {
 			showAlertMessage("Please enter email.", AlertType.INFORMATION);
-		} else if (textField_password.getText().equals("")) {
+			return;
+		}  if (textField_password.getText().equals("")) {
 			showAlertMessage("Please enter password.", AlertType.INFORMATION);
-		} else {
+			return;
+		}  if(textField_branch.isVisible())
+		{
+			if(textField_branch.getText().equals(""))
+			{
+				showAlertMessage("Please enter branch.", AlertType.INFORMATION);
+				return;
+			}
+		}
+		if(textField_shopManagerId.isVisible())
+		{
+			if(textField_shopManagerId.getText().equals(""))
+			{
+				showAlertMessage("Please enter Shop Manager id.", AlertType.INFORMATION);
+				return;
+			}
+		}
 			switch (selected_user.getPrivilege()) {
 				case ShopEmployee:
 					ShopEmployee shopEmployeeEntity = new ShopEmployee();
@@ -388,8 +414,6 @@ public class AdministratorController extends BaseController
 				break;
 
 			}
-		}
-
 	}
 
 	/**
@@ -482,6 +506,11 @@ public class AdministratorController extends BaseController
 						User entity = new User();
 						msg = MessagesFactory.createGetAllEntityMessage(entity);
 						m_Client.sendMessageToServer(msg);
+						selected_user=null;
+						textField_password.clear();
+						textField_email.clear();
+						textField_shopManagerId.clear();
+						textField_branch.clear();
 					}
 				} else if (!res.isSucceed()) {
 					showAlertMessage("User update faild please try again", AlertType.WARNING);
