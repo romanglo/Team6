@@ -24,7 +24,7 @@ public class ShopCostumerRow
 
 	private Float m_cumulativePrice;
 
-	SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+	private SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
 	// end region -> Fields
 
 	// region Getters
