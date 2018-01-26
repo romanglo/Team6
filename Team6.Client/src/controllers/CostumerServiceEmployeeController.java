@@ -180,19 +180,18 @@ public class CostumerServiceEmployeeController extends BaseController
 	private void addComplaint_saveButtonClick(ActionEvent event)
 	{
 		if (m_addcomplaint_textfield_id.getText().isEmpty()
-				|| m_addcomplaint_textarea_costumercomplaint.getText().isEmpty()
-				|| combobox_shop.getValue() == null) {
+				|| m_addcomplaint_textarea_costumercomplaint.getText().isEmpty() || combobox_shop.getValue() == null) {
 			showAlertMessage("Please complete all fields before saving.", AlertType.INFORMATION);
 		} else {
 			int costumerId;
 			try {
 				costumerId = Integer.parseInt(m_addcomplaint_textfield_id.getText());
-				if(costumerId <= 0)
-				{
+				if (costumerId <= 0) {
 					showAlertMessage("Invalid costumer ID! Please enter positive number.", AlertType.INFORMATION);
 					return;
 				}
-			} catch (Exception ex) {
+			}
+			catch (Exception ex) {
 				showAlertMessage("Invalid costumer ID! Please enter only numbers.", AlertType.ERROR);
 				return;
 			}
@@ -315,8 +314,12 @@ public class CostumerServiceEmployeeController extends BaseController
 	@FXML
 	private void treatComplaint_setIdInCombobox()
 	{
-		m_treatcomplaint_list = FXCollections.observableArrayList(m_treatcomplaint_id_array);
-		m_treatcomplaint_combobox_id.setItems(m_treatcomplaint_list);
+		if (m_treatcomplaint_id_array.isEmpty()) {
+			showAlertMessage("There are no complaints required for treatmentõ", AlertType.INFORMATION);
+		} else {
+			m_treatcomplaint_list = FXCollections.observableArrayList(m_treatcomplaint_id_array);
+			m_treatcomplaint_combobox_id.setItems(m_treatcomplaint_list);
+		}
 	}
 
 	/**
@@ -400,8 +403,7 @@ public class CostumerServiceEmployeeController extends BaseController
 		if (opensurvey_combobox_shopname.getValue() == null) {
 			showAlertMessage("Please complete all fields before saving.", AlertType.INFORMATION);
 			return;
-		} else if(opensurvey_combobox_shopname.getValue().isEmpty())
-		{
+		} else if (opensurvey_combobox_shopname.getValue().isEmpty()) {
 			showAlertMessage("Please select valid shop.", AlertType.WARNING);
 			return;
 		}
@@ -555,16 +557,15 @@ public class CostumerServiceEmployeeController extends BaseController
 			} else if (msg.getMessageData() instanceof EntitiesListData) {
 				m_addcomplaint_shopmanager_array = ((EntitiesListData) msg.getMessageData()).getEntities();
 				m_addcomplaint_managerid_array.clear();
-				Platform.runLater(() -> {
-					combobox_shop.getItems().clear();
-				});
+				Platform.runLater(() -> combobox_shop.getItems().clear());
 				m_addcomplaint_managername_array.clear();
 				for (int i = 0; i < m_addcomplaint_shopmanager_array.size(); i++) {
 					m_addcomplaint_managerid_array.add(((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getId()
 							+ " -" + ((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getName());
 				}
 				m_addcomplaint_list = FXCollections.observableArrayList(m_addcomplaint_managerid_array);
-				combobox_shop.setItems(m_addcomplaint_list);
+				Platform.runLater(() -> combobox_shop.setItems(m_addcomplaint_list));
+
 			}
 		} else if (correct_title.equals(optinons_side[1])) {
 			boolean flag = true;
