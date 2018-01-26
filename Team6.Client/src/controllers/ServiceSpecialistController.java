@@ -172,8 +172,15 @@ public class ServiceSpecialistController extends BaseController
 	@FXML
 	private void saveAnalysis(ActionEvent event)
 	{
+		if(combobox_id.getValue() == null) {
+			showAlertMessage("Please select survey to analisys.", AlertType.WARNING);
+			textarea_analysis.clear();
+			return;
+		}
 		if ((textarea_analysis.getText().equals("")) || (combobox_id.getValue().equals(""))) {
 			showAlertMessage("Specialist analisys area and/or survey ID are empty", AlertType.WARNING);
+		} else if(textarea_analysis.getText().length() > 200) {
+			showAlertMessage("Specialist analisys limited to 200 charters.", AlertType.WARNING);
 		} else {
 			selected_survey.setSummary(textarea_analysis.getText());
 			Message msg = MessagesFactory.createUpdateEntityMessage(selected_survey);

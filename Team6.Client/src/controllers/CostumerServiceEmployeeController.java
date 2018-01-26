@@ -15,6 +15,7 @@ import entities.CostumerServiceEmployee;
 import entities.IEntity;
 import entities.ShopManager;
 import entities.Survey;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -178,19 +179,31 @@ public class CostumerServiceEmployeeController extends BaseController
 	@FXML
 	private void addComplaint_saveButtonClick(ActionEvent event)
 	{
-		if (m_addcomplaint_textfield_id.getText().equals("")
-				|| m_addcomplaint_textarea_costumercomplaint.getText().equals("")) {
+		if (m_addcomplaint_textfield_id.getText().isEmpty()
+				|| m_addcomplaint_textarea_costumercomplaint.getText().isEmpty()
+				|| combobox_shop.getValue() == null) {
 			showAlertMessage("Please complete all fields before saving.", AlertType.INFORMATION);
 		} else {
+			int costumerId;
+			try {
+				costumerId = Integer.parseInt(m_addcomplaint_textfield_id.getText());
+				if(costumerId <= 0)
+				{
+					showAlertMessage("Invalid costumer ID! Please enter positive number.", AlertType.INFORMATION);
+					return;
+				}
+			} catch (Exception ex) {
+				showAlertMessage("Invalid costumer ID! Please enter only numbers.", AlertType.ERROR);
+				return;
+			}
 			m_addcomplaint_selected_complaint = new Complaint();
 			m_addcomplaint_selected_complaint.setShopManagerId(
 					Integer.parseInt(combobox_shop.getValue().substring(0, combobox_shop.getValue().indexOf('-') - 1)));
 			m_addcomplaint_selected_complaint.setComplaint(m_addcomplaint_textarea_costumercomplaint.getText());
 			m_addcomplaint_selected_complaint.setCreationDate(new Date());
 			m_addcomplaint_selected_complaint.setCostumerServiceEmployeeId(my_id);
-			int costumer_id = Integer.parseInt(m_addcomplaint_textfield_id.getText());
 			Costumer entity = new Costumer();
-			entity.setId(costumer_id);
+			entity.setId(costumerId);
 			Message msg = MessagesFactory.createGetEntityMessage(entity);
 			m_Client.sendMessageToServer(msg);
 			combobox_shop.setDisable(true);
@@ -387,6 +400,10 @@ public class CostumerServiceEmployeeController extends BaseController
 		if (opensurvey_combobox_shopname.getValue() == null) {
 			showAlertMessage("Please complete all fields before saving.", AlertType.INFORMATION);
 			return;
+		} else if(opensurvey_combobox_shopname.getValue().isEmpty())
+		{
+			showAlertMessage("Please select valid shop.", AlertType.WARNING);
+			return;
 		}
 		if (opensurvey_datepicker_enddate.getValue() == null) {
 			showAlertMessage("You left empty fields.", AlertType.WARNING);
@@ -531,7 +548,6 @@ public class CostumerServiceEmployeeController extends BaseController
 						if (((RespondMessageData) msg.getMessageData()).isSucceed()) {
 							m_Logger.severe("Successfully added complaint");
 							showAlertMessage("Successfully added complaint", AlertType.INFORMATION);
-							addcomplaint_initializeShopCombobox();
 						}
 					}
 				}
@@ -539,7 +555,9 @@ public class CostumerServiceEmployeeController extends BaseController
 			} else if (msg.getMessageData() instanceof EntitiesListData) {
 				m_addcomplaint_shopmanager_array = ((EntitiesListData) msg.getMessageData()).getEntities();
 				m_addcomplaint_managerid_array.clear();
-				combobox_shop.getItems().clear();
+				Platform.runLater(() -> {
+					combobox_shop.getItems().clear();
+				});
 				m_addcomplaint_managername_array.clear();
 				for (int i = 0; i < m_addcomplaint_shopmanager_array.size(); i++) {
 					m_addcomplaint_managerid_array.add(((ShopManager) m_addcomplaint_shopmanager_array.get(i)).getId()

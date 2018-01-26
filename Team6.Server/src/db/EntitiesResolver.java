@@ -5,6 +5,7 @@ import java.sql.Blob;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -117,7 +118,7 @@ public class EntitiesResolver {
 			returningList = resultSetToSurveyResultEntities(resultSet);
 		} else if (expectedType.equals(ShopCostumer.class)) {
 			returningList = resultSetToShopCostumerEntities(resultSet);
-		} else if(expectedType.equals(CostumerServiceEmployee.class)) {
+		} else if (expectedType.equals(CostumerServiceEmployee.class)) {
 			returningList = resultSetToCostumerServiceEmployeeEntities(resultSet);
 		}
 
@@ -150,7 +151,6 @@ public class EntitiesResolver {
 		return ShopCostumerEntities.isEmpty() ? null : ShopCostumerEntities;
 	}
 
-	
 	/**
 	 * The method received {@link ResultSet} and resolve it to {@link List} of
 	 * {@link ShopCostumer} entity that describes a shop catalog.
@@ -657,9 +657,9 @@ public class EntitiesResolver {
 				try {
 					complaintReport.setShopManagerId(resultSet.getInt(1));
 					Date mysqlDate = resultSet.getDate(2);
-					if(mysqlDate != null) {
-					complaintReport.setYear(new java.util.Date(mysqlDate.getTime()));}
-					else {
+					if (mysqlDate != null) {
+						complaintReport.setYear(new java.util.Date(mysqlDate.getTime()));
+					} else {
 						complaintReport.setYear(null);
 					}
 					complaintReport.setQuarter(resultSet.getInt(3));
@@ -704,9 +704,9 @@ public class EntitiesResolver {
 					complaint.setShopManagerId(resultSet.getInt(3));
 					complaint.setCostumerServiceEmployeeId(resultSet.getInt(4));
 					Date mysqlDate = resultSet.getDate(5);
-					if(mysqlDate!= null) {
-					complaint.setCreationDate(new java.util.Date(mysqlDate.getTime()));}
-					else {
+					if (mysqlDate != null) {
+						complaint.setCreationDate(new java.util.Date(mysqlDate.getTime()));
+					} else {
 						complaint.setCreationDate(null);
 					}
 					complaint.setComplaint(resultSet.getString(6));
@@ -881,9 +881,11 @@ public class EntitiesResolver {
 					reservation.setPrice(resultSet.getFloat(7));
 					reservation.setBlessingCard(resultSet.getString(8));
 					Date mysqlDate = resultSet.getDate(9);
-					if(mysqlDate != null) {
-					reservation.setDeliveryDate(new java.util.Date(mysqlDate.getTime()));}
-					else {
+					if (mysqlDate != null) {
+						Timestamp mysqlTime = resultSet.getTimestamp(9);
+						mysqlDate.setTime(mysqlTime.getTime());
+						reservation.setDeliveryDate(new java.util.Date(mysqlDate.getTime()));
+					} else {
 						reservation.setDeliveryDate(null);
 					}
 					reservation.setDeliveryType(Enum.valueOf(ReservationDeliveryType.class, resultSet.getString(10)));

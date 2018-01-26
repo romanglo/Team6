@@ -1064,6 +1064,13 @@ public class ShopManagerController extends BaseController
 		int costumerId, costumerIndexInArray;
 		try {
 			costumerId = Integer.parseInt(textField_addShopCostumer.getText());
+			if(costumerId <= 0)
+			{
+				showAlertMessage("Invalid ID!", AlertType.ERROR);
+				textField_addShopCostumer.clear();
+				textFiled_costumerDetails.clear();
+				return;
+			}
 		}
 		catch (Exception ex) {
 			showAlertMessage("Invalid ID!", AlertType.ERROR);

@@ -525,7 +525,7 @@ public class CostumerController extends BaseController
 		delivery_radio.setSelected(true);
 		pickup_radio.setSelected(false);
 		date_pick.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-		
+
 		if (immidiate_delivery.isSelected()) {
 			combo_hour.setDisable(true);
 			combo_minute.setDisable(true);
@@ -605,9 +605,18 @@ public class CostumerController extends BaseController
 			showAlertMessage("Please fill in all fields to start a search.", AlertType.INFORMATION);
 			return;
 		}
-		double min = Double.parseDouble(min_price.getText());
-		double max = Double.parseDouble(max_price.getText());
-		int amount = Integer.parseInt(item_amount.getText());
+
+		double min, max;
+		int amount;
+		try {
+			min = Double.parseDouble(min_price.getText());
+			max = Double.parseDouble(max_price.getText());
+			amount = Integer.parseInt(item_amount.getText());
+		}
+		catch (Exception ex) {
+			showAlertMessage("Illigal values entered.", AlertType.WARNING);
+			return;
+		}
 
 		if (min < 0 || max < 0 || amount < 1 || max < min) {
 			showAlertMessage("Illigal values entered.", AlertType.WARNING);
@@ -1472,7 +1481,7 @@ public class CostumerController extends BaseController
 		combo_hour.setDisable(false);
 		combo_minute.setDisable(false);
 		date_pick.setDisable(false);
-		
+
 		credit_card_number.setText("");
 		delivery_address.setText("");
 		delivery_name.setText("");

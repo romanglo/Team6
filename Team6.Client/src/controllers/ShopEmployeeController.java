@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import boundaries.CatalogItemRow;
 import boundaries.ReservationStatusRow;
 import common.AlertBuilder;
 import entities.EntitiesEnums;
@@ -256,7 +255,8 @@ public class ShopEmployeeController extends BaseController
 					Reservation reservation;
 					for (int i = 0; i < reservations.size(); i++) {
 						reservation = (Reservation) reservations.get(i);
-						if (reservation.getType().equals(EntitiesEnums.ReservationType.Open)) {
+						if (reservation.getType().equals(EntitiesEnums.ReservationType.Open)
+								&& reservation.getShopManagerId() == manager_id) {
 							ReservationStatusRow statusRow = new ReservationStatusRow(reservation.getId(),
 									reservation.getCostumerId(), reservation.getPrice(),
 									reservation.getType().toString(), reservation.getDeliveryDate());
@@ -412,29 +412,25 @@ public class ShopEmployeeController extends BaseController
 
 	private void needToBeClosed()
 	{
-		String string_toclose="";
-		Date today=new Date();
-		for(int i=0;i<reservations.size();i++)
-		{
-			Reservation res=(Reservation)reservations.get(i);
-			if((res.getType().equals(EntitiesEnums.ReservationType.Open))&&(res.getDeliveryDate().getTime()<today.getTime()))
-			{
-				Date delivery=res.getDeliveryDate();
-				if(string_toclose.equals(""))
-				{
-					string_toclose=string_toclose+" "+res.getId();
-					
-				}
-				else
-				{
-					string_toclose=string_toclose+" , "+res.getId();
+		String string_toclose = "";
+		Date today = new Date();
+		for (int i = 0; i < reservations.size(); i++) {
+			Reservation res = (Reservation) reservations.get(i);
+			if ((res.getType().equals(EntitiesEnums.ReservationType.Open))
+					&& (res.getDeliveryDate().getTime() < today.getTime())) {
+				Date delivery = res.getDeliveryDate();
+				if (string_toclose.equals("")) {
+					string_toclose = string_toclose + " " + res.getId();
+
+				} else {
+					string_toclose = string_toclose + " , " + res.getId();
 				}
 				delivery.getTime();
 			}
 		}
-		if(!(string_toclose.equals("")))
-		{
-			showAlertMessage("The following reservations require yours attention: " + string_toclose + " Since their delivery time has already passed!", AlertType.INFORMATION);
+		if (!(string_toclose.equals(""))) {
+			showAlertMessage("The following reservations require yours attention: " + string_toclose
+					+ " Since their delivery time has already passed!", AlertType.INFORMATION);
 		}
 	}
 	// end region -> BUI event region
