@@ -147,23 +147,20 @@
 				</AnchorPane>
 
 				<AnchorPane fx:id="anchorpane_option2" styleClass="content-section"
-					layoutY="79.0" prefHeight="368.0" prefWidth="450.0" visible="falseS"
+					layoutY="79.0" prefHeight="368.0" prefWidth="450.0" visible="false"
 					AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
-					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
+					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
 					<children>
-						<Button layoutX="76.0" layoutY="335.0" mnemonicParsing="false"
-							onAction="#closeReservation" prefHeight="25.0" prefWidth="147.0"
-							text="Save Changes" AnchorPane.bottomAnchor="5.0"
-							AnchorPane.rightAnchor="5.0" />
+						
 						<TableView fx:id="reservation_table" editable="true"
-							layoutX="-7.0" layoutY="35.0" prefHeight="250.0" prefWidth="500.0"
+						 prefHeight="250.0" prefWidth="500.0"
 							AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="5.0"
-							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="20.0">
+							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0">
 							<columns>
 								<TableColumn fx:id="tablecolumn_reservation_id"
-									editable="false" minWidth="50.0" sortable="false" text="ID" />
+									editable="false" minWidth="30" sortable="false" text="ID" />
 								<TableColumn fx:id="tablecolumn_costumer_id"
-									editable="false" minWidth="50.0" sortable="false" text="Costumer ID" />
+									editable="false" minWidth="60" sortable="false" text="Costumer ID" />
 								<TableColumn fx:id="tablecolumn_reservation_price"
 									editable="false" minWidth="60.0" sortable="false" text="Price" />
 								<TableColumn fx:id="tablecolumn_reservation_type"
@@ -175,6 +172,13 @@
 								<TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
 							</columnResizePolicy>
 						</TableView>
+						<Label
+							text="You can close an reservation by double-clicking its entry in the table:"
+							AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
+						<Button layoutX="76.0" layoutY="335.0" mnemonicParsing="false"
+							onAction="#closeReservation" prefHeight="25.0" prefWidth="147.0"
+							text="Save Changes" AnchorPane.bottomAnchor="5.0"
+							AnchorPane.rightAnchor="5.0" />
 					</children>
 				</AnchorPane>
 			</children>

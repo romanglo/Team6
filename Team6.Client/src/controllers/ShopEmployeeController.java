@@ -185,6 +185,7 @@ public class ShopEmployeeController extends BaseController
 		return new String[] { "Add survey", "Close Reservations" };
 	}
 
+	boolean m_firstTime = true;
 	/**
 	 * {@inheritDoc}
 	 */
@@ -263,10 +264,15 @@ public class ShopEmployeeController extends BaseController
 							open_reservations.add(statusRow);
 						}
 					}
-					reservation_list.setAll(open_reservations);
-					open_reservations.clear();
+
 					javafx.application.Platform.runLater(() -> {
-						drewContantToTable();
+						reservation_list.setAll(open_reservations);
+						open_reservations.clear();
+						drawContantToTable();
+						if(m_firstTime) {
+							drawContantToTable();
+							m_firstTime=false;
+						}
 					});
 					needToBeClosed();
 				}
@@ -275,7 +281,7 @@ public class ShopEmployeeController extends BaseController
 					showAlertMessage("Your reservations have been successfully closed", AlertType.INFORMATION);
 					reservation_list.clear();
 					closes_reservations.clear();
-					drewContantToTable();
+					drawContantToTable();
 					initialReservations();
 				}
 			}
@@ -334,7 +340,7 @@ public class ShopEmployeeController extends BaseController
 					} else {
 						return;
 					}
-					drewContantToTable();
+					drawContantToTable();
 				}
 			});
 			return tableRow;
@@ -350,7 +356,7 @@ public class ShopEmployeeController extends BaseController
 				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, String>("reservationStatus"));
 		tablecolumn_delivery_date
 				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, String>("deliveryDateInFormat"));
-		drewContantToTable();
+		drawContantToTable();
 	}
 
 	/**
@@ -404,7 +410,7 @@ public class ShopEmployeeController extends BaseController
 	 * Insert data into table and show the updated table.
 	 * 
 	 */
-	private void drewContantToTable()
+	private void drawContantToTable()
 	{
 		reservation_table.setItems(reservation_list);
 		reservation_table.refresh();

@@ -880,11 +880,9 @@ public class EntitiesResolver {
 					reservation.setNumberOfItems(resultSet.getInt(6));
 					reservation.setPrice(resultSet.getFloat(7));
 					reservation.setBlessingCard(resultSet.getString(8));
-					Date mysqlDate = resultSet.getDate(9);
-					if (mysqlDate != null) {
-						Timestamp mysqlTime = resultSet.getTimestamp(9);
-						mysqlDate.setTime(mysqlTime.getTime());
-						reservation.setDeliveryDate(new java.util.Date(mysqlDate.getTime()));
+					Timestamp mysqlDateTime = resultSet.getTimestamp(9);
+					if (mysqlDateTime != null) {
+						reservation.setDeliveryDate(new java.util.Date(mysqlDateTime.getTime()));
 					} else {
 						reservation.setDeliveryDate(null);
 					}

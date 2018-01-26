@@ -288,12 +288,15 @@
 					<children>
 						<AnchorPane fx:id="anchorpane_reservations" visible="false"
 							AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0"
-							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+							AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
 							<children>
+								<Label
+									text="You can see an open order by double-clicking its entry in the table:"
+									AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
 								<TableView fx:id="reservation_table" editable="true"
 									layoutX="-7.0" layoutY="35.0" prefHeight="250.0" prefWidth="500.0"
 									AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="5.0"
-									AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="35.0">
+									AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="30.0">
 									<columns>
 										<TableColumn fx:id="tablecolumn_reservation_id"
 											editable="false" minWidth="60.0" prefWidth="50.0" sortable="false"
@@ -362,12 +365,15 @@
 						<AnchorPane fx:id="anchorpane_complaints_display"
 							visible="false" AnchorPane.bottomAnchor="5.0"
 							AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
-							AnchorPane.topAnchor="0.0">
+							AnchorPane.topAnchor="5.0">
 							<children>
+								<Label
+									text="You can see a complaint details by double-clicking its entry in the table:"
+									AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0" />
 								<TableView fx:id="complaints_table" editable="true"
 									layoutX="-7.0" layoutY="35.0" prefHeight="150.0" prefWidth="500.0"
 									AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
-									AnchorPane.topAnchor="20.0">
+									AnchorPane.topAnchor="35.0">
 									<columns>
 										<TableColumn fx:id="tablecolumn_complaints_id"
 											editable="false" minWidth="60.0" prefWidth="50.0" sortable="false"
@@ -383,14 +389,14 @@
 									</columnResizePolicy>
 								</TableView>
 								<VBox prefHeight="80.0" AnchorPane.leftAnchor="5.0"
-									AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="180.0">
+									AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="195.0">
 									<Label prefHeight="17.0" prefWidth="180.0" text="Costumer complaint:" />
 									<TextArea fx:id="textarea_complaint" editable="false"
 										layoutY="117.0" prefWidth="295.0" />
 								</VBox>
 								<VBox prefHeight="80.0" prefWidth="534.0"
 									AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0"
-									AnchorPane.topAnchor="270.0">
+									AnchorPane.topAnchor="285.0">
 									<Label prefHeight="17.0" prefWidth="167.0" text="Complaint summary:" />
 									<TextArea fx:id="textarea_summary" prefWidth="325.0"
 										editable="false" />
