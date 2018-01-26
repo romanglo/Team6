@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import boundaries.CatalogItemRow;
+import boundaries.ReservationStatusRow;
 import common.AlertBuilder;
 import entities.EntitiesEnums;
 import entities.IEntity;
@@ -111,19 +112,23 @@ public class ShopEmployeeController extends BaseController
 
 	private List<IEntity> reservations;
 
-	private ArrayList<CatalogItemRow> open_reservations = new ArrayList<>();
+	private ArrayList<ReservationStatusRow> open_reservations = new ArrayList<>();
 
-	private ObservableList<CatalogItemRow> reservation_list = FXCollections.observableArrayList();
+	private ObservableList<ReservationStatusRow> reservation_list = FXCollections.observableArrayList();
 
 	private @FXML Label enter_date;
 
-	private @FXML TableView<CatalogItemRow> reservation_table;
+	private @FXML TableView<ReservationStatusRow> reservation_table;
 
-	private @FXML TableColumn<CatalogItemRow, Integer> tablecolumn_reservation_id;
+	private @FXML TableColumn<ReservationStatusRow, Integer> tablecolumn_reservation_id;
 
-	private @FXML TableColumn<CatalogItemRow, Float> tablecolumn_reservation_price;
+	private @FXML TableColumn<ReservationStatusRow, Integer> tablecolumn_costumer_id;
 
-	private @FXML TableColumn<CatalogItemRow, String> tablecolumn_reservation_type;
+	private @FXML TableColumn<ReservationStatusRow, Float> tablecolumn_reservation_price;
+
+	private @FXML TableColumn<ReservationStatusRow, String> tablecolumn_reservation_type;
+
+	private @FXML TableColumn<ReservationStatusRow, String> tablecolumn_delivery_date;
 
 	private ArrayList<IEntity> closes_reservations = new ArrayList<>();
 
@@ -205,7 +210,6 @@ public class ShopEmployeeController extends BaseController
 								correct_survey = (Survey) temp.get(i);
 							}
 						}
-
 					}
 					if (correct_survey == null) {
 						showAlertMessage("There are no surveys for your shop.", AlertType.INFORMATION);
@@ -241,7 +245,6 @@ public class ShopEmployeeController extends BaseController
 								combobox_answer6.setValueFactory(svf6);
 								showAlertMessage("Successfully added", AlertType.INFORMATION);
 							});
-
 						}
 					}
 				}
@@ -250,12 +253,14 @@ public class ShopEmployeeController extends BaseController
 			if (messageData instanceof EntitiesListData) {
 				if (((EntitiesListData) messageData).getEntities().get(0) instanceof Reservation) {
 					reservations = ((EntitiesListData) messageData).getEntities();
+					Reservation reservation;
 					for (int i = 0; i < reservations.size(); i++) {
-						if (((Reservation) reservations.get(i)).getType().equals(EntitiesEnums.ReservationType.Open)) {
-							CatalogItemRow catlogitem = new CatalogItemRow(((Reservation) reservations.get(i)).getId(),
-									null, ((Reservation) reservations.get(i)).getPrice(), null, null,
-									((Reservation) reservations.get(i)).getType().toString());
-							open_reservations.add(catlogitem);
+						reservation = (Reservation) reservations.get(i);
+						if (reservation.getType().equals(EntitiesEnums.ReservationType.Open)) {
+							ReservationStatusRow statusRow = new ReservationStatusRow(reservation.getId(),
+									reservation.getCostumerId(), reservation.getPrice(),
+									reservation.getType().toString(), reservation.getDeliveryDate());
+							open_reservations.add(statusRow);
 						}
 					}
 					reservation_list.setAll(open_reservations);
@@ -307,20 +312,20 @@ public class ShopEmployeeController extends BaseController
 	private void initializeConfigurationShopSalesTable()
 	{
 		reservation_table.setRowFactory(param -> {
-			TableRow<CatalogItemRow> tableRow = new TableRow<>();
+			TableRow<ReservationStatusRow> tableRow = new TableRow<>();
 			tableRow.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
-					CatalogItemRow rowData = tableRow.getItem();
+					ReservationStatusRow rowData = tableRow.getItem();
 
-					if (rowData.getType() == "Closed") return;
+					if (rowData.getReservationStatus() == "Closed") return;
 
 					Alert alert = new AlertBuilder().setAlertType(AlertType.CONFIRMATION)
 							.setContentText("Are you sure you want to close the reservation?").build();
 					Optional<ButtonType> result = alert.showAndWait();
 					if (result.get() == ButtonType.OK) {
-						rowData.setM_type("Closed");
+						rowData.setReservationStatus("Closed");
 						for (int i = 0; i < reservations.size(); i++) {
-							if (rowData.getM_id() == ((Reservation) reservations.get(i)).getId()) {
+							if (rowData.getReservationId() == ((Reservation) reservations.get(i)).getId()) {
 								((Reservation) reservations.get(i)).setType(EntitiesEnums.ReservationType.Closed);
 								closes_reservations.add(((Reservation) reservations.get(i)));
 							}
@@ -334,9 +339,16 @@ public class ShopEmployeeController extends BaseController
 			return tableRow;
 		});
 
-		tablecolumn_reservation_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
-		tablecolumn_reservation_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
-		tablecolumn_reservation_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
+		tablecolumn_reservation_id
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, Integer>("reservationId"));
+		tablecolumn_costumer_id
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, Integer>("costumerId"));
+		tablecolumn_reservation_price
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, Float>("reservationPrice"));
+		tablecolumn_reservation_type
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, String>("reservationStatus"));
+		tablecolumn_delivery_date
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, String>("deliveryDateInFormat"));
 		drewContantToTable();
 	}
 
