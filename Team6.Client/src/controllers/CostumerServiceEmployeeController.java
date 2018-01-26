@@ -315,7 +315,7 @@ public class CostumerServiceEmployeeController extends BaseController
 	private void treatComplaint_setIdInCombobox()
 	{
 		if (m_treatcomplaint_id_array.isEmpty()) {
-			showAlertMessage("There are no complaints required for treatmentõ", AlertType.INFORMATION);
+			showAlertMessage("There are no complaints required for treatment.", AlertType.INFORMATION);
 		} else {
 			m_treatcomplaint_list = FXCollections.observableArrayList(m_treatcomplaint_id_array);
 			m_treatcomplaint_combobox_id.setItems(m_treatcomplaint_list);
