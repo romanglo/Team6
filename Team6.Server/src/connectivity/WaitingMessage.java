@@ -1,24 +1,35 @@
 package connectivity;
 
-import newMessages.Message;
+import messages.Message;
 import ocsf.server.ConnectionToClient;
 
+/**
+ * WaitingMessage: A package internal class, used by {@link Server} for contains
+ * the received {@link Message}s.
+ *
+ */
 class WaitingMessage {
 
 	// region Fields
 
 	private Message m_message;
 
-	private ConnectionToClient m_sender;
+	private final ConnectionToClient m_sender;
 
 	// end region -> Fields
 
 	// region Getters
 
+	/**
+	 * @return the message
+	 */
 	public Message getMessage() {
 		return m_message;
 	}
 
+	/**
+	 * @return the sender thread.
+	 */
 	public ConnectionToClient getSender() {
 		return m_sender;
 	}
@@ -27,6 +38,10 @@ class WaitingMessage {
 
 	// region Setters
 
+	/**
+	 * @param message
+	 *            the message to set.
+	 */
 	public void setMessage(Message message) {
 		m_message = message;
 	}
@@ -35,6 +50,15 @@ class WaitingMessage {
 
 	// region Constructors
 
+	/**
+	 * 
+	 * @see WaitingMessage
+	 *
+	 * @param client
+	 *            the sender thread, this is unchangeable data.
+	 * @param message
+	 *            a message from client.
+	 */
 	public WaitingMessage(ConnectionToClient client, Message message) {
 		m_message = message;
 		m_sender = client;

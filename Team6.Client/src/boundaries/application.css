@@ -1,75 +1,317 @@
+.root {
+    -fx-background-color: #ffffff;
+    -fx-font-family: Ariel;
+    -fx-font-size: 12.0px;
+}
 
-#tf_enterItemId {
-	-fx-text-alignment: center ;
+.header-section {
+    -fx-padding: 10.0px;
+    -fx-font-size: 20.0px;
+    -fx-background-color: linear-gradient(teal,#ffffff);
+}
+
+.header-section .label { 
+    -fx-padding: 10.0px;
+    -fx-effect: dropshadow( gaussian , rgba(255.0,255.0,255.0,0.5) , 0.0,0.0,2.0,3.0 );
+}
+
+.header-section .label .text {
+    -fx-fill: #ffffff;
+    -fx-stroke: #000000;
+    -fx-stroke-width: 2.0px;
+}
+
+
+.header-section .button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #000000;
+    -fx-font-size: 16.0px;
+    -fx-cursor: hand;
+    -fx-border-width: 0.0;
+}
+
+.sidebar-section {
+    -fx-min-width: 200.0px;
+    -fx-pref-width: 200.0px;
+    -fx-max-width: 200.0px;
+    -fx-border-width: 1.0;
+    -fx-border-color: transparent #E8E8E8 transparent transparent;
+}
+
+
+.sidebar-section ToggleButton {
+    -fx-font-size: 18.0px;
+    -fx-padding: 10.0 15.0 10.0 15.0;
+    -fx-border-width: 1.0;
+    -fx-border-color: transparent transparent #E8E8E8 transparent;
+    -fx-min-width: 200.0px;
+    -fx-pref-width: 200.0px;
+    -fx-max-width: 200.0px;
+    -fx-background-color: transparent;
+    -fx-font-family: Berlin Sans FB Demi;
+}
+
+.sidebar-section ToggleButton:hover 
+{
+    -fx-background-color: linear-gradient(#ffffff, #61a2b1);
+}
+
+.sidebar-section ToggleButton:selected {
+     -fx-font-weight: bold;
+}
+
+.content-section {
+    -fx-padding: 10.0 20.0 10.0 20.0;
+    -fx-wrap-text: true;
+}
+
+.content-section .label {
+	
+    -fx-font-size: 16.0px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #016565;
+    -fx-effect: dropshadow( gaussian , grey , 0.0,0.0,0.0,1.0 );
+}
+
+.content-section-label .label .text{
+    -fx-fill: #ffffff;
+    -fx-stroke: #000000;
+    -fx-stroke-width: 2.0px;
+}
+
+.footer-section {
+	-fx-font-size: 16.0px;
+    -fx-alignment: center;
+    -fx-padding: 10.0 10.0 10.0 10.0;
+    -fx-border-width: 1.0;
+    -fx-border-color: #E8E8E8 transparent transparent transparent;
+}
+
+.user-details {
+    -fx-background-color: linear-gradient(#ffffff,#cccccc);
+}
+
+.table-view{
+   -fx-background-color: transparent;
+}
+
+.table-view:focused{
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header-background{
+    -fx-background-color: linear-gradient(grey,white);
+}
+
+.table-view .column-header-background .label{
+    -fx-background-color: transparent;
+    -fx-text-fill: teal;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #005797;
+    -fx-background-insets: 0.0;
+    -fx-background-radius: 1.0;
+}
+
+.table-view > .virtual-flow > .scroll-bar:vertical,
+.table-view > .virtual-flow > .scroll-bar:vertical > .track,
+.table-view > .virtual-flow > .scroll-bar:vertical > .track-background, 
+.table-view > .virtual-flow > .scroll-bar:horizontal,
+.table-view > .virtual-flow > .scroll-bar:horizontal > .track,
+.table-view > .virtual-flow > .scroll-bar:horizontal > .track-background {
+    -fx-background-color: transparent;
+}
+
+.table-view > .virtual-flow > .scroll-bar > .increment-button, 
+.table-view > .virtual-flow > .scroll-bar > .decrement-button {
+    -fx-opacity: 0.0;
 }
 
  .button
 {
-	-fx-background-color: #5490ff;
-	-fx-text-fill: white;
-	-fx-padding: 6 6 6 6;
-	-fx-border-radius: 8;
-}
-.button:hover 
-{
-    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+	-fx-background-radius: 22.0;
+	-fx-border-color: teal;
+	-fx-border-radius: 22.0;
+	-fx-border-width: 1.0;
+	
 }
 
-.tab-pane .tab-header-area .tab-header-background 
-{
-    -fx-opacity: 0;
+.button .text{
+    -fx-font-size: 14.0px;
 }
 
-.tab-pane
+.button:pressed
 {
-    -fx-tab-min-width:90px;
-    /*-fx-background-color: lightgrey;*/
+	-fx-rotate: 10.0;
 }
 
-.tab
-{
-    -fx-background-insets: 0 1 0 1,0,0;
-}
-.tab-pane .tab
-{
-    -fx-background-color: #9fa4a0;
+.combo-box-base {
+    -fx-background-color: -fx-shadow-highlight-color, -fx-outer-border, -fx-inner-border, white;
+    -fx-background-insets: 0.0 0.0 -1.0 0.0, 0.0, 1.0, 2.0;    
+    -fx-border-radius: 10.0 10.0 0.0 0.0;
+  	-fx-background-radius: 10.0 10.0 0.0 0.0;
 }
 
-.tab-pane .tab:selected
-{
-    -fx-background-color: #5490ff;
+.combo-box-popup .list-view .list-cell {
+    -fx-background-color: white;
 }
 
-
-.tab-content-area 
-{
--fx-background-color: rgb(218,218,218);
-/*-fx-padding: 1px; 
--fx-border-color: white; 
--fx-border-width: 3px;*/
-/* -fx-opacity: -fx-disabled-opacity;*/
-}
-
-.tab .tab-label 
-{ 
-	-fx-alignment: center-right  ;
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #ececec;
     -fx-text-fill: black;
-    -fx-font-size: 12px;
-    -fx-font-weight: bold; 
+    -fx-font-family: Oxygen Light;
 }
 
-.tab:selected .tab-label 
-{ 
-    -fx-alignment: CENTER;
-    -fx-text-fill: white;
+.combo-box .cell:selected {
+    -fx-text-fill: teal;
 }
-.label
-{
-    -fx-text-fill: #5490ff;
-    -fx-font-weight: bold;
-    -fx-font-size: 16px;
+
+
+
+ .text-field{
+	-fx-border-radius: 10.0 10.0 10.0 10.0;
+  	-fx-background-radius: 10.0 10.0 10.0 10.0;
+} 
+
+
+.chart-title {
+  -fx-text-fill: #4682b4;
+  -fx-font-size: 1.6em;
 }
-.root
-{
-	-fx-background-color: white;
+ 
+.axis-label {
+  -fx-text-fill: #4682b4;
+  -fx-font-size: 1.2em;
+}
+
+.chart-legend {
+   -fx-background-color:  transparent;
+   -fx-padding: 20.0px;
+}
+ 
+.chart-legend-item-symbol{
+   -fx-background-radius: 0.0;
+}
+ 
+.chart-legend-item{
+    -fx-text-fill: #191970;
+}
+ 
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+
+.chart-vertical-grid-lines {
+    -fx-stroke: transparent ;
+} 
+
+.chart-horizontal-grid-lines {
+    -fx-stroke: #3278fa;
+}
+
+.chart-alternative-row-fill {
+    -fx-fill: #dddddd;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0.0;
+}
+
+.date-picker > .arrow-button > .arrow {
+    -fx-shape: "M0,0v9h9V0H0z M2,8H1V7h1V8z M2,6H1V5h1V6z M2,4H1V3h1V4z M4,8H3V7h1V8z M4,6H3V5h1V6z M4,4H3V3h1V4z M6,8H5V7h1V8z M6,6H5 V5h1V6z M6,4H5V3h1V4z M8,8H7V7h1V8z M8,6H7V5h1V6z M8,4H7V3h1V4z";
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.416667em 0.416667em 0.333333em 0.333333em; /* 5 5 4 4 */
+    -fx-scale-shape: true;
+}
+
+.date-picker .text-field{
+    -fx-skin: "com.sun.javafx.scene.control.skin.TextFieldSkin";
+}
+
+.date-picker .text-input{
+    -fx-background-radius: 0, 0;
+
+    -fx-background-color: transparent, white;
+    -fx-background-insets: 2, 2;
+}
+
+.date-picker > .arrow-button:hover {
+    -fx-background-color: #d9d9d9;
+    -fx-background-insets: 3 3 3 3;
+    -fx-background-radius: 0;
+}
+
+.date-picker > .arrow-button:pressed {
+    -fx-background-color: black;
+}
+
+.date-picker > .arrow-button:pressed > .arrow {
+    -fx-background-color: white;
+}
+
+.date-picker-popup {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+}
+
+.date-picker-popup > .month-year-pane {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+}
+
+.date-picker-popup > * > .spinner > .button {
+    -fx-padding: 0.25em 0.583333em 0.25em 0.583333em; /* 3 7 3 7 */
+}
+
+.date-picker-popup > * > .spinner > .button {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+}
+
+.date-picker-popup > * > .spinner {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+}
+
+.date-picker-popup > * > .spinner > .button:hover {
+    -fx-background-color: #dadada;
+}
+
+.date-picker-popup > * > .spinner > .button:armed {
+    -fx-background-color: #606060;
+}
+
+.date-picker-popup > * > .spinner > .button > .left-arrow,
+.date-picker-popup > * > .spinner > .button > .right-arrow {
+    -fx-background-color: #606060;
+    -fx-background-insets: 0;
+    -fx-effect: null;
+}
+
+.date-picker-popup > * > .spinner > .button:pressed > .left-arrow,
+.date-picker-popup > * > .spinner > .button:pressed > .right-arrow {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
+}
+
+.date-picker-popup > .calendar-grid {
+    -fx-background-color: white;
+    /*-fx-background-insets: 1 0 0 0;*/
+    -fx-padding: 0;
+}
+
+.date-picker-popup > * > .previous-month,
+.date-picker-popup > * > .next-month {
+    -fx-background-color: white;
+    -fx-opacity: 0.3;
+}
+
+.date-picker-popup > * > .day-name-cell,
+.date-picker-popup > * > .week-number-cell {
+    -fx-font-size: 0.75em;
+    -fx-font-family: "Segoe UI Semibold", "Segoe UI", Helvetica, Arial, sans-serif;
 }

@@ -1,27 +1,12 @@
 
 package controllers;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
-import client.ApplicationEntryPoint;
-import client.Client;
-import client.ClientConfiguration;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
-import logger.LogManager;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.IMessageData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -29,10 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.imageio.ImageIO;
-import newEntities.EntitiesEnums;
-import newEntities.IEntity;
-import newEntities.Item;
+
 import boundaries.CatalogItemRow;
+import entities.EntitiesEnums;
+import entities.IEntity;
+import entities.Item;
+import entities.ItemInShop;
+import entities.ShopManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,7 +28,6 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
@@ -55,132 +42,127 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.util.Callback;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.EntityDataOperation;
+import messages.IMessageData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
- *
- * CompanyEmployeeController : TODO Shimon: Create class description
+ * CompanyEmployeeController : Managed the Company Employee UI.
  * 
+ * @see BaseController
  */
-public class CompanyEmployeeController
-		implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class CompanyEmployeeController extends BaseController
 {
-	/* UI Binding Fields region */
 
-	// Title images :
-	@FXML private ImageView imageview_gif;
+	// region Actors Panes
+	private @FXML AnchorPane anchorpane_editCatalog;
 
-	@FXML private ImageView imageview_title;
+	private @FXML AnchorPane anchorpane_shopSales;
+	// end region -> Actors Panes
 
-	/* End of --> UI Binding Fields region */
-
-	/* Main AnchorPane declaration */
-
-	@FXML private AnchorPane anchorPane_mainStage;
-
-	/* End of --> Main AnchorPane declaration */
-
-	/* Fields */
-	private Logger m_logger;
-
-	private Client m_client;
-
-	private ClientConfiguration m_configuration;
-	/* End of --> Fields region */
-
+	// region Fields Edit Catalog Stage
 	/* Catalog table declaration */
-	@FXML private TableView<CatalogItemRow> catalog_table;
+	@FXML private TableView<CatalogItemRow> tableView_catalog;
 
-	@FXML private TableColumn<CatalogItemRow, Integer> tablecolumn_id;
+	@FXML private TableColumn<CatalogItemRow, Integer> tableColumn_catalogItemID;
 
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_name;
+	@FXML private TableColumn<CatalogItemRow, String> tableColumn_catalogItemName;
 
-	@FXML private TableColumn<CatalogItemRow, String> tablecolumn_type;
+	@FXML private TableColumn<CatalogItemRow, String> tableColumn_catalogItemType;
 
-	@FXML private TableColumn<CatalogItemRow, Float> tablecolumn_price;
+	@FXML private TableColumn<CatalogItemRow, Float> tableColumn_catalogItemPrice;
 
-	@FXML private TableColumn<CatalogItemRow, ImageView> tablecolumn_image;
+	@FXML private TableColumn<CatalogItemRow, ImageView> tableColumn_catalogItemImage;
 	/* End of --> Catalog table declaration */
 
 	/* Action catalog buttons */
-	@FXML private Button button_addNewItem;
+	@FXML private Button button_addNewCatalogItem;
 
-	@FXML private Button button_removeItem;
+	@FXML private Button button_removeCatalogItem;
 
-	@FXML private Button button_save;
+	@FXML private Button button_saveCatalogChanges;
 
-	@FXML private Button button_reset;
+	@FXML private Button button_resetCatalogChanges;
 	/* End of --> Action catalog buttons */
 
 	/* View and changes savers lists declaration */
-	ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
+	
+	private ObservableList<CatalogItemRow> catalog = FXCollections.observableArrayList();
 
-	ArrayList<Item> itemsAdded = new ArrayList<>();
+	private ArrayList<Item> itemsCatalogAdded = new ArrayList<>();
 
-	ArrayList<Item> itemsRemoved = new ArrayList<>();
+	private ArrayList<Item> itemsCatalogRemoved = new ArrayList<>();
 
-	ArrayList<Item> itemsChanged = new ArrayList<>();
+	private ArrayList<Item> itemsCatalogChanged = new ArrayList<>();
+	
+	/* End of --> View and changes savers lists declaration */
+	
+	// end region -> Fields Edit Catalog Stage
+
+	// region Fields Shop Sales Stage
+	
+	/* Catalog table declaration */
+	@FXML private TableView<CatalogItemRow> tableView_shopSales;
+
+	@FXML private TableColumn<CatalogItemRow, Integer> tableColumn_itemInSaleID;
+
+	@FXML private TableColumn<CatalogItemRow, Float> tableColumn_discountedPrice;
+
+	/* End of --> Catalog table declaration */
+
+	/* Action catalog buttons */
+	@FXML private Button button_addNewDiscountedItem;
+
+	@FXML private Button button_removeDiscountedItem;
+
+	@FXML private Button button_saveSalesChanges;
+
+	@FXML private Button button_resetSalesChanges;
+
+	@FXML private ComboBox<String> comboBox_storeList;
+	/* End of --> Action catalog buttons */
+
+	/* View and changes savers lists declaration */
+	private ObservableList<CatalogItemRow> shopSales = FXCollections.observableArrayList();
+
+	private ObservableList<String> stores = FXCollections.observableArrayList();
+
+	private ArrayList<ItemInShop> salesAdded = new ArrayList<>();
+
+	private ArrayList<ItemInShop> salesRemoved = new ArrayList<>();
+
+	private ArrayList<ItemInShop> salesChanged = new ArrayList<>();
+
 	/* End of --> View and changes savers lists declaration */
 
-	/* UI events region */
+	// end region -> Fields Shop Sales Stage
 
-	/* Initializing methods region */
+	// region BaseController Implementation
+
+	// ----------------------------------------------------------------------------INIT-------------------------------------------------------------
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void initialize(URL url, ResourceBundle rb)
+	protected void internalInitialize() throws Exception
 	{
-		initializeFields();
-		initializeImages();
-		initializeClientHandler();
 		getCatalogFromServer();
-		initializeConfigurationTable();
-	}
-
-	private void initializeFields()
-	{
-		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
-		m_client = ApplicationEntryPoint.Client;
-	}
-
-	private void initializeImages()
-	{
-		InputStream serverGif = getClass().getResourceAsStream("/boundaries/images/Flower.gif");
-		if (serverGif != null) {
-			Image image = new Image(serverGif);
-			imageview_gif.setImage(image);
-		}
-		InputStream title = getClass().getResourceAsStream("/boundaries/images/Zerli_Headline.jpg");
-		if (title != null) {
-			Image image = new Image(title);
-			imageview_title.setImage(image);
-		}
-	}
-
-	private void initializeClientHandler()
-	{
-		m_client.setMessagesHandler(this);
-		m_client.setClientStatusHandler(this);
 	}
 
 	/**
+	 * Initialize Edit Catalog table columns and define action when double click on
+	 * table row.
 	 * 
-	 * TODO Shimon456: Auto-generated comment stub - Change it!
-	 *
 	 */
-	private void getCatalogFromServer()
-	{
-		Message entityMessage = MessagesFactory.createGetAllEntityMessage(new Item());
-		m_client.sendMessageToServer(entityMessage);
-	}
-
 	private void initializeConfigurationTable()
 	{
-		catalog_table.setRowFactory(param -> {
+		tableView_catalog.setRowFactory(param -> {
 			TableRow<CatalogItemRow> tableRow = new TableRow<>();
 			tableRow.setOnMouseClicked(event -> {
 				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
@@ -196,15 +178,16 @@ public class CompanyEmployeeController
 						pickType = pickType.substring(11, pickType.indexOf(',') - 1);
 
 						// Classification by selected node.
-						if (pickType.equals(rowData.getName())) pickType = "name";
-						else if (pickType.equals(rowData.getPrice())) pickType = "price";
-						else if (pickType.equals(rowData.getType())) pickType = "type";
-						else if (pickType.equals(rowData.getId())) pickType = "id";
-						else pickType = "image";
+						if (pickType.equals(rowData.getName())) pickType = "Name";
+						else if (pickType.equals(rowData.getPrice())) pickType = "Price";
+						else if (pickType.equals(rowData.getType())) pickType = "Type";
+						else if (pickType.equals(rowData.getId())) pickType = "ID";
+						else pickType = "Image";
 					} else {
-						pickType = selectedNode.getId().substring(12);
+						String selected = selectedNode.getId();
+						pickType = selected.substring(23, selected.length());
 					}
-					if (!(pickType.equals("id") || pickType.equals("image"))) {
+					if (!(pickType.equals("ID") || pickType.equals("Image") || pickType.equals("Type"))) {
 						TextInputDialog dialog = new TextInputDialog();
 						dialog.setTitle("Update Item Value");
 						dialog.setHeaderText("Do you want to update the item " + pickType + "  ?\n" + "ID: "
@@ -219,37 +202,27 @@ public class CompanyEmployeeController
 						if (resultString == null || resultString.isEmpty()) return;
 
 						switch (pickType) {
-
-							case "name":
+							case "Name":
 								rowData.setM_name(resultString);
 							break;
-							case "type":
-								if (!(resultString.equals(EntitiesEnums.ProductType.Flower.toString())
-										|| resultString.equals(EntitiesEnums.ProductType.FlowerPot.toString())
-										|| resultString.equals(EntitiesEnums.ProductType.BridalBouquet.toString())
-										|| resultString
-												.equals(EntitiesEnums.ProductType.FlowerArrangement.toString()))) {
-									errorMSG("The type you entered doesn't exist");
-									m_logger.warning("Entered wrorg ProductType");
-									return;
-								} else {
-									rowData.setM_type(resultString);
+							case "Price":
+								try {
+									Float price = Float.parseFloat(resultString);
+									if (price <= 0) {
+										showAlertMessage("The price you entered lower then 0", AlertType.ERROR);
+										return;
+									} else {
+										rowData.setM_price(price);
+									}
 								}
-							break;
-							case "price":
-								Float price = Float.parseFloat(resultString);
-								if (price <= 0) {
-									errorMSG("The price you entered lower then 0");
-									m_logger.warning("Entered zero or negative price");
+								catch (Exception ignored) {
+									showAlertMessage("Invalid price! Please enter a number.", AlertType.ERROR);
 									return;
-								} else {
-									rowData.setM_price(price);
 								}
-
 						}
 						addEditedItemToArray(rowData);
 						catalogChanged();
-					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("image")) {
+					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("Image")) {
 
 						FileChooser fileChooser = new FileChooser();
 						fileChooser.setTitle("Open Resource File");
@@ -262,8 +235,53 @@ public class CompanyEmployeeController
 							addEditedItemToArray(rowData);
 						}
 						catch (Exception e) {
+							return;
 						}
 						catalogChanged();
+
+					} else if (event.getClickCount() == 2 && (!tableRow.isEmpty()) && pickType.equals("Type")) {
+						Dialog<CatalogItemRow> addDialog = new Dialog<>();
+						addDialog.setTitle("Edit Catalog Item Type");
+
+						Label labelSubject = new Label("Do you want to update the item " + pickType + "  ?\n" + "ID: "
+								+ rowData.getM_id() + " , Name: " + rowData.getM_name() + " , Type: "
+								+ rowData.getM_type() + " , Price: " + rowData.getM_price());
+
+						ObservableList<String> typeList = FXCollections.observableArrayList();
+						typeList.add("Flower");
+						typeList.add("FlowerPot");
+						typeList.add("BridalBouquet");
+						typeList.add("FlowerArrangement");
+						ComboBox<String> comboBoxType = new ComboBox<>(typeList);
+						comboBoxType.setValue(rowData.getType());
+
+						ButtonType buttonTypeOk = new ButtonType("Done", ButtonData.OK_DONE);
+						addDialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+						addDialog.setResultConverter(new Callback<ButtonType, CatalogItemRow>() {
+
+							@Override
+							public CatalogItemRow call(ButtonType b)
+							{
+								if (b == buttonTypeOk) {
+									String newType = comboBoxType.getValue();
+									if (newType.equals(rowData.getM_type())) return null;
+									rowData.setM_type(newType);
+									addEditedItemToArray(rowData);
+									catalogChanged();
+									drawContantToTable();
+								}
+								return null;
+							}
+						});
+						GridPane dialogGrid = new GridPane();
+						dialogGrid.add(labelSubject, 1, 2);
+						dialogGrid.add(new Label("\n"), 1, 4);
+						dialogGrid.add(new Label("Types: "), 1, 6);
+						dialogGrid.add(comboBoxType, 1, 8);
+						addDialog.getDialogPane().setContent(dialogGrid);
+
+						Optional<CatalogItemRow> result = addDialog.showAndWait();
+						if (!(result.isPresent())) return;
 
 					}
 					drawContantToTable();
@@ -272,13 +290,75 @@ public class CompanyEmployeeController
 			return tableRow;
 		});
 
-		tablecolumn_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
-		tablecolumn_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
-		tablecolumn_type.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
-		tablecolumn_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
-		tablecolumn_image.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, ImageView>("image"));
+		tableColumn_catalogItemID.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
+		tableColumn_catalogItemName.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
+		tableColumn_catalogItemType.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("type"));
+		tableColumn_catalogItemPrice.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
+		tableColumn_catalogItemImage.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, ImageView>("image"));
 		drawContantToTable();
 	}
+
+	/**
+	 * Initialize Shop Sales table columns and define action when double click on
+	 * table row.
+	 *
+	 */
+	private void initializeConfigurationShopSalesTable()
+	{
+		tableView_shopSales.setRowFactory(param -> {
+			TableRow<CatalogItemRow> tableRow = new TableRow<>();
+			tableRow.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
+					CatalogItemRow rowData = tableRow.getItem();
+
+					if (rowData.getId() == " ") {
+						return;
+					}
+
+					TextInputDialog dialog = new TextInputDialog();
+					dialog.setTitle("Update Item Discount");
+					dialog.setHeaderText("Do you want to update the discount on " + rowData.getId() + '-'
+							+ rowData.getPrice() + " ?");
+					dialog.setContentText("Please enter the new value:");
+					// Traditional way to get the response value.
+					Optional<String> result = dialog.showAndWait();
+					if (!result.isPresent()) return;
+					String resultString = result.get();
+					if (!(resultString != null && !resultString.isEmpty()
+							&& !resultString.equals(rowData.getPrice()))) {
+						return;
+					}
+
+					Float discountedPrice;
+					try {
+						discountedPrice = Float.parseFloat(resultString);
+					}
+					catch (Exception e) {
+						showAlertMessage("Invalid discounted price!", AlertType.ERROR);
+						return;
+					}
+					if (discountedPrice <= 0) {
+						showAlertMessage("The price you entered lower then 0", AlertType.ERROR);
+						return;
+					} else {
+						rowData.setM_price(discountedPrice);
+					}
+					addNewSaleToArray(rowData);
+					shopSalesCatalogChanged();
+					drawContantToShopSalesTable();
+				}
+			});
+			return tableRow;
+		});
+
+		tableColumn_itemInSaleID.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
+		tableColumn_discountedPrice.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
+		drawContantToShopSalesTable();
+	}
+
+	// ----------------------------------------------------------------------------INIT-------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------PRIVATE-------------------------------------------------------------
 
 	/**
 	 * Search for edited Item in itemChanged array.
@@ -289,8 +369,8 @@ public class CompanyEmployeeController
 	 */
 	private int checkIfItemAlreadyExistInArray(Item editedItem)
 	{
-		for (Item entity : itemsChanged) {
-			if (entity.getId() == editedItem.getId()) return itemsChanged.indexOf(entity);
+		for (Item entity : itemsCatalogChanged) {
+			if (entity.getId() == editedItem.getId()) return itemsCatalogChanged.indexOf(entity);
 		}
 		return -1;
 	}
@@ -312,8 +392,8 @@ public class CompanyEmployeeController
 		if (rowData.getM_image() != null) editedItem.setImage(rowData.getM_image());
 		int indexOfExistItemEntityInArray;
 		if ((indexOfExistItemEntityInArray = checkIfItemAlreadyExistInArray(editedItem)) != -1)
-			itemsChanged.set(indexOfExistItemEntityInArray, editedItem);
-		else itemsChanged.add(editedItem);
+			itemsCatalogChanged.set(indexOfExistItemEntityInArray, editedItem);
+		else itemsCatalogChanged.add(editedItem);
 	}
 
 	/**
@@ -344,40 +424,201 @@ public class CompanyEmployeeController
 	 */
 	private void drawContantToTable()
 	{
-		catalog_table.setItems(catalog);
-		catalog_table.refresh();
+		tableView_catalog.setItems(catalog);
+		tableView_catalog.refresh();
+
 	}
 
 	/**
-	 * Create error window for user.
+	 * Search for edited item sale in itemChanged array.
+	 * 
+	 * @param editedSale
+	 *            Edited item sale.
+	 * @return The item index in array, return -1 if item doesn't exist.
+	 */
+	private int checkIfItemAlreadySaleExistInArray(ItemInShop editedSale)
+	{
+		for (ItemInShop entity : salesChanged) {
+			if (entity.getItemId() == editedSale.getItemId()) return salesChanged.indexOf(entity);
+		}
+		return -1;
+	}
+
+	/**
+	 * Add/Edit the edited ItemEntity to itemChanged array.
+	 * 
+	 * @param rowData
+	 *            Table row with edited item data.
+	 */
+	private void addNewSaleToArray(CatalogItemRow rowData)
+	{
+		ItemInShop editedItem = new ItemInShop();
+		editedItem.setItemId(rowData.getM_id());
+		editedItem.setDiscountedPrice(rowData.getM_price());
+		editedItem.setShopManagerId(stringShopIdToInt(comboBox_storeList.getValue()));
+		int indexOfExistItemEntityInArray;
+		if ((indexOfExistItemEntityInArray = checkIfItemAlreadySaleExistInArray(editedItem)) != -1)
+			salesChanged.set(indexOfExistItemEntityInArray, editedItem);
+		else salesChanged.add(editedItem);
+	}
+
+	/**
+	 * Insert data into table and show the updated table.
 	 * 
 	 */
-	private void errorMSG(String errorType)
+	private void drawContantToShopSalesTable()
 	{
-		Platform.runLater(() -> {
-			Alert errorMessage = new Alert(AlertType.ERROR);
-			errorMessage.setTitle("Error Message");
-			errorMessage.setContentText(errorType);
-			errorMessage.show();
-		});
+		tableView_shopSales.setItems(shopSales);
+		tableView_shopSales.refresh();
 	}
 
 	/**
 	 * Check that all fields are filed and valid.
+	 *
+	 * @param id
+	 *            The discounted item.
+	 * @param discountedPrice
+	 *            The discounted price.
+	 * @return <code>true</code> if all fields are filled and with valid values,
+	 *         <code>false</code> otherwise.
+	 */
+	private boolean checkAddNewSaleFields(TextField id, TextField discountedPrice)
+	{
+		String inputedID, inputedDiscountedPrice;
+		inputedID = id.getText();
+		inputedDiscountedPrice = discountedPrice.getText();
+
+		if (inputedID == null || inputedDiscountedPrice == null) {
+			showAlertMessage("One or more fields are empty", AlertType.ERROR);
+			return false;
+		}
+		if (inputedID.isEmpty() || inputedDiscountedPrice.isEmpty()) {
+			showAlertMessage("One or more fields are empty", AlertType.ERROR);
+			return false;
+		}
+
+		Float newPrice;
+		Integer itemID;
+		try {
+			itemID = Integer.parseInt(inputedID);
+			newPrice = Float.parseFloat(inputedDiscountedPrice);
+		}
+		catch (Exception ex) {
+			showAlertMessage("Invalid input!", AlertType.ERROR);
+			return false;
+		}
+
+		if (itemID <= 0) {
+			showAlertMessage("The ID you entered lower then 0", AlertType.ERROR);
+			return false;
+		}
+
+		for (CatalogItemRow item : shopSales) {
+			if (item.getM_id() == itemID) {
+				showAlertMessage("Item discount already exist!", AlertType.WARNING);
+				return false;
+			}
+		}
+
+		if (newPrice <= 0) {
+			showAlertMessage("The price you entered lower then 0", AlertType.ERROR);
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Check if the item is exist in comapny catalog.
+	 *
+	 * @param itemID
+	 *            The item ID.
+	 * @return <code>true</code> if the item exist in company catalog,
+	 *         <code>false</code> otherwise.
+	 */
+	private boolean checkIfNewItemExistInCatalog(String itemID)
+	{
+		for (CatalogItemRow item : catalog)
+			if (itemID.equals(item.getId())) return true;
+		showAlertMessage("Item ID doesn't exist in catalog!", AlertType.WARNING);
+		return false;
+	}
+
+	/**
+	 * Able access to save\reset buttons.
 	 * 
 	 */
-	private boolean checkFields(TextField name, TextField price, TextField domainColor)
+	private void shopSalesCatalogChanged()
+	{
+		button_saveSalesChanges.setDisable(false);
+		button_resetSalesChanges.setDisable(false);
+	}
+
+	/**
+	 * Clean saved data arrays and disable access to save\reset button.
+	 * 
+	 */
+	private void cleanSavedDataShopSalesArray()
+	{
+		button_resetSalesChanges.setDisable(true);
+		button_saveSalesChanges.setDisable(true);
+		salesAdded.clear();
+		salesChanged.clear();
+		salesRemoved.clear();
+	}
+
+	/**
+	 * Clean all local changes arrays.
+	 *
+	 */
+	private void cleanEditCatalogVariables()
+	{
+		itemsCatalogAdded.clear();
+		itemsCatalogChanged.clear();
+		itemsCatalogRemoved.clear();
+	}
+
+	/**
+	 * Clean all Shop Sales variables.
+	 *
+	 */
+	private void cleanShopSalesVariables()
+	{
+		tableView_shopSales.getItems().clear();
+		comboBox_storeList.getItems().clear();
+		stores.clear();
+		shopSales.clear();
+		salesAdded.clear();
+		salesChanged.clear();
+		salesRemoved.clear();
+	}
+
+	/**
+	 * Check that all fields are filed and valid.
+	 *
+	 * @param name
+	 *            The item name.
+	 * @param priceText
+	 *            The item price.
+	 * @param domainColor
+	 *            The item domain color.
+	 * @return <code>true</code> if the item exist in company catalog,
+	 *         <code>false</code> otherwise.
+	 */
+	private boolean checkAddNewCatalogItemFields(TextField name, TextField priceText, TextField domainColor)
 	{
 		String inputedName, inputedPrice, inputedDomainColor;
 		inputedName = name.getText();
-		inputedPrice = price.getText();
+		inputedPrice = priceText.getText();
 		inputedDomainColor = domainColor.getText();
 
 		if (inputedName == null || inputedPrice == null || inputedDomainColor == null) return false;
 		if (inputedName.isEmpty() || inputedPrice.isEmpty() || inputedDomainColor.isEmpty()) return false;
-		if (Float.parseFloat(inputedPrice) <= 0) {
-			errorMSG("The price you entered lower then 0");
-			m_logger.warning("Entered zero or negative price");
+		try {
+			Float price = Float.parseFloat(inputedPrice);
+			if(price <= 0)
+				return false;
+		}
+		catch (Exception ex) {
 			return false;
 		}
 		return true;
@@ -389,8 +630,8 @@ public class CompanyEmployeeController
 	 */
 	private void catalogChanged()
 	{
-		button_save.setDisable(false);
-		button_reset.setDisable(false);
+		button_saveCatalogChanges.setDisable(false);
+		button_resetCatalogChanges.setDisable(false);
 	}
 
 	/**
@@ -399,19 +640,56 @@ public class CompanyEmployeeController
 	 */
 	private void cleanSavedDataArray()
 	{
-		button_reset.setDisable(true);
-		button_save.setDisable(true);
-		itemsAdded.clear();
-		itemsChanged.clear();
-		itemsRemoved.clear();
+		button_resetCatalogChanges.setDisable(true);
+		button_saveCatalogChanges.setDisable(true);
+		itemsCatalogAdded.clear();
+		itemsCatalogChanged.clear();
+		itemsCatalogRemoved.clear();
 	}
-	/* End of --> Initializing methods region */
-
-	/* Client handlers implementation region */
 
 	/**
-	 * Execute remove item procedure.
-	 * 
+	 * Initialize company catalog values.
+	 *
+	 * @param catalogItems
+	 *            The catalog items.
+	 */
+	private void companyCatalogInit(List<IEntity> catalogItems)
+	{
+		for (IEntity entity : catalogItems) {
+			if (!(entity instanceof Item)) {
+				m_Logger.warning("Received entity not of the type requested.");
+				return;
+			}
+			Item item = (Item) entity;
+			CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getType().toString(),
+					item.getPrice(), item.getDomainColor(), item.getImage());
+			catalog.add(itemRow);
+		}
+	}
+
+	/**
+	 * Parse the shop full name to shop ID.
+	 *
+	 * @param shopID
+	 *            The shop full name.
+	 * @return The shop ID.
+	 */
+	private int stringShopIdToInt(String shopID)
+	{
+		shopID = shopID.substring(0, shopID.indexOf(' '));
+		return Integer.parseInt(shopID);
+	}
+
+	// ----------------------------------------------------------------------------PRIVATE-------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------FXML-------------------------------------------------------------
+
+	/**
+	 * Activated when "Remove catalog item" button pressed. Execute remove item from
+	 * catalog procedure.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
 	 */
 	@FXML
 	private void removeItemFromCatalog(ActionEvent event)
@@ -426,13 +704,13 @@ public class CompanyEmployeeController
 		String resultString = result.get();
 
 		if (resultString == null || resultString.isEmpty()) {
-			errorMSG("Invalid Input");
+			showAlertMessage("Invalid Input", AlertType.ERROR);
 			return;
 		}
 
 		Integer idToRemove = Integer.parseInt(resultString);
 		if (idToRemove <= 0) {
-			errorMSG("Invalid ID");
+			showAlertMessage("Invalid ID", AlertType.ERROR);
 			return;
 		}
 
@@ -449,19 +727,22 @@ public class CompanyEmployeeController
 				itemToRemove.setPrice(catalog.get(i).getM_price());
 				itemToRemove.setDomainColor(catalog.get(i).getM_domainColor());
 				if (catalog.get(i).getM_image() != null) itemToRemove.setImage(catalog.get(i).getM_image());
-				itemsRemoved.add(itemToRemove);
+				itemsCatalogRemoved.add(itemToRemove);
 				catalog.remove(i);
 				catalogChanged();
 				drawContantToTable();
 				return;
 			}
 		}
-		errorMSG("Item ID doesn't exist");
+		showAlertMessage("Item ID doesn't exist", AlertType.ERROR);
 	}
 
 	/**
-	 * Clean saved data arrays and get from server the previous catalog.
-	 * 
+	 * Activated when "Reset Changes" button pressed. Clean saved data arrays and
+	 * get from server the previous catalog.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
 	 */
 	@FXML
 	private void resetChanges(ActionEvent event)
@@ -471,8 +752,11 @@ public class CompanyEmployeeController
 	}
 
 	/**
-	 * Execute add item procedure.
-	 * 
+	 * Activated when "Add catalog item" button pressed. Execute add item to catalog
+	 * procedure.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
 	 */
 	@FXML
 	private void addItemToCatalog(ActionEvent event)
@@ -506,7 +790,8 @@ public class CompanyEmployeeController
 			@Override
 			public void handle(final ActionEvent event)
 			{
-				imagePath.setText(addItemImage.showOpenDialog(null).getAbsolutePath());
+				File f = addItemImage.showOpenDialog(null);
+				if (f != null) imagePath.setText(f.getAbsolutePath());
 			}
 		});
 
@@ -521,9 +806,8 @@ public class CompanyEmployeeController
 			public CatalogItemRow call(ButtonType b)
 			{
 				if (b == buttonTypeOk) {
-					if (!(checkFields(textFieldName, textFieldPrice, textFieldDomainColor))) {
-						errorMSG("One or more of fields is empty");
-						m_logger.warning("AddItem - One or more of fields is empty");
+					if (!(checkAddNewCatalogItemFields(textFieldName, textFieldPrice, textFieldDomainColor))) {
+						showAlertMessage("Item adding failed due to invalid input!", AlertType.ERROR);
 						return null;
 					}
 					CatalogItemRow newItem;
@@ -545,14 +829,13 @@ public class CompanyEmployeeController
 						newItem = new CatalogItemRow(textFieldName.getText(), comboBoxType.getValue(),
 								Float.parseFloat(textFieldPrice.getText()), textFieldDomainColor.getText(),
 								newItemImage);
-						itemToAdd.setImage(newItem.getM_image());
 					}
-
+					itemToAdd.setImage(newItem.getM_image());
 					itemToAdd.setName(textFieldName.getText());
 					itemToAdd.setType(parseStringToProductType(comboBoxType.getValue()));
 					itemToAdd.setPrice(Float.parseFloat(textFieldPrice.getText()));
 					itemToAdd.setDomainColor(textFieldDomainColor.getText());
-					itemsAdded.add(itemToAdd);
+					itemsCatalogAdded.add(itemToAdd);
 					catalog.add(newItem);
 					catalogChanged();
 					drawContantToTable();
@@ -582,42 +865,45 @@ public class CompanyEmployeeController
 	}
 
 	/**
-	 * Send changes (add/remove/change) to server and update catalog.
-	 * 
+	 * Activated when "Save Changes" button pressed. Send changes
+	 * (add/remove/change) to server and update catalog.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
 	 */
 	@FXML
 	private void saveChanges(ActionEvent event)
 	{
-		for (Item entity : itemsRemoved) {
-			if (itemsChanged.contains(entity)) itemsChanged.remove(entity);
+		for (Item entity : itemsCatalogRemoved) {
+			if (itemsCatalogChanged.contains(entity)) itemsCatalogChanged.remove(entity);
 		}
 
 		Message entityMessage;
 		ArrayList<IEntity> transferedEntities = new ArrayList<>();
-		if (itemsRemoved.size() > 0) {
-			for (Item entity : itemsRemoved) {
+		if (itemsCatalogRemoved.size() > 0) {
+			for (Item entity : itemsCatalogRemoved) {
 				transferedEntities.add(entity);
 			}
 			entityMessage = MessagesFactory.createRemoveEntitiesMessage(transferedEntities);
-			m_client.sendMessageToServer(entityMessage);
+			m_Client.sendMessageToServer(entityMessage);
 		}
 
-		if (itemsChanged.size() > 0) {
+		if (itemsCatalogChanged.size() > 0) {
 			transferedEntities.clear();
-			for (Item entity : itemsChanged) {
+			for (Item entity : itemsCatalogChanged) {
 				transferedEntities.add(entity);
 			}
 			entityMessage = MessagesFactory.createUpdateEntitiesMessage(transferedEntities);
-			m_client.sendMessageToServer(entityMessage);
+			m_Client.sendMessageToServer(entityMessage);
 		}
 
-		if (itemsAdded.size() > 0) {
+		if (itemsCatalogAdded.size() > 0) {
 			transferedEntities.clear();
-			for (Item entity : itemsAdded) {
+			for (Item entity : itemsCatalogAdded) {
 				transferedEntities.add(entity);
 			}
 			entityMessage = MessagesFactory.createAddEntitiesMessage(transferedEntities);
-			m_client.sendMessageToServer(entityMessage);
+			m_Client.sendMessageToServer(entityMessage);
 		}
 
 		getCatalogFromServer();
@@ -625,59 +911,363 @@ public class CompanyEmployeeController
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Activated when shop ComboBox value changed. Send Get message for all selected
+	 * shop sales.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
 	 */
-	@Override
-	public synchronized void onMessageReceived(Message msg) throws Exception
+	@FXML
+	private void selectShop(ActionEvent event)
 	{
-		IMessageData messageData = msg.getMessageData();
-		if (!(messageData instanceof EntitiesListData) && !(messageData instanceof RespondMessageData)) {
-			m_logger.warning("Received message data not of the type requested.");
+		if (comboBox_storeList.getItems().isEmpty()) return;
+		button_addNewDiscountedItem.setDisable(false);
+		button_removeDiscountedItem.setDisable(false);
+		int shop_number = stringShopIdToInt(comboBox_storeList.getValue());
+		getShopSalesFromServer(shop_number);
+	}
+
+	/**
+	 * Activated when "Remove discount" button pressed. Execute remove item
+	 * procedure.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
+	 */
+	@FXML
+	private void removeItemFromSalesCatalog(ActionEvent event)
+	{
+		TextInputDialog dialog = new TextInputDialog();
+		dialog.setTitle("Remove Item Discount From Shop Catalog");
+		dialog.setHeaderText("Please enter Item ID:");
+		// Traditional way to get the response value.
+		Optional<String> result = dialog.showAndWait();
+		if (!result.isPresent()) return;
+
+		String resultString = result.get();
+
+		if (resultString == null || resultString.isEmpty()) {
+			showAlertMessage("Invalid Input", AlertType.ERROR);
 			return;
 		}
 
-		if (messageData instanceof EntitiesListData) {
-			catalog.clear();
-			List<IEntity> entityList = ((EntitiesListData) messageData).getEntities();
-			for (IEntity entity : entityList) {
-				if (!(entity instanceof Item)) {
-					m_logger.warning("Received entity not of the type requested.");
-					return;
-				}
-				Item item = (Item) entity;
-				CatalogItemRow itemRow = new CatalogItemRow(item.getId(), item.getName(), item.getType().toString(),
-						item.getPrice(), item.getDomainColor(), item.getImage());
-				catalog.add(itemRow);
-			}
-			drawContantToTable();
-		} else if (messageData instanceof RespondMessageData) {
-			RespondMessageData respondMessageData = (RespondMessageData) messageData;
-			boolean succeed = respondMessageData.isSucceed();
-			if (!succeed) {
-				IMessageData respondedMessageData = respondMessageData.getMessageData();
-				errorMSG("Roman gibur");
-			}
+		Integer idToRemove = Integer.parseInt(resultString);
+		if (idToRemove <= 0) {
+			showAlertMessage("Invalid ID", AlertType.ERROR);
+			return;
 		}
 
+		Integer idInTable;
+		int i;
+
+		for (i = 0; i < shopSales.size(); i++) {
+			idInTable = shopSales.get(i).getM_id();
+			if (idToRemove == idInTable) {
+				ItemInShop itemToRemove = new ItemInShop();
+				itemToRemove.setItemId(idToRemove);
+				itemToRemove.setDiscountedPrice(shopSales.get(i).getM_price());
+				itemToRemove.setShopManagerId(stringShopIdToInt(comboBox_storeList.getValue()));
+				salesRemoved.add(itemToRemove);
+				shopSales.remove(i);
+				shopSalesCatalogChanged();
+				drawContantToShopSalesTable();
+				return;
+			}
+		}
+		showAlertMessage("Item ID doesn't exist", AlertType.ERROR);
+	}
+
+	/**
+	 * Activated when "Reset Changed" button pressed. Clean saved data arrays and
+	 * get from server the previous catalog.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
+	 */
+	@FXML
+	private void resetSalesCatalogChanges(ActionEvent event)
+	{
+		int shopID = stringShopIdToInt(comboBox_storeList.getValue());
+		getShopSalesFromServer(shopID);
+		cleanSavedDataShopSalesArray();
+	}
+
+	/**
+	 * Activated when "Add new discount" button pressed. Execute add item procedure.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
+	 */
+	@FXML
+	private void addSalesToCatalog(ActionEvent event)
+	{
+		Dialog<CatalogItemRow> addDialog = new Dialog<>();
+		addDialog.setTitle("Add New Discount");
+
+		Label labelSubject = new Label("Add New Item Discount");
+		labelSubject.setFont(new Font(16));
+
+		TextField textFieldID = new TextField();
+		textFieldID.setPromptText("Enter Item ID");
+
+		TextField textFieldDiscountedPrice = new TextField();
+		textFieldDiscountedPrice.setPromptText("Enter Discounted Price");
+
+		ButtonType buttonTypeOk = new ButtonType("Done", ButtonData.OK_DONE);
+		addDialog.getDialogPane().getButtonTypes().add(buttonTypeOk);
+		addDialog.setResultConverter(new Callback<ButtonType, CatalogItemRow>() {
+
+			@Override
+			public CatalogItemRow call(ButtonType b)
+			{
+				if (b == buttonTypeOk) {
+					if (!(checkAddNewSaleFields(textFieldID, textFieldDiscountedPrice))) return null;
+					if (!(checkIfNewItemExistInCatalog(textFieldID.getText()))) return null;
+					CatalogItemRow newItem;
+					ItemInShop itemToAdd = new ItemInShop();
+					newItem = new CatalogItemRow(Integer.parseInt(textFieldID.getText()),
+							Float.parseFloat(textFieldDiscountedPrice.getText()));
+
+					itemToAdd.setShopManagerId(stringShopIdToInt(comboBox_storeList.getValue()));
+					itemToAdd.setItemId(Integer.parseInt(textFieldID.getText()));
+					itemToAdd.setDiscountedPrice(Float.parseFloat(textFieldDiscountedPrice.getText()));
+					salesAdded.add(itemToAdd);
+					shopSales.add(newItem);
+					shopSalesCatalogChanged();
+					drawContantToShopSalesTable();
+				}
+				return null;
+			}
+		});
+
+		GridPane dialogGrid = new GridPane();
+		dialogGrid.add(labelSubject, 1, 2);
+		dialogGrid.add(new Label("Item ID: "), 1, 4);
+		dialogGrid.add(textFieldID, 2, 4);
+		dialogGrid.add(new Label("Discounted Price: "), 1, 6);
+		dialogGrid.add(textFieldDiscountedPrice, 2, 6);
+		addDialog.getDialogPane().setContent(dialogGrid);
+
+		Optional<CatalogItemRow> result = addDialog.showAndWait();
+		if (!(result.isPresent())) return;
+	}
+
+	/**
+	 * Activated when "Add new discount" button pressed. Send changes
+	 * (add/remove/change) to server and update catalog.
+	 *
+	 * @param event
+	 *            Action Event of the button click.
+	 */
+	@FXML
+	private void saveSalesCatalogChanges(ActionEvent event)
+	{
+		for (ItemInShop entity : salesRemoved) {
+			if (salesChanged.contains(entity)) salesChanged.remove(entity);
+		}
+
+		Message entityMessage;
+		ArrayList<IEntity> transferedEntities = new ArrayList<>();
+		if (salesRemoved.size() > 0) {
+			for (ItemInShop entity : salesRemoved) {
+				transferedEntities.add(entity);
+			}
+			entityMessage = MessagesFactory.createRemoveEntitiesMessage(transferedEntities);
+			m_Client.sendMessageToServer(entityMessage);
+		}
+
+		if (salesChanged.size() > 0) {
+			transferedEntities.clear();
+			for (ItemInShop entity : salesChanged) {
+				transferedEntities.add(entity);
+			}
+			entityMessage = MessagesFactory.createUpdateEntitiesMessage(transferedEntities);
+			m_Client.sendMessageToServer(entityMessage);
+		}
+
+		if (salesAdded.size() > 0) {
+			transferedEntities.clear();
+			for (ItemInShop entity : salesAdded) {
+				transferedEntities.add(entity);
+			}
+			entityMessage = MessagesFactory.createAddEntitiesMessage(transferedEntities);
+			m_Client.sendMessageToServer(entityMessage);
+		}
+
+		int shopID = stringShopIdToInt(comboBox_storeList.getValue());
+		getShopSalesFromServer(shopID);
+		cleanSavedDataShopSalesArray();
+	}
+
+	// ----------------------------------------------------------------------------FXML-------------------------------------------------------------
+
+	// ----------------------------------------------------------------------------SERVER-COMMUNICATION---------------------------------------------
+
+	/**
+	 * Send get all message to server for all store company.
+	 *
+	 */
+	private void getStoreList()
+	{
+		Message entityMessage = MessagesFactory.createGetAllEntityMessage(new ShopManager());
+		m_Client.sendMessageToServer(entityMessage);
+	}
+
+	/**
+	 * Send get all message to server for all current shop sales.
+	 *
+	 * @param shopID
+	 *            The current shop.
+	 */
+	private void getShopSalesFromServer(int shopID)
+	{
+		ItemInShop item = new ItemInShop();
+		item.setShopManagerId(shopID);
+		Message entityMessage = MessagesFactory.createGetAllEntityMessage(item);
+		m_Client.sendMessageToServer(entityMessage);
+	}
+
+	/**
+	 * Send get all message to server for all catalog items.
+	 *
+	 */
+	private void getCatalogFromServer()
+	{
+		Message entityMessage = MessagesFactory.createGetAllEntityMessage(new Item());
+		m_Client.sendMessageToServer(entityMessage);
+	}
+
+	// ----------------------------------------------------------------------------SERVER-COMMUNICATION---------------------------------------------
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean onSelection(String title)
+	{
+		if (title == "Edit Catalog" && anchorpane_editCatalog.isVisible()) return true;
+		else if (title == "Shop Sales" && anchorpane_shopSales.isVisible()) return true;
+		switch (title) {
+			case "Edit Catalog":
+				cleanShopSalesVariables();
+				getCatalogFromServer();
+				initializeConfigurationTable();
+				anchorpane_editCatalog.setVisible(true);
+				anchorpane_shopSales.setVisible(false);
+			break;
+
+			case "Shop Sales":
+				cleanEditCatalogVariables();
+				getStoreList();
+				initializeConfigurationShopSalesTable();
+				anchorpane_editCatalog.setVisible(false);
+				anchorpane_shopSales.setVisible(true);
+			break;
+			default:
+				return false;
+		}
+		return true;
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onClientConnected()
+	protected String[] getSideButtonsNames()
 	{
-		// TODO Shimon : Add event handling
+		return new String[] { "Edit Catalog", "Shop Sales" };
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onClientDisconnected()
+	public void onMessageReceived(Message msg) throws Exception
 	{
-		// TODO Shimon : Add event handling
+		IMessageData messageData = msg.getMessageData();
+		if (!(messageData instanceof EntitiesListData) && !(messageData instanceof RespondMessageData)) {
+			m_Logger.warning("Received message data not of the type requested.");
+			return;
+		}
+
+		if (anchorpane_editCatalog.isVisible()) {
+			if (messageData instanceof EntitiesListData) {
+				catalog.clear();
+				Platform.runLater(() -> {
+					companyCatalogInit(((EntitiesListData) messageData).getEntities());
+				});
+				drawContantToTable();
+			} else if (messageData instanceof RespondMessageData) {
+				RespondMessageData respondMessageData = (RespondMessageData) messageData;
+				boolean succeed = respondMessageData.isSucceed();
+				EntityDataOperation operation;
+				if (respondMessageData.getMessageData() instanceof EntitiesListData) {
+					operation = ((EntitiesListData) respondMessageData.getMessageData()).getOperation();
+				} else {
+					operation = ((EntityData) respondMessageData.getMessageData()).getOperation();
+				}
+				if (!succeed) {
+					if (operation == EntityDataOperation.GetALL) catalog.clear();
+					showAlertMessage(operation.toString() + " Failed!", AlertType.ERROR);
+				} else {
+					showAlertMessage("Catalog update successfully!", AlertType.INFORMATION);
+				}
+			}
+		} else if (anchorpane_shopSales.isVisible()) {
+			if (messageData instanceof EntitiesListData) {
+				List<IEntity> entityList = ((EntitiesListData) messageData).getEntities();
+				if (entityList.isEmpty()) return;
+				if (entityList.get(0) instanceof ShopManager) {
+					String shop;
+					ShopManager shopID;
+					for (IEntity entity : entityList) {
+						if (!(entity instanceof ShopManager)) {
+							m_Logger.warning("Failed to get ");
+						}
+						shopID = (ShopManager) entity;
+						shop = shopID.getId() + " - " + shopID.getName();
+						stores.add(shop);
+					}
+					comboBox_storeList.setItems(stores);
+				} else {
+					shopSales.clear();
+					for (IEntity entity : entityList) {
+						if (!(entity instanceof ItemInShop)) {
+							m_Logger.warning("Received entity not of the type requested.");
+							return;
+						}
+						ItemInShop item = (ItemInShop) entity;
+						CatalogItemRow itemRow = new CatalogItemRow(item.getItemId(), item.getDiscountedPrice());
+						shopSales.add(itemRow);
+					}
+					drawContantToShopSalesTable();
+				}
+			} else if (messageData instanceof RespondMessageData) {
+				RespondMessageData respondMessageData = (RespondMessageData) messageData;
+				boolean succeed = respondMessageData.isSucceed();
+				if (respondMessageData.getMessageData() instanceof EntityData) {
+					if (((EntityData) respondMessageData.getMessageData()).getEntity() instanceof ItemInShop) {
+						if (!succeed) {
+							Platform.runLater(() -> {
+								showAlertMessage("There are no discounts for this shop", AlertType.INFORMATION);
+							});
+							shopSales.clear();
+							drawContantToShopSalesTable();
+						}
+					} else {
+						showAlertMessage("Shop sales update successfully!", AlertType.INFORMATION);
+					}
+				}
+			}
+		} else {
+			if (messageData instanceof EntitiesListData) {
+				catalog.clear();
+				Platform.runLater(() -> {
+					companyCatalogInit(((EntitiesListData) messageData).getEntities());
+				});
+			}
+		}
 	}
 
-	/* End of --> Client handlers implementation region */
+	// end region -> BaseController Implementation
 }

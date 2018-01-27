@@ -9,34 +9,27 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import connectivity.Server;
+import entities.Complaint;
+import entities.IEntity;
+import entities.Item;
+import entities.ItemInReservation;
+import entities.ItemInShop;
+import entities.Reservation;
+import entities.ShopCatalogData;
+import entities.ShopCostumer;
+import entities.Survey;
+import entities.SurveyResult;
+import entities.User;
+import entities.EntitiesEnums.UserStatus;
 import logger.LogManager;
-import newEntities.Complaint;
-import newEntities.ComplaintsReport;
-import newEntities.Costumer;
-import newEntities.EntitiesEnums.UserStatus;
-import newEntities.IEntity;
-import newEntities.IncomesReport;
-import newEntities.Item;
-import newEntities.ItemInReservation;
-import newEntities.ItemInShop;
-import newEntities.Reservation;
-import newEntities.ReservationsReport;
-import newEntities.ShopCatalogData;
-import newEntities.ShopCostumer;
-import newEntities.ShopEmployee;
-import newEntities.ShopManager;
-import newEntities.ShopSurvey;
-import newEntities.Survey;
-import newEntities.SurveysReport;
-import newEntities.User;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.EntityDataCollection;
-import newMessages.EntityDataOperation;
-import newMessages.IMessageData;
-import newMessages.LoginData;
-import newMessages.Message;
-import newMessages.RespondMessageData;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.EntityDataCollection;
+import messages.EntityDataOperation;
+import messages.IMessageData;
+import messages.LoginData;
+import messages.Message;
+import messages.RespondMessageData;
 
 /**
  *
@@ -83,79 +76,6 @@ public class MessagesResolver implements Server.MessagesHandler {
 	}
 	// end region -> Constructors
 
-	// region private Methods
-
-	private <TData extends IEntity> IMessageData executeSelectQuery(String selectQuery, Class<TData> expectedType) {
-		ResultSet queryResult = null;
-
-		try {
-			queryResult = m_dbController.executeSelectQuery(selectQuery);
-			if (queryResult == null) {
-				return null;
-			}
-			List<IEntity> entities = EntitiesResolver.ResultSetToEntity(queryResult, expectedType);
-			if (entities == null) {
-				return null;
-			}
-			return entities.isEmpty() ? null : new EntitiesListData(EntityDataOperation.None, entities);
-
-		} catch (Exception e) {
-			m_logger.warning(
-					"Failed on try to execute select query! query: " + selectQuery + ", exception: " + e.getMessage());
-		} finally {
-			if (queryResult != null) {
-				try {
-					queryResult.close();
-				} catch (SQLException e) {
-					m_logger.warning("Failed on try to close the ResultSet of the executed query:" + selectQuery
-							+ ", exception: " + e.getMessage());
-				}
-			}
-		}
-		return null;
-	}
-
-	private boolean executeQuery(IEntity entity, String query) {
-		boolean queryResult = false;
-		try {
-			queryResult = m_dbController.executeQuery(query);
-		} catch (Exception ex) {
-			m_logger.warning(
-					"Failed on try to execute query of: " + entity.toString() + ", exception: " + ex.getMessage());
-		}
-		return queryResult;
-	}
-
-	private int getLastInsertId() {
-		String lastIdQuery = QueryGenerator.getLastIdQuery();
-		if (lastIdQuery == null) {
-			return -1;
-		}
-		ResultSet queryResult = null;
-		int returningValue = -1;
-		try {
-			queryResult = m_dbController.executeSelectQuery(lastIdQuery);
-			if (queryResult != null) {
-				queryResult.next();
-				returningValue = queryResult.getInt(1);
-			}
-		} catch (Exception ex) {
-			m_logger.warning("Failed on try to execute query: " + lastIdQuery + ", exception: " + ex);
-		} finally {
-			if (queryResult != null) {
-				try {
-					queryResult.close();
-				} catch (SQLException e) {
-					m_logger.warning("Failed on try to close the ResultSet of the executed query:" + lastIdQuery
-							+ ", exception: " + e.getMessage());
-				}
-			}
-		}
-		return returningValue;
-	}
-
-	// end region -> private methods
-
 	// region Server.MessagesHandler Implementation
 
 	/**
@@ -191,6 +111,16 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	// end region -> Server.MessagesHandler Implementation
 
+	/**
+	 * 
+	 * This method called by {@link MessagesResolver#onMessageReceived(Message)}
+	 * when received a message with {@link ShopCatalogData} {@link IMessageData}.
+	 *
+	 * @param shopCatalogData
+	 *            the received {@link ShopCatalogData}
+	 * @return {@link EntitiesListData} if the operation succeed and
+	 *         <code>null</code> if does not.
+	 */
 	private IMessageData onShopCatalogDataReceived(ShopCatalogData shopCatalogData) {
 		int shopManagerId = shopCatalogData.getShopManagerId();
 		if (shopManagerId < 1) {
@@ -199,7 +129,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 		}
 
 		ResultSet queryResult = null;
-		String getShopCatalogQuery = QueryGenerator.getShopCatalog(shopManagerId);
+		String getShopCatalogQuery = QueryGenerator.generateShopCatalogQuery(shopManagerId);
 
 		try {
 			CallableStatement callableStatement = m_dbController.getCallableStatement(getShopCatalogQuery);
@@ -231,6 +161,17 @@ public class MessagesResolver implements Server.MessagesHandler {
 		return null;
 	}
 
+	/**
+	 * 
+	 * This method called by {@link MessagesResolver#onMessageReceived(Message)}
+	 * when received a message with {@link LoginData} {@link IMessageData}.
+	 *
+	 * @param loginData
+	 *            the received {@link LoginData}
+	 * @return In case of login message {@link User} {@link EntityData} if the
+	 *         operation succeed and {@link LoginData} if does not. In case of
+	 *         logout message would return <code>null</code> in any situation.
+	 */
 	private IMessageData onLoginDataReceived(LoginData loginData) {
 		User user = new User();
 		user.setUserName(loginData.getUserName());
@@ -280,6 +221,16 @@ public class MessagesResolver implements Server.MessagesHandler {
 		return userEntityData;
 	}
 
+	/**
+	 * 
+	 * This method called by {@link MessagesResolver#onMessageReceived(Message)}
+	 * when received a message with {@link EntityDataCollection}
+	 * {@link IMessageData}.
+	 *
+	 * @param messageData
+	 *            the received {@link EntityDataCollection}
+	 * @return {@link RespondMessageData} with operation result.
+	 */
 	private IMessageData onEntityDataCollectionReceived(EntityDataCollection messageData) {
 		List<EntityData> entities = messageData.getEntityDataList();
 		boolean result = true;
@@ -299,6 +250,15 @@ public class MessagesResolver implements Server.MessagesHandler {
 		return new RespondMessageData(messageData, result);
 	}
 
+	/**
+	 * 
+	 * This method called by {@link MessagesResolver#onMessageReceived(Message)}
+	 * when received a message with {@link EntitiesListData} {@link IMessageData}.
+	 *
+	 * @param messageData
+	 *            the received {@link EntitiesListData}
+	 * @return {@link RespondMessageData} with operation result.
+	 */
 	private IMessageData onEntitiesListDataReceived(EntitiesListData messageData) {
 		EntityDataOperation operation = messageData.getOperation();
 		if (operation == EntityDataOperation.Get || operation == EntityDataOperation.GetALL
@@ -318,6 +278,16 @@ public class MessagesResolver implements Server.MessagesHandler {
 		return new RespondMessageData(messageData, result);
 	}
 
+	/**
+	 * 
+	 * This method called by {@link MessagesResolver#onMessageReceived(Message)}
+	 * when received a message with {@link EntityData} {@link IMessageData}.
+	 *
+	 * @param entityData
+	 *            the received {@link EntityData}
+	 * @return {@link IMessageData} if the operation perform and <code>null</code>
+	 *         if operation failed.
+	 */
 	private IMessageData onEntityDataReceived(EntityData entityData) {
 		IEntity receivedEntity = entityData.getEntity();
 
@@ -325,113 +295,199 @@ public class MessagesResolver implements Server.MessagesHandler {
 			return null;
 		}
 
+		EntityDataOperation operation = entityData.getOperation();
+		IEntity entity = entityData.getEntity();
+
 		IMessageData returnedMessageData = null;
-		if (receivedEntity instanceof Item) {
-			returnedMessageData = onItemEntityReceived((Item) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof ShopSurvey) {
-			returnedMessageData = onShopSurveyEntityReceived((ShopSurvey) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof ShopCostumer) {
-			returnedMessageData = onShopCostumerEntityReceived((ShopCostumer) receivedEntity,
-					entityData.getOperation());
-		} else if (receivedEntity instanceof Costumer) {
-			returnedMessageData = onCostumerEntityReceived((Costumer) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof Reservation) {
-			returnedMessageData = onReservationEntityReceived((Reservation) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof ShopManager) {
-			returnedMessageData = onShopManagerEntityReceived((ShopManager) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof ShopEmployee) {
-			returnedMessageData = onShopEmployeeEntityReceived((ShopEmployee) receivedEntity,
-					entityData.getOperation());
-		} else if (receivedEntity instanceof ItemInReservation) {
-			returnedMessageData = onItemInReservationEntityReceived((ItemInReservation) receivedEntity,
-					entityData.getOperation());
-		} else if (receivedEntity instanceof ItemInShop) {
-			returnedMessageData = onItemInShopEntityReceived((ItemInShop) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof Complaint) {
-			returnedMessageData = onComplainteEntityReceived((Complaint) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof Survey) {
-			returnedMessageData = onSurveyEntityReceived((Survey) receivedEntity, entityData.getOperation());
-		} else if (receivedEntity instanceof ComplaintsReport) {
-			returnedMessageData = onComplaintsReportEntityReceived((ComplaintsReport) receivedEntity,
-					entityData.getOperation());
-		} else if (receivedEntity instanceof SurveysReport) {
-			returnedMessageData = onSurveysReportEntityReceived((SurveysReport) receivedEntity,
-					entityData.getOperation());
-		} else if (receivedEntity instanceof IncomesReport) {
-			returnedMessageData = onIncomesReportEntityReceived((IncomesReport) receivedEntity,
-					entityData.getOperation());
-		} else if (receivedEntity instanceof ReservationsReport) {
-			returnedMessageData = onReservationsReportEntityReceived((ReservationsReport) receivedEntity,
-					entityData.getOperation());
-		} else if (receivedEntity instanceof User) {
-			returnedMessageData = onUserEntityReceived((User) receivedEntity, entityData.getOperation());
-		}
-		if (returnedMessageData != null && returnedMessageData instanceof RespondMessageData) {
-			((RespondMessageData) returnedMessageData).setMessageData(entityData);
+		switch (operation) {
+
+		case Get:
+			returnedMessageData = onEntityGetOperation(entityData);
+			break;
+
+		case GetALL:
+			returnedMessageData = onEntityGetAllOperation(entityData);
+			break;
+
+		case Update:
+			returnedMessageData = onEntityUpdateOperation(entityData);
+			break;
+
+		case Remove:
+			returnedMessageData = onEntityRemoveOperation(entityData);
+			break;
+
+		case Add:
+			returnedMessageData = onEntityAddOperation(entityData);
+			break;
+
+		default:
+			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + entity.toString()
+					+ ", Operation: " + operation.toString());
+			break;
 		}
 
 		return returnedMessageData;
 	}
 
-	// end region -> Server.MessagesHandler Implementation
+	/**
+	 * 
+	 * This method called by
+	 * {@link MessagesResolver#onEntityDataReceived(EntityData)} when received a
+	 * {@link EntityData} with {@link EntityDataOperation#Get} .
+	 *
+	 * @param entityData
+	 *            the received {@link EntityData}
+	 * @return {@link EntityData} if the operation succeed and
+	 *         {@link RespondMessageData} if does not.
+	 */
+	private IMessageData onEntityGetOperation(EntityData entityData) {
+		IEntity entity = entityData.getEntity();
+		Class<? extends IEntity> entityType = entityData.getEntity().getClass();
 
-	// region Item Entity Operations
+		String selectQuery = QueryGenerator.generateSelectQuery(entity);
+		if (selectQuery == null) {
+			return new RespondMessageData(entityData, false);
+		}
+		IMessageData executeSelectQuery = executeSelectQuery(selectQuery, entityType);
+		if (executeSelectQuery == null) {
+			return new RespondMessageData(entityData, false);
+		}
+		IEntity entityResult = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
+		return new EntityData(EntityDataOperation.None, entityResult);
 
-	private IMessageData onItemEntityReceived(Item item, EntityDataOperation operation) {
+	}
+
+	/**
+	 * 
+	 * This method called by
+	 * {@link MessagesResolver#onEntityDataReceived(EntityData)} when received a
+	 * {@link EntityData} with {@link EntityDataOperation#GetALL} .
+	 *
+	 * @param entityData
+	 *            the received {@link EntityData}
+	 * @return {@link EntitiesListData} if the operation succeed and
+	 *         {@link RespondMessageData} if does not.
+	 */
+	private IMessageData onEntityGetAllOperation(EntityData entityData) {
+		IEntity entity = entityData.getEntity();
+		Class<? extends IEntity> entityType = entityData.getEntity().getClass();
+		String selectAllQuery = QueryGenerator.generateSelectAllQuery(entity);
+		if (selectAllQuery == null) {
+			return new RespondMessageData(entityData, false);
+		}
+		IMessageData executeSelectQuery = executeSelectQuery(selectAllQuery, entityType);
+		if (executeSelectQuery == null) {
+			return new RespondMessageData(entityData, false);
+		}
+		return executeSelectQuery;
+	}
+
+	/**
+	 * 
+	 * This method called by
+	 * {@link MessagesResolver#onEntityDataReceived(EntityData)} when received a
+	 * {@link EntityData} with {@link EntityDataOperation#Update} .
+	 *
+	 * @param entityData
+	 *            the received {@link EntityData}
+	 * @return {@link RespondMessageData} with the result of operation perform.
+	 */
+	private IMessageData onEntityUpdateOperation(EntityData entityData) {
+		IEntity entity = entityData.getEntity();
+		Class<? extends IEntity> entityType = entityData.getEntity().getClass();
+		boolean updateResult = false;
+		if (entityType.equals(Item.class)) {
+			updateResult = updateItemEntityExecution((Item) entity);
+		} else {
+			String updateQuery = QueryGenerator.generateUpdateQuery(entity);
+			if (updateQuery != null) {
+				updateResult = executeQuery(entity, updateQuery);
+			}
+		}
+		RespondMessageData respondMessageData = new RespondMessageData(entityData, updateResult);
+		return respondMessageData;
+	}
+
+	/**
+	 * 
+	 * This method called by
+	 * {@link MessagesResolver#onEntityDataReceived(EntityData)} when received a
+	 * {@link EntityData} with {@link EntityDataOperation#Remove} .
+	 *
+	 * @param entityData
+	 *            the received {@link EntityData}
+	 * @return {@link RespondMessageData} with the result of operation perform.
+	 */
+	private IMessageData onEntityRemoveOperation(EntityData entityData) {
+		IEntity entity = entityData.getEntity();
+
+		String removeQuery = QueryGenerator.generateDeleteQuery(entity);
+		if (removeQuery == null) {
+			return new RespondMessageData(entityData, false);
+		}
+
+		boolean removeResult = executeQuery(entity, removeQuery);
+		RespondMessageData respondMessageData = new RespondMessageData(entityData, removeResult);
+		return respondMessageData;
+	}
+
+	/**
+	 * 
+	 * This method called by
+	 * {@link MessagesResolver#onEntityDataReceived(EntityData)} when received a
+	 * {@link EntityData} with {@link EntityDataOperation#Add} .
+	 *
+	 * @param entityData
+	 *            the received {@link EntityData}
+	 * @return {@link RespondMessageData} with the result of operation perform.
+	 */
+	private IMessageData onEntityAddOperation(EntityData entityData) {
+		IEntity entity = entityData.getEntity();
+		Class<? extends IEntity> entityType = entityData.getEntity().getClass();
+
 		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectItemQuery(item);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, Item.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllItemsQuery();
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Item.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Update:
-			result = updateItemEntityExecution(item);
-			break;
-		case Remove:
-			String removeItemQuery = QueryGenerator.removeItemQuery(item);
-			if (removeItemQuery != null) {
-				result = executeQuery(item, removeItemQuery);
-			}
-			break;
-		case Add:
+		if (entityType.equals(Item.class)) {
+			Item item = (Item) entity;
 			result = addItemEntityExecution(item);
 			if (result) {
 				int lastInsertId = getLastInsertId();
 				item.setId(lastInsertId);
 			}
-			break;
+		} else if (entityType.equals(ItemInShop.class) || entityType.equals(ItemInReservation.class)
+				|| entityType.equals(ShopCostumer.class) || entityType.equals(SurveyResult.class)) {
+			String insertQuery = QueryGenerator.generateInsertQuery(entity);
+			if (insertQuery != null) {
+				result = executeQuery(entity, insertQuery);
+			}
+		} else {
 
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + item.toString() + ", Operation: "
-					+ operation.toString());
-			break;
+			String insertQuery = QueryGenerator.generateInsertQuery(entity);
+			if (insertQuery != null) {
+				result = executeQuery(entity, insertQuery);
+			}
+			if (result) {
+				int lastInsertId = getLastInsertId();
+
+				if (entityType.equals(Reservation.class)) {
+					((Reservation) entity).setId(lastInsertId);
+				}
+				if (entityType.equals(Survey.class)) {
+					((Survey) entity).setId(lastInsertId);
+				}
+				if (entityType.equals(Complaint.class)) {
+					((Complaint) entity).setId(lastInsertId);
+				}
+			}
 		}
 
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
+		return new RespondMessageData(entityData, result);
 	}
+	// end region -> Server.MessagesHandler Implementation
 
 	private boolean addItemEntityExecution(Item item) {
 
-		String insertItemQuery = QueryGenerator.insertItemQuery(item);
+		String insertItemQuery = QueryGenerator.generateInsertQuery(item);
 		if (insertItemQuery == null) {
 			return false;
 		}
@@ -445,7 +501,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 	}
 
 	private boolean updateItemEntityExecution(Item item) {
-		String updateItemQuery = QueryGenerator.updateItemQuery(item);
+		String updateItemQuery = QueryGenerator.generateUpdateQuery(item);
 		if (updateItemQuery == null) {
 			return false;
 		}
@@ -484,7 +540,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 		boolean result = false;
 		switch (operation) {
 		case Get:
-			String selectQuery = QueryGenerator.selectUserQuery(user);
+			String selectQuery = QueryGenerator.generateSelectQuery(user);
 			if (selectQuery == null) {
 				break;
 			}
@@ -495,7 +551,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
 			return new EntityData(EntityDataOperation.None, entity);
 		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllUsersQuery();
+			String selectAllQuery = QueryGenerator.generateSelectAllQuery(user);
 			if (selectAllQuery == null) {
 				break;
 			}
@@ -505,7 +561,7 @@ public class MessagesResolver implements Server.MessagesHandler {
 			}
 			break;
 		case Update:
-			String updateQuery = QueryGenerator.updateUserQuery(user);
+			String updateQuery = QueryGenerator.generateUpdateQuery(user);
 			if (updateQuery != null) {
 				result = executeQuery(user, updateQuery);
 			}
@@ -524,659 +580,76 @@ public class MessagesResolver implements Server.MessagesHandler {
 
 	// end region -> User Entity Operations
 
-	// region Costumer Entity Operations
+	// region private Methods
 
-	private IMessageData onCostumerEntityReceived(Costumer costumer, EntityDataOperation operation) {
+	private <TData extends IEntity> IMessageData executeSelectQuery(String selectQuery, Class<TData> expectedType) {
+		ResultSet queryResult = null;
 
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectCostumerQuery(costumer);
-			if (selectQuery == null) {
-				break;
+		try {
+			queryResult = m_dbController.executeSelectQuery(selectQuery);
+			if (queryResult == null) {
+				m_logger.warning("Failed on try to execute select query : " + selectQuery);
+				return null;
 			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, Costumer.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllCostumersQuery();
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Costumer.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Update:
-			String updateQuery = QueryGenerator.updateCostumerQuery(costumer);
-			if (updateQuery != null) {
-				result = executeQuery(costumer, updateQuery);
-			}
-			break;
+			List<IEntity> entities = EntitiesResolver.resultSetToEntity(queryResult, expectedType);
+			return entities != null && !entities.isEmpty() ? new EntitiesListData(EntityDataOperation.None, entities)
+					: null;
 
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + costumer.toString()
-					+ ", Operation: " + operation.toString());
-			break;
+		} catch (Exception e) {
+			m_logger.warning(
+					"Failed on try to execute select query! query: " + selectQuery + ", exception: " + e.getMessage());
+		} finally {
+			if (queryResult != null) {
+				try {
+					queryResult.close();
+				} catch (SQLException e) {
+					m_logger.warning("Failed on try to close the ResultSet of the executed query:" + selectQuery
+							+ ", exception: " + e.getMessage());
+				}
+			}
 		}
-
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
+		return null;
 	}
 
-	// end region -> Costumer Entity Operations
-
-	// region Reservation Entity Operations
-
-	private IMessageData onReservationEntityReceived(Reservation reservation, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectReservationQuery(reservation);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, Reservation.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllReservationsQuery();
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Reservation.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Update:
-			String updateQuery = QueryGenerator.updateReservationQuery(reservation);
-			if (updateQuery != null) {
-				result = executeQuery(reservation, updateQuery);
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertReservationQuery(reservation);
-			if (insertQuery != null) {
-				result = executeQuery(reservation, insertQuery);
-			}
-			if (result) {
-				int lastInsertId = getLastInsertId();
-				reservation.setId(lastInsertId);
-			}
-			break;
-
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + reservation.toString()
-					+ ", Operation: " + operation.toString());
-			break;
+	private boolean executeQuery(IEntity entity, String query) {
+		boolean queryResult = false;
+		try {
+			queryResult = m_dbController.executeQuery(query);
+		} catch (Exception ex) {
+			m_logger.warning(
+					"Failed on try to execute query of: " + entity.toString() + ", exception: " + ex.getMessage());
 		}
-
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
+		return queryResult;
 	}
 
-	// end region -> Reservation Entity Operations
-
-	// region Survey Entity Operations
-
-	private IMessageData onSurveyEntityReceived(Survey survey, EntityDataOperation operation) {
-
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectSurveyQuery(survey);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, Survey.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllSurveysQuery();
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Reservation.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertSurveyQuery(survey);
-			if (insertQuery != null) {
-				result = executeQuery(survey, insertQuery);
-			}
-			if (result) {
-				int lastInsertId = getLastInsertId();
-				survey.setId(lastInsertId);
-			}
-			break;
-		
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + survey.toString()
-					+ ", Operation: " + operation.toString());
-			break;
+	private int getLastInsertId() {
+		String lastIdQuery = QueryGenerator.generateLastIdQuery();
+		if (lastIdQuery == null) {
+			return -1;
 		}
-
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
+		ResultSet queryResult = null;
+		int returningValue = -1;
+		try {
+			queryResult = m_dbController.executeSelectQuery(lastIdQuery);
+			if (queryResult != null) {
+				queryResult.next();
+				returningValue = queryResult.getInt(1);
+			}
+		} catch (Exception ex) {
+			m_logger.warning("Failed on try to execute query: " + lastIdQuery + ", exception: " + ex);
+		} finally {
+			if (queryResult != null) {
+				try {
+					queryResult.close();
+				} catch (SQLException e) {
+					m_logger.warning("Failed on try to close the ResultSet of the executed query:" + lastIdQuery
+							+ ", exception: " + e.getMessage());
+				}
+			}
+		}
+		return returningValue;
 	}
 
-	// end region -> Survey Entity Operations
+	// end region -> private methods
 
-	// region Complaint Entity Operations
-
-	private IMessageData onComplainteEntityReceived(Complaint complaint, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectComplaintQuery(complaint);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, Complaint.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllComplaintsQuery();
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, Complaint.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertComplaintQuery(complaint);
-			if (insertQuery != null) {
-				result = executeQuery(complaint, insertQuery);
-			}
-			if (result) {
-				int lastInsertId = getLastInsertId();
-				complaint.setId(lastInsertId);
-			}
-			break;
-		case Update:
-			String updateQuery = QueryGenerator.updateComplaintQuery(complaint);
-			if (updateQuery != null) {
-				result = executeQuery(complaint, updateQuery);
-			}
-			break;
-
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + complaint.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> Complaint Entity Operations
-
-	// region ItemInShop Entity Operations
-
-	private IMessageData onItemInShopEntityReceived(ItemInShop itemInShop, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectItemInShopsQuery(itemInShop);
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ItemInShop.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Update:
-			String updateQuery = QueryGenerator.updateItemInShopQuery(itemInShop);
-			if (updateQuery != null) {
-				result = executeQuery(itemInShop, updateQuery);
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertItemInShopQuery(itemInShop);
-			if (insertQuery != null) {
-				result = executeQuery(itemInShop, insertQuery);
-			}
-			break;
-		case Remove:
-			String removeQuery = QueryGenerator.removeItemInShopQuery(itemInShop);
-			if (removeQuery != null) {
-				result = executeQuery(itemInShop, removeQuery);
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + itemInShop.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> Reservation ItemInShop Operations
-
-	// region ItemInReservation Entity Operations
-
-	private IMessageData onItemInReservationEntityReceived(ItemInReservation itemInReservation,
-			EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectItemsInReservationQuery(itemInReservation);
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ItemInReservation.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertItemInReservationQuery(itemInReservation);
-			if (insertQuery != null) {
-				result = executeQuery(itemInReservation, insertQuery);
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + itemInReservation.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> ItemInReservation Entity Operations
-
-	// region ShopEmployee Entity Operations
-
-	private IMessageData onShopEmployeeEntityReceived(ShopEmployee shopEmployee, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectShopEmployeeQuery(shopEmployee);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopEmployee.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllShopEmployeesQuery();
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopEmployee.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopEmployee.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> ShopEmployee Entity Operations
-
-	// region ShopManager Entity Operations
-
-	private IMessageData onShopManagerEntityReceived(ShopManager shopManager, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectShopManagerQuery(shopManager);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopManager.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectShopManagersQuery();
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopManager.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopManager.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> ShopManager Entity Operations
-
-	// region ReservationsReport Entity Operations
-
-	private IMessageData onReservationsReportEntityReceived(ReservationsReport reservationsReport,
-			EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectReservationsReportQuery(reservationsReport);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ReservationsReport.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllReservationsReportsQuery(reservationsReport);
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ReservationsReport.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertReservationsReportQuery(reservationsReport);
-			if (insertQuery != null) {
-				result = executeQuery(reservationsReport, insertQuery);
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + reservationsReport.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> Reservation Entity Operations
-
-	// region IncomesReport Entity Operations
-
-	private IMessageData onIncomesReportEntityReceived(IncomesReport incomesReport, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectIncomesReportQuery(incomesReport);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, IncomesReport.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllIncomesReportQuery(incomesReport);
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, IncomesReport.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertIncomesReportQuery(incomesReport);
-			if (insertQuery != null) {
-				result = executeQuery(incomesReport, insertQuery);
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + incomesReport.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> IncomesReport Entity Operations
-
-	// region SurveysReport Entity Operations
-
-	private IMessageData onSurveysReportEntityReceived(SurveysReport surveysReport, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectSurveysReportQuery(surveysReport);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, SurveysReport.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllSurveysReportQuery(surveysReport);
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, SurveysReport.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertSurveysReportQuery(surveysReport);
-			if (insertQuery != null) {
-				result = executeQuery(surveysReport, insertQuery);
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + surveysReport.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> SurveysReport Entity Operations
-
-	// region ComplaintsReport Entity Operations
-
-	private IMessageData onComplaintsReportEntityReceived(ComplaintsReport complaintsReport,
-			EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectComplaintsReportQuery(complaintsReport);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ComplaintsReport.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllComplaintsReportQuery(complaintsReport);
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ComplaintsReport.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertComplaintsReportQuery(complaintsReport);
-			if (insertQuery != null) {
-				result = executeQuery(complaintsReport, insertQuery);
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + complaintsReport.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> ComplaintsReport Entity Operations
-
-	// region ComplaintsReport Entity Operations
-
-	private IMessageData onShopCostumerEntityReceived(ShopCostumer shopCostumer, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectShopCostumerQuery(shopCostumer);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopCostumer.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllShopCostumerReportQuery();
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopCostumer.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-		case Add:
-			String insertQuery = QueryGenerator.insertShopCostumerQuery(shopCostumer);
-			if (insertQuery != null) {
-				result = executeQuery(shopCostumer, insertQuery);
-			}
-			break;
-		case Update:
-			String updateQuery = QueryGenerator.updateShopCostumerQuery(shopCostumer);
-			if (updateQuery != null) {
-				result = executeQuery(shopCostumer, updateQuery);
-			}
-			break;
-		case Remove:
-			String removeQuery = QueryGenerator.removeShopCostumerQuery(shopCostumer);
-			if (removeQuery != null) {
-				result = executeQuery(shopCostumer, removeQuery);
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopCostumer.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> ComplaintsReport Entity Operations
-
-	// region ComplaintsReport Entity Operations
-
-	private IMessageData onShopSurveyEntityReceived(ShopSurvey shopSurvey, EntityDataOperation operation) {
-		boolean result = false;
-		switch (operation) {
-		case Get:
-			String selectQuery = QueryGenerator.selectShopSurveyQuery(shopSurvey);
-			if (selectQuery == null) {
-				break;
-			}
-			IMessageData executeSelectQuery = executeSelectQuery(selectQuery, ShopSurvey.class);
-			if (executeSelectQuery == null) {
-				break;
-			}
-			IEntity entity = ((EntitiesListData) executeSelectQuery).getEntities().get(0);
-			return new EntityData(EntityDataOperation.None, entity);
-
-		case GetALL:
-			String selectAllQuery = QueryGenerator.selectAllShopSurveyQuery(shopSurvey);
-			if (selectAllQuery == null) {
-				break;
-			}
-			IMessageData executeSelectAllQuery = executeSelectQuery(selectAllQuery, ShopSurvey.class);
-			if (executeSelectAllQuery != null) {
-				return executeSelectAllQuery;
-			}
-			break;
-
-		case Add:
-			String insertQuery = QueryGenerator.insertShopSurveyQuery(shopSurvey);
-			if (insertQuery != null) {
-				result = executeQuery(shopSurvey, insertQuery);
-			}
-			break;
-
-		case Update:
-			String updateQuery = QueryGenerator.updateShopSurveyQuery(shopSurvey);
-			if (updateQuery != null) {
-				result = executeQuery(shopSurvey, updateQuery);
-			}
-			break;
-		default:
-			m_logger.warning("Received unsupported opertaion for IEntity! Entity: " + shopSurvey.toString()
-					+ ", Operation: " + operation.toString());
-			break;
-		}
-		RespondMessageData respondMessageData = new RespondMessageData();
-		respondMessageData.setSucceed(result);
-		return respondMessageData;
-	}
-
-	// end region -> ComplaintsReport Entity Operations
 }

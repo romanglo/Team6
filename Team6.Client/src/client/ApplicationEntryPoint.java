@@ -3,6 +3,7 @@ package client;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -16,15 +17,16 @@ import com.sun.istack.internal.Nullable;
 
 import common.UncaughetExceptions;
 import controllers.LoginController;
-import newEntities.User;
-import newMessages.Message;
-import newMessages.MessagesFactory;
+import entities.User;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import logger.LogManager;
+import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
@@ -34,6 +36,8 @@ import logger.LogManager;
 public class ApplicationEntryPoint extends Application
 {
 
+	// region Static Fields
+
 	private final static String s_lockFilePath = "ClientLockFile.lock";
 
 	private static File s_file;
@@ -42,9 +46,11 @@ public class ApplicationEntryPoint extends Application
 
 	private static FileLock s_lockFile;
 
+	// end region -> Static Fields
+
 	/**
-	 * The main method of the application, the method ensure only one running instance of
-	 * the application, using file lock pattern. *
+	 * The main method of the application, the method ensure only one running
+	 * instance of the application, using file lock pattern. *
 	 * 
 	 * @param args
 	 *            Application arguments.
@@ -71,7 +77,7 @@ public class ApplicationEntryPoint extends Application
 			if (s_lockFile == null) {
 				// File is locked by other application
 				s_fileChannel.close();
-				System.out.println("Only one instance of Server can run at the same time.");
+				System.out.println("Only one instance of Client can run at the same time.");
 				System.exit(1);
 			}
 
@@ -157,6 +163,11 @@ public class ApplicationEntryPoint extends Application
 		s_logger.config("Client configuration loaded:" + ClientConfiguration.toString());
 	}
 
+	/**
+	 * The method initialize shutdown sequence in case of uncaught exception.
+	 * 
+	 * @see UncaughetExceptions
+	 */
 	private void initializeUncughtExceptionHandler()
 	{
 		UncaughetExceptions.UncaughtExceptionsHandler uncaughtExceptionsHandler = new UncaughetExceptions.UncaughtExceptionsHandler() {
@@ -180,7 +191,7 @@ public class ApplicationEntryPoint extends Application
 	/* region Application override methods */
 
 	/**
-	 * Method opens the UI of the client.
+	 * {@inheritDoc}
 	 */
 	@Override
 	public void start(Stage primaryStage)
@@ -190,13 +201,20 @@ public class ApplicationEntryPoint extends Application
 			Parent root = (Parent) loader.load();
 			LoginController controller = (LoginController) loader.getController();
 			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/login.css").toExternalForm());
 			primaryStage.setScene(scene);
 			primaryStage.setWidth(700);
 			primaryStage.setHeight(500);
 			primaryStage.setTitle("Zer-Li");
 			primaryStage.setResizable(false);
 			controller.intializeKeyHandler(scene);
+
+			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
+			if (iconResource != null) {
+				Image icon = new Image(iconResource);
+				primaryStage.getIcons().add(icon);
+			}
+
 			primaryStage.show();
 		}
 		catch (Exception e) {
@@ -205,6 +223,9 @@ public class ApplicationEntryPoint extends Application
 		}
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void init() throws Exception
 	{
@@ -222,6 +243,9 @@ public class ApplicationEntryPoint extends Application
 		super.init();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void stop() throws Exception
 	{
@@ -256,6 +280,12 @@ public class ApplicationEntryPoint extends Application
 		Client = null;
 	}
 
+	/**
+	 * 
+	 * The method send disconnection message to the server as part of the shutdown
+	 * sequence.
+	 *
+	 */
 	private void disconnectUser()
 	{
 		if (ConnectedUser != null && Client != null) {
@@ -270,5 +300,6 @@ public class ApplicationEntryPoint extends Application
 			Client.sendMessageToServer(logoutMessage);
 		}
 	}
+
 	/* End of --> Private disposing methods region */
 }

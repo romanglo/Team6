@@ -2,355 +2,442 @@
 package controllers;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
-
-import client.ApplicationEntryPoint;
-import client.Client;
-import client.ClientConfiguration;
+import java.util.Optional;
+import boundaries.ReservationStatusRow;
+import common.AlertBuilder;
+import entities.EntitiesEnums;
+import entities.IEntity;
+import entities.Reservation;
+import entities.ShopEmployee;
+import entities.Survey;
+import entities.SurveyResult;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
-import logger.LogManager;
-import newEntities.IEntity;
-import newEntities.ShopEmployee;
-import newEntities.ShopSurvey;
-import newEntities.Survey;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.IMessageData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
-
+import javafx.scene.layout.AnchorPane;
+import messages.EntitiesListData;
+import messages.EntityData;
+import messages.IMessageData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
  *
- * CompanyEmployeeController :
- * TODO Naal: Create class description
+ * ShopEmployeeController: Manages shop employee UI.
+ * 
+ * @see BaseController
  * 
  */
-public class ShopEmployeeController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class ShopEmployeeController extends BaseController
 {
-	/* UI Binding Fields region */
 
-	
-	// Title images :
-	@FXML private ImageView imageview_gif;
+	// region Fields
 
-	@FXML private ImageView imageview_title;
-	
-	@FXML private ImageView imageview_subtitle;
-	
+	private @FXML AnchorPane anchorpane_option1;
+
+	private @FXML AnchorPane anchorpane_option2;
+
+	private @FXML AnchorPane anchorpane_dino;
+
+	private @FXML ImageView imageview_dino;
+
+	private String correct_title;
+
 	@FXML private TextField textfiled_id;
-	
+
 	@FXML private TextField textfiled_question1;
-	
+
 	@FXML private TextField textfiled_question2;
-	
+
 	@FXML private TextField textfiled_question3;
-	
+
 	@FXML private TextField textfiled_question4;
-	
+
 	@FXML private TextField textfiled_question5;
-	
+
 	@FXML private TextField textfiled_question6;
-	
-	@FXML private ComboBox<Integer> combobox_answer1;
-	
-	@FXML private ComboBox<Integer> combobox_answer2;
-	
-	@FXML private ComboBox<Integer> combobox_answer3;
-	
-	@FXML private ComboBox<Integer> combobox_answer4;
-	
-	@FXML private ComboBox<Integer> combobox_answer5;
-	
-	@FXML private ComboBox<Integer> combobox_answer6;
-	
-	@FXML private ComboBox<Integer> combobox_surveyida;
-	
 
-	/* End of --> UI Binding Fields region */
+	@FXML private Spinner<Integer> combobox_answer1;
 
-	/* Fields */
-	private Logger m_logger;
+	@FXML private Spinner<Integer> combobox_answer2;
 
-	private Client m_client;
+	@FXML private Spinner<Integer> combobox_answer3;
 
-	private ClientConfiguration m_configuration;
-	
-	private ObservableList<Integer> list;
-	
-	private ShopSurvey entity;
-	
-	private List<IEntity> m_surveys_array;
-	
-	private ArrayList<Integer> m_surveysid_array= new ArrayList();
-;
-	
-	private int m_shop;
-	
-	/* End of --> Fields region */
+	@FXML private Spinner<Integer> combobox_answer4;
 
-	/* UI events region */
-	
-	@FXML
-	public void surveyExistenceCheck(ActionEvent event) throws Exception
-	{
-		if(textfiled_id.getText().equals(""))
-			showInformationMessage("Survey id text filed is empty");
-			else
-		{
-			int id=Integer.parseInt(textfiled_id.getText());
-			Survey entity= new Survey();//id
-			Message msg = MessagesFactory.createGetEntityMessage(entity);
-			m_client.sendMessageToServer(msg);
-		}
-	}
-	@FXML
-	public void selectSurvey(ActionEvent event)
-	{	
-		int surveyid=combobox_surveyida.getValue();
-		for(int i=0;i<m_surveys_array.size();i++)
-		{
-			if(((ShopSurvey)m_surveys_array.get(i)).getId()==surveyid)
-			{
-				entity=((ShopSurvey)m_surveys_array.get(i));
-			}
-		}
-		Survey survey_entity=new Survey();
-		survey_entity.setId(entity.getSurveyId());
-		Message msg=MessagesFactory.createGetEntityMessage(survey_entity);
-		m_client.sendMessageToServer(msg);
-	}
-	
-	@FXML
-	public void clear(ActionEvent event)
-	{
-		
-	}
-	
-	@FXML
-	public void addSurvey(ActionEvent event)
-	{
-		if(checkFileds())
-		{
-		ShopSurvey cur_shopservey=null;
-		int surv_id=combobox_surveyida.getValue();
-		for(int i=0;i<m_surveys_array.size();i++)
-		{
-			if(((ShopSurvey)m_surveys_array.get(i)).getId()==surv_id)
-				cur_shopservey =(ShopSurvey)m_surveys_array.get(i);
-		}
-		cur_shopservey.setAnswer1(cur_shopservey.getAnswer1()+combobox_answer1.getValue());
-		cur_shopservey.setAnswer2(cur_shopservey.getAnswer2()+combobox_answer2.getValue());
-		cur_shopservey.setAnswer3(cur_shopservey.getAnswer3()+combobox_answer3.getValue());
-		cur_shopservey.setAnswer4(cur_shopservey.getAnswer4()+combobox_answer4.getValue());
-		cur_shopservey.setAnswer5(cur_shopservey.getAnswer5()+combobox_answer5.getValue());
-		cur_shopservey.setAnswer6(cur_shopservey.getAnswer6()+combobox_answer6.getValue());
-		cur_shopservey.setNumberOfAnswers(cur_shopservey.getNumberOfAnswers()+1);
-		Message msg=MessagesFactory.createUpdateEntityMessage(cur_shopservey);
-		m_client.sendMessageToServer(msg);
-		}
-		else
-		{
-			showInformationMessage("One or more of the fileds is empty");
-		}
-	}
-		
-	/* private methods region */
-	
-	private void showInformationMessage(String message)
-	{
-		if (message == null || message.isEmpty()) {
-			return;
-		}
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
+	@FXML private Spinner<Integer> combobox_answer5;
 
-		alert.showAndWait();
-	}
-	
-	private boolean checkFileds()
-	{
-		return ((combobox_answer1.getValue()!=null)&&(combobox_answer2.getValue()!=null)&&(combobox_answer3.getValue()!=null)&&
-				(combobox_answer4.getValue()!=null)&&(combobox_answer5.getValue()!=null)&&(combobox_answer6.getValue()!=null)
-				&&(!(textfiled_question1.getText().equals("")))&&(!(textfiled_question2.getText().equals("")))&&
-				(!(textfiled_question3.getText().equals("")))&&(!(textfiled_question4.getText().equals("")))&&
-				(!(textfiled_question5.getText().equals("")))&&(!(textfiled_question6.getText().equals(""))));
-	}
+	@FXML private Spinner<Integer> combobox_answer6;
 
-	/* Initializing methods region */
+	private int manager_id;
+
+	private Survey correct_survey;
+
+	private String[] questions = { "How likely is it that you would recommended our company?",
+			"How well do our porducts meet your needs?", "How would you rate the quality of our products?",
+			"How would you rate the value for money of the product?",
+			"How likely are you to purchase any of our products again?",
+			"How would you rate the shopping experience in our shop?" };
+
+	private SpinnerValueFactory<Integer> svf1 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
+
+	private SpinnerValueFactory<Integer> svf2 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
+
+	private SpinnerValueFactory<Integer> svf3 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
+
+	private SpinnerValueFactory<Integer> svf4 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
+
+	private SpinnerValueFactory<Integer> svf5 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
+
+	private SpinnerValueFactory<Integer> svf6 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 10);
+
+	private List<IEntity> reservations;
+
+	private ArrayList<ReservationStatusRow> open_reservations = new ArrayList<>();
+
+	private ObservableList<ReservationStatusRow> reservation_list = FXCollections.observableArrayList();
+
+	private @FXML Label enter_date;
+
+	private @FXML TableView<ReservationStatusRow> reservation_table;
+
+	private @FXML TableColumn<ReservationStatusRow, Integer> tablecolumn_reservation_id;
+
+	private @FXML TableColumn<ReservationStatusRow, Integer> tablecolumn_costumer_id;
+
+	private @FXML TableColumn<ReservationStatusRow, Float> tablecolumn_reservation_price;
+
+	private @FXML TableColumn<ReservationStatusRow, String> tablecolumn_reservation_type;
+
+	private @FXML TableColumn<ReservationStatusRow, String> tablecolumn_delivery_date;
+
+	private ArrayList<IEntity> closes_reservations = new ArrayList<>();
+
+	// end region -> Fields
+
+	// region BaseController Implementation
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void initialize(URL url, ResourceBundle rb)
+	protected void internalInitialize() throws Exception
 	{
-		initializeFields();
-		initializeImages();
-		initializeClientHandler();
-		answersinitialize();
-		initializeshop();
+		initializeConfigurationShopSalesTable();
+
+		InputStream dinoResource = getClass().getResourceAsStream("/boundaries/images/dino.gif");
+		if (dinoResource != null) {
+			Image image = new Image(dinoResource);
+			imageview_dino.setImage(image);
+		}
 	}
 
-	private void initializeFields()
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean onSelection(String title)
 	{
-		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
-		m_client = ApplicationEntryPoint.Client;
+		correct_title = title;
+		switch (title) {
+			case "Add survey":
+				anchorpane_option1.setVisible(false);
+				anchorpane_option2.setVisible(false);
+				anchorpane_dino.setVisible(false);
+				initializesurveys();
+			break;
+			case "Close Reservations":
+				anchorpane_option1.setVisible(false);
+				anchorpane_option2.setVisible(true);
+				anchorpane_dino.setVisible(false);
+				initialReservations();
+			break;
+			default:
+				return false;
+		}
+		return true;
 	}
 
-	private void initializeImages()
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String[] getSideButtonsNames()
 	{
-		InputStream serverGif = getClass().getResourceAsStream("/boundaries/images/Flower.gif");
-		if (serverGif != null) {
-			Image image = new Image(serverGif);
-			imageview_gif.setImage(image);
-		}
-		InputStream title = getClass().getResourceAsStream("/boundaries/images/Zerli_Headline.jpg");
-		if (title != null) {
-			Image image = new Image(title);
-			imageview_title.setImage(image);
-		}
-		InputStream costumerSeviceHeadLine = getClass().getResourceAsStream("/boundaries/images/AddNewSurvey.png");
-		if (serverGif != null) 
-		{
-			Image image = new Image(costumerSeviceHeadLine);
-			imageview_subtitle.setImage(image);
-		}
-		}
-
-	private void initializeClientHandler()
-	{
-		m_client.setMessagesHandler(this);
-		m_client.setClientStatusHandler(this);
+		return new String[] { "Add survey", "Close Reservations" };
 	}
-	
-	private void answersinitialize()
+
+	boolean m_firstTime = true;
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onMessageReceived(Message msg) throws Exception
 	{
+		IMessageData messageData = msg.getMessageData();
+		if (correct_title.equals("Add survey")) {
+			if (messageData instanceof EntityData) {
+				if (((EntityData) messageData).getEntity() instanceof ShopEmployee) {
+					manager_id = ((ShopEmployee) ((EntityData) messageData).getEntity()).getShopManagerId();
+					Survey survey_entity = new Survey();
+					msg = MessagesFactory.createGetAllEntityMessage(survey_entity);
+					m_Client.sendMessageToServer(msg);
+				}
+			} else if (messageData instanceof EntitiesListData) {
+				if (((EntitiesListData) messageData).getEntities().get(0) instanceof Survey) {
+					List<IEntity> temp = ((EntitiesListData) messageData).getEntities();
+					for (int i = 0; i < temp.size(); i++) {
+						if (((Survey) temp.get(i)).getManagerId() == manager_id) {
+							if (((Survey) temp.get(i)).getEndDate().after(new Date())) {
+								correct_survey = (Survey) temp.get(i);
+							}
+						}
+					}
+					if (correct_survey == null) {
+						showAlertMessage("There are no surveys for your shop.", AlertType.INFORMATION);
+						anchorpane_dino.setVisible(true);
+					} else {
+						anchorpane_option1.setVisible(true);
+						textfiled_question1.setText(questions[0]);
+						textfiled_question2.setText(questions[1]);
+						textfiled_question3.setText(questions[2]);
+						textfiled_question4.setText(questions[3]);
+						textfiled_question5.setText(questions[4]);
+						textfiled_question6.setText(questions[5]);
+					}
+				}
+			} else if (messageData instanceof RespondMessageData) {
+				if (((RespondMessageData) messageData).getMessageData() instanceof EntityData) {
+					if (((EntityData) ((RespondMessageData) messageData).getMessageData())
+							.getEntity() instanceof SurveyResult) {
+						if (((RespondMessageData) messageData).isSucceed()) {
+							m_Logger.severe("Survey added succssefuly");
+							javafx.application.Platform.runLater(() -> {
+								combobox_answer1.getValueFactory().setValue(0);
+								combobox_answer2.getValueFactory().setValue(0);
+								combobox_answer3.getValueFactory().setValue(0);
+								combobox_answer4.getValueFactory().setValue(0);
+								combobox_answer5.getValueFactory().setValue(0);
+								combobox_answer6.getValueFactory().setValue(0);
+								combobox_answer1.setValueFactory(svf1);
+								combobox_answer2.setValueFactory(svf2);
+								combobox_answer3.setValueFactory(svf3);
+								combobox_answer4.setValueFactory(svf4);
+								combobox_answer5.setValueFactory(svf5);
+								combobox_answer6.setValueFactory(svf6);
+								showAlertMessage("Successfully added", AlertType.INFORMATION);
+							});
+						}
+					}
+				}
+			}
+		} else if (correct_title.equals("Close Reservations")) {
+			if (messageData instanceof EntitiesListData) {
+				if (((EntitiesListData) messageData).getEntities().get(0) instanceof Reservation) {
+					reservations = ((EntitiesListData) messageData).getEntities();
+					Reservation reservation;
+					for (int i = 0; i < reservations.size(); i++) {
+						reservation = (Reservation) reservations.get(i);
+						if (reservation.getType().equals(EntitiesEnums.ReservationType.Open)
+								&& reservation.getShopManagerId() == manager_id) {
+							ReservationStatusRow statusRow = new ReservationStatusRow(reservation.getId(),
+									reservation.getCostumerId(), reservation.getPrice(),
+									reservation.getType().toString(), reservation.getDeliveryDate());
+							open_reservations.add(statusRow);
+						}
+					}
+
+					javafx.application.Platform.runLater(() -> {
+						reservation_list.setAll(open_reservations);
+						open_reservations.clear();
+						drawContantToTable();
+						if(m_firstTime) {
+							drawContantToTable();
+							m_firstTime=false;
+						}
+					});
+					needToBeClosed();
+				}
+			} else if (messageData instanceof RespondMessageData) {
+				if (((RespondMessageData) messageData).isSucceed()) {
+					showAlertMessage("Your reservations have been successfully closed", AlertType.INFORMATION);
+					reservation_list.clear();
+					closes_reservations.clear();
+					drawContantToTable();
+					initialReservations();
+				}
+			}
+		}
+	}
+
+	// end region -> BaseController Implementation
+
+	// UI event region
+
+	private void initializesurveys()
+	{
+		String username = m_ConnectedUser.getUserName();
+		ShopEmployee shopemployee_entity = new ShopEmployee();
+		shopemployee_entity.setUserName(username);
+		Message msg = MessagesFactory.createGetEntityMessage(shopemployee_entity);
+		m_Client.sendMessageToServer(msg);
 		ArrayList<Integer> answers = new ArrayList<Integer>();
-		for(int i=1;i<11;i++)
-		{
+		for (int i = 1; i < 11; i++) {
 			answers.add(i);
 		}
-		 list = FXCollections.observableArrayList(answers);
-		 combobox_answer1.setItems(list);
-		 combobox_answer2.setItems(list);
-		 combobox_answer3.setItems(list);
-		 combobox_answer4.setItems(list);
-		 combobox_answer5.setItems(list);
-		 combobox_answer6.setItems(list);
+		combobox_answer1.setValueFactory(svf1);
+		combobox_answer2.setValueFactory(svf2);
+		combobox_answer3.setValueFactory(svf3);
+		combobox_answer4.setValueFactory(svf4);
+		combobox_answer5.setValueFactory(svf5);
+		combobox_answer6.setValueFactory(svf6);
 	}
-	private void initializeSurveys()
-	{
-		ShopSurvey sur_entity= new ShopSurvey();
-		sur_entity.setShopManagerId(m_shop);
-		Message msg=MessagesFactory.createGetAllEntityMessage(sur_entity);
-		m_client.sendMessageToServer(msg);
-	}
-	
-	private void initializeshop()
-	{
-		ShopEmployee shopemp=new ShopEmployee();
-		shopemp.setUserName(ApplicationEntryPoint.ConnectedUser.getUserName());
-		Message msg=MessagesFactory.createGetEntityMessage(shopemp);
-		m_client.sendMessageToServer(msg);
-	}
-
-	/* End of --> Initializing methods region */
-
-	/* Client handlers implementation region */
 
 	/**
-	 * {@inheritDoc}
+	 * Initialize Shop Sales table columns and define action when double click on
+	 * table row.
+	 *
 	 */
-	@Override
-	public synchronized void onMessageReceived(Message msg) throws Exception
+	private void initializeConfigurationShopSalesTable()
 	{
-		if(msg.getMessageData() instanceof EntityData)
-		{
-			if(((EntityData)msg.getMessageData()).getEntity() instanceof ShopEmployee)
-			{
-				ShopEmployee s=(ShopEmployee) ((EntityData)msg.getMessageData()).getEntity();
-				m_shop=s.getShopManagerId();
-				initializeSurveys();
-			}
-			else if(((EntityData)msg.getMessageData()).getEntity() instanceof Survey)
-				{
-					Survey s=(Survey) ((EntityData)msg.getMessageData()).getEntity();
-					textfiled_question1.setText(s.getFirstQuestion());
-					textfiled_question2.setText(s.getSecondQuestion());
-					textfiled_question3.setText(s.getThirdQuestion());
-					textfiled_question4.setText(s.getFourthQuestion());
-					textfiled_question5.setText(s.getFifthQuestion());
-					textfiled_question6.setText(s.getSixthQuestion());
+		reservation_table.setRowFactory(param -> {
+			TableRow<ReservationStatusRow> tableRow = new TableRow<>();
+			tableRow.setOnMouseClicked(event -> {
+				if (event.getClickCount() == 2 && (!tableRow.isEmpty())) {
+					ReservationStatusRow rowData = tableRow.getItem();
+
+					if (rowData.getReservationStatus() == "Closed") return;
+
+					Alert alert = new AlertBuilder().setAlertType(AlertType.CONFIRMATION)
+							.setContentText("Are you sure you want to close the reservation?").build();
+					Optional<ButtonType> result = alert.showAndWait();
+					if (result.get() == ButtonType.OK) {
+						rowData.setReservationStatus("Closed");
+						for (int i = 0; i < reservations.size(); i++) {
+							if (rowData.getReservationId() == ((Reservation) reservations.get(i)).getId()) {
+								((Reservation) reservations.get(i)).setType(EntitiesEnums.ReservationType.Closed);
+								closes_reservations.add(((Reservation) reservations.get(i)));
+							}
+						}
+					} else {
+						return;
+					}
+					drawContantToTable();
 				}
+			});
+			return tableRow;
+		});
+
+		tablecolumn_reservation_id
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, Integer>("reservationId"));
+		tablecolumn_costumer_id
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, Integer>("costumerId"));
+		tablecolumn_reservation_price
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, Float>("reservationPrice"));
+		tablecolumn_reservation_type
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, String>("reservationStatus"));
+		tablecolumn_delivery_date
+				.setCellValueFactory(new PropertyValueFactory<ReservationStatusRow, String>("deliveryDateInFormat"));
+		drawContantToTable();
+	}
+
+	/**
+	 * Add survey to shop
+	 *
+	 * @param event
+	 *            add button clicked
+	 */
+	@FXML
+	private void addSurvey(ActionEvent event)
+	{
+		if ((combobox_answer1.getValue() == 0) || (combobox_answer2.getValue() == 0)
+				|| (combobox_answer3.getValue() == 0) || (combobox_answer4.getValue() == 0)
+				|| (combobox_answer5.getValue() == 0) || (combobox_answer6.getValue() == 0)) {
+			showAlertMessage("One or more of the answers are 0 it needs to be at least 1.", AlertType.WARNING);
+		} else {
+			SurveyResult surveyResult = new SurveyResult();
+			surveyResult.setFirstAnswer(combobox_answer1.getValue());
+			surveyResult.setSecondAnswer(combobox_answer2.getValue());
+			surveyResult.setThirdAnswer(combobox_answer3.getValue());
+			surveyResult.setFourthanswer(combobox_answer4.getValue());
+			surveyResult.setFifthAnswer(combobox_answer5.getValue());
+			surveyResult.setSixthAnswer(combobox_answer6.getValue());
+			surveyResult.setSurveyId(correct_survey.getId());
+			surveyResult.setEnterDate(new Date());
+			Message msg = MessagesFactory.createAddEntityMessage(surveyResult);
+			m_Client.sendMessageToServer(msg);
 		}
-		else
-		{
-			if (msg.getMessageData() instanceof EntitiesListData)
-			{
-				EntitiesListData entitiesListData = (EntitiesListData)msg.getMessageData();
-				m_surveys_array = entitiesListData.getEntities();
-				for(int i=0;i<m_surveys_array.size();i++)
-				{
-						m_surveysid_array.add(((ShopSurvey)m_surveys_array.get(i)).getId());
-				}
-			list = FXCollections.observableArrayList(m_surveysid_array);
-			combobox_surveyida.setItems(list);	
-			}
-			else if(msg.getMessageData() instanceof RespondMessageData)
-			{
-				if(((RespondMessageData)msg.getMessageData()).isSucceed())
-				{
-					m_logger.severe("Update sucssed");
-				}
-				else
-					m_logger.severe("Update faild");
-			}
-		}	
 	}
-		
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onClientConnected()
+	private void initialReservations()
 	{
-		// TODO Shimon : Add event handling
+		reservation_list.clear();
+		Reservation res = new Reservation();
+		Message msg = MessagesFactory.createGetAllEntityMessage(res);
+		m_Client.sendMessageToServer(msg);
+	}
+
+	@FXML
+	private void closeReservation(ActionEvent event)
+	{
+		if (closes_reservations.isEmpty()) {
+			showAlertMessage("There are no changes.", AlertType.INFORMATION);
+			return;
+		}
+		Message msg = MessagesFactory.createUpdateEntitiesMessage(closes_reservations);
+		m_Client.sendMessageToServer(msg);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Insert data into table and show the updated table.
+	 * 
 	 */
-	@Override
-	public void onClientDisconnected()
+	private void drawContantToTable()
 	{
-		// TODO Shimon : Add event handling
+		reservation_table.setItems(reservation_list);
+		reservation_table.refresh();
 	}
 
-	/* End of --> Client handlers implementation region */
+	private void needToBeClosed()
+	{
+		String string_toclose = "";
+		Date today = new Date();
+		for (int i = 0; i < reservations.size(); i++) {
+			Reservation res = (Reservation) reservations.get(i);
+			if ((res.getType().equals(EntitiesEnums.ReservationType.Open))
+					&& (res.getDeliveryDate().getTime() < today.getTime())) {
+				Date delivery = res.getDeliveryDate();
+				if (string_toclose.equals("")) {
+					string_toclose = string_toclose + " " + res.getId();
+
+				} else {
+					string_toclose = string_toclose + " , " + res.getId();
+				}
+				delivery.getTime();
+			}
+		}
+		if (!(string_toclose.equals(""))) {
+			showAlertMessage("The following reservations require yours attention: " + string_toclose
+					+ " Since their delivery time has already passed!", AlertType.INFORMATION);
+		}
+	}
+	// end region -> BUI event region
 }

@@ -105,7 +105,7 @@ public class DbController extends Startable {
 			m_Logger.severe("Failed to open connection with MySql server! exception: " + e.getMessage());
 			throw e;
 		}
-		m_Logger.info("Connection with MySQL database created! connection string: " + connectionString);
+		m_Logger.info("Connection with MySQL database created successfully! connection string: " + connectionString);
 	}
 
 	/**
@@ -124,7 +124,7 @@ public class DbController extends Startable {
 			m_Logger.severe("Failed to close the connection to MySql! exception: " + e.getMessage());
 			throw e;
 		}
-		m_Logger.info("Connection with MySQL database closed!");
+		m_Logger.info("Connection with MySQL database closed successfully!");
 
 	}
 
@@ -140,7 +140,9 @@ public class DbController extends Startable {
 	 *            The query to execute.
 	 * @return A {@link ResultSet} with the query result.
 	 * @throws NotRunningException
-	 *             if the method called when the state is not Running.
+	 *             thrown if the method called when the {@link IStartable} is not in
+	 *             running state.
+	 * 
 	 */
 	public ResultSet executeSelectQuery(String query) throws NotRunningException {
 		if (!isRunning()) {
@@ -168,7 +170,9 @@ public class DbController extends Startable {
 	 *            The query to execute.
 	 * @return true if the update succeed and false if does not.
 	 * @throws NotRunningException
-	 *             if the method called when the state is not Running.
+	 *             thrown if the method called when the {@link IStartable} is not in
+	 *             running state.
+	 * 
 	 */
 	public boolean executeQuery(String query) throws NotRunningException {
 		if (!isRunning()) {
@@ -194,8 +198,12 @@ public class DbController extends Startable {
 	 * @param sql
 	 *            An query that matching to {@link PreparedStatement} rules.
 	 * @return A {@link PreparedStatement} that related to the connected schema.
+	 * @throws NotRunningException
+	 *             thrown if the method called when the {@link IStartable} is not in
+	 *             running state.
+	 * 
 	 */
-	public PreparedStatement getPreparedStatement(String sql) {
+	public PreparedStatement getPreparedStatement(String sql) throws NotRunningException {
 		if (!isRunning()) {
 			throw new NotRunningException(this);
 		}
@@ -239,9 +247,11 @@ public class DbController extends Startable {
 	 * @param sql
 	 *            An query that matching to {@link CallableStatement} rules.
 	 * @return A {@link CallableStatement} that related to the connected schema.
+	 * @throws NotRunningException
+	 *             thrown if the method called when the {@link IStartable} is not in
+	 *             running state.
 	 */
-
-	public CallableStatement getCallableStatement(String sql) {
+	public CallableStatement getCallableStatement(String sql) throws NotRunningException {
 		if (!isRunning()) {
 			throw new NotRunningException(this);
 		}

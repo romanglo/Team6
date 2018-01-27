@@ -4,31 +4,37 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import com.sun.istack.internal.NotNull;
+
+import entities.Complaint;
+import entities.ComplaintsReport;
+import entities.Costumer;
+import entities.CostumerServiceEmployee;
+import entities.IEntity;
+import entities.IncomesReport;
+import entities.Item;
+import entities.ItemInReservation;
+import entities.ItemInShop;
+import entities.Reservation;
+import entities.ReservationsReport;
+import entities.ShopCostumer;
+import entities.ShopEmployee;
+import entities.ShopManager;
+import entities.Survey;
+import entities.SurveyResult;
+import entities.SurveysReport;
+import entities.User;
 import logger.LogManager;
-import newEntities.Complaint;
-import newEntities.ComplaintsReport;
-import newEntities.Costumer;
-import newEntities.IEntity;
-import newEntities.IncomesReport;
-import newEntities.Item;
-import newEntities.ItemInReservation;
-import newEntities.ItemInShop;
-import newEntities.Reservation;
-import newEntities.ReservationsReport;
-import newEntities.ShopCostumer;
-import newEntities.ShopEmployee;
-import newEntities.ShopManager;
-import newEntities.ShopSurvey;
-import newEntities.Survey;
-import newEntities.SurveysReport;
-import newEntities.User;
 
 /**
  *
- * QueryGenerator: A factory of queries based on {@link IEntity}.
+ * QueryGenerator: A factory of queries based on {@link IEntity}. It is
+ * impossible to create an instance of this class, all the methods in this class
+ * is static.
  */
-@SuppressWarnings("javadoc")
 public class QueryGenerator {
+
+	// region Constructor
 
 	/**
 	 * The constructor is empty to ensure that it will not be possible to create
@@ -38,31 +44,404 @@ public class QueryGenerator {
 
 	}
 
+	// end region -> Constructors
+
+	// region Fields
+
 	private final static SimpleDateFormat s_yearFormat = new SimpleDateFormat("yyyy");
 
 	private final static SimpleDateFormat s_dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-	private final static SimpleDateFormat s_dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+	private final static SimpleDateFormat s_dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	private static Logger s_logger = null;
 
-	private static void loggerLazyLoading() {
-		if (s_logger == null) {
-			s_logger = LogManager.getLogger();
-		}
-	}
+	// end region -> Fields
 
-	public static String getLastIdQuery() {
+	// region Public Methods
+
+	// region Stored Procedures Queries
+
+	/**
+	 * @return A query which calling to stored procedure that returns the ID of the
+	 *         last inserted row.
+	 */
+	public static String generateLastIdQuery() {
 		return "SELECT LAST_INSERT_ID();";
 	}
 
-	public static String getShopCatalog(int shopManagerId) {
+	/**
+	 * @param shopManagerId
+	 *            The ID of the required shop catalog.
+	 * @return A query which calling to stored procedure that returns catalog of a
+	 *         specific shop.
+	 */
+	public static String generateShopCatalogQuery(int shopManagerId) {
 		return "CALL getShopCatalog(" + shopManagerId + ");";
+	}
+
+	/**
+	 * @return A query which calling to stored procedure that checks the costumers
+	 *         in shop subscription expire Date.
+	 * 
+	 */
+	public static String generateCheckCostumersSubscriptionQuery() {
+		return "CALL checkCostumersSubsription();";
+	}
+
+	/**
+	 * @param shopManagerId
+	 *            The ID of the required shop incomes report.
+	 * @param year
+	 *            the year of the required incomes report.
+	 * @param querter
+	 *            the quarter of the required incomes report.
+	 * @return A query which calling to stored procedure that returns incomes report
+	 *         of a specific shop.
+	 */
+	public static String generateIncomesReportQuery(int shopManagerId, String year, int querter) {
+		return "CALL generateIncomesReport(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	}
+
+	/**
+	 * @param shopManagerId
+	 *            The ID of the required shop reservations report.
+	 * @param year
+	 *            the year of the required reservations report.
+	 * @param querter
+	 *            the quarter of the required reservations report.
+	 * @return A query which calling to stored procedure that returns reservations
+	 *         report of a specific shop.
+	 */
+	public static String generateReservationsReportQuery(int shopManagerId, String year, int querter) {
+		return "CALL generateReservationsReport(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	}
+
+	/**
+	 * @param shopManagerId
+	 *            The ID of the required shop complaints report.
+	 * @param year
+	 *            the year of the required complaints report.
+	 * @param querter
+	 *            the quarter of the required complaints report.
+	 * @return A query which calling to stored procedure that returns complaints
+	 *         report of a specific shop.
+	 */
+	public static String generateComplaintsReportQuery(int shopManagerId, String year, int querter) {
+		return "CALL generateComplaintsReport(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	}
+
+	/**
+	 * @param shopManagerId
+	 *            The ID of the required shop surveys report.
+	 * @param year
+	 *            the year of the required surveys report.
+	 * @param querter
+	 *            the quarter of the required surveys report.
+	 * @return A query which calling to stored procedure that returns surveys report
+	 *         of a specific shop.
+	 */
+	public static String generateSurveysReportQuery(int shopManagerId, String year, int querter) {
+		return "CALL generateSurveysReport(" + shopManagerId + ",'" + year + "'," + querter + ")";
+	}
+
+	/**
+	 * @return A query which set all 'Connected' {@link User}s status to
+	 *         'Disconnected'.
+	 */
+	public static String generateUpdateAllUsersToDisconnectQuery() {
+		return "UPDATE users SET uStatus = 'Disconnected' WHERE uStatus = 'Connected' ;";
+	}
+
+	/**
+	 * 
+	 * Generate "INSERT" query by the received {@link IEntity} type and states.
+	 *
+	 * @param <TData>
+	 *            An instance which implements {@link IEntity}.
+	 * @param entity
+	 *            An {@link IEntity} of the requested type.
+	 * @return A "INSERT" query if the type is supported and all the necessary
+	 *         states exists, and <code>null</code> id does not.
+	 */
+	public static <TData extends IEntity> String generateInsertQuery(TData entity) {
+		if (entity == null) {
+			logMessage("generateInsertQuery method received null parameter.");
+			return null;
+		}
+
+		Class<? extends IEntity> entityType = entity.getClass();
+		if (entityType.equals(Item.class)) {
+			return insertItemQuery((Item) entity);
+		}
+		if (entityType.equals(Reservation.class)) {
+			return insertReservationQuery((Reservation) entity);
+		}
+		if (entityType.equals(Complaint.class)) {
+			return insertComplaintQuery((Complaint) entity);
+		}
+		if (entityType.equals(ItemInShop.class)) {
+			return insertItemInShopQuery((ItemInShop) entity);
+		}
+		if (entityType.equals(ItemInReservation.class)) {
+			return insertItemInReservationQuery((ItemInReservation) entity);
+		}
+		if (entityType.equals(ShopCostumer.class)) {
+			return insertShopCostumerQuery((ShopCostumer) entity);
+		}
+		if (entityType.equals(Survey.class)) {
+			return insertSurveyQuery((Survey) entity);
+		}
+		if (entityType.equals(SurveyResult.class)) {
+			return insertSurveyResultQuery((SurveyResult) entity);
+		}
+		logMessage("generateInsertQuery method received unsupported entity, type: " + entity.getClass().getName());
+		return null;
+	}
+
+	/**
+	 * 
+	 * Generate "DELETE" query by the received {@link IEntity} type and states.
+	 *
+	 * @param <TData>
+	 *            An instance which implements {@link IEntity}.
+	 * @param entity
+	 *            An {@link IEntity} of the requested type.
+	 * @return A "DELETE" query if the type is supported and all the necessary
+	 *         states exists, and <code>null</code> id does not.
+	 */
+	public static <TData extends IEntity> String generateDeleteQuery(@NotNull TData entity) {
+		if (entity == null) {
+			logMessage("generateDeleteQuery method received null parameter.");
+			return null;
+		}
+
+		Class<? extends IEntity> entityType = entity.getClass();
+		if (entityType.equals(Item.class)) {
+			return deleteItemQuery((Item) entity);
+		}
+		if (entityType.equals(ItemInShop.class)) {
+			return deleteItemInShopQuery((ItemInShop) entity);
+		}
+		if (entityType.equals(ShopCostumer.class)) {
+			return deleteShopCostumerQuery((ShopCostumer) entity);
+		}
+		logMessage("generateDeleteQuery method received unsupported entity, type: " + entity.getClass().getName());
+		return null;
+	}
+
+	/**
+	 * 
+	 * Generate "SELECT" query by the received {@link IEntity} type and states.
+	 *
+	 * @param <TData>
+	 *            An instance which implements {@link IEntity}.
+	 * @param entity
+	 *            An {@link IEntity} of the requested type.
+	 * @return A "SELECT" query if the type is supported and all the necessary
+	 *         states exists, and <code>null</code> id does not.
+	 */
+	public static <TData extends IEntity> String generateSelectAllQuery(@NotNull TData entity) {
+		if (entity == null) {
+			logMessage("generateSelectAllQuery method received null parameter.");
+			return null;
+		}
+
+		Class<? extends IEntity> entityType = entity.getClass();
+		if (entityType.equals(Item.class)) {
+			return selectAllItemQuery();
+		}
+		if (entityType.equals(Reservation.class)) {
+			return selectAllReservationQuery((Reservation) entity);
+		}
+		if (entityType.equals(Complaint.class)) {
+			return selectAllComplaintQuery((Complaint) entity);
+		}
+		if (entityType.equals(ComplaintsReport.class)) {
+			return selectAllComplaintsReportQuery((ComplaintsReport) entity);
+		}
+		if (entityType.equals(Costumer.class)) {
+			return selectAllCostumerQuery();
+		}
+		if (entityType.equals(CostumerServiceEmployee.class)) {
+			return selectAllCostumerServiceEmployeeQuery();
+		}
+		if (entityType.equals(IncomesReport.class)) {
+			return selectAllIncomesReportQuery((IncomesReport) entity);
+		}
+		if (entityType.equals(ReservationsReport.class)) {
+			return selectAllReservationsReportQuery((ReservationsReport) entity);
+		}
+		if (entityType.equals(ShopCostumer.class)) {
+			return selectAllShopCostumerQuery((ShopCostumer) entity);
+		}
+		if (entityType.equals(ShopEmployee.class)) {
+			return selectAllShopEmployeeQuery();
+		}
+		if (entityType.equals(ShopManager.class)) {
+			return selectAllShopManagerQuery();
+		}
+		if (entityType.equals(Survey.class)) {
+			return selectAllSurveyQuery();
+		}
+		if (entityType.equals(SurveyResult.class)) {
+			return selectAllSurveyResultQuery();
+		}
+		if (entityType.equals(SurveysReport.class)) {
+			return selectAllSurveysReportQuery((SurveysReport) entity);
+		}
+		if (entityType.equals(User.class)) {
+			return selectAllUserQuery();
+		}
+		if (entityType.equals(ItemInReservation.class)) {
+			return selectAllItemInReservationQuery((ItemInReservation) entity);
+		}
+		if (entityType.equals(ItemInShop.class)) {
+			return selectAllItemInShopQuery((ItemInShop) entity);
+		}
+		logMessage("generateSelectAllQuery method received unsupported entity, type: " + entity.getClass().getName());
+		return null;
+	}
+
+	/**
+	 * 
+	 * Generate "SELECT" query by the received {@link IEntity} type and states, this
+	 * query should select only one {@link IEntity} by the {@link IEntity} ID.
+	 *
+	 * @param <TData>
+	 *            An instance which implements {@link IEntity}.
+	 * @param entity
+	 *            An {@link IEntity} of the requested type.
+	 * @return A "SELECT" query if the type is supported and all the necessary
+	 *         states exists, and <code>null</code> id does not.
+	 */
+	public static <TData extends IEntity> String generateSelectQuery(@NotNull TData entity) {
+		if (entity == null) {
+			logMessage("generateSelectQuery method received null parameter.");
+			return null;
+		}
+
+		Class<? extends IEntity> entityType = entity.getClass();
+		if (entityType.equals(Item.class)) {
+			return selectItemQuery((Item) entity);
+		}
+		if (entityType.equals(Reservation.class)) {
+			return selectReservationQuery((Reservation) entity);
+		}
+		if (entityType.equals(Complaint.class)) {
+			return selectComplaintQuery((Complaint) entity);
+		}
+		if (entityType.equals(ComplaintsReport.class)) {
+			return selectComplaintsReportQuery((ComplaintsReport) entity);
+		}
+		if (entityType.equals(Costumer.class)) {
+			return selectCostumerQuery((Costumer) entity);
+		}
+		if (entityType.equals(CostumerServiceEmployee.class)) {
+			return selectCostumerServiceEmployeeQuery((CostumerServiceEmployee) entity);
+		}
+		if (entityType.equals(IncomesReport.class)) {
+			return selectIncomesReportQuery((IncomesReport) entity);
+		}
+		if (entityType.equals(ReservationsReport.class)) {
+			return selectReservationsReportQuery((ReservationsReport) entity);
+		}
+		if (entityType.equals(ShopCostumer.class)) {
+			return selectShopCostumerQuery((ShopCostumer) entity);
+		}
+		if (entityType.equals(ShopEmployee.class)) {
+			return selectShopEmployeeQuery((ShopEmployee) entity);
+		}
+		if (entityType.equals(ShopManager.class)) {
+			return selectShopManagerQuery((ShopManager) entity);
+		}
+		if (entityType.equals(Survey.class)) {
+			return selectSurveyQuery((Survey) entity);
+		}
+		if (entityType.equals(SurveyResult.class)) {
+			return selectSurveyResultQuery((SurveyResult) entity);
+		}
+		if (entityType.equals(SurveysReport.class)) {
+			return selectSurveysReportQuery((SurveysReport) entity);
+		}
+		if (entityType.equals(User.class)) {
+			return selectUserQuery((User) entity);
+		}
+
+		logMessage("generateSelectQuery method received unsupported entity, type: " + entity.getClass().getName());
+		return null;
+	}
+
+	/**
+	 * 
+	 * Generate "UPDATE" query by the received {@link IEntity} type and states.
+	 *
+	 * @param <TData>
+	 *            An instance which implements {@link IEntity}.
+	 * @param entity
+	 *            An {@link IEntity} of the requested type.
+	 * @return A "UPDATE" query if the type is supported and all the necessary
+	 *         states exists, and <code>null</code> id does not.
+	 */
+	public static <TData extends IEntity> String generateUpdateQuery(@NotNull TData entity) {
+		if (entity == null) {
+			logMessage("generateUpdateQuery method method received null parameter.");
+			return null;
+		}
+
+		Class<? extends IEntity> entityType = entity.getClass();
+		if (entityType.equals(Item.class)) {
+			return updateItemQuery((Item) entity);
+		}
+		if (entityType.equals(Reservation.class)) {
+			return updateReservationQuery((Reservation) entity);
+		}
+		if (entityType.equals(Complaint.class)) {
+			return updateComplaintQuery((Complaint) entity);
+		}
+		if (entityType.equals(Costumer.class)) {
+			return updateCostumerQuery((Costumer) entity);
+		}
+		if (entityType.equals(ItemInShop.class)) {
+			return updateItemInShopQuery((ItemInShop) entity);
+		}
+		if (entityType.equals(ShopCostumer.class)) {
+			return updateShopCostumerQuery((ShopCostumer) entity);
+		}
+		if (entityType.equals(ShopEmployee.class)) {
+			return updateShopEmployeeQuery((ShopEmployee) entity);
+		}
+		if (entityType.equals(ShopManager.class)) {
+			return updateShopManagerQuery((ShopManager) entity);
+		}
+		if (entityType.equals(Survey.class)) {
+			return updateSurveyQuery((Survey) entity);
+		}
+		if (entityType.equals(SurveyResult.class)) {
+			return updateSurveyResultQuery((SurveyResult) entity);
+		}
+		if (entityType.equals(User.class)) {
+			return updateUserQuery((User) entity);
+		}
+
+		logMessage("generateUpdateQuery method received unsupported entity, type: " + entity.getClass().getName());
+		return null;
+	}
+	// end region -> Stored Procedures Queries
+
+	// end region -> Public Methods
+
+	private static void logMessage(@NotNull String message) {
+		if (s_logger == null) {
+			s_logger = LogManager.getLogger();
+		}
+		s_logger.warning(message);
+
 	}
 
 	// region Items Entity
 
-	public static String insertItemQuery(Item item) {
+	private static String insertItemQuery(Item item) {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("INSERT INTO items (iName,iType,iPrice,iImage,iDomainColor) VALUES ('");
 		stringBuilder.append(item.getName());
@@ -76,24 +455,22 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String removeItemQuery(Item item) {
+	private static String deleteItemQuery(Item item) {
 
 		int id = item.getId();
 		if (id < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Could not generate remove Item query with impossiable id: " + id);
+			logMessage("Could not generate remove Item query with impossiable id: " + id);
 			return "";
 		}
 
 		return "UPDATE items SET iDeleted = 1 WHERE iId = " + id + " ;";
 	}
 
-	public static String updateItemQuery(Item item) {
+	private static String updateItemQuery(Item item) {
 
 		int id = item.getId();
 		if (id < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Could not generate update Item query with impossiable id: " + id);
+			logMessage("Could not generate update Item query with impossiable id: " + id);
 			return "";
 		}
 
@@ -114,19 +491,18 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String selectItemQuery(Item item) {
+	private static String selectItemQuery(Item item) {
 
 		int id = item.getId();
 		if (id < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Could not generate select Item query with impossiable id: " + id);
+			logMessage("Could not generate select Item query with impossiable id: " + id);
 			return "";
 		}
 
 		return "SELECT * FROM catalog WHERE iId = " + id + " ;";
 	}
 
-	public static String selectAllItemsQuery() {
+	private static String selectAllItemQuery() {
 		return "SELECT * FROM catalog;";
 	}
 
@@ -134,30 +510,28 @@ public class QueryGenerator {
 
 	// region -> User Entity
 
-	public static String selectAllUsersQuery() {
+	private static String selectAllUserQuery() {
 		return "SELECT * FROM users;";
 	}
 
-	public static String selectUserQuery(User user) {
+	private static String selectUserQuery(User user) {
 		String userName = user.getUserName();
 		if (userName == null || userName.isEmpty()) {
-			loggerLazyLoading();
-			s_logger.warning("Could not generate select user query with null or empty username");
+			logMessage("Could not generate select all users query with null or empty username");
 			return null;
 		}
 
 		return "SELECT * FROM users WHERE uUserName = '" + userName + "';";
 	}
 
-	public static String updateUserQuery(User user) {
+	private static String updateUserQuery(User user) {
 		if (user == null) {
 			return null;
 		}
 
 		String userName = user.getUserName();
 		if (!(userName != null && !userName.isEmpty())) {
-			loggerLazyLoading();
-			s_logger.warning("Could not generate update user query with null or empty username");
+			logMessage("Could not generate update user query with null or empty username");
 			return null;
 		}
 
@@ -178,14 +552,11 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String updateAllUsersToDisconnectQuery() {
-		return "UPDATE users SET uStatus = 'Disconnected' WHERE uStatus = 'Connected' ;";
-	}
 	// End region -> User Entity
 
 	// region Costumer Entity
 
-	public static String selectCostumerQuery(Costumer costumer) {
+	private static String selectCostumerQuery(Costumer costumer) {
 		String userName = costumer.getUserName();
 		int costumerId = costumer.getId();
 
@@ -196,24 +567,22 @@ public class QueryGenerator {
 		} else if (userName != null && !userName.isEmpty()) {
 			returningString = "SELECT * FROM costumers WHERE uUserName = '" + userName + "';";
 		} else {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get costumer entity without any identification data.");
+			logMessage("Received request to select costumer entity without any identification data.");
 		}
 		return returningString;
 	}
 
-	public static String selectAllCostumersQuery() {
+	private static String selectAllCostumerQuery() {
 		return "SELECT * FROM costumers;";
 	}
 
-	public static String updateCostumerQuery(Costumer costumer) {
+	private static String updateCostumerQuery(Costumer costumer) {
 		String userName = costumer.getUserName();
 		int costumerId = costumer.getId();
 
 		if (!(costumerId > 0 && userName != null && !userName.isEmpty())) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get costumer entity with impossiable ID's: costumer ID = "
-					+ costumerId + ", user name =" + userName);
+			logMessage("Received request to update costumer entity with impossiable ID's: costumer ID = " + costumerId
+					+ ", user name =" + userName);
 			return null;
 		}
 
@@ -239,27 +608,37 @@ public class QueryGenerator {
 
 	// region -> Reservation Entity
 
-	public static String selectReservationQuery(Reservation reservation) {
+	private static String selectReservationQuery(Reservation reservation) {
 		int id = reservation.getId();
 
 		if (id < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get reservation entity with impossiable id: " + id);
+			logMessage("Received request to select reservation entity with impossiable id: " + id);
 			return null;
 		}
 		return "SELECT * FROM reservations WHERE rId = " + id + ';';
 	}
 
-	public static String selectAllReservationsQuery() {
+	private static String selectAllReservationQuery(Reservation reservation) {
+		int costumerId = reservation.getCostumerId();
+		int shopManagerId = reservation.getShopManagerId();
+
+		if (costumerId > 0 && shopManagerId > 0) {
+			return "SELECT * FROM reservations WHERE cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
+		}
+		if (costumerId > 0) {
+			return "SELECT * FROM reservations WHERE cId = " + costumerId + " ;";
+		}
+		if (shopManagerId > 0) {
+			return "SELECT * FROM reservations WHERE smId = " + shopManagerId + " ;";
+		}
 		return "SELECT * FROM reservations ;";
 
 	}
 
-	public static String updateReservationQuery(Reservation reservation) {
+	private static String updateReservationQuery(Reservation reservation) {
 		int reservationId = reservation.getId();
 		if (reservationId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get reservation entity with impossiable ID: " + reservationId);
+			logMessage("Received request to update reservation entity with impossiable ID: " + reservationId);
 			return null;
 		}
 
@@ -292,13 +671,12 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String insertReservationQuery(Reservation reservation) {
+	private static String insertReservationQuery(Reservation reservation) {
 		int costumerId = reservation.getCostumerId();
 		int shopManagerId = reservation.getShopManagerId();
 
 		if (shopManagerId < 1 || costumerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get reservation entity with impossiable ID's: costumer ID = "
+			logMessage("Received request to insert reservation entity with impossiable ID's: costumer ID = "
 					+ costumerId + ", shop manager ID=" + shopManagerId);
 			return null;
 		}
@@ -336,119 +714,142 @@ public class QueryGenerator {
 
 	// region Survey Entity
 
-	public static String insertSurveyQuery(Survey survey) {
-		int shopManagerId = survey.getId();
+	private static String insertSurveyQuery(Survey survey) {
+		int shopManagerId = survey.getManagerId();
 
 		if (shopManagerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get survey entity with impossiable shop manager ID:" + shopManagerId);
+			logMessage("Received request to insert survey entity with impossiable shop manager ID:" + shopManagerId);
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(
-				"INSERT INTO surveys (suId,suQuestion1,suQuestion2,suQuestion3,suQuestion4,suQuestion5,suQuestion6,suSummary) VALUES ('");
-
-		stringBuilder.append(survey.getFirstQuestion());
+		stringBuilder.append("INSERT INTO surveys (smId,suStartDate,suEndDate) VALUES (");
+		stringBuilder.append(survey.getManagerId());
+		stringBuilder.append(",'");
+		stringBuilder.append(s_dateFormat.format(survey.getStartDate()));
 		stringBuilder.append("','");
-		stringBuilder.append(survey.getSecondQuestion());
-		stringBuilder.append("','");
-		stringBuilder.append(survey.getThirdQuestion());
-		stringBuilder.append("','");
-		stringBuilder.append(survey.getFourthQuestion());
-		stringBuilder.append("','");
-		stringBuilder.append(survey.getFifthQuestion());
-		stringBuilder.append("','");
-		stringBuilder.append(survey.getSixthQuestion());
+		stringBuilder.append(s_dateFormat.format(survey.getEndDate()));
 		stringBuilder.append("');");
 		return stringBuilder.toString();
 	}
 
-	public static String selectSurveyQuery(Survey survey) {
+	private static String selectSurveyQuery(Survey survey) {
 		int id = survey.getId();
 
 		if (id < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get survey entity with impossiable id: " + id);
+			logMessage("Received request to select survey entity with impossiable id: " + id);
 			return null;
 		}
 		return "SELECT * FROM surveys WHERE suId = " + id + ';';
 	}
 
-	public static String selectAllSurveysQuery() {
+	private static String selectAllSurveyQuery() {
 		return "SELECT * FROM surveys ;";
+	}
+
+	private static String updateSurveyQuery(Survey survey) {
+		int id = survey.getId();
+		if (id < 1) {
+			logMessage("Received request to update survey entity with impossiable ID: " + id);
+			return null;
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("UPDATE surveys SET suStartDate = '");
+		stringBuilder.append(s_dateFormat.format(survey.getStartDate()));
+		stringBuilder.append("', suEndDate = '");
+		stringBuilder.append(s_dateFormat.format(survey.getEndDate()));
+		stringBuilder.append("' WHERE suId = ");
+		stringBuilder.append(id);
+		stringBuilder.append(';');
+		return stringBuilder.toString();
 	}
 
 	// end region -> Survey Entity
 
 	// region Complaints Entity
 
-	public static String selectComplaintQuery(Complaint complaint) {
+	private static String selectComplaintQuery(Complaint complaint) {
 		int id = complaint.getId();
-		if (id > 1) {
-			return "SELECT * FROM complaints WHERE coId = " + id + ';';
+		if (id < 1) {
+			logMessage("Received request to select complaint entity with impossiable ID: " + id);
+			return null;
 		}
+
+		return "SELECT * FROM complaints WHERE coId = " + id + ';';
+	}
+
+	private static String selectAllComplaintQuery(Complaint complaint) {
+
+		if (complaint == null) {
+			return "SELECT * from complaints;";
+		}
+
 		int costumerId = complaint.getCostumerId();
 		int shopManagerId = complaint.getShopManagerId();
+		int costumerServiceId = complaint.getCostumerServiceEmployeeId();
 
+		if (costumerId > 0 && shopManagerId > 0 && costumerServiceId > 0) {
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND smId = " + shopManagerId
+					+ " AND cseId = " + costumerServiceId + " ;";
+		}
 		if (costumerId > 0 && shopManagerId > 0) {
-			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND smId = " + shopManagerId + ';';
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
 		}
-
+		if (costumerId > 0 && costumerServiceId > 0) {
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " AND cseId = " + costumerServiceId + " ;";
+		}
+		if (shopManagerId > 0 && costumerServiceId > 0) {
+			return "SELECT * FROM complaints WHERE smId = " + shopManagerId + " AND cseId = " + costumerServiceId
+					+ " ;";
+		}
 		if (costumerId > 0) {
-			return "SELECT * FROM complaints WHERE cId = " + costumerId + ';';
+			return "SELECT * FROM complaints WHERE cId = " + costumerId + " ;";
 		}
-
 		if (shopManagerId > 0) {
-			return "SELECT * FROM complaints WHERE smId = " + shopManagerId + ';';
+			return "SELECT * FROM complaints WHERE smId = " + shopManagerId + " ;";
 		}
-
-		loggerLazyLoading();
-		s_logger.warning("Received request to get complaint entity with impossiable ID's: complaint ID = " + id
-				+ "costumer ID = " + costumerId + ", shop manager ID=" + shopManagerId);
-		return null;
+		if (costumerServiceId > 0) {
+			return "SELECT * FROM complaints WHERE cseId = " + costumerServiceId + " ;";
+		}
+		return "SELECT * from complaints;";
 
 	}
 
-	public static String selectAllComplaintsQuery() {
-		return "SELECT * FROM complaints ;";
-	}
-
-	public static String insertComplaintQuery(Complaint complaint) {
+	private static String insertComplaintQuery(Complaint complaint) {
 		int costumerId = complaint.getCostumerId();
 		int shopManagerId = complaint.getShopManagerId();
-
-		if (shopManagerId < 1 || costumerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get complaint entity with impossiable ID's: costumer ID = "
-					+ costumerId + ", shop manager ID=" + shopManagerId);
+		int costumerServiceEmployeeId = complaint.getCostumerServiceEmployeeId();
+		if (shopManagerId < 1 || costumerId < 1 || costumerServiceEmployeeId < 1) {
+			logMessage("Received request to insert complaint entity with impossiable ID's: costumer ID = " + costumerId
+					+ ", shop manager ID = " + shopManagerId + ", costumer service employee ID = "
+					+ costumerServiceEmployeeId);
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO complaints (cId,smId,coDate,coComplaint,coSummary,coOpened) VALUES (");
+		stringBuilder.append("INSERT INTO complaints (cId,smId,cseId,coDate,coComplaint,coOpened) VALUES (");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
+		stringBuilder.append(',');
+		stringBuilder.append(costumerServiceEmployeeId);
 		stringBuilder.append(",'");
 		stringBuilder.append(s_dateFormat.format(complaint.getCreationDate()));
 		stringBuilder.append("','");
 		stringBuilder.append(complaint.getComplaint());
-		stringBuilder.append("','");
-		stringBuilder.append(complaint.getSummary());
 		stringBuilder.append("',");
 		stringBuilder.append(complaint.isOpened() ? 1 : 0);
 		stringBuilder.append(");");
 		return stringBuilder.toString();
 	}
 
-	public static String updateComplaintQuery(Complaint complaint) {
+	private static String updateComplaintQuery(Complaint complaint) {
 		int id = complaint.getId();
 		int costumerId = complaint.getCostumerId();
 		int shopManagerId = complaint.getShopManagerId();
-
-		if (id < 1 || shopManagerId < 1 || costumerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get complaint entity with impossiable ID's: complain ID = " + id
-					+ ", costumer ID = " + costumerId + ", shop manager ID=" + shopManagerId);
+		int costumerServiceEmployeeId = complaint.getCostumerServiceEmployeeId();
+		if (shopManagerId < 1 || costumerId < 1 || costumerServiceEmployeeId < 1) {
+			logMessage("Received request to update complaint entity with impossiable ID's: costumer ID = " + costumerId
+					+ ", shop manager ID = " + shopManagerId + ", costumer service employee ID = "
+					+ costumerServiceEmployeeId);
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
@@ -470,7 +871,7 @@ public class QueryGenerator {
 
 	// region ItemsInShops Entity
 
-	public static String selectItemInShopsQuery(ItemInShop itemInShop) {
+	private static String selectAllItemInShopQuery(ItemInShop itemInShop) {
 
 		int itemId = itemInShop.getItemId();
 		int shopManagerId = itemInShop.getShopManagerId();
@@ -487,19 +888,17 @@ public class QueryGenerator {
 			return "SELECT * FROM items_in_shops WHERE smId = " + shopManagerId + ';';
 		}
 
-		loggerLazyLoading();
-		s_logger.warning("Received request to get shop item entity with impossiable ID's: item ID = " + itemId
+		logMessage("Received request to select all shop items entity with impossiable ID's: item ID = " + itemId
 				+ ", shop manager ID=" + shopManagerId);
 		return null;
 	}
 
-	public static String updateItemInShopQuery(ItemInShop itemInShop) {
+	private static String updateItemInShopQuery(ItemInShop itemInShop) {
 		int itemId = itemInShop.getItemId();
 		int shopManagerId = itemInShop.getShopManagerId();
 
 		if (shopManagerId < 1 || itemId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop item entity with impossiable ID's: item ID = " + itemId
+			logMessage("Received request to update shop item entity with impossiable ID's: item ID = " + itemId
 					+ ", shop manager ID=" + shopManagerId);
 			return null;
 		}
@@ -508,45 +907,43 @@ public class QueryGenerator {
 		stringBuilder.append("isDiscountedPrice = ");
 		stringBuilder.append(itemInShop.getDiscountedPrice());
 		stringBuilder.append(" WHERE iId = ");
-		stringBuilder.append(itemInShop.getItemId());
+		stringBuilder.append(itemId);
 		stringBuilder.append(" AND smId = ");
-		stringBuilder.append(itemInShop.getShopManagerId());
+		stringBuilder.append(shopManagerId);
 		stringBuilder.append(';');
 
 		return stringBuilder.toString();
 
 	}
 
-	public static String insertItemInShopQuery(ItemInShop itemInShop) {
+	private static String insertItemInShopQuery(ItemInShop itemInShop) {
 		int itemId = itemInShop.getItemId();
 		int shopManagerId = itemInShop.getShopManagerId();
 
 		if (shopManagerId < 1 || itemId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop item entity with impossiable ID's: item ID = " + itemId
+			logMessage("Received request to insert shop item entity with impossiable ID's: item ID = " + itemId
 					+ ", shop manager ID=" + shopManagerId);
 			return null;
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("INSERT INTO items_in_shops (smId,iId,isDiscountedPrice) VALUES (");
-		stringBuilder.append(itemId);
-		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
+		stringBuilder.append(',');
+		stringBuilder.append(itemId);
 		stringBuilder.append(',');
 		stringBuilder.append(itemInShop.getDiscountedPrice());
 		stringBuilder.append(");");
 		return stringBuilder.toString();
 	}
 
-	public static String removeItemInShopQuery(ItemInShop itemInShop) {
+	private static String deleteItemInShopQuery(ItemInShop itemInShop) {
 
 		int itemId = itemInShop.getItemId();
 		int shopManagerId = itemInShop.getShopManagerId();
 
 		if (shopManagerId < 1 || itemId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop item entity with impossiable ID's: item ID = " + itemId
+			logMessage("Received request to remove shop item entity with impossiable ID's: item ID = " + itemId
 					+ ", shop manager ID=" + shopManagerId);
 			return null;
 		}
@@ -554,9 +951,9 @@ public class QueryGenerator {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("DELETE FROM items_in_shops WHERE ");
 		stringBuilder.append("iId = ");
-		stringBuilder.append(itemInShop.getItemId());
+		stringBuilder.append(itemId);
 		stringBuilder.append(" AND smId = ");
-		stringBuilder.append(itemInShop.getShopManagerId());
+		stringBuilder.append(shopManagerId);
 		stringBuilder.append(';');
 		return stringBuilder.toString();
 	}
@@ -565,7 +962,7 @@ public class QueryGenerator {
 
 	// region ItemInReservation Entity
 
-	public static String selectItemsInReservationQuery(ItemInReservation itemInReservation) {
+	private static String selectAllItemInReservationQuery(ItemInReservation itemInReservation) {
 		int itemId = itemInReservation.getItemId();
 		int reservationId = itemInReservation.getReservationId();
 		if (itemId > 0 && reservationId > 0) {
@@ -580,19 +977,17 @@ public class QueryGenerator {
 			return "SELECT * FROM items_in_reservations WHERE rId = " + reservationId + ';';
 		}
 
-		loggerLazyLoading();
-		s_logger.warning("Received request to get reservation item entity with impossiable ID's: item ID = " + itemId
+		logMessage("Received request to select reservation item entity with impossiable ID's: item ID = " + itemId
 				+ ", reservation ID=" + reservationId);
 		return null;
 	}
 
-	public static String insertItemInReservationQuery(ItemInReservation itemInReservation) {
+	private static String insertItemInReservationQuery(ItemInReservation itemInReservation) {
 		int itemId = itemInReservation.getItemId();
 		int reservationId = itemInReservation.getReservationId();
 		if (itemId < 1 || reservationId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get reservation item entity with impossiable ID's: item ID = "
-					+ itemId + ", reservation ID=" + reservationId);
+			logMessage("Received request to insert reservation item entity with impossiable ID's: item ID = " + itemId
+					+ ", reservation ID=" + reservationId);
 			return null;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
@@ -614,7 +1009,7 @@ public class QueryGenerator {
 
 	// region ShopEmployee Entity
 
-	public static String selectShopEmployeeQuery(ShopEmployee shopEmployee) {
+	private static String selectShopEmployeeQuery(ShopEmployee shopEmployee) {
 		String userName = shopEmployee.getUserName();
 		int shopEmployeeId = shopEmployee.getId();
 
@@ -625,21 +1020,42 @@ public class QueryGenerator {
 		} else if (userName != null && !userName.isEmpty()) {
 			returningString = "SELECT * FROM shop_employees WHERE uUserName = '" + userName + "';";
 		} else {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop employee entity without any identification data.");
+			logMessage("Received request to select shop employee entity without any identification data.");
 		}
 		return returningString;
 	}
 
-	public static String selectAllShopEmployeesQuery() {
+	private static String selectAllShopEmployeeQuery() {
 		return "SELECT * FROM shop_employees ;";
 	}
 
+	private static String updateShopEmployeeQuery(ShopEmployee shopEmployee) {
+		String userName = shopEmployee.getUserName();
+		int id = shopEmployee.getId();
+
+		if (userName != null && !userName.isEmpty() && id > 1) {
+			return "UPDATE shop_employees SET smId = " + shopEmployee.getShopManagerId() + " WHERE uUserName = '"
+					+ userName + "' AND seId = " + id + ";";
+		}
+
+		if (userName != null && !userName.isEmpty()) {
+			return "UPDATE shop_employees SET smId = " + shopEmployee.getShopManagerId() + " WHERE uUserName = '"
+					+ userName + "' ;";
+		}
+
+		if (id > 1) {
+			return "UPDATE shop_employees SET smId = " + shopEmployee.getShopManagerId() + " WHERE seId = " + id + ";";
+		}
+
+		logMessage("Received request to update Shop Employee entity with impossiable ID's: username = " + userName
+				+ ", ID=" + id);
+		return null;
+	}
 	// end region -> ShopEmployee Entity
 
 	// region ShopManager Entity
 
-	public static String selectShopManagerQuery(ShopManager shopManager) {
+	private static String selectShopManagerQuery(ShopManager shopManager) {
 		String userName = shopManager.getUserName();
 		int shopManagerId = shopManager.getId();
 
@@ -650,29 +1066,49 @@ public class QueryGenerator {
 		} else if (userName != null && !userName.isEmpty()) {
 			returningString = "SELECT * FROM shop_managers WHERE uUserName = '" + userName + "';";
 		} else {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop manager entity without any identification data.");
+			logMessage("Received request to select shop manager entity without any identification data.");
 		}
 		return returningString;
 	}
 
-	public static String selectShopManagersQuery() {
+	private static String selectAllShopManagerQuery() {
 		return "SELECT * FROM shop_managers ;";
+	}
+
+	private static String updateShopManagerQuery(ShopManager shopManager) {
+		String userName = shopManager.getUserName();
+		int id = shopManager.getId();
+
+		if (userName != null && !userName.isEmpty() && id > 1) {
+			return "UPDATE shop_managers SET smName = '" + shopManager.getName() + "' WHERE uUserName = '" + userName
+					+ "' AND smId = " + id + ";";
+		}
+
+		if (userName != null && !userName.isEmpty()) {
+			return "UPDATE shop_managers SET smName = '" + shopManager.getName() + "' WHERE uUserName = '" + userName
+					+ "' ;";
+		}
+
+		if (id > 1) {
+			return "UPDATE shop_managers SET smName = '" + shopManager.getName() + "' smId = " + id + ";";
+		}
+
+		logMessage("Received request to update shop manager entity with impossiable ID's: username = " + userName
+				+ ", ID=" + id);
+		return null;
 	}
 
 	// end region -> ShopManager Entity
 
 	// region ReservationsReport Entity
 
-	public static String selectReservationsReportQuery(ReservationsReport reservationsReport) {
+	private static String selectReservationsReportQuery(ReservationsReport reservationsReport) {
 		int shopManagerId = reservationsReport.getShopManagerId();
 		Date year = reservationsReport.getYear();
 		int quarter = reservationsReport.getQuarter();
 		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning(
-					"Received request to get reservations report entity with impossiable ID's: Shop Manager ID = "
-							+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
+			logMessage("Received request to select reservations report entity with impossiable ID's: Shop Manager ID = "
+					+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
 		}
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("SELECT * FROM reservations_reports WHERE ");
@@ -686,13 +1122,12 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String selectAllReservationsReportsQuery(ReservationsReport reservationsReport) {
+	private static String selectAllReservationsReportQuery(ReservationsReport reservationsReport) {
 		int shopManagerId = reservationsReport.getShopManagerId();
 		Date year = reservationsReport.getYear();
 		if (shopManagerId < 1 && year == null) {
-			loggerLazyLoading();
-			s_logger.warning(
-					"Received request to get reservations report entity with impossiable ID's: Shop Manager ID = "
+			logMessage(
+					"Received request to select all reservations report entity with impossiable ID's: Shop Manager ID = "
 							+ shopManagerId + ", Year = " + s_yearFormat.format(year));
 		}
 		if (shopManagerId < 1) {
@@ -706,66 +1141,16 @@ public class QueryGenerator {
 				+ s_yearFormat.format(year) + "' ;";
 	}
 
-	public static String insertReservationsReportQuery(ReservationsReport reservationsReport) {
-		int shopManagerId = reservationsReport.getShopManagerId();
-		Date year = reservationsReport.getYear();
-		int quarter = reservationsReport.getQuarter();
-
-		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning(
-					"Received request to get reservations report entity with impossiable ID's: Shop Manager ID = "
-							+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(
-				"INSERT INTO reservations_reports (smId,rrYear,rrQuarter,rrMonth1_Flower,rrMonth1_FlowerPot,rrMonth1_FlowerArrangement,rrMonth1_BridalBouquet,rrMonth2_Flower,rrMonth2_FlowerPot,rrMonth2_FlowerArrangement,rrMonth2_BridalBouquet,rrMonth3_Flower,rrMonth3_FlowerPot,rrMonth3_FlowerArrangement,rrMonth3_BridalBouquet) VALUES (");
-		stringBuilder.append(shopManagerId);
-		stringBuilder.append(",'");
-		stringBuilder.append(s_yearFormat.format(year));
-		stringBuilder.append("',");
-		stringBuilder.append(quarter);
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowersInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerPotsInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerArrangementsInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedBridalBouquetsInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowersInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerPotsInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerArrangementsInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedBridalBouquetsInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowersInThirdMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerPotsInThirdMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedFlowerArrangementsInThirdMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(reservationsReport.getNumberOfOrderedBridalBouquetsInThirdMonth());
-		stringBuilder.append(");");
-		return stringBuilder.toString();
-
-	}
-
 	// end region -> ReservationsReport Entity
 
 	// region IncomesReport Entity
 
-	public static String selectIncomesReportQuery(IncomesReport incomesReport) {
+	private static String selectIncomesReportQuery(IncomesReport incomesReport) {
 		int shopManagerId = incomesReport.getShopManagerId();
 		Date year = incomesReport.getYear();
 		int quarter = incomesReport.getQuarter();
 		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get incomes report entity with impossiable ID's: Shop Manager ID = "
+			logMessage("Received request to select incomes report entity with impossiable ID's: Shop Manager ID = "
 					+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
 		}
 		StringBuilder stringBuilder = new StringBuilder();
@@ -780,12 +1165,11 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String selectAllIncomesReportQuery(IncomesReport incomesReport) {
+	private static String selectAllIncomesReportQuery(IncomesReport incomesReport) {
 		int shopManagerId = incomesReport.getShopManagerId();
 		Date year = incomesReport.getYear();
 		if (shopManagerId < 1 && year == null) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get incomes report entity with impossiable ID's: Shop Manager ID = "
+			logMessage("Received request to select all incomes report entity with impossiable ID's: Shop Manager ID = "
 					+ shopManagerId + ", Year = " + s_yearFormat.format(year));
 		}
 		if (shopManagerId < 1) {
@@ -799,45 +1183,16 @@ public class QueryGenerator {
 				+ s_yearFormat.format(year) + "' ;";
 	}
 
-	public static String insertIncomesReportQuery(IncomesReport incomesReport) {
-		int shopManagerId = incomesReport.getShopManagerId();
-		Date year = incomesReport.getYear();
-		int quarter = incomesReport.getQuarter();
-
-		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get incomes report entity with impossiable ID's: Shop Manager ID = "
-					+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO incomes_reports (smId,irYear,irQuarter,irMonth1,irMonth2,irMonth3) VALUES (");
-		stringBuilder.append(shopManagerId);
-		stringBuilder.append(",'");
-		stringBuilder.append(s_yearFormat.format(year));
-		stringBuilder.append("',");
-		stringBuilder.append(quarter);
-		stringBuilder.append(',');
-		stringBuilder.append(incomesReport.getIncomesInFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(incomesReport.getIncomesInSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(incomesReport.getIncomesInThirdMonth());
-		stringBuilder.append(");");
-		return stringBuilder.toString();
-	}
-
 	// end region -> IncomesReport Entity
 
 	// region SurveysReport Entity
 
-	public static String selectSurveysReportQuery(SurveysReport surveysReport) {
+	private static String selectSurveysReportQuery(SurveysReport surveysReport) {
 		int shopManagerId = surveysReport.getShopManagerId();
 		Date year = surveysReport.getYear();
 		int quarter = surveysReport.getQuarter();
 		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get survey report entity with impossiable ID's: Shop Manager ID = "
+			logMessage("Received request to select survey report entity with impossiable ID's: Shop Manager ID = "
 					+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
 		}
 		StringBuilder stringBuilder = new StringBuilder();
@@ -852,12 +1207,11 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String selectAllSurveysReportQuery(SurveysReport surveysReport) {
+	private static String selectAllSurveysReportQuery(SurveysReport surveysReport) {
 		int shopManagerId = surveysReport.getShopManagerId();
 		Date year = surveysReport.getYear();
 		if (shopManagerId < 1 && year == null) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get surveys report entity with impossiable ID's: Shop Manager ID = "
+			logMessage("Received request to select all surveys report entity with impossiable ID's: Shop Manager ID = "
 					+ shopManagerId + ", Year = " + s_yearFormat.format(year));
 		}
 		if (shopManagerId < 1) {
@@ -871,54 +1225,17 @@ public class QueryGenerator {
 				+ s_yearFormat.format(year) + "' ;";
 	}
 
-	public static String insertSurveysReportQuery(SurveysReport surveysReport) {
-		int shopManagerId = surveysReport.getShopManagerId();
-		Date year = surveysReport.getYear();
-		int quarter = surveysReport.getQuarter();
-
-		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get incomes report entity with impossiable ID's: Shop Manager ID = "
-					+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(
-				"INSERT INTO incomes_reports (smId,srYear,srQuarter,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES (");
-		stringBuilder.append(shopManagerId);
-		stringBuilder.append(",'");
-		stringBuilder.append(s_yearFormat.format(year));
-		stringBuilder.append("',");
-		stringBuilder.append(quarter);
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getFirstAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getSecondAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getThirdAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getFourthAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getFifthAnswerAverage());
-		stringBuilder.append(',');
-		stringBuilder.append(surveysReport.getSixthAnswerAverage());
-		stringBuilder.append(");");
-		return stringBuilder.toString();
-	}
-
 	// end region -> SurveysReport Entity
 
 	// region ComplaintsReport Entity
 
-	public static String selectComplaintsReportQuery(ComplaintsReport complaintsReport) {
+	private static String selectComplaintsReportQuery(ComplaintsReport complaintsReport) {
 		int shopManagerId = complaintsReport.getShopManagerId();
 		Date year = complaintsReport.getYear();
 		int quarter = complaintsReport.getQuarter();
 		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning(
-					"Received request to get complaints report entity with impossiable ID's: Shop Manager ID = "
-							+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
+			logMessage("Received request to select complaints report entity with impossiable ID's: Shop Manager ID = "
+					+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
 		}
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("SELECT * FROM complaints_reports WHERE ");
@@ -932,13 +1249,12 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String selectAllComplaintsReportQuery(ComplaintsReport complaintsReport) {
+	private static String selectAllComplaintsReportQuery(ComplaintsReport complaintsReport) {
 		int shopManagerId = complaintsReport.getShopManagerId();
 		Date year = complaintsReport.getYear();
 		if (shopManagerId < 1 && year == null) {
-			loggerLazyLoading();
-			s_logger.warning(
-					"Received request to get complaints report entity with impossiable ID's: Shop Manager ID = "
+			logMessage(
+					"Received request to select all complaints report entity with impossiable ID's: Shop Manager ID = "
 							+ shopManagerId + ", Year = " + s_yearFormat.format(year));
 		}
 		if (shopManagerId < 1) {
@@ -952,49 +1268,30 @@ public class QueryGenerator {
 				+ s_yearFormat.format(year) + "' ;";
 	}
 
-	public static String insertComplaintsReportQuery(ComplaintsReport complaintsReport) {
-		int shopManagerId = complaintsReport.getShopManagerId();
-		Date year = complaintsReport.getYear();
-		int quarter = complaintsReport.getQuarter();
-
-		if (shopManagerId < 1 || year == null || quarter < 1 || quarter > 4) {
-			loggerLazyLoading();
-			s_logger.warning(
-					"Received request to get complaints report entity with impossiable ID's: Shop Manager ID = "
-							+ shopManagerId + ", Year = " + s_yearFormat.format(year) + ", Quarter = " + quarter);
-		}
-
-		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder
-				.append("INSERT INTO complaints_reports (smId,crYear,crQuarter,crMonth1,crMonth2,crMonth3) VALUES (");
-		stringBuilder.append(shopManagerId);
-		stringBuilder.append(",'");
-		stringBuilder.append(s_yearFormat.format(year));
-		stringBuilder.append("',");
-		stringBuilder.append(quarter);
-		stringBuilder.append(',');
-		stringBuilder.append(complaintsReport.getNumberOfComplaintsFirstMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(complaintsReport.getNumberOfComplaintsSecondMonth());
-		stringBuilder.append(',');
-		stringBuilder.append(complaintsReport.getNumberOfComplaintsThirdMonth());
-		stringBuilder.append(");");
-		return stringBuilder.toString();
-	}
-
 	// end region -> ComplaintsReport Entity
 
 	// region ShopCostumer Entity
 
-	public static String selectShopCostumerQuery(ShopCostumer shopCostumer) {
+	private static String selectShopCostumerQuery(ShopCostumer shopCostumer) {
+		int costumerId = shopCostumer.getCostumerId();
+		int shopManagerId = shopCostumer.getShopManagerId();
+
+		if (shopManagerId < 1 || costumerId < 1) {
+			logMessage("Received request to select shop costumer entity with impossiable ID's: costumer ID = "
+					+ costumerId + ", shop manager ID=" + shopManagerId);
+			return null;
+		}
+
+		return "SELECT * FROM costumers_in_shops WHERE cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
+
+	}
+
+	private static String selectAllShopCostumerQuery(ShopCostumer shopCostumer) {
 		int costumerId = shopCostumer.getCostumerId();
 		int shopManagerId = shopCostumer.getShopManagerId();
 
 		if (shopManagerId < 1 && costumerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop costumer entity with impossiable ID's: costumer ID = "
-					+ costumerId + ", shop manager ID=" + shopManagerId);
-			return null;
+			return "SELECT * FROM costumers_in_shops;";
 		}
 
 		if (costumerId < 1) {
@@ -1005,26 +1302,21 @@ public class QueryGenerator {
 			return "SELECT * FROM costumers_in_shops WHERE cId = " + costumerId + " ;";
 		}
 		return "SELECT * FROM costumers_in_shops WHERE cId = " + costumerId + " AND smId = " + shopManagerId + " ;";
-
 	}
 
-	public static String selectAllShopCostumerReportQuery() {
-		return "SELECT * FROM costumers_in_shops;";
-	}
-
-	public static String insertShopCostumerQuery(ShopCostumer shopCostumer) {
+	private static String insertShopCostumerQuery(ShopCostumer shopCostumer) {
 		int costumerId = shopCostumer.getCostumerId();
 		int shopManagerId = shopCostumer.getShopManagerId();
 
 		if (shopManagerId < 1 || costumerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop costumer entity with impossiable ID's: costumer ID = "
+			logMessage("Received request to insert shop costumer entity with impossiable ID's: costumer ID = "
 					+ costumerId + ", shop manager ID=" + shopManagerId);
 			return null;
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO costumers_in_shops (cId,smId,csCostumerSubscription,csCreditCard,csStartSubscriptionDate) VALUES (");
+		stringBuilder.append(
+				"INSERT INTO costumers_in_shops (cId,smId,csCostumerSubscription,csCreditCard,csStartSubscriptionDate) VALUES (");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(',');
 		stringBuilder.append(shopManagerId);
@@ -1038,12 +1330,11 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String updateShopCostumerQuery(ShopCostumer shopCostumer) {
+	private static String updateShopCostumerQuery(ShopCostumer shopCostumer) {
 		int costumerId = shopCostumer.getCostumerId();
 		int shopManagerId = shopCostumer.getShopManagerId();
 		if (shopManagerId < 1 || costumerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop costumer entity with impossiable ID's: costumer ID = "
+			logMessage("Received request to update shop costumer entity with impossiable ID's: costumer ID = "
 					+ costumerId + ", shop manager ID=" + shopManagerId);
 			return null;
 		}
@@ -1051,11 +1342,13 @@ public class QueryGenerator {
 		stringBuilder.append("UPDATE costumers_in_shops SET ");
 		stringBuilder.append("csCostumerSubscription = '");
 		stringBuilder.append(shopCostumer.getCostumerSubscription());
-		stringBuilder.append("' , csCreditCard = '");
+		stringBuilder.append("', csCreditCard = '");
 		stringBuilder.append(shopCostumer.getCreditCard());
-		stringBuilder.append("' , csStartSubscriptionDate = '");
+		stringBuilder.append("', csStartSubscriptionDate = '");
 		stringBuilder.append(s_dateFormat.format(shopCostumer.getSubscriptionStartDate()));
-		stringBuilder.append("' WHERE cId = ");
+		stringBuilder.append("', csCumulativePrice = ");
+		stringBuilder.append(shopCostumer.getCumulativePrice());
+		stringBuilder.append(" WHERE cId = ");
 		stringBuilder.append(costumerId);
 		stringBuilder.append(" AND smId = ");
 		stringBuilder.append(shopManagerId);
@@ -1063,13 +1356,12 @@ public class QueryGenerator {
 		return stringBuilder.toString();
 	}
 
-	public static String removeShopCostumerQuery(ShopCostumer shopCostumer) {
+	private static String deleteShopCostumerQuery(ShopCostumer shopCostumer) {
 
 		int costumerId = shopCostumer.getCostumerId();
 		int shopManagerId = shopCostumer.getShopManagerId();
 		if (shopManagerId < 1 || costumerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop costumer entity with impossiable ID's: costumer ID = "
+			logMessage("Received request to remove shop costumer entity with impossiable ID's: costumer ID = "
 					+ costumerId + ", shop manager ID=" + shopManagerId);
 			return null;
 		}
@@ -1088,88 +1380,113 @@ public class QueryGenerator {
 
 	// region ShopSurvey Entity
 
-	public static String selectShopSurveyQuery(ShopSurvey shopSurvey) {
-		int id = shopSurvey.getId();
+	private static String selectSurveyResultQuery(SurveyResult surveyResult) {
+		int id = surveyResult.getId();
 		if (id < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop survey entity with impossiable ID = " + id);
+			logMessage("Received request to select survey result entity with impossiable ID = " + id);
 			return null;
 		}
-		return "SELECT * FROM surveys_in_shops WHERE ssId = " + id + " ;";
+		return "SELECT * FROM survey_results WHERE srId = " + id + " ;";
 	}
 
-	public static String selectAllShopSurveyQuery(ShopSurvey shopSurvey) {
-		int surveyId = shopSurvey.getSurveyId();
-		int shopManagerId = shopSurvey.getShopManagerId();
-		if (surveyId < 1 && shopManagerId < 1) {
-			return "SELECT * FROM surveys_in_shops WHERE ssClosed = 0 ;";
-		}
+	private static String selectAllSurveyResultQuery() {
+		return "SELECT * FROM survey_results WHERE srSummary IS NULL ;";
+	}
+
+	private static String insertSurveyResultQuery(SurveyResult surveyResult) {
+		int surveyId = surveyResult.getSurveyId();
 		if (surveyId < 1) {
-			return "SELECT * FROM surveys_in_shops WHERE smId = " + shopManagerId + " AND ssClosed = 0 ;";
-		}
-
-		if (shopManagerId < 1) {
-			return "SELECT * FROM surveys_in_shops WHERE suId = " + surveyId + " AND ssClosed = 0 ;";
-		}
-
-		return "SELECT * FROM surveys_in_shops WHERE suId = " + surveyId + " AND smId = " + shopManagerId
-				+ " AND ssClosed = 0 ;";
-	}
-
-	public static String insertShopSurveyQuery(ShopSurvey shopSurvey) {
-		int surveyId = shopSurvey.getSurveyId();
-		int shopManagerId = shopSurvey.getShopManagerId();
-
-		if (surveyId < 1 || shopManagerId < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop survey entity with impossiable ID's: survey ID = " + surveyId
-					+ ", shop manager ID=" + shopManagerId);
+			logMessage("Received request to insert survey entity with impossiable ID:  " + surveyId);
 			return null;
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("INSERT INTO surveys_in_shops (suId,smId) VALUES (");
+		stringBuilder.append(
+				"INSERT INTO survey_results (suId,srEnterDate,srAnswer1,srAnswer2,srAnswer3,srAnswer4,srAnswer5,srAnswer6) VALUES (");
 		stringBuilder.append(surveyId);
+		stringBuilder.append(",'");
+		stringBuilder.append(s_dateFormat.format(surveyResult.getEnterDate()));
+		stringBuilder.append("',");
+		stringBuilder.append(surveyResult.getFirstAnswer());
 		stringBuilder.append(',');
-		stringBuilder.append(shopManagerId);
+		stringBuilder.append(surveyResult.getSecondAnswer());
+		stringBuilder.append(',');
+		stringBuilder.append(surveyResult.getThirdAnswer());
+		stringBuilder.append(',');
+		stringBuilder.append(surveyResult.getFourthAnswer());
+		stringBuilder.append(',');
+		stringBuilder.append(surveyResult.getFifthAnswer());
+		stringBuilder.append(',');
+		stringBuilder.append(surveyResult.getSixthAnswer());
 		stringBuilder.append(");");
 		return stringBuilder.toString();
 	}
 
-	public static String updateShopSurveyQuery(ShopSurvey shopSurvey) {
-		int id = shopSurvey.getId();
+	private static String updateSurveyResultQuery(SurveyResult surveyResult) {
+		int id = surveyResult.getId();
 
 		if (id < 1) {
-			loggerLazyLoading();
-			s_logger.warning("Received request to get shop survey entity with impossiable ID = " + id);
+			logMessage("Received request to update shop survey entity with impossiable ID = " + id);
 			return null;
 		}
 
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("UPDATE surveys_in_shops SET ");
-		stringBuilder.append("ssAnswer1 = ");
-		stringBuilder.append(shopSurvey.getAnswer1());
-		stringBuilder.append(", ssAnswer2 = ");
-		stringBuilder.append(shopSurvey.getAnswer2());
-		stringBuilder.append(", ssAnswer3 = ");
-		stringBuilder.append(shopSurvey.getAnswer3());
-		stringBuilder.append(", ssAnswer4 = ");
-		stringBuilder.append(shopSurvey.getAnswer4());
-		stringBuilder.append(", ssAnswer5 = ");
-		stringBuilder.append(shopSurvey.getAnswer5());
-		stringBuilder.append(", ssAnswer6 = ");
-		stringBuilder.append(shopSurvey.getAnswer6());
-		stringBuilder.append(", ssNumberOfAnswers = ");
-		stringBuilder.append(shopSurvey.getNumberOfAnswers());
-		stringBuilder.append(", ssSummary = '");
-		stringBuilder.append(shopSurvey.getSummary());
-		stringBuilder.append("', ssClosed = ");
-		stringBuilder.append(shopSurvey.isClosed() ? 1 : 0);
-		stringBuilder.append(" WHERE ssId = ");
+		stringBuilder.append("UPDATE survey_results SET ");
+		stringBuilder.append("suId = ");
+		stringBuilder.append(surveyResult.getSurveyId());
+		stringBuilder.append(", srEnterDate = '");
+		stringBuilder.append(s_dateFormat.format(surveyResult.getEnterDate()));
+		stringBuilder.append("', srAnswer1 = ");
+		stringBuilder.append(surveyResult.getFirstAnswer());
+		stringBuilder.append(", srAnswer2 = ");
+		stringBuilder.append(surveyResult.getSecondAnswer());
+		stringBuilder.append(", srAnswer3 = ");
+		stringBuilder.append(surveyResult.getThirdAnswer());
+		stringBuilder.append(", srAnswer4 = ");
+		stringBuilder.append(surveyResult.getFourthAnswer());
+		stringBuilder.append(", srAnswer5 = ");
+		stringBuilder.append(surveyResult.getFifthAnswer());
+		stringBuilder.append(", srAnswer6 = ");
+		stringBuilder.append(surveyResult.getSixthAnswer());
+		stringBuilder.append(", srSummary = '");
+		stringBuilder.append(surveyResult.getSummary());
+		stringBuilder.append("' WHERE srId = ");
 		stringBuilder.append(id);
 		stringBuilder.append(" ;");
 		return stringBuilder.toString();
 	}
 	// end region -> ShopSurvey Entity
+
+	// region Costumer Service Employee Entity
+
+	private static String selectCostumerServiceEmployeeQuery(CostumerServiceEmployee costumerServiceEmployee) {
+		int id = costumerServiceEmployee.getId();
+		String userName = costumerServiceEmployee.getUserName();
+
+		if (id > 1 && userName != null && !userName.isEmpty()) {
+			return "SELECT * FROM costumer_service_employees WHERE cseId = " + id + " AND uUserName = '" + userName
+					+ "' ;";
+
+		}
+		if (id > 1) {
+			return "SELECT * FROM costumer_service_employees WHERE cseId = " + id + " ;";
+		}
+
+		if (userName != null && !userName.isEmpty()) {
+			return "SELECT * FROM costumer_service_employees WHERE uUserName = '" + userName + "' ;";
+
+		}
+
+		logMessage(
+				"Received request to select costumer service employee entity with impossiable ID's: costumer service ID = "
+						+ id + ", user name = " + userName);
+		return null;
+	}
+
+	private static String selectAllCostumerServiceEmployeeQuery() {
+		return "SELECT * FROM costumer_service_employees;";
+	}
+
+	// end region -> Costumer Service Employee Entity
 
 }

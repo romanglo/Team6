@@ -10,13 +10,13 @@ import java.util.logging.Logger;
 import com.sun.istack.internal.Nullable;
 
 import logger.LogManager;
-import newMessages.Message;
+import messages.Message;
 import ocsf.client.AbstractClient;
 
 /**
  *
- * Client: Implement connection to a sever and transfer data.
- * 
+ * Client: Implementation of {@link AbstractClient} that can receive and send
+ * {@link Message} type message.
  */
 public class Client extends AbstractClient
 {
@@ -40,7 +40,7 @@ public class Client extends AbstractClient
 		 *             The method can throw any kind of exception, this method call
 		 *             surround with try/catch.
 		 * 
-		 * @see {@link Message} the received type.
+		 * @see Message the received type.
 		 */
 		void onMessageReceived(Message msg) throws Exception;
 	}
@@ -194,6 +194,12 @@ public class Client extends AbstractClient
 		}
 	}
 
+	/**
+	 * Handles a message sent from the server to this client.
+	 *
+	 * @param obj
+	 *            the received message from server.
+	 */
 	@Override
 	public void handleMessageFromServer(Object obj)
 	{
@@ -232,7 +238,7 @@ public class Client extends AbstractClient
 	 *            - Information sent from the UI.
 	 * @return true if the sending succeed and false if does not.
 	 */
-	public boolean sendMessageToServer(Object data)
+	public boolean sendMessageToServer(Message data)
 	{
 		boolean returningValue = true;
 		try {
@@ -248,7 +254,11 @@ public class Client extends AbstractClient
 	// end region -> Public Methods
 
 	// region Protected Methods
-	
+
+	/**
+	 * Hook method called after a connection has been established. The method invoke
+	 * the {@link ClientStatusHandler#onClientConnected()} if it exists.
+	 */
 	@Override
 	protected void connectionEstablished()
 	{
@@ -260,10 +270,13 @@ public class Client extends AbstractClient
 		if (m_clientStatusHandler != null) {
 			m_clientStatusHandler.onClientConnected();
 		}
-		
-		
+
 	}
-	
+
+	/**
+	 * Hook method called after the connection has been closed. The method invoke
+	 * the {@link ClientStatusHandler#onClientDisconnected()} if it exists.
+	 */
 	@Override
 	protected void connectionClosed()
 	{
@@ -272,12 +285,20 @@ public class Client extends AbstractClient
 		if (m_incomingMessagesConsumingTask != null) {
 			m_incomingMessagesConsumingTask.stopTask();
 		}
-		
+
 		if (m_clientStatusHandler != null) {
 			m_clientStatusHandler.onClientDisconnected();
 		}
 	}
 
+	/**
+	 * Hook method called each time an exception is thrown by the client's thread
+	 * that is waiting for messages from the server. This method call
+	 * {@link #connectionClosed()} if the connection with the server closed.
+	 *
+	 * @param exception
+	 *            the exception raised.
+	 */
 	@Override
 	protected void connectionException(Exception exception)
 	{
@@ -296,7 +317,7 @@ public class Client extends AbstractClient
 	}
 
 	// end region -> Protected Methods
-	
+
 	// region Nested Classes
 
 	/**

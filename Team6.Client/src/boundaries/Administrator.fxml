@@ -1,21 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ComboBox?>
 
-<AnchorPane minHeight="285.0" minWidth="380.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="372.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AdministratorController">
-	<children>
+<BorderPane xmlns="http://javafx.com/javafx/8.0.152"
+	xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.AdministratorController">
+	<top>
+		<BorderPane fx:id="borderpain_main_top" styleClass="header-section">
+			<left>
+				<Label text="Zer-Li">
+					<font>
+						<Font name="Britannic Bold" size="52" />
+					</font>
+				</Label>
+			</left>
+			<right>
+				<VBox>
+					<Button onAction="#onLogoutButtonPressed" text="Logout">
+						<graphic>
+							<ImageView fx:id="imageview_logout_button" fitHeight="24"
+								fitWidth="24" pickOnBounds="true" preserveRatio="true" />
+						</graphic>
+					</Button>
+					<Button onAction="#onAccountButtonPressed" text="Account">
+						<graphic>
+							<ImageView fx:id="imageview_account_button" fitHeight="24"
+								fitWidth="24" pickOnBounds="true" preserveRatio="true" />
+						</graphic>
+					</Button>
+				</VBox>
+			</right>
+		</BorderPane>
+	</top>
+	<left>
+		<VBox fx:id="vbox_sidebar" styleClass="sidebar-section" />
+	</left>
+	<center>
+		<AnchorPane BorderPane.alignment="TOP_LEFT">
+			<children>
+				<AnchorPane fx:id="anchorpane_welcome"
+					AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="5.0"
+					AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="0.0">
+					<ImageView fx:id="imageview_welcome" fitHeight="300"
+						pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0"
+						AnchorPane.rightAnchor="0.0" />
+					<VBox styleClass="content-section-label"
+						AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+						<Label text="Welcome">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="52" />
+							</font>
+						</Label>
+						<Label text="Back,">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="52" />
+							</font>
+						</Label>
+						<Label fx:id="label_username">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="52" />
+							</font>
+						</Label>
+					</VBox>
+				</AnchorPane>
+				<AnchorPane fx:id="anchorpane_option1" visible="false"
+					styleClass="content-section">
+					<children>
+						<ComboBox fx:id="comboBox_user" layoutX="170.0" layoutY="70.0"
+							onAction="#userSelected" prefWidth="150.0" promptText="Select username" />
+						<ComboBox fx:id="comboBox_status" layoutX="170.0"
+							layoutY="120.0" prefWidth="150.0" />
+						<ComboBox fx:id="comboBox_privillge" layoutX="170.0"
+							layoutY="170.0" prefWidth="150.0" />
+						<Button fx:id="button_update1" layoutX="170.0" layoutY="220.0"
+							mnemonicParsing="false" onAction="#updatebtn1" text="Update" />
+						<Label layoutX="40.0" layoutY="75.0" text="Username" />
+						<Label fx:id="label_status" layoutX="40.0" layoutY="125.0"
+							text="Status" />
+						<Label fx:id="label_privillege" layoutX="40.0" layoutY="175.0"
+							text="Privilege" />
+						<Label text="Update User Status">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="36" />
+							</font>
+						</Label>
 
-		<AnchorPane layoutY="79.0" prefHeight="368.0" prefWidth="450.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="75.0">
-         <children>
-            <Button layoutX="59.0" layoutY="99.0" mnemonicParsing="false" onAction="#changeCustomerCoordinates" text="Change customer coordinates" /> 
-            <Button layoutX="59.0" layoutY="166.0" mnemonicParsing="false" text="Update customer status and privilge" onAction="#updateUserStatus" />
-            <Button layoutX="59.0" layoutY="229.0" mnemonicParsing="false" text="Exit from system" onAction="#closeWindow" />
-         </children></AnchorPane>
-
-		<!--  Title: -->
-		<ImageView fx:id="imageview_gif" fitHeight="84.0" fitWidth="59.0" layoutX="336.0" layoutY="6.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="6.0" />
-		<ImageView fx:id="imageview_title" fitHeight="48.0" fitWidth="154.0" layoutX="14.0" layoutY="6.0" pickOnBounds="true" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="6.0" />
-	</children>
-</AnchorPane>
+					</children>
+				</AnchorPane>
+				<AnchorPane fx:id="anchorpane_option21" visible="false"
+					styleClass="content-section">
+					<children>
+						<ComboBox fx:id="comboBox_user1" layoutX="170.0" layoutY="70.0"
+							onAction="#userSelected1" prefWidth="150.0" promptText="Select username" />
+						<Button text="Update" layoutX="170.0" layoutY="270"
+							mnemonicParsing="false" fx:id="button_update" onAction="#updatebtn" />
+						<TextField fx:id="textField_email" layoutX="170"
+							layoutY="120.0" />
+						<TextField fx:id="textField_password" layoutX="170"
+							layoutY="170.0" />
+						<TextField fx:id="textField_branch" layoutX="170"
+							layoutY="220.0" />
+						<TextField fx:id="textField_shopManagerId" layoutX="170"
+							layoutY="220.0" />
+						<Label text="Username" layoutX="35" layoutY="70" />
+						<Label text="Email" layoutX="35" layoutY="120" fx:id="label_email" />
+						<Label text="Password" layoutX="35" layoutY="170" fx:id="label_password" />
+						<Label text="Branch" layoutX="35" layoutY="220" fx:id="label_branch" />
+						<Label text="Shop manager ID" layoutX="35" layoutY="220"
+							fx:id="label_shopManagerId" />
+						<Label text="Update User Coordinates">
+							<font>
+								<Font name="Berlin Sans FB Demi Bold" size="36" />
+							</font>
+						</Label>
+					</children>
+				</AnchorPane>
+			</children>
+			<BorderPane.margin>
+				<Insets left="5.0" top="5.0" />
+			</BorderPane.margin>
+		</AnchorPane>
+	</center>
+	<bottom>
+		<BorderPane styleClass="footer-section">
+			<center>
+				<Label text="© 2018 Group 6">
+					<BorderPane.margin>
+						<Insets />
+					</BorderPane.margin>
+				</Label>
+			</center>
+			<right>
+				<Circle fx:id="circle_connection_status" fill="GREY" radius="12"
+					stroke="BLACK" strokeType="INSIDE">
+					<effect>
+						<DropShadow color="#00000084" />
+					</effect>
+					<BorderPane.margin>
+						<Insets right="5.0" top="1.0" />
+					</BorderPane.margin>
+				</Circle>
+			</right>
+		</BorderPane>
+	</bottom>
+</BorderPane>

@@ -6,6 +6,8 @@ import java.util.logging.Logger;
 
 import com.sun.istack.internal.NotNull;
 
+import logger.LogManager;
+
 /**
  *
  * Startable: Base abstract implementation to {@link IStartable} interface.
@@ -29,10 +31,14 @@ public abstract class Startable implements IStartable
 	// region Constructors
 
 	/**
+	 * Create instance of {@link ScheduledExecutor}.
+	 * 
+	 * @see IStartable
+	 * 
 	 * @param throwable
 	 *            if true the method {@link IStartable#Start()} will throw
 	 *            {@link RuntimeException} on error case. if false only the
-	 *            {@link StartableState} will changed.
+	 *            {@link IStartable} state will changed.
 	 * @param logger
 	 *            A logger to write to it.
 	 */
@@ -45,9 +51,55 @@ public abstract class Startable implements IStartable
 		m_Id = getClass().getName();
 
 		m_running = false;
-		
+
 	}
 
+	/**
+	 * 
+	 * Create instance of {@link ScheduledExecutor}, get logger from
+	 * {@link LogManager#getLogger()}.
+	 * 
+	 * @see Startable#Startable(boolean, Logger)
+	 * @see IStartable
+	 * 
+	 * @param throwable
+	 *            if true the method {@link IStartable#Start()} will throw
+	 *            {@link RuntimeException} on error case. if false only the
+	 *            {@link IStartable} state will changed.
+	 */
+	protected Startable(boolean throwable)
+	{
+		this(throwable, LogManager.getLogger());
+	}
+
+	/**
+	 * Create instance of {@link ScheduledExecutor}. This instance would not throws
+	 * exceptions in {@link IStartable#Start()} method.
+	 * 
+	 * @see Startable#Startable(boolean, Logger)
+	 * @param logger
+	 *            A logger to write to it.
+	 */
+	protected Startable(@NotNull Logger logger)
+	{
+		this(false, logger);
+	}
+
+	/**
+	 * 
+	 * Create instance of {@link ScheduledExecutor}, get logger from
+	 * {@link LogManager#getLogger()}. This instance would not throws exceptions in
+	 * {@link IStartable#Start()} method.
+	 * 
+	 * @see Startable#Startable(boolean, Logger)
+	 * 
+	 * @see IStartable
+	 * 
+	 */
+	protected Startable()
+	{
+		this(false, LogManager.getLogger());
+	}
 	// end region -> Constructors
 
 	// region Getters
@@ -131,12 +183,18 @@ public abstract class Startable implements IStartable
 	// region Abstract Methods
 
 	/**
-	 * The method contain the real login in stop operation.
+	 * The method contain the real login in stop operation, this method called from exception safe scope.
+	 * 
+	 * @throws Exception
+	 *             an exception if the initial stop failed.
 	 */
 	protected abstract void initialStop() throws Exception;
 
 	/**
 	 * The method contain the real login in start operation.
+	 * 
+	 * @throws Exception
+	 *             an exception if the initial start failed, this method called from exception safe scope.
 	 */
 	protected abstract void initialStart() throws Exception;
 

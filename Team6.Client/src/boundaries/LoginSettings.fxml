@@ -17,11 +17,11 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="300" prefWidth="300" nodeOrientation="LEFT_TO_RIGHT"
-	xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1"
+	xmlns="http://javafx.com/javafx/8.0.152" xmlns:fx="http://javafx.com/fxml/1"
 	fx:controller="controllers.LoginSettingsController">
 	<children>
 		<TableView fx:id="setting_table" editable="true" layoutX="20.0"
-			layoutY="18.0" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="0.0"
+			layoutY="18.0" AnchorPane.bottomAnchor="67" AnchorPane.leftAnchor="0.0"
 			AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
 			<columns>
 				<TableColumn fx:id="tablecolumn_setting" editable="false"
@@ -34,8 +34,8 @@
 			</columnResizePolicy>
 		</TableView>
 		<Button fx:id="btn_update_settings" mnemonicParsing="false"
-			onAction="#updateSettingsFile" prefHeight="24.0" prefWidth="80.0"
-			text="Update file" AnchorPane.bottomAnchor="11.0"
+			onAction="#updateSettingsFile" prefHeight="20.0" prefWidth="150"
+			text="Update Default Settings" AnchorPane.bottomAnchor="11.0"
 			AnchorPane.rightAnchor="14.0" />
 	</children>
 </AnchorPane>

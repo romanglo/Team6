@@ -4,15 +4,15 @@ package controllers;
 import java.util.ArrayList;
 import java.util.Date;
 
-import newEntities.Costumer;
-import newEntities.EntitiesEnums.CostumerSubscription;
-import newEntities.EntitiesEnums.ReservationDeliveryType;
-import newEntities.EntitiesEnums.ReservationType;
-import newEntities.IEntity;
-import newEntities.Item;
-import newEntities.ItemInReservation;
-import newEntities.Reservation;
-import newEntities.ShopCostumer;
+import entities.Costumer;
+import entities.IEntity;
+import entities.Item;
+import entities.ItemInReservation;
+import entities.Reservation;
+import entities.ShopCostumer;
+import entities.EntitiesEnums.CostumerSubscription;
+import entities.EntitiesEnums.ReservationDeliveryType;
+import entities.EntitiesEnums.ReservationType;
 
 /**
  *
@@ -73,6 +73,14 @@ public class Costumer_SavedData
 	public static Integer getCostumerId()
 	{
 		return s_costumer.getId();
+	}
+	
+	/**
+	 * @return the cumulative price
+	 */
+	public static float getCumulativePrice()
+	{
+		return s_shopCostumer.getCumulativePrice();
 	}
 	
 	/**
@@ -195,6 +203,15 @@ public class Costumer_SavedData
 	}
 	
 	/**
+	 * @param cumulativePrice
+	 *            the cumulative price to set
+	 */
+	public static void setCumulativePrice(float cumulativePrice)
+	{
+		s_shopCostumer.setCumulativePrice(cumulativePrice);
+	}
+	
+	/**
 	 * Upgrade the shop of the costumer.
 	 *
 	 * @param shopCostumer
@@ -273,6 +290,27 @@ public class Costumer_SavedData
 				}
 			}
 			s_itemsInReservation.add(item);
+		}
+	}
+	
+	/**
+	 * Remove the {@link IEntity} from the reservation list of the costumer.
+	 *
+	 * @param item
+	 *            the item to remove.
+	 */
+	public static void removeItemFromReservation(IEntity item)
+	{
+		ItemInReservation recievedItem = (ItemInReservation) item;
+		if (s_itemsInReservation != null) {
+			for (IEntity entity : s_itemsInReservation) {
+				ItemInReservation itemInReservation = (ItemInReservation) entity;
+				if (recievedItem.getItemId() == itemInReservation.getItemId()) {
+					recievedItem = itemInReservation;
+					break;
+				}
+			}
+			s_itemsInReservation.remove(recievedItem);
 		}
 	}
 

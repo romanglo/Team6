@@ -1,90 +1,72 @@
 
 package controllers;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
-import client.ApplicationEntryPoint;
-import client.Client;
-import client.ClientConfiguration;
+
+import entities.IEntity;
+import entities.SurveyResult;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import logger.LogManager;
-import newEntities.IEntity;
-import newEntities.ShopSurvey;
-import newEntities.Survey;
-import newMessages.EntitiesListData;
-import newMessages.EntityData;
-import newMessages.IMessageData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
-import newMessages.RespondMessageData;
+import javafx.scene.layout.AnchorPane;
+import messages.EntitiesListData;
+import messages.IMessageData;
+import messages.Message;
+import messages.MessagesFactory;
+import messages.RespondMessageData;
 
 /**
  *
- * ServiceSpecialistController : ServiceSpecialist can enter summery and update
- * the survey.
+ * ServiceSpecialistController: manages the service specialist UI.
+ * 
+ * @see BaseController
  * 
  */
-public class ServiceSpecialistController
-		implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class ServiceSpecialistController extends BaseController
 {
-	/* UI Binding Fields region */
 
-	// Title images :
-	@FXML private ImageView imageview_gif;
+	// region Fields
 
-	@FXML private ImageView imageview_title;
+	private @FXML AnchorPane anchorpane_option1;
 
-	@FXML private ComboBox<String> combobox_id;
+	private @FXML ImageView imageview_gif;
 
-	@FXML private TextField textfield_question1;
+	private @FXML ImageView imageview_title;
 
-	@FXML private TextField textfield_question2;
+	private @FXML ComboBox<String> combobox_id;
 
-	@FXML private TextField textfield_question3;
+	private @FXML TextField textfield_question1;
 
-	@FXML private TextField textfield_question4;
+	private @FXML TextField textfield_question2;
 
-	@FXML private TextField textfield_question5;
+	private @FXML TextField textfield_question3;
 
-	@FXML private TextField textfield_question6;
+	private @FXML TextField textfield_question4;
 
-	@FXML private TextField textfield_answer1;
+	private @FXML TextField textfield_question5;
 
-	@FXML private TextField textfield_answer2;
+	private @FXML TextField textfield_question6;
 
-	@FXML private TextField textfield_answer3;
+	private @FXML TextField textfield_answer1;
 
-	@FXML private TextField textfield_answer4;
+	private @FXML TextField textfield_answer2;
 
-	@FXML private TextField textfield_answer5;
+	private @FXML TextField textfield_answer3;
 
-	@FXML private TextField textfield_answer6;
+	private @FXML TextField textfield_answer4;
 
-	@FXML private TextArea textarea_analysis;
+	private @FXML TextField textfield_answer5;
 
-	/* End of --> UI Binding Fields region */
+	private @FXML TextField textfield_answer6;
 
-	/* Fields */
-	private Logger m_logger;
-
-	private Client m_client;
-
-	private ClientConfiguration m_configuration;
+	private @FXML TextArea textarea_analysis;
 
 	private ObservableList<String> m_list;
 
@@ -92,200 +74,180 @@ public class ServiceSpecialistController
 
 	private ArrayList<String> m_surveysid_array = new ArrayList<String>();
 
-	private ShopSurvey selected_survey;
+	private SurveyResult selected_survey;
 
-	/* End of --> Fields region */
+	private String[] questions = { "How likely is it that you would recommended our company?",
+			"How well do our porducts meet your needs?", "How would you rate the quality of our products?",
+			"How would you rate the value for money of the product?",
+			"How likely are you to purchase any of our products again?",
+			"How would you rate the shopping experience in our shop?" };
 
-	/* Initializing methods region */
+	// end region -> Fields
+
+	// region BaseController Implementation
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void initialize(URL url, ResourceBundle rb)
+	protected void internalInitialize() throws Exception
 	{
-		initializeFields();
-		initializeImages();
-		initializeClientHandler();
-		initializesurveys();
+		textarea_analysis.textProperty().addListener((observable, old_value, new_value) -> {
+			if (new_value.length() == 501) {
+				textarea_analysis.setText(old_value);
+			}
+		});
 	}
 
-	private void initializeFields()
-	{
-		m_logger = LogManager.getLogger();
-		m_configuration = ApplicationEntryPoint.ClientConfiguration;
-		m_client = ApplicationEntryPoint.Client;
-	}
-
-	private void initializeImages()
-	{
-		InputStream serverGif = getClass().getResourceAsStream("/boundaries/images/Flower.gif");
-		if (serverGif != null) {
-			Image image = new Image(serverGif);
-			imageview_gif.setImage(image);
-		}
-		InputStream title = getClass().getResourceAsStream("/boundaries/images/Zerli_Headline.jpg");
-		if (title != null) {
-			Image image = new Image(title);
-			imageview_title.setImage(image);
-		}
-	}
-
-	private void initializeClientHandler()
-	{
-		m_client.setMessagesHandler(this);
-		m_client.setClientStatusHandler(this);
-	}
-
-	private void initializesurveys()
-	{
-		combobox_id.setValue("");
-		ShopSurvey shopsurvey_entity = new ShopSurvey();
-		Message msg = MessagesFactory.createGetAllEntityMessage(shopsurvey_entity);
-		m_client.sendMessageToServer(msg);
-	}
-
-	/* End of --> Initializing methods region */
-
-	/* UI events region */
 	/**
-	 * Adds questions and answers in the right place when choosing a survey.
-	 *
-	 * @param event
-	 *            Combo box clicked.
+	 * {@inheritDoc}
 	 */
-	@FXML
-	public void selectSurvey(ActionEvent event)
+	@Override
+	protected boolean onSelection(String title)
 	{
-		if ((combobox_id.getValue() == null) || (combobox_id.getValue().equals(""))) return;
-		int id = Integer.parseInt(combobox_id.getValue());
-		for (int i = 0; i < m_survey_array.size(); i++) {
-			if (id == ((ShopSurvey) m_survey_array.get(i)).getId())
-				selected_survey = (ShopSurvey) m_survey_array.get(i);
+		switch (title) {
+			case "Add analysis":
+				anchorpane_option1.setVisible(true);
+				javafx.application.Platform.runLater(() -> {
+					initializesurveys();
+				});
+			break;
 		}
-		textfield_answer1.setText(Integer.toString(selected_survey.getAnswer1()));
-		textfield_answer2.setText(Integer.toString(selected_survey.getAnswer2()));
-		textfield_answer3.setText(Integer.toString(selected_survey.getAnswer3()));
-		textfield_answer4.setText(Integer.toString(selected_survey.getAnswer4()));
-		textfield_answer5.setText(Integer.toString(selected_survey.getAnswer5()));
-		textfield_answer6.setText(Integer.toString(selected_survey.getAnswer6()));
-		Survey survey_entity = new Survey();
-		survey_entity.setId(selected_survey.getSurveyId());
-		Message msg = MessagesFactory.createGetEntityMessage(survey_entity);
-		m_client.sendMessageToServer(msg);
+		return true;
 	}
 
 	/**
-	 * Updating and closing the survey.
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String[] getSideButtonsNames()
+	{
+		return new String[] { "Add analysis" };
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void onMessageReceived(Message msg) throws Exception
+	{
+		IMessageData messageData = msg.getMessageData();
+		if (messageData instanceof EntitiesListData) {
+			if (((EntitiesListData) messageData).getEntities().get(0) instanceof SurveyResult) {
+				m_survey_array = ((EntitiesListData) messageData).getEntities();
+				m_surveysid_array.clear();
+				for (int i = 0; i < m_survey_array.size(); i++) {
+					if (((SurveyResult) m_survey_array.get(i)).getSummary() == null)
+						m_surveysid_array.add(Integer.toString(((SurveyResult) m_survey_array.get(i)).getId()));
+				}
+				javafx.application.Platform.runLater(() -> {
+					setInCombobox();
+				});
+
+			}
+		} else {
+			if (messageData instanceof RespondMessageData) {
+				if ((((RespondMessageData) messageData).isSucceed())) {
+					m_Logger.severe("successfully updated");
+					javafx.application.Platform.runLater(() -> {
+						initializesurveys();
+						showAlertMessage("Successfully added", AlertType.INFORMATION);
+					});
+
+				}
+			}
+		}
+	}
+
+	// end region -> BaseController Implementation
+
+	// UI events region
+
+	/**
+	 * Update the complaints add specialist analysis
 	 *
 	 * @param event
 	 *            save button clicked.
 	 */
 	@FXML
-	public void saveAnalysis(ActionEvent event)
+	private void saveAnalysis(ActionEvent event)
 	{
-		if ((textarea_analysis.getText().equals("")) || (combobox_id.getValue().equals(""))) {
-			showInformationMessage("Specialist analisys area Or survey id is empty");
-		} else {
-			selected_survey.setSummary(textarea_analysis.getText());
-			selected_survey.setClosed(true);
-			Message msg = MessagesFactory.createUpdateEntityMessage(selected_survey);
-			m_client.sendMessageToServer(msg);
-			combobox_id.setDisable(true);
-			combobox_id.getItems().clear();
-			m_survey_array.clear();
-			m_surveysid_array.clear();
-			initializesurveys();
-			combobox_id.setDisable(false);
+		if(combobox_id.getValue() == null) {
+			showAlertMessage("Please select survey to analisys.", AlertType.WARNING);
 			textarea_analysis.clear();
-			textfield_answer1.clear();
-			textfield_answer2.clear();
-			textfield_answer3.clear();
-			textfield_answer4.clear();
-			textfield_answer5.clear();
-			textfield_answer6.clear();
-			textfield_question1.clear();
-			textfield_question2.clear();
-			textfield_question3.clear();
-			textfield_question4.clear();
-			textfield_question5.clear();
-			textfield_question6.clear();
-		}
-	}
-
-	/* End of --> UI events region */
-
-	/* Private methods region */
-
-	private void showInformationMessage(String message)
-	{
-		if (message == null || message.isEmpty()) {
 			return;
 		}
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-		alert.showAndWait();
-	}
-	/* End of --> Private methods region */
-
-	/* Client handlers implementation region */
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public synchronized void onMessageReceived(Message msg) throws Exception
-	{
-		IMessageData messageData = msg.getMessageData();
-		if (messageData instanceof EntitiesListData) {
-			if (((EntitiesListData) messageData).getEntities().get(0) instanceof ShopSurvey) {
-				m_survey_array = ((EntitiesListData) messageData).getEntities();
-				for (int i = 0; i < m_survey_array.size(); i++) {
-					if (!(((ShopSurvey) m_survey_array.get(i)).isClosed()))
-						m_surveysid_array.add(Integer.toString(((ShopSurvey) m_survey_array.get(i)).getId()));
-				}
-				m_list = FXCollections.observableArrayList(m_surveysid_array);
-				combobox_id.setItems(m_list);
-			}
+		if ((textarea_analysis.getText().equals("")) || (combobox_id.getValue().equals(""))) {
+			showAlertMessage("Specialist analisys area and/or survey ID are empty", AlertType.WARNING);
+		} else if(textarea_analysis.getText().length() > 200) {
+			showAlertMessage("Specialist analisys limited to 200 charters.", AlertType.WARNING);
 		} else {
-			if (messageData instanceof EntityData) {
-				if (((EntityData) messageData).getEntity() instanceof Survey) {
-					textfield_question1.setText(((Survey) ((EntityData) messageData).getEntity()).getFirstQuestion());
-					textfield_question2.setText(((Survey) ((EntityData) messageData).getEntity()).getSecondQuestion());
-					textfield_question3.setText(((Survey) ((EntityData) messageData).getEntity()).getThirdQuestion());
-					textfield_question4.setText(((Survey) ((EntityData) messageData).getEntity()).getFourthQuestion());
-					textfield_question5.setText(((Survey) ((EntityData) messageData).getEntity()).getFifthQuestion());
-					textfield_question6.setText(((Survey) ((EntityData) messageData).getEntity()).getSixthQuestion());
-				}
-			} else {
-				if (messageData instanceof RespondMessageData) {
-					if ((((RespondMessageData) messageData).isSucceed())) {
-						m_logger.severe("successfully updated");
-					}
-				}
-			}
+			selected_survey.setSummary(textarea_analysis.getText());
+			Message msg = MessagesFactory.createUpdateEntityMessage(selected_survey);
+			m_Client.sendMessageToServer(msg);
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onClientConnected()
+	private void initializesurveys()
 	{
-		// TODO Shimon : Add event handling
+		textfield_answer1.clear();
+		textfield_answer2.clear();
+		textfield_answer3.clear();
+		textfield_answer4.clear();
+		textfield_answer5.clear();
+		textfield_answer6.clear();
+		textfield_question1.clear();
+		textfield_question2.clear();
+		textfield_question3.clear();
+		textfield_question4.clear();
+		textfield_question5.clear();
+		textfield_question6.clear();
+		m_surveysid_array.clear();
+		textarea_analysis.clear();
+		SurveyResult shopsurvey_entity = new SurveyResult();
+		Message msg = MessagesFactory.createGetAllEntityMessage(shopsurvey_entity);
+		m_Client.sendMessageToServer(msg);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void onClientDisconnected()
+	@FXML
+	private void selectSurvey(ActionEvent event)
 	{
-		// TODO Shimon : Add event handling
+		if (combobox_id.getValue() == null) {
+			return;
+		}
+		if (combobox_id.getValue().equals("")) return;
+		int id = Integer.parseInt(combobox_id.getValue());
+
+		SurveyResult correct_survey = null;
+		for (int i = 0; i < m_survey_array.size(); i++) {
+			if (((SurveyResult) m_survey_array.get(i)).getId() == id) {
+				correct_survey = (SurveyResult) m_survey_array.get(i);
+			}
+		}
+
+		selected_survey = correct_survey;
+		textfield_answer1.setText(Integer.toString(correct_survey.getFirstAnswer()));
+		textfield_answer2.setText(Integer.toString(correct_survey.getSecondAnswer()));
+		textfield_answer3.setText(Integer.toString(correct_survey.getThirdAnswer()));
+		textfield_answer4.setText(Integer.toString(correct_survey.getFourthAnswer()));
+		textfield_answer5.setText(Integer.toString(correct_survey.getFifthAnswer()));
+		textfield_answer6.setText(Integer.toString(correct_survey.getSixthAnswer()));
+		textfield_question1.setText(questions[0]);
+		textfield_question2.setText(questions[1]);
+		textfield_question3.setText(questions[2]);
+		textfield_question4.setText(questions[3]);
+		textfield_question5.setText(questions[4]);
+		textfield_question6.setText(questions[5]);
 	}
 
-	/* End of --> Client handlers implementation region */
+	private void setInCombobox()
+	{
+		javafx.application.Platform.runLater(() -> {
+			m_list = FXCollections.observableArrayList(m_surveysid_array);
+			combobox_id.getItems().clear();
+			combobox_id.setItems(m_list);
+		});
+	}
+
+	// End of -> UI event region
 }

@@ -1,7 +1,9 @@
 
 package controllers;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,9 +13,41 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import common.AlertBuilder;
+import entities.User;
+import javafx.animation.FadeTransition;
+import javafx.application.Platform;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Tooltip;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Duration;
 import logger.LogManager;
+import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
@@ -23,10 +57,32 @@ import logger.LogManager;
  * 
  * @see Initializable
  * @see client.Client.ClientStatusHandler
- * 
+ * @see client.Client.MessageReceiveHandler
  */
-public abstract class BaseController implements Initializable, Client.ClientStatusHandler
+public abstract class BaseController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
+
+	// region UI Fields
+
+	private @FXML ImageView imageview_logo;
+
+	private @FXML BorderPane borderpain_main_top;
+
+	private @FXML VBox vbox_sidebar;
+
+	private @FXML AnchorPane anchorpane_welcome;
+
+	private @FXML ImageView imageview_welcome;
+
+	private @FXML ImageView imageview_account_button;
+
+	private @FXML ImageView imageview_logout_button;
+
+	private @FXML Label label_username;
+
+	private @FXML Circle circle_connection_status;
+
+	// end region UI Fields
 
 	// region Fields
 
@@ -38,10 +94,40 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 
 	protected ClientConfiguration m_Configuration;
 
+	protected User m_ConnectedUser;
+
 	private Timer m_timer;
 
 	private int m_reconnectAttemptNumber;
+
+	private ToggleButton m_currentPressedButton = null;
+
+	private RadialGradient m_redGradient;
+
+	private RadialGradient m_greenGradient;
+
+	private Tooltip m_connectedToolTip;
+
+	private Tooltip m_disconnectedToolTip;
+
 	// end region -> Fields
+
+	// region Getters
+
+	/**
+	 * @return the pressed button in side bar text that received in
+	 *         {@link BaseController#getSideButtonsNames()}, if never pressed button
+	 *         the method will return <code>null</code>.
+	 */
+	protected String getPressedButton()
+	{
+		if (m_currentPressedButton == null) {
+			return null;
+		}
+		return m_currentPressedButton.getText();
+	}
+
+	// end region -> Getters
 
 	// region Constructors
 
@@ -69,10 +155,16 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 		m_Logger = LogManager.getLogger();
 		m_Client = ApplicationEntryPoint.Client;
 		m_Configuration = ApplicationEntryPoint.ClientConfiguration;
+		m_ConnectedUser = ApplicationEntryPoint.ConnectedUser;
 
 		m_Client.setClientStatusHandler(this);
+		m_Client.setMessagesHandler(this);
+		if (!m_Client.isConnected()) {
+			onClientDisconnected();
+		}
 
 		try {
+			initalizeBaseWindow();
 			internalInitialize();
 		}
 		catch (Exception ex) {
@@ -81,13 +173,219 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 		}
 	}
 
-	/**
-	 * The method called when the controller initialized. The default implementation
-	 * does nothing, it may be overridden by extending class.
-	 */
-	protected abstract void internalInitialize() throws Exception;
+	private void initalizeBaseWindow()
+	{
+		initializeContent();
+		initializeTopBar();
+		initializeSideBar();
+		initializeBottomBar();
+	}
 
 	// end region -> initialize Implementation Methods
+
+	// region Base Window Methods
+
+	private void initializeBottomBar()
+	{
+		double centerX = circle_connection_status.getCenterX();
+		double centerY = circle_connection_status.getCenterY();
+		double radius = circle_connection_status.getRadius();
+		m_redGradient = new RadialGradient(0, .1, centerX, centerY, radius, false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.ORANGERED), new Stop(1, Color.RED));
+		m_greenGradient = new RadialGradient(0, .1, centerX, centerY, radius, false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.GREENYELLOW), new Stop(1, Color.GREEN));
+
+		m_connectedToolTip = new Tooltip();
+		m_connectedToolTip.setText("Connected to server.");
+		m_disconnectedToolTip = new Tooltip();
+		m_disconnectedToolTip.setText("Disonnected from server,\ntrying to reconnect every 10 seconds.");
+		setConnectionCircleStatus(m_Client.isConnected());
+
+	}
+
+	private void setConnectionCircleStatus(boolean connected)
+	{
+		Platform.runLater(() -> {
+			if (connected) {
+				circle_connection_status.setFill(m_greenGradient);
+				Tooltip.install(circle_connection_status, m_connectedToolTip);
+			} else {
+				circle_connection_status.setFill(m_redGradient);
+				Tooltip.install(circle_connection_status, m_disconnectedToolTip);
+			}
+		});
+	}
+
+	private void initializeSideBar()
+	{
+		ObservableList<Node> children = vbox_sidebar.getChildren();
+
+		String[] buttons = getSideButtonsNames();
+		for (String button : buttons) {
+			ToggleButton toggleButton = new ToggleButton();
+			toggleButton.setText(button);
+			toggleButton.setOnAction((action) -> onSideBarButtonPressed(action));
+			children.add(toggleButton);
+		}
+	}
+
+	private void initializeTopBar()
+	{
+		InputStream account = getClass().getResourceAsStream("/boundaries/images/account.png");
+		if (account != null) {
+			Image accountImage = new Image(account);
+			imageview_account_button.setImage(accountImage);
+		}
+
+		InputStream logout = getClass().getResourceAsStream("/boundaries/images/logout.png");
+		if (logout != null) {
+			Image logoutImage = new Image(logout);
+			imageview_logout_button.setImage(logoutImage);
+		}
+	}
+
+	private void initializeContent()
+	{
+		InputStream tulips = getClass().getResourceAsStream("/boundaries/images/tulips.jpg");
+		if (tulips != null) {
+			Image image = new Image(tulips);
+			imageview_welcome.setImage(image);
+		}
+
+		label_username.setText(m_ConnectedUser.getUserName());
+	}
+
+	private void onSideBarButtonPressed(ActionEvent event)
+	{
+		Object source = event.getSource();
+		if (!(source instanceof ToggleButton)) {
+			m_Logger.warning("Receiven onAction event of the side bar not from toggle button! Received type: "
+					+ source.getClass().getName());
+			return;
+		}
+		ToggleButton pressedButton = (ToggleButton) source;
+
+		String selection = pressedButton.getText();
+
+		if (m_currentPressedButton == null) {
+
+			if (!onSelection(selection)) {
+				m_Logger.info("Selection denied by the implemanting class. The Selection: " + selection);
+				pressedButton.setSelected(false);
+				return;
+			}
+			anchorpane_welcome.setVisible(false);
+			m_currentPressedButton = pressedButton;
+			return;
+		}
+
+		if (pressedButton == m_currentPressedButton) {
+			pressedButton.setSelected(true);
+			return;
+		}
+
+		if (!onSelection(selection)) {
+			m_Logger.info("Selection denied by the implemanting class. The Selection: " + selection);
+			pressedButton.setSelected(false);
+			return;
+		}
+
+		for (Node node : vbox_sidebar.getChildren()) {
+			if (!(node instanceof ToggleButton) || node == pressedButton) {
+				continue;
+			}
+			((ToggleButton) node).setSelected(false);
+		}
+
+		pressedButton.setSelected(true);
+		m_currentPressedButton = pressedButton;
+	}
+
+	@FXML
+	private void onLogoutButtonPressed(ActionEvent event)
+	{
+		Alert alert = new AlertBuilder().setAlertType(AlertType.CONFIRMATION)
+				.setContentText("Do you really want to log out?").build();
+		Optional<ButtonType> confirmationResult = alert.showAndWait();
+		if (confirmationResult.get() != ButtonType.OK) {
+			return;
+		}
+		try {
+			if (m_ConnectedUser != null) {
+				Message logoutMessage = MessagesFactory.createLogoutMessage(m_ConnectedUser.getUserName(),
+						m_ConnectedUser.getPassword());
+				m_Client.sendMessageToServer(logoutMessage);
+			}
+			ApplicationEntryPoint.ConnectedUser = null;
+			m_Client.setMessagesHandler(null);
+			m_Client.setClientStatusHandler(null);
+			m_Client.closeConnection();
+
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/boundaries/Login.fxml"));
+			Parent root = (Parent) loader.load();
+			LoginController controller = (LoginController) loader.getController();
+			Scene scene = new Scene(root);
+			scene.getStylesheets().add(getClass().getResource("/boundaries/login.css").toExternalForm());
+			Stage loginStage = new Stage();
+			loginStage.setScene(scene);
+			loginStage.setWidth(700);
+			loginStage.setHeight(500);
+			loginStage.setTitle("Zer-Li");
+			loginStage.setResizable(false);
+			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
+			if (iconResource != null) {
+				Image icon = new Image(iconResource);
+				loginStage.getIcons().add(icon);
+			}
+			controller.intializeKeyHandler(scene);
+			loginStage.show();
+		}
+		catch (Exception ex) {
+			m_Logger.severe("Failed on try to log out, the application will shut down. exception: " + ex.getMessage());
+			showAlertMessage("Error!\nFailed on try to logout, the aplication shutting down.. ", AlertType.ERROR);
+		}
+
+		Stage stage = (Stage) borderpain_main_top.getScene().getWindow();
+		if (stage != null) {
+			stage.close();
+		} else {
+			borderpain_main_top.getScene().getWindow().hide();
+		}
+	}
+
+	@FXML
+	private void onAccountButtonPressed(ActionEvent event)
+	{
+		try {
+			Stage currentStage = (Stage) borderpain_main_top.getScene().getWindow();
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/boundaries/UserDetails.fxml"));
+			Parent parent = (Parent) fxmlLoader.load();
+			FadeTransition ft = new FadeTransition(Duration.seconds(1.5), parent);
+			ft.setFromValue(0.0);
+			ft.setToValue(1.0);
+			ft.play();
+			Scene scene = new Scene(parent);
+			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+			Stage nextStage = new Stage();
+			nextStage.setScene(scene);
+			nextStage.setResizable(false);
+			nextStage.initModality(Modality.WINDOW_MODAL);
+			nextStage.initStyle(StageStyle.DECORATED);
+			nextStage.initOwner(currentStage);
+			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
+			if (iconResource != null) {
+				Image icon = new Image(iconResource);
+				nextStage.getIcons().add(icon);
+			}
+			nextStage.showAndWait();
+		}
+		catch (Exception e) {
+			m_Logger.severe("Failed on try to load the user details window, excepion: " + e.getMessage());
+			showAlertMessage("Your account details could not be loaded at this time..", AlertType.ERROR);
+		}
+	}
+
+	// end region -> Base Controller Methods
 
 	// region Client.ClientStatusHandler Implementation Methods
 
@@ -98,11 +396,11 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	public final void onClientConnected()
 	{
 		m_Logger.info("Reconnected to the server successfully");
+		setConnectionCircleStatus(true);
 		if (m_timer != null) {
 			m_timer.cancel();
 			m_timer = null;
 		}
-
 		try {
 			onReconnectToServer();
 		}
@@ -114,22 +412,16 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	}
 
 	/**
-	 * Hook method called after a connection has been established. The default
-	 * implementation does nothing, it may be overridden by extending class.
-	 */
-	protected void onReconnectToServer()
-	{
-
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void onClientDisconnected()
+	public final void onClientDisconnected()
 	{
+		setConnectionCircleStatus(false);
+
 		if (m_Client == null) {
 			m_Logger.info("Disconnected from the server, unable to reconnect due to Client instance is null!");
+			return;
 		}
 
 		m_Logger.info("Disconnected from the server, reconnect attempt will happen every "
@@ -146,22 +438,134 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 							+ ex.getMessage());
 		}
 	}
+	// end region -> Client.ClientStatusHandler Implementation Methods
+
+	// region Public & Protected Methods
 
 	/**
-	 * Hook method called after the connection has been closed due to an method
-	 * calling or exception. The default implementation does nothing. The default
+	 * 
+	 * {@link BaseController} dispose methods, should be called on {@link Stage}
+	 * closing sequence.
+	 *
+	 */
+	public final void dispose()
+	{
+		try {
+			if (m_timer != null) {
+				m_timer.cancel();
+				m_timer = null;
+			}
+			internalDispose();
+			m_Logger.info("Base controller disposed successfully");
+		}
+		catch (Exception ex) {
+			m_Logger.info("Base controller failed on try to dispose! Exception: " + ex.getMessage());
+		}
+	}
+
+	/**
+	 * The method show alert message from {@link Alert} type.
+	 *
+	 * @param message
+	 *            the message to show.
+	 * 
+	 * @param alertType
+	 *            the type of the alert, selected type determinate ton the title and
+	 *            the image.
+	 */
+	protected void showAlertMessage(String message, AlertType alertType)
+	{
+		if (message == null || message.isEmpty()) {
+			return;
+		}
+		javafx.application.Platform.runLater(() -> {
+			Alert alert = new AlertBuilder().setAlertType(alertType).setContentText(message).build();
+			alert.showAndWait();
+		});
+	}
+
+	// end region -> Public Methods
+
+	// region Abstract Methods
+
+	/**
+	 * The method called when the controller initialized. The default implementation
+	 * does nothing, it may be overridden by extending class. The method called from
+	 * exception safe scope.
+	 * 
+	 * @throws Exception
+	 *             an exception if the initial stop failed.
+	 */
+	protected abstract void internalInitialize() throws Exception;
+
+	/**
+	 * 
+	 * This method invoked when any button pressed in the side bar.
+	 *
+	 * @param title
+	 *            the name of the selected option, as received in
+	 *            {@link BaseController#getSideButtonsNames}.
+	 * @return <code>true</code> if the selection approved and <code>false</code> if
+	 *         does not.
+	 */
+	protected abstract boolean onSelection(String title);
+
+	/**
+	 * 
+	 * This method implemented by inherit class, and get the names of the options at
+	 * the side bar.
+	 *
+	 * @return An array of the name of the option at the side bar.
+	 */
+	protected abstract String[] getSideButtonsNames();
+
+	// end region -> Abstract Methods
+
+	// region Optional Event Methods
+
+	/**
+	 * Event method called after a connection has been established. The default
 	 * implementation does nothing, it may be overridden by extending class.
 	 */
-	private void onDisconnectFromServer() throws Exception
+	protected void onReconnectToServer()
 	{
 
 	}
 
-	// end region -> Client.ClientStatusHandler Implementation Methods
+	/**
+	 * Event method called after the connection has been closed due to an method
+	 * calling or exception. The default implementation does nothing. The default
+	 * implementation does nothing, it may be overridden by extending class. This
+	 * method called from exception safe scope.
+	 * 
+	 * @throws Exception
+	 *             an exception if the initial stop failed.
+	 */
+	protected void onDisconnectFromServer() throws Exception
+	{
+
+	}
+
+	/**
+	 * Event method called when the controller has been disposed. The default
+	 * implementation does nothing, it may be overridden by extending class.
+	 */
+	protected void internalDispose()
+	{
+
+	}
+
+	// end region -> Optional Event Methods
 
 	// region Nested Classes
 
-	class ReconnectTimerTask extends TimerTask
+	/**
+	 * 
+	 * ReconnectTimerTask: An extend of {@link TimerTask} that related to the
+	 * reconnection attempts.
+	 *
+	 */
+	private class ReconnectTimerTask extends TimerTask
 	{
 
 		@Override
@@ -183,42 +587,4 @@ public abstract class BaseController implements Initializable, Client.ClientStat
 	}
 
 	// end region -> Nested Classes
-
-	// region Methods
-
-	/**
-	 * 
-	 * {@link BaseController} dispose methods, should be called on {@link Stage}
-	 * closing sequence.
-	 *
-	 */
-	public final void dispose()
-	{
-
-		try {
-			if (m_Client != null) {
-				m_Client.setClientStatusHandler(null);
-			}
-			if (m_timer != null) {
-				m_timer.cancel();
-				m_timer = null;
-			}
-			internalDispose();
-			m_Logger.info("Base controller disposed successfully");
-		}
-		catch (Exception ex) {
-			m_Logger.info("Base controller failed on try to dispose! Exception: " + ex.getMessage());
-		}
-	}
-
-	/**
-	 * Hook method called when the controller has been disposed. The default
-	 * implementation does nothing, it may be overridden by extending class.
-	 */
-	protected void internalDispose()
-	{
-
-	}
-
-	// end region -> Public Methods
 }

@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import common.AlertBuilder;
 import configurations.ConnectivityConfiguration;
 import configurations.DbConfiguration;
 import configurations.ServerConfiguration;
@@ -29,6 +30,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
@@ -38,10 +40,13 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.RadialGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import logger.LogManager;
-import javafx.scene.control.Label;
+import entities.User;
 
 /**
  *
@@ -51,59 +56,38 @@ import javafx.scene.control.Label;
 public class ServerController implements Initializable, Server.ServerStatusHandler, Server.ClientConnectionHandler {
 	// region UI Elements
 
-	@FXML
-	private TabPane tabpane;
+	private @FXML TabPane tabpane;
 
 	/* Database start-stop button declaration */
-	@FXML
-	private Button btn_db_start;
-	@FXML
-	private Button btn_db_stop;
+	private @FXML Button btn_db_start;
+	private @FXML Button btn_db_stop;
 
 	/* Database status declaration */
-	@FXML
-	private Circle circle_db_on;
-	@FXML
-	private Circle circle_db_off;
+	private @FXML Circle circle_db_on;
+	private @FXML Circle circle_db_off;
 
 	/* Connectivity start-stop button declaration */
 
-	@FXML
-	private Button btn_connectivity_start;
-	@FXML
-	private Button btn_connectivity_stop;
+	private @FXML Button btn_connectivity_start;
+	private @FXML Button btn_connectivity_stop;
 
 	/* Connectivity status declaration */
-	@FXML
-	private Circle circle_connectivity_on;
-	@FXML
-	private Circle circle_connectivity_off;
-	@FXML
-	private Label label_numberOfConnectedUsers;
+	private @FXML Circle circle_connectivity_on;
+	private @FXML Circle circle_connectivity_off;
+	private @FXML Label label_numberOfConnectedUsers;
 
 	/* Log text view declaration */
-	@FXML
-	private TextArea textarea_log;
+	private @FXML TextArea textarea_log;
 
 	/* Setting table declaration */
-	@FXML
-	private TableView<SettingsRow> setting_table;
-	@FXML
-	private TableColumn<SettingsRow, String> tablecolumn_setting;
-	@FXML
-	private TableColumn<SettingsRow, String> tablecolumn_value;
-	@FXML
-	private TableColumn<SettingsRow, String> tablecolumn_type;
-	@FXML
-	private Button btn_update_settings;
+	private @FXML TableView<SettingsRow> setting_table;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_setting;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_value;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_region;
 
 	/* Title images */
-	@FXML
-	private ImageView imageview_gif;
-	@FXML
-	private ImageView imageview_title;
-	@FXML
-	Button btn_run_logger_file;
+	private @FXML ImageView imageview_gif;
+	private @FXML Button btn_run_logger_file;
 
 	// end region -> UI Elements
 
@@ -141,19 +125,31 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		initializeConfigurationTable();
 	}
 
+	/**
+	 * This method initialize all the images in {@link ServerController}.
+	 */
 	private void initializeImages() {
 		InputStream serverGif = getClass().getResourceAsStream("ServerGIF.gif");
 		if (serverGif != null) {
 			Image image = new Image(serverGif);
 			imageview_gif.setImage(image);
 		}
-		InputStream title = getClass().getResourceAsStream("Zerli_Headline.jpg");
-		if (title != null) {
-			Image image = new Image(title);
-			imageview_title.setImage(image);
-		}
+
+		RadialGradient dbRed = new RadialGradient(0, .1, circle_db_off.getCenterX(), circle_db_off.getCenterY(),
+				circle_db_off.getRadius(), false, CycleMethod.NO_CYCLE, new Stop(0, Color.ORANGERED),
+				new Stop(1, Color.RED));
+		circle_db_off.setFill(dbRed);
+
+		RadialGradient connectivityRed = new RadialGradient(0, .1, circle_connectivity_off.getCenterX(),
+				circle_connectivity_off.getCenterY(), circle_connectivity_off.getRadius(), false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.ORANGERED), new Stop(1, Color.RED));
+		circle_connectivity_off.setFill(connectivityRed);
 	}
 
+	/**
+	 * The method initialize {@link ServerController#setting_table} and set
+	 * necessary triggers.
+	 */
 	private void initializeConfigurationTable() {
 		setting_table.setRowFactory(param -> {
 			TableRow<SettingsRow> tableRow = new TableRow<>();
@@ -177,27 +173,37 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 					}
 					if (rowData.getType().equals(ConnectivityConfiguration.CONFIGURATION_TYPE_NAME)) {
 						int port;
+						boolean wrongInput = false;
 						try {
 							port = Integer.parseInt(resultString);
-							m_configuration.getConnectivityConfiguration().setPort(port);
-							m_server.setPort(port);
-							if (m_server.isListening()) {
-								showInformationMessage(
-										"Attention: You must reopen application connection for the changes to take effect!");
+							if (port >= 0 && port <= 65636) {
+								m_configuration.getConnectivityConfiguration().setPort(port);
+								m_server.setPort(port);
+								if (m_server.isListening()) {
+									showAlertMessage(
+											"Attention: You must reopen application connection for the changes to take effect!",
+											AlertType.WARNING);
+								}
+							} else {
+								wrongInput = true;
 							}
 						} catch (NumberFormatException e) {
+							wrongInput = true;
+						}
+						if (wrongInput) {
+							showAlertMessage("The port must be an number between 0 to 65535!", AlertType.ERROR);
 							return;
 						}
 					} else {
 						m_configuration.getDbConfiguration().updateValueByName(rowData.getSetting(), resultString);
 						if (m_dbContoller.isRunning()) {
-							showInformationMessage(
-									"Attention: You must reopen database connection for the changes to take effect!");
+							showAlertMessage(
+									"Attention: You must reopen database connection for the changes to take effect!",
+									AlertType.WARNING);
 						}
 					}
 					rowData.setValue(resultString);
 					drawContantToTable();
-					btn_update_settings.setDisable(false);
 					String msg = "The Configuration " + rowData.getType() + '-' + rowData.getSetting()
 							+ " value changed to " + rowData.getValue();
 					m_logger.info(msg);
@@ -207,15 +213,16 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			});
 			return tableRow;
 		});
-		tablecolumn_type.setCellValueFactory(new PropertyValueFactory<>("type"));
+		tablecolumn_region.setCellValueFactory(new PropertyValueFactory<>("type"));
 		tablecolumn_setting.setCellValueFactory(new PropertyValueFactory<>("setting"));
 		tablecolumn_value.setCellValueFactory(new PropertyValueFactory<>("value"));
 
 		drawContantToTable();
-
-		btn_update_settings.setDisable(true);
 	}
 
+	/**
+	 * Initialize {@link ServerController} internal logic.
+	 */
 	private void initializeServerLogic() {
 		m_server.setServerActionHandler(this);
 		m_server.setClientConnectionHandler(this);
@@ -225,6 +232,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		m_server.setMessagesHandler(m_messageResolver);
 	}
 
+	/**
+	 * Initialize {@link ServerController} fields.
+	 */
 	private void initializeFields() {
 		m_dbContoller = ApplicationEntryPoint.DbContoller;
 		m_server = ApplicationEntryPoint.Server;
@@ -236,17 +246,28 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	// end region -> Initializable Implementation
 
 	// region UI Methods
-
-	@FXML
-	private void startDb(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_db_start} and try
+	 * to open connection with the DB.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void startDb(ActionEvent event) {
 		try {
 			addMessageToLog("Trying to connect to the database with the configuration: "
 					+ m_configuration.getDbConfiguration().toString());
 			m_dbContoller.Start();
 			btn_db_start.setDisable(true);
 			btn_db_stop.setDisable(false);
-			circle_db_on.setFill(Paint.valueOf("green"));
-			circle_db_off.setFill(Paint.valueOf("grey"));
+
+			final RadialGradient green = new RadialGradient(0, .1, circle_db_on.getCenterX(), circle_db_on.getCenterY(),
+					circle_db_on.getRadius(), false, CycleMethod.NO_CYCLE, new Stop(0, Color.GREENYELLOW),
+					new Stop(1, Color.GREEN));
+			circle_db_on.setFill(green);
+
+			circle_db_off.setFill(Color.GREY);
 
 		} catch (Exception e) {
 			addMessageToLog("Failed to disconnect from database, exception : " + e.getMessage());
@@ -259,15 +280,27 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		addMessageToLog("Connected successfully to the database");
 	}
 
-	@FXML
-	private void stopDb(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_db_stop} and try to
+	 * close connection with the DB.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void stopDb(ActionEvent event) {
 		try {
 			addMessageToLog("Trying to disconnect from the database");
 			m_dbContoller.Stop();
 			btn_db_start.setDisable(false);
 			btn_db_stop.setDisable(true);
-			circle_db_on.setFill(Paint.valueOf("grey"));
-			circle_db_off.setFill(Paint.valueOf("red"));
+
+			circle_db_on.setFill(Color.GREY);
+
+			final RadialGradient red = new RadialGradient(0, .1, circle_db_off.getCenterX(), circle_db_off.getCenterY(),
+					circle_db_off.getRadius(), false, CycleMethod.NO_CYCLE, new Stop(0, Color.ORANGERED),
+					new Stop(1, Color.RED));
+			circle_db_off.setFill(red);
 
 		} catch (Exception e) {
 			m_logger.log(Level.SEVERE, "Failed to disconnect from database", event);
@@ -277,8 +310,15 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		addMessageToLog("Disconnected successfully from the database");
 	}
 
-	@FXML
-	private void startConnectivity(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_connectivity_start}
+	 * and try to open {@link Server} connection.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void startConnectivity(ActionEvent event) {
 		String ip;
 		try {
 			ip = InetAddress.getLocalHost().toString();
@@ -298,8 +338,15 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 	}
 
-	@FXML
-	private void stopConnectivity(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_connectivity_stop}
+	 * and try to close {@link Server} connection.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void stopConnectivity(ActionEvent event) {
 		String msg = "Trying to stop TCP\\IP connection";
 		m_logger.info(msg);
 		addMessageToLog(msg);
@@ -312,25 +359,26 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 	}
 
-	@FXML
-	private void updateSettingsFile(ActionEvent event) {
-		m_configuration.updateResourceFile();
-		btn_update_settings.setDisable(true);
-	}
-
-	@FXML
-	private void runLoggerFile(ActionEvent event) {
+	/**
+	 * 
+	 * The method called on click of {@link ServerController#btn_run_logger_file}
+	 * and try to load the logger file.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
+	private @FXML void runLoggerFile(ActionEvent event) {
 		String loggerPath = LogManager.getLoggerPath();
 		if (!(loggerPath != null && !loggerPath.isEmpty())) {
 			m_logger.warning("'Show Text Log' button while the log path not initialized.");
-			showInformationMessage("Text log file did not initialized.");
+			showAlertMessage("Text log file did not initialized.", AlertType.ERROR);
 			return;
 		}
 
 		File file = new File(loggerPath);
 		if (!file.exists()) {
 			m_logger.warning("There is not a log in the receiving log path: " + loggerPath);
-			showInformationMessage("Text logger did not initialized.");
+			showAlertMessage("Text logger did not initialized.", AlertType.ERROR);
 			return;
 		}
 
@@ -338,8 +386,8 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		if (!Desktop.isDesktopSupported()) {
 			m_logger.info(
 					"'Desktop Platform' is not supported in this computer, so it is impossible to open text log file.");
-			showInformationMessage("Error:\nFiles opening platfron are not supported in this computer!\nLog path: \""
-					+ loggerPath + "\"");
+			showAlertMessage("Error:\nFiles opening platfron are not supported in this computer!\nLog path: \""
+					+ loggerPath + "\"", AlertType.ERROR);
 			return;
 
 		}
@@ -350,14 +398,21 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 			desktop.open(file);
 		} catch (IOException ex) {
 			m_logger.severe("Failed on try to open the text logger file! Exception: " + ex.getMessage());
-			showInformationMessage(
-					"Some error occured on try to open the text log file!\nLog path: \"" + loggerPath + "\"");
+			showAlertMessage("Some error occured on try to open the text log file!\nLog path: \"" + loggerPath + "\"",
+					AlertType.ERROR);
 		}
 	}
+
 	// end region -> UI Methods
 
 	// region Private Methods
 
+	/**
+	 * 
+	 * The method draw the {@link ServerConfiguration} to
+	 * {@link ServerController#setting_table}.
+	 *
+	 */
 	private void drawContantToTable() {
 		DbConfiguration dbConfiguration = m_configuration.getDbConfiguration();
 		ConnectivityConfiguration connectivityConfiguration = m_configuration.getConnectivityConfiguration();
@@ -376,20 +431,31 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		setting_table.setItems(settings);
 	}
 
-	private void showInformationMessage(String message) {
+	/**
+	 * The method show alert message from {@link Alert} type.
+	 *
+	 * @param message
+	 *            the message to show.
+	 * @param alertType
+	 *            the type of the alert, selected type determinate ton the title and
+	 *            the image.
+	 */
+	private void showAlertMessage(String message, AlertType alertType) {
 		if (message == null || message.isEmpty()) {
 			return;
 		}
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-
-		alert.showAndWait();
-
-		addMessageToLog(message);
+		javafx.application.Platform.runLater(() -> {
+			Alert alert = new AlertBuilder().setAlertType(alertType).setContentText(message).build();
+			alert.showAndWait();
+		});
 	}
 
+	/**
+	 * The methods print a message to visual logger.
+	 *
+	 * @param msg
+	 *            the message to print.
+	 */
 	private void addMessageToLog(String msg) {
 		if (msg != null && !msg.isEmpty()) {
 			LocalDateTime now = LocalDateTime.now();
@@ -402,6 +468,10 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 	}
 
+	/**
+	 * The methods reset all the 'Connected' {@link User} entities in the DB to be
+	 * 'Disconnected'.
+	 */
 	private void resetUsersStatus() {
 		if (!m_dbContoller.isRunning()) {
 			m_resetUserStatus = true;
@@ -410,7 +480,7 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 		}
 
 		try {
-			String updateAllUsersToDisconnectQuery = QueryGenerator.updateAllUsersToDisconnectQuery();
+			String updateAllUsersToDisconnectQuery = QueryGenerator.generateUpdateAllUsersToDisconnectQuery();
 			boolean executeQuery = m_dbContoller.executeQuery(updateAllUsersToDisconnectQuery);
 			String msg;
 			if (executeQuery) {
@@ -441,8 +511,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 		btn_connectivity_start.setDisable(true);
 		btn_connectivity_stop.setDisable(false);
-		circle_connectivity_on.setFill(Paint.valueOf("green"));
-		circle_connectivity_off.setFill(Paint.valueOf("grey"));
+
+		circle_connectivity_off.setFill(Color.GREY);
+
+		final RadialGradient green = new RadialGradient(0, .1, circle_connectivity_on.getCenterX(),
+				circle_connectivity_on.getCenterY(), circle_connectivity_on.getRadius(), false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.GREENYELLOW), new Stop(1, Color.GREEN));
+		circle_connectivity_on.setFill(green);
+
 		addMessageToLog("TCP\\IP connection opened successfully");
 
 		resetUsersStatus();
@@ -455,8 +531,14 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	public void onServerStopped() {
 		btn_connectivity_start.setDisable(false);
 		btn_connectivity_stop.setDisable(true);
-		circle_connectivity_on.setFill(Paint.valueOf("grey"));
-		circle_connectivity_off.setFill(Paint.valueOf("red"));
+
+		circle_connectivity_on.setFill(Color.GREY);
+
+		final RadialGradient red = new RadialGradient(0, .1, circle_connectivity_off.getCenterX(),
+				circle_connectivity_off.getCenterY(), circle_connectivity_off.getRadius(), false, CycleMethod.NO_CYCLE,
+				new Stop(0, Color.ORANGERED), new Stop(1, Color.RED));
+		circle_connectivity_off.setFill(red);
+
 		addMessageToLog("TCP\\IP connection closed successfully");
 	}
 
@@ -464,6 +546,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 
 	// region Server.ClientConnectionHandler Implementation
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onClientConnected(String clientDetails, int numberOfConnectedClients) {
 		javafx.application.Platform
@@ -472,6 +557,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 				"A client: " + clientDetails + " connected, number of connected clients: " + numberOfConnectedClients);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void onClientDisconnected(String clientDetails, int numberOfConnectedClients) {
 		javafx.application.Platform

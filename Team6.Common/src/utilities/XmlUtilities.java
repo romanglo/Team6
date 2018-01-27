@@ -27,7 +27,7 @@ public class XmlUtilities
 	 *            the buffer of the XML file.
 	 * @param type
 	 *            A class object of the type that XML file describes.
-	 * @return An instance of <TData> if the parsing succeed, and null if did not.
+	 * @return An instance of <code>TData</code> if the parsing succeed, and null if did not.
 	 * @throws Exception
 	 *             If the parsing process failed.
 	 * @throws NullPointerException

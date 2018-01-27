@@ -4,14 +4,26 @@ package controllers;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.sun.istack.internal.Nullable;
 
 import client.ApplicationEntryPoint;
 import client.Client;
+import common.AlertBuilder;
+import entities.IEntity;
+import entities.User;
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.RotateTransition;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.beans.value.WritableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -33,42 +45,43 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import logger.LogManager;
-import newEntities.IEntity;
-import newEntities.User;
-import newMessages.EntityData;
-import newMessages.IMessageData;
-import newMessages.LoginData;
-import newMessages.Message;
-import newMessages.MessagesFactory;
+import messages.EntityData;
+import messages.IMessageData;
+import messages.LoginData;
+import messages.Message;
+import messages.MessagesFactory;
 
 /**
  *
  * LoginController: Create first connection with the server and login to the
- * system.
+ * system, the controller related to 'Login.FXML' and 'LoginSettings.FXML' .
  * 
  */
 public class LoginController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
 {
 	/* UI Binding Fields region */
 
-	@FXML private ImageView imageview_background;
+	private @FXML ImageView imageview_background;
 
-	@FXML private ImageView imageview_usericon;
-
-	@FXML private ImageView btn_imageview_settings;
+	private @FXML ImageView btn_imageview_settings;
 
 	// login fields and buttons :
 
-	@FXML private TextField textField_userName;
+	private @FXML TextField textField_userName;
 
-	@FXML private PasswordField passwordField_userPassword;
+	private @FXML PasswordField passwordField_userPassword;
 
-	@FXML private Button btn_login;
+	private @FXML Button btn_settings;
+
+	private @FXML Button btn_login;
 
 	/* End of --> UI Binding Fields region */
 
@@ -82,12 +95,20 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	private Stage m_connectingStage;
 
+	private RotateTransition m_settingsButtonRotate;
+
 	private boolean m_canceled;
 
 	/* End of --> Fields region */
 
 	/* UI events region */
 
+	/**
+	 * This method is an listener to on action event of login button.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
 	@FXML
 	private void onLoginButtonPressed(ActionEvent event)
 	{
@@ -96,17 +117,17 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		String pasword = passwordField_userPassword.getText();
 
 		if ((userName == null || userName.isEmpty()) && (pasword == null || pasword.isEmpty())) {
-			showInformationMessage("Please enter your username and password.");
+			showAlertMessage("Please enter your username and password.", AlertType.INFORMATION);
 			return;
 		}
 
 		if (userName == null || userName.isEmpty()) {
-			showInformationMessage("Please enter your username.");
+			showAlertMessage("Please enter your username.", AlertType.INFORMATION);
 			return;
 		}
 
 		if (pasword == null || pasword.isEmpty()) {
-			showInformationMessage("Please enter your password.");
+			showAlertMessage("Please enter your password.", AlertType.INFORMATION);
 			return;
 		}
 
@@ -114,36 +135,106 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		m_client.setClientStatusHandler(this);
 
 		if (!m_client.isConnected() && !m_client.createConnectionWithServer()) {
-			showInformationMessage("Failed to connect to server! Please check the settings and try again..");
+			showAlertMessage("Failed to connect to server! Please check the settings and try again.", AlertType.ERROR);
 			return;
 		}
 
 		displayConnectingWindow();
 	}
 
+	/**
+	 * This method is an listener to on action event of settings button.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
 	@FXML
 	private void onSettingsButtonPressed(ActionEvent event)
 	{
 		try {
+			m_settingsButtonRotate.stop();
+			btn_settings.setRotate(0);
 			Stage currentStage = (Stage) btn_login.getScene().getWindow();
 
-			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/boundaries/LoginSettings.FXML"));
+			FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/boundaries/LoginSettings.fxml"));
 			Parent parent = (Parent) fxmlLoader.load();
 			Scene scene = new Scene(parent);
-			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/boundaries/login.css").toExternalForm());
 			Stage nextStage = new Stage();
 			nextStage.setScene(scene);
 			nextStage.setTitle("Zer-Li Settings");
 			nextStage.setResizable(false);
 			nextStage.initModality(Modality.WINDOW_MODAL);
 			nextStage.initOwner(currentStage);
+			InputStream iconResource = getClass().getResourceAsStream("/boundaries/images/icon.png");
+			if (iconResource != null) {
+				Image icon = new Image(iconResource);
+				nextStage.getIcons().add(icon);
+			}
+			setSettingsAnimation(currentStage, nextStage);
+
 			nextStage.showAndWait();
 		}
 		catch (Exception e) {
-			m_logger.severe("Failed on try to load the settings window, excepion: " + e.getMessage());
-			showInformationMessage("The settings can not be changed at this time..");
+			m_logger.log(Level.SEVERE, "Failed on try to load the settings window", e);
+			showAlertMessage("The settings can not be changed at this time.", AlertType.WARNING);
 			return;
 		}
+	}
+
+	/**
+	 * 
+	 * This method set fade in animation to window.
+	 *
+	 * @param currentStage
+	 *            the current stage
+	 * @param stageToAnimate
+	 *            the next stage which will be animated.
+	 */
+	private void setSettingsAnimation(Stage currentStage, Stage stageToAnimate)
+	{
+
+		double screenRightEdge = currentStage.getX() + currentStage.getWidth();
+		stageToAnimate.setX(screenRightEdge);
+		stageToAnimate.setY(currentStage.getY());
+		stageToAnimate.setWidth(0);
+
+		Timeline timeline = new Timeline();
+
+		WritableValue<Double> writableWidth = new WritableValue<Double>() {
+
+			@Override
+			public Double getValue()
+			{
+				return stageToAnimate.getWidth();
+			}
+
+			@Override
+			public void setValue(Double value)
+			{
+				stageToAnimate.setX(screenRightEdge - value);
+				stageToAnimate.setWidth(value);
+			}
+		};
+
+		KeyValue kv = new KeyValue(writableWidth, 300d);
+		KeyFrame kf = new KeyFrame(Duration.millis(1500), kv);
+		timeline.getKeyFrames().addAll(kf);
+		timeline.play();
+		stageToAnimate.setOnCloseRequest(new EventHandler<WindowEvent>() {
+
+			@Override
+			public void handle(WindowEvent event)
+			{
+				Timeline timeline = new Timeline();
+				KeyFrame endFrame = new KeyFrame(Duration.millis(1500), new KeyValue(writableWidth, 0.0));
+				timeline.getKeyFrames().add(endFrame);
+				timeline.setOnFinished(e -> Platform.runLater(() -> stageToAnimate.hide()));
+				timeline.play();
+				event.consume();
+			}
+		});
+
 	}
 
 	/* End of --> UI events region */
@@ -151,7 +242,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	/**
 	 * 
 	 * This method should be called by this stage creator! The method set listener
-	 * to key events..
+	 * to key events.
 	 *
 	 * @param thisScene
 	 *            The scene of this stage.
@@ -189,8 +280,46 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		initializeImages();
 
 		initializeTextFields();
+
+		initialzeButtons();
 	}
 
+	/**
+	 * The method initialize all the buttons in the controller.
+	 */
+	private void initialzeButtons()
+	{
+		btn_login.getStyleClass().add("loginButton");
+		btn_settings.getStyleClass().add("settingsButton");
+
+		m_settingsButtonRotate = new RotateTransition(Duration.seconds(2), btn_imageview_settings);
+		m_settingsButtonRotate.setByAngle(360);
+		m_settingsButtonRotate.setCycleCount(Animation.INDEFINITE);
+		m_settingsButtonRotate.setInterpolator(Interpolator.LINEAR);
+
+		btn_settings.setOnMouseEntered(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event)
+			{
+				m_settingsButtonRotate.play();
+			}
+		});
+
+		btn_settings.setOnMouseExited(new EventHandler<MouseEvent>() {
+
+			@Override
+			public void handle(MouseEvent event)
+			{
+				m_settingsButtonRotate.stop();
+				btn_imageview_settings.setRotate(0);
+			}
+		});
+	}
+
+	/**
+	 * The method initialize all the text fields in the controller.
+	 */
 	private void initializeTextFields()
 	{
 		textField_userName.textProperty().addListener(new ChangeListener<String>() {
@@ -220,17 +349,15 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		});
 	}
 
+	/**
+	 * The method initialize all the images in the controller.
+	 */
 	private void initializeImages()
 	{
-		InputStream backgoundImage = getClass().getResourceAsStream("/boundaries/images/login_background.jpg");
+		InputStream backgoundImage = getClass().getResourceAsStream("/boundaries/images/login_background.png");
 		if (backgoundImage != null) {
 			Image image = new Image(backgoundImage);
 			imageview_background.setImage(image);
-		}
-		InputStream userImage = getClass().getResourceAsStream("/boundaries/images/default_user.png");
-		if (userImage != null) {
-			Image image = new Image(userImage);
-			imageview_usericon.setImage(image);
 		}
 		InputStream settingsImage = getClass().getResourceAsStream("/boundaries/images/settings.png");
 		if (settingsImage != null) {
@@ -298,7 +425,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 		catch (Exception ex) {
 			m_logger.warning("Error when sending get request, excpetion: " + ex.getMessage());
-			showInformationMessage("Could not send message to server at the moment,\nplease try again later.");
+			showAlertMessage("Could not send message to server at the moment,\nplease try again later.",
+					AlertType.WARNING);
 		}
 
 	}
@@ -309,70 +437,91 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	@Override
 	public void onClientDisconnected()
 	{
-		// TODO ROMAN : check if try to connect in this moment and back to regular
-		// window.
+		if (m_connectingStage != null && m_connectingStage.isShowing()) {
+			m_connectingStage.close();
+		}
 	}
 
 	/* End of --> Implemented methods region */
 
 	/* Private methods region */
 
-	private void showInformationMessage(String message)
+	/**
+	 * The method show alert message from {@link Alert} type.
+	 *
+	 * @param message
+	 *            the message to show.
+	 * @param alertType
+	 *            the type of the alert, selected type determinate ton the title and
+	 *            the image.
+	 */
+	private void showAlertMessage(String message, AlertType alertType)
 	{
 		if (message == null || message.isEmpty()) {
 			return;
 		}
 		javafx.application.Platform.runLater(() -> {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Information Dialog");
-			alert.setHeaderText(null);
-			alert.setContentText(message);
+			Alert alert = new AlertBuilder().setAlertType(alertType).setContentText(message).build();
 			alert.showAndWait();
 		});
 	}
 
+	/**
+	 * 
+	 * The method perform an actions sequence in case of login failure.
+	 *
+	 * @param loginData
+	 *            The received login data.
+	 */
 	private void onLoginFailure(LoginData loginData)
 	{
 		javafx.application.Platform.runLater(() -> {
 			passwordField_userPassword.clear();
+			m_client.closeConnectionWithServer();
+			m_logger.info("Login failed! Login message: " + loginData.toString());
+			showAlertMessage("Login Failed! Reason:\n" + loginData.getMessage(), AlertType.ERROR);
 		});
-		m_client.closeConnectionWithServer();
-		m_logger.info("Login failed! Login message: " + loginData.toString());
-		showInformationMessage("Login Failed! Reason:\n" + loginData.getMessage());
 	}
 
+	/**
+	 * 
+	 * This method try to display the logged on user.
+	 *
+	 * @param userEntity
+	 *            the logged on user.
+	 */
 	private void showUserWindow(User userEntity)
 	{
 		URL url = null;
 
 		switch (userEntity.getPrivilege()) {
 			case Administrator:
-				url = getClass().getResource("/boundaries/Administrator.FXML");
+				url = getClass().getResource("/boundaries/Administrator.fxml");
 			break;
 
 			case CompanyEmployee:
-				url = getClass().getResource("/boundaries/CompanyEmployee_AddShopDiscount.FXML");
+				url = getClass().getResource("/boundaries/CompanyEmployee.fxml");
 			break;
 
 			case Costumer:
-				url = getClass().getResource("/boundaries/Costumer.FXML");
+				url = getClass().getResource("/boundaries/Costumer.fxml");
 			break;
 
 			case CostumerService:
-				url = getClass().getResource("/boundaries/CostumerServiceEmployee.FXML");
+				url = getClass().getResource("/boundaries/CostumerServiceEmployee.fxml");
 			break;
 
 			case ServiceSpecialist:
-				url = getClass().getResource("/boundaries/ServiceSpecialist.FXML");
+				url = getClass().getResource("/boundaries/ServiceSpecialist.fxml");
 			break;
 
 			case ShopEmployee:
-				url = getClass().getResource("/boundaries/ShopEmployee.FXML");
+				url = getClass().getResource("/boundaries/ShopEmployee.fxml");
 			break;
 
 			case ChainManager:
 			case ShopManager:
-				url = getClass().getResource("/boundaries/ShopManager.FXML");
+				url = getClass().getResource("/boundaries/ShopManager.fxml");
 			break;
 
 			default:
@@ -400,8 +549,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 		}
 		catch (Exception e) {
 			String errorString = "Failed on try to load the next scene";
-			m_logger.severe(errorString + ", excepion: " + e.getMessage());
-			showInformationMessage(errorString);
+			m_logger.log(Level.SEVERE, errorString, e);
+			showAlertMessage(errorString, AlertType.ERROR);
 			return;
 		}
 		if (scene != null) {
@@ -410,15 +559,25 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	}
 
+	/**
+	 * This method display an connection window with progress icon.
+	 */
 	private void displayConnectingWindow()
 	{
 		if (m_connectingStage == null) {
 			Stage currentStage = (Stage) btn_login.getScene().getWindow();
 
 			ProgressIndicator progressIndicator = new ProgressIndicator();
-			Label label = new Label("Trying to connect ...");
-
+			Label label = new Label();
+			label.setStyle(".label " + "{" + " -fx-text-fill: black;" + " -fx-font-weight: bold;"
+					+ " -fx-font-size: 20px;" + "}");
+			label.setText("Trying to connect ...");
 			Button button = new Button();
+			button.setStyle(" .button " + "{" + " -fx-background-color: #bfbfbf;" + "	-fx-background-radius: 22;"
+					+ "	-fx-text-fill: white;" + "	-fx-border-color: teal;" + "	-fx-border-radius: 22;"
+					+ "	-fx-border-width: 3;" + "}" + " .button:hover " + "{" + "     -fx-background-color: white;"
+					+ "     -fx-text-fill: teal; " + "}");
+
 			button.setText("Cancel");
 			button.setOnAction(event -> {
 				m_canceled = true;
@@ -428,10 +587,8 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			VBox root = new VBox(10, label, progressIndicator, button);
 			root.setAlignment(Pos.BASELINE_CENTER);
 			Scene scene = new Scene(root, 300, 150);
-			scene.getStylesheets().add(getClass().getResource("/boundaries/application.css").toExternalForm());
 			m_connectingStage = new Stage();
 			m_connectingStage.setScene(scene);
-			m_connectingStage.setTitle("Connecting");
 			m_connectingStage.setResizable(false);
 			m_connectingStage.initModality(Modality.WINDOW_MODAL);
 			m_connectingStage.initStyle(StageStyle.TRANSPARENT);
@@ -444,6 +601,11 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 
 	/* Nested classes region */
 
+	/**
+	 * NextWindowLoader: This {@link Runnable} prepare the next window and run it,
+	 * must be invoked on MAIN thread.
+	 *
+	 */
 	private class NextWindowLoader implements Runnable
 	{
 
@@ -457,6 +619,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 			m_baseController = baseController;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public void run()
 		{
@@ -465,15 +630,23 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				nextStage = new Stage();
 				nextStage.setScene(m_nextScene);
 				nextStage.setTitle("Zer-Li");
+				InputStream iconResource = LoginController.this.getClass()
+						.getResourceAsStream("/boundaries/images/icon.png");
+				if (iconResource != null) {
+					Image icon = new Image(iconResource);
+					nextStage.getIcons().add(icon);
+				}
 				if (m_baseController != null) {
 					nextStage.setOnHidden(e -> m_baseController.dispose());
 				}
+				nextStage.setMinWidth(875);
+				nextStage.setMinHeight(600);
 				nextStage.show();
 			}
 			catch (Exception e) {
 				String errorString = "Failed on try to load the next window";
 				m_logger.severe(errorString + ", excepion: " + e.getMessage());
-				showInformationMessage(errorString);
+				showAlertMessage(errorString, AlertType.ERROR);
 				return;
 			}
 
@@ -484,8 +657,7 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 				btn_login.getScene().getWindow().hide();
 			}
 		}
+
+		/* End of --> Nested classes region */
 	}
-
-	/* End of --> Nested classes region */
-
 }

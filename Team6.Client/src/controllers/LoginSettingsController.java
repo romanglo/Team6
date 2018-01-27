@@ -10,6 +10,7 @@ import boundaries.SettingsRow;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import common.AlertBuilder;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -33,29 +34,37 @@ import logger.LogManager;
  */
 public class LoginSettingsController implements Initializable
 {
-	/* UI Binding Fields region */
+	// region UI Fields
 
-	@FXML private TableView<SettingsRow> setting_table;
+	private @FXML TableView<SettingsRow> setting_table;
 
-	@FXML private TableColumn<SettingsRow, String> tablecolumn_setting;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_setting;
 
-	@FXML private TableColumn<SettingsRow, String> tablecolumn_value;
+	private @FXML TableColumn<SettingsRow, String> tablecolumn_value;
 
-	@FXML private Button btn_update_settings;
+	private @FXML Button btn_update_settings;
 
-	/* End of --> UI Binding Fields region */
+	// end region -> UI Fields
 
-	/* Fields */
+	// region Fields
+
 	private Logger m_logger;
 
 	private ClientConfiguration m_configuration;
 
 	private Client m_client;
 
-	/* End of --> Fields region */
+	// end region -> Fields
 
-	/* UI events region */
+	// region UI events
 
+	/**
+	 * 
+	 * The method update the {@link ClientConfiguration} resource file.
+	 *
+	 * @param event
+	 *            the trigger event.
+	 */
 	@FXML
 	private void updateSettingsFile(ActionEvent event)
 	{
@@ -63,9 +72,9 @@ public class LoginSettingsController implements Initializable
 		btn_update_settings.setDisable(true);
 	}
 
-	/* End of --> UI events region */
+	// end region -> UI events
 
-	/* Initializing methods region */
+	// region Initializing methods region
 
 	/**
 	 * {@inheritDoc}
@@ -79,6 +88,10 @@ public class LoginSettingsController implements Initializable
 		initializeConfigurationTable();
 	}
 
+	/**
+	 * The method initialize {@link LoginSettingsController#setting_table} and set
+	 * necessary triggers.
+	 */
 	private void initializeConfigurationTable()
 	{
 		setting_table.setRowFactory(param -> {
@@ -106,13 +119,13 @@ public class LoginSettingsController implements Initializable
 						case ClientConfiguration.PROPERTY_NAME_IP:
 							long count = resultString.chars().filter(ch -> ch == '.').count();
 							if (!resultString.equalsIgnoreCase("localhost") && count != 3) {
-								wrongInput=true;
-								showInformationMessage("Please enter valid IP address!");
+								wrongInput = true;
+								showAlertMessage("Please enter valid IP address!", AlertType.INFORMATION);
 								break;
 							}
-							
+
 							resultString = resultString.toLowerCase();
-							m_logger.info(String.format("The properry:\"%s\" updated from %s to %s",
+							m_logger.info(String.format("The property:\"%s\" updated from %s to %s",
 									ClientConfiguration.PROPERTY_NAME_IP, m_configuration.getIp(), resultString));
 
 							m_client.setHost(resultString);
@@ -125,7 +138,7 @@ public class LoginSettingsController implements Initializable
 							try {
 								int port = Integer.parseInt(resultString);
 								if (port >= 0 && port <= 65636) {
-									m_logger.info(String.format("The properry:\"%s\" updated from %d to %d",
+									m_logger.info(String.format("The property:\"%s\" updated from %d to %d",
 											ClientConfiguration.PROPERTY_NAME_PORT, m_configuration.getPort(), port));
 									m_client.setPort(port);
 									m_configuration.setPort(port);
@@ -138,7 +151,7 @@ public class LoginSettingsController implements Initializable
 								wrongInput = true;
 							}
 							if (wrongInput) {
-								showInformationMessage("The port must be an number between 0 to 65535!");
+								showAlertMessage("The port must be an number between 0 to 65535!", AlertType.WARNING);
 							}
 						break;
 
@@ -163,10 +176,16 @@ public class LoginSettingsController implements Initializable
 		btn_update_settings.setDisable(true);
 	}
 
-	/* End of --> Initializing methods region */
+	// end region -> Initializing methods region
 
-	/* Private methods region */
+	// region Private methods
 
+	/**
+	 * 
+	 * The method draw the {@link ClientConfiguration} to
+	 * {@link LoginSettingsController#setting_table}.
+	 *
+	 */
 	private void drawContantToTable()
 	{
 		ObservableList<SettingsRow> settings = FXCollections.observableArrayList();
@@ -177,17 +196,25 @@ public class LoginSettingsController implements Initializable
 		setting_table.setItems(settings);
 	}
 
-	private void showInformationMessage(String message)
+	/**
+	 * The method show alert message from {@link Alert} type.
+	 *
+	 * @param message
+	 *            the message to show.
+	 * @param alertType
+	 *            the type of the alert, selected type determinate ton the title and
+	 *            the image.
+	 */
+	protected void showAlertMessage(String message, AlertType alertType)
 	{
 		if (message == null || message.isEmpty()) {
 			return;
 		}
-		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle("Information Dialog");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
-
-		alert.showAndWait();
+		javafx.application.Platform.runLater(() -> {
+			Alert alert = new AlertBuilder().setAlertType(alertType).setContentText(message).build();
+			alert.showAndWait();
+		});
 	}
-	/* End of --> Private methods region */
+
+	// end region -> Private methods
 }
