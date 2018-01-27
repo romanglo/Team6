@@ -766,8 +766,6 @@ public class ShopManagerController extends BaseController
 	/**
 	 * Change Bar Chart accord to report values. Method for Reservations report.
 	 *
-	 * @param reportTypeName
-	 *            The report type.
 	 * @param barToChange
 	 *            The Bar Chart to change.
 	 * @param storeId
@@ -834,8 +832,6 @@ public class ShopManagerController extends BaseController
 	/**
 	 * Change Bar Chart accord to report values. Method for Survey report.
 	 *
-	 * @param reportTypeName
-	 *            The report type.
 	 * @param barToChange
 	 *            The Bar Chart to change.
 	 * @param storeId
@@ -1043,7 +1039,9 @@ public class ShopManagerController extends BaseController
 	/**
 	 * Activate when Report Type ComboBox value changed. Set the Compare report type
 	 * accord to the default report type.
-	 * 
+	 *
+	 * @param event
+	 *            Action Event of the combo box.
 	 */
 	@FXML
 	private void reportTypeChanged(ActionEvent event)
@@ -1064,8 +1062,7 @@ public class ShopManagerController extends BaseController
 		int costumerId, costumerIndexInArray;
 		try {
 			costumerId = Integer.parseInt(textField_addShopCostumer.getText());
-			if(costumerId <= 0)
-			{
+			if (costumerId <= 0) {
 				showAlertMessage("Invalid ID!", AlertType.ERROR);
 				textField_addShopCostumer.clear();
 				textFiled_costumerDetails.clear();

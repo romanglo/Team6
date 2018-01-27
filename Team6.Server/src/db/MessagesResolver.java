@@ -168,9 +168,9 @@ public class MessagesResolver implements Server.MessagesHandler {
 	 *
 	 * @param loginData
 	 *            the received {@link LoginData}
-	 * @return In case of login message {@link userEntityData} if the operation
-	 *         succeed and {@link LoginData} if does not. In case of logout message
-	 *         would return <code>null</code> in any situation.
+	 * @return In case of login message {@link User} {@link EntityData} if the
+	 *         operation succeed and {@link LoginData} if does not. In case of
+	 *         logout message would return <code>null</code> in any situation.
 	 */
 	private IMessageData onLoginDataReceived(LoginData loginData) {
 		User user = new User();

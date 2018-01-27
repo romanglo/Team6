@@ -451,6 +451,9 @@ public class LoginController implements Initializable, Client.ClientStatusHandle
 	 *
 	 * @param message
 	 *            the message to show.
+	 * @param alertType
+	 *            the type of the alert, selected type determinate ton the title and
+	 *            the image.
 	 */
 	private void showAlertMessage(String message, AlertType alertType)
 	{

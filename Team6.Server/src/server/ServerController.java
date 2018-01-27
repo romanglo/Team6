@@ -46,6 +46,7 @@ import javafx.scene.paint.RadialGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import logger.LogManager;
+import entities.User;
 
 /**
  *
@@ -435,6 +436,9 @@ public class ServerController implements Initializable, Server.ServerStatusHandl
 	 *
 	 * @param message
 	 *            the message to show.
+	 * @param alertType
+	 *            the type of the alert, selected type determinate ton the title and
+	 *            the image.
 	 */
 	private void showAlertMessage(String message, AlertType alertType) {
 		if (message == null || message.isEmpty()) {
