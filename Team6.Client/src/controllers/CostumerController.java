@@ -356,6 +356,11 @@ public class CostumerController extends BaseController
 				showAlertMessage("Please fill in all fields to complete the reservation.", AlertType.INFORMATION);
 				return;
 			}
+			
+			if (!delivery_phone.getText().trim().matches("[0-9]+")) {
+				showAlertMessage("A phone number can only contain numbers.", AlertType.ERROR);
+				return;
+			}
 		}
 		if (!immidiate_delivery.isSelected()) {
 			if (date_pick.getValue().isBefore(LocalDate.now())
@@ -369,10 +374,7 @@ public class CostumerController extends BaseController
 			showAlertMessage("A credit card can only contain numbers.", AlertType.ERROR);
 			return;
 		}
-		if (!delivery_phone.getText().trim().matches("[0-9]+")) {
-			showAlertMessage("A phone number can only contain numbers.", AlertType.ERROR);
-			return;
-		}
+		
 
 		updateFieldsWithData();
 
