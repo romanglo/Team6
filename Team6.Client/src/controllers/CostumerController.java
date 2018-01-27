@@ -578,15 +578,21 @@ public class CostumerController extends BaseController
 			}
 		}
 
-		for (ShopCostumer shopCostumer : shopCostumerList) {
-			if (Costumer_SavedData.getShopManagerId() == shopCostumer.getShopManagerId()) {
-				Costumer_SavedData.setShopCostumer(shopCostumer);
-				break;
-			}
-		}
+//		for (ShopCostumer shopCostumer : shopCostumerList) {
+//			if (Costumer_SavedData.getShopManagerId() == shopCostumer.getShopManagerId()) {
+//				Costumer_SavedData.setShopCostumer(shopCostumer);
+//				break;
+//			}
+//		}
 
+		ShopCostumer shopCostumer = new ShopCostumer();
+		shopCostumer.setShopManagerId(Costumer_SavedData.getShopManagerId());
+		shopCostumer.setCostumerId(Costumer_SavedData.getCostumerId());
+		Message entityMessage = MessagesFactory.createGetEntityMessage(shopCostumer);
+		m_Client.sendMessageToServer(entityMessage);
+		
 		ShopCatalogData catalogData = new ShopCatalogData(Costumer_SavedData.getShopManagerId());
-		Message entityMessage = MessagesFactory.createIMessageDataMessage(catalogData);
+		entityMessage = MessagesFactory.createIMessageDataMessage(catalogData);
 		m_Client.sendMessageToServer(entityMessage);
 	}
 
@@ -1482,6 +1488,8 @@ public class CostumerController extends BaseController
 		combo_minute.setDisable(false);
 		date_pick.setDisable(false);
 
+		credit_card_label.setVisible(true);
+		credit_card_number.setVisible(true);
 		credit_card_number.setText("");
 		delivery_address.setText("");
 		delivery_name.setText("");
@@ -1497,9 +1505,6 @@ public class CostumerController extends BaseController
 			if (m_useSubscription) {
 				credit_card_label.setVisible(false);
 				credit_card_number.setVisible(false);
-			} else {
-				credit_card_label.setVisible(true);
-				credit_card_number.setVisible(true);
 			}
 		}
 
