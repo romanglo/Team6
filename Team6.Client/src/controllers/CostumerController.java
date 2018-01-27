@@ -369,6 +369,10 @@ public class CostumerController extends BaseController
 			showAlertMessage("A credit card can only contain numbers.", AlertType.ERROR);
 			return;
 		}
+		if (!delivery_phone.getText().trim().matches("[0-9]+")) {
+			showAlertMessage("A phone number can only contain numbers.", AlertType.ERROR);
+			return;
+		}
 
 		updateFieldsWithData();
 
