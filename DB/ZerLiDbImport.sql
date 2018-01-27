@@ -1,5 +1,11 @@
-CREATE DATABASE  IF NOT EXISTS `zer-li` /*!40100 DEFAULT CHARACTER SET utf8 */;
+UNLOCK TABLES;
+
+DROP DATABASE IF EXISTS `zer-li`;
+
+CREATE DATABASE `zer-li` /*!40100 DEFAULT CHARACTER SET utf8 */;
+
 USE `zer-li`;
+
 -- MySQL dump 10.13  Distrib 5.7.17, for Win64 (x86_64)
 --
 -- Host: localhost    Database: zer-li
