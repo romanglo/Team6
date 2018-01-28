@@ -356,6 +356,11 @@ public class CostumerController extends BaseController
 				showAlertMessage("Please fill in all fields to complete the reservation.", AlertType.INFORMATION);
 				return;
 			}
+			
+			if (!delivery_phone.getText().trim().matches("[0-9]+")) {
+				showAlertMessage("A phone number can only contain numbers.", AlertType.ERROR);
+				return;
+			}
 		}
 		if (!immidiate_delivery.isSelected()) {
 			if (date_pick.getValue().isBefore(LocalDate.now())
@@ -369,6 +374,7 @@ public class CostumerController extends BaseController
 			showAlertMessage("A credit card can only contain numbers.", AlertType.ERROR);
 			return;
 		}
+		
 
 		updateFieldsWithData();
 
@@ -522,8 +528,6 @@ public class CostumerController extends BaseController
 		int minute = calendar.get(Calendar.MINUTE);
 		combo_hour.setValue("" + (hour < 10 ? "0" + hour : hour));
 		combo_minute.setValue("" + (minute < 10 ? "0" + minute : minute));
-		delivery_radio.setSelected(true);
-		pickup_radio.setSelected(false);
 		date_pick.setValue(calendar.getTime().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 
 		if (immidiate_delivery.isSelected()) {
@@ -577,13 +581,6 @@ public class CostumerController extends BaseController
 				break;
 			}
 		}
-
-//		for (ShopCostumer shopCostumer : shopCostumerList) {
-//			if (Costumer_SavedData.getShopManagerId() == shopCostumer.getShopManagerId()) {
-//				Costumer_SavedData.setShopCostumer(shopCostumer);
-//				break;
-//			}
-//		}
 
 		ShopCostumer shopCostumer = new ShopCostumer();
 		shopCostumer.setShopManagerId(Costumer_SavedData.getShopManagerId());
