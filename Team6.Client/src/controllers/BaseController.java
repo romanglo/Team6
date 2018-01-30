@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import client.ApplicationEntryPoint;
 import client.Client;
 import client.ClientConfiguration;
+import client.IMessageReceiveHandler;
 import common.AlertBuilder;
 import entities.User;
 import javafx.animation.FadeTransition;
@@ -57,9 +58,9 @@ import messages.MessagesFactory;
  * 
  * @see Initializable
  * @see client.Client.ClientStatusHandler
- * @see client.Client.MessageReceiveHandler
+ * @see client.IMessageReceiveHandler
  */
-public abstract class BaseController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public abstract class BaseController implements Initializable, Client.ClientStatusHandler, IMessageReceiveHandler
 {
 
 	// region UI Fields

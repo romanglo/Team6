@@ -55,6 +55,32 @@ public class Costumer extends User
 	{
 		m_balance = balance;
 	}
+	
+	/**
+	 * Empty constructor.
+	 */
+	public Costumer()
+	{
+		
+	}
+	
+	/**
+	 * Copy constructor.
+	 *
+	 * @param costumer
+	 *            The {@link Costumer} to set in the new instance.
+	 */
+	public Costumer(Costumer costumer)
+	{
+		m_id = costumer.getId();
+		m_balance = costumer.getBalance();
+		setEmail(costumer.getEmail());
+		setImage(costumer.getImage());
+		setPassword(costumer.getPassword());
+		setPrivilege(costumer.getPrivilege());
+		setStatus(costumer.getStatus());
+		setUserName(costumer.getUserName());
+	}
 
 	/**
 	 * {@inheritDoc}

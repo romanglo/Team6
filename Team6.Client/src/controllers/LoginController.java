@@ -11,6 +11,7 @@ import com.sun.istack.internal.Nullable;
 
 import client.ApplicationEntryPoint;
 import client.Client;
+import client.IMessageReceiveHandler;
 import common.AlertBuilder;
 import entities.IEntity;
 import entities.User;
@@ -65,7 +66,7 @@ import messages.MessagesFactory;
  * system, the controller related to 'Login.FXML' and 'LoginSettings.FXML' .
  * 
  */
-public class LoginController implements Initializable, Client.ClientStatusHandler, Client.MessageReceiveHandler
+public class LoginController implements Initializable, Client.ClientStatusHandler, IMessageReceiveHandler
 {
 	/* UI Binding Fields region */
 
