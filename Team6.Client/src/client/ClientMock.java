@@ -18,7 +18,7 @@ import messages.RespondMessageData;
  * ClientMock: Client communication mock class for testing.
  * 
  */
-public class ClientShame implements IMessageSender
+public class ClientMock implements IMessageSender
 {
 
 	private List<Reservation> m_reservationList;
@@ -35,12 +35,15 @@ public class ClientShame implements IMessageSender
 	 * @param costumer
 	 *            The costumer connected to the reservation.
 	 */
-	public ClientShame(List<Reservation> reservationList, Costumer costumer)
+	public ClientMock(List<Reservation> reservationList, Costumer costumer)
 	{
 		m_reservationList = reservationList;
 		m_costumer = costumer;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean sendMessageToServer(Message data)
 	{
@@ -63,6 +66,7 @@ public class ClientShame implements IMessageSender
 
 		IEntity entity = entityData.getEntity();
 		if (entity instanceof Costumer) {
+			/* Received costumer entity. */
 			Costumer costumer = (Costumer) entity;
 			if (costumer.getId() != m_costumer.getId()) {
 				newEntityData = new EntityData(EntityDataOperation.None, costumer);
@@ -73,6 +77,7 @@ public class ClientShame implements IMessageSender
 				isSuccess = true;
 			}
 		} else if (entity instanceof Reservation) {
+			/* Received reservation entity. */
 			Reservation reservation = (Reservation) entity;
 			Reservation toUpdate = null;
 			boolean isPresent = false;
@@ -110,6 +115,9 @@ public class ClientShame implements IMessageSender
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void setMessagesHandler(IMessageReceiveHandler messagesHandler)
 	{

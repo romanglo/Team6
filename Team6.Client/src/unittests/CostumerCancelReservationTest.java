@@ -13,7 +13,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import client.ClientShame;
+import client.ClientMock;
 import client.IMessageReceiveHandler;
 import controllers.CostumerCancelReservation;
 import entities.Costumer;
@@ -26,7 +26,7 @@ import entities.Reservation;
 import messages.EntityData;
 import messages.IMessageData;
 import messages.Message;
-import messages.MessageFactoryMock;
+import messages.MessageFactoryStub;
 import messages.RespondMessageData;
 
 /**
@@ -37,7 +37,7 @@ import messages.RespondMessageData;
 public class CostumerCancelReservationTest
 {
 
-	private ClientShame m_clientShame;
+	private ClientMock m_clientShame;
 
 	private CostumerCancelReservation m_cancelReservation;
 
@@ -86,8 +86,8 @@ public class CostumerCancelReservationTest
 		m_costumer.setStatus(UserStatus.Connected);
 		m_costumer.setUserName("costumer");
 
-		m_clientShame = new ClientShame(m_reservationList, m_costumer);
-		m_cancelReservation = new CostumerCancelReservation(m_clientShame, new MessageFactoryMock());
+		m_clientShame = new ClientMock(m_reservationList, m_costumer);
+		m_cancelReservation = new CostumerCancelReservation(m_clientShame, new MessageFactoryStub());
 	}
 
 	/**
@@ -97,22 +97,17 @@ public class CostumerCancelReservationTest
 	@Test
 	public void testCancelReservation()
 	{
-		m_clientShame.setMessagesHandler(new IMessageReceiveHandler() {
-
-			@Override
-			public void onMessageReceived(Message msg) throws Exception
-			{
-				/* Parse the response from the mock. */
-				IMessageData messageData = msg.getMessageData();
-				RespondMessageData respondMessageData = (RespondMessageData) messageData;
-				IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
-				if (entity instanceof Costumer) {
-					assertTrue("The costumer was not updated.", respondMessageData.isSucceed());
-				} else if (entity instanceof Reservation) {
-					Reservation reservation = (Reservation) entity;
-					assertTrue("The reservation was not updated.",
-							respondMessageData.isSucceed() && reservation.getType() == ReservationType.Canceled);
-				}
+		m_clientShame.setMessagesHandler((msg) -> {
+			/* Parse the response from the mock. */
+			IMessageData messageData = msg.getMessageData();
+			RespondMessageData respondMessageData = (RespondMessageData) messageData;
+			IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
+			if (entity instanceof Costumer) {
+				assertTrue("The costumer was not updated.", respondMessageData.isSucceed());
+			} else if (entity instanceof Reservation) {
+				Reservation reservation = (Reservation) entity;
+				assertTrue("The reservation was not updated.",
+						respondMessageData.isSucceed() && reservation.getType() == ReservationType.Canceled);
 			}
 		});
 		Reservation reservation = m_reservationList.get(0);
@@ -125,20 +120,15 @@ public class CostumerCancelReservationTest
 	 * delivered to the server and returns false for the update request.
 	 */
 	@Test
-	public void testCancelReservationWrongReservationId()
+	public void testCancelReservationIdNotExist()
 	{
-		m_clientShame.setMessagesHandler(new IMessageReceiveHandler() {
-
-			@Override
-			public void onMessageReceived(Message msg) throws Exception
-			{
-				/* Parse the response from the mock. */
-				IMessageData messageData = msg.getMessageData();
-				RespondMessageData respondMessageData = (RespondMessageData) messageData;
-				IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
-				if (entity instanceof Reservation) {
-					assertFalse("The reservation with wrong ID was accepted.", respondMessageData.isSucceed());
-				}
+		m_clientShame.setMessagesHandler((msg) -> {
+			/* Parse the response from the mock. */
+			IMessageData messageData = msg.getMessageData();
+			RespondMessageData respondMessageData = (RespondMessageData) messageData;
+			IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
+			if (entity instanceof Reservation) {
+				assertFalse("The reservation with wrong ID was accepted.", respondMessageData.isSucceed());
 			}
 		});
 		/* Create reservation instance with not existing ID */
@@ -153,20 +143,15 @@ public class CostumerCancelReservationTest
 	 * to the server and returns false for the update request.
 	 */
 	@Test
-	public void testCancelReservationWrongCostumerId()
+	public void testCancelReservationCostumerIdNotExist()
 	{
-		m_clientShame.setMessagesHandler(new IMessageReceiveHandler() {
-
-			@Override
-			public void onMessageReceived(Message msg) throws Exception
-			{
-				/* Parse the response from the mock. */
-				IMessageData messageData = msg.getMessageData();
-				RespondMessageData respondMessageData = (RespondMessageData) messageData;
-				IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
-				if (entity instanceof Reservation) {
-					assertFalse("The reservation with wrong costumer ID was accepted.", respondMessageData.isSucceed());
-				}
+		m_clientShame.setMessagesHandler((msg) -> {
+			/* Parse the response from the mock. */
+			IMessageData messageData = msg.getMessageData();
+			RespondMessageData respondMessageData = (RespondMessageData) messageData;
+			IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
+			if (entity instanceof Reservation) {
+				assertFalse("The reservation with wrong costumer ID was accepted.", respondMessageData.isSucceed());
 			}
 		});
 		/* Create reservation instance with not existing costumer ID */
@@ -181,20 +166,15 @@ public class CostumerCancelReservationTest
 	 * the server and returns false for the update request.
 	 */
 	@Test
-	public void testCancelReservationWrongShopId()
+	public void testCancelReservationShopIdNotExist()
 	{
-		m_clientShame.setMessagesHandler(new IMessageReceiveHandler() {
-
-			@Override
-			public void onMessageReceived(Message msg) throws Exception
-			{
-				/* Parse the response from the mock. */
-				IMessageData messageData = msg.getMessageData();
-				RespondMessageData respondMessageData = (RespondMessageData) messageData;
-				IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
-				if (entity instanceof Reservation) {
-					assertFalse("The reservation with wrong shop ID was accepted.", respondMessageData.isSucceed());
-				}
+		m_clientShame.setMessagesHandler((msg) -> {
+			/* Parse the response from the mock. */
+			IMessageData messageData = msg.getMessageData();
+			RespondMessageData respondMessageData = (RespondMessageData) messageData;
+			IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
+			if (entity instanceof Reservation) {
+				assertFalse("The reservation with wrong shop ID was accepted.", respondMessageData.isSucceed());
 			}
 		});
 		/* Create reservation instance with not existing shop ID */
@@ -208,15 +188,15 @@ public class CostumerCancelReservationTest
 	 * Testing method to test if null data is delivered to the canceling method.
 	 */
 	@Test
-	public void testCancelReservationNullData()
+	public void testCancelReservationSendNullData()
 	{
 		/* Check for sending null data instead of reservation. */
 		assertFalse("Successfully delivered null data.", m_cancelReservation.cancelReservation(m_costumer, null));
-		
+
 		/* Check for sending null data instead of costumer. */
 		assertFalse("Successfully delivered null data.",
 				m_cancelReservation.cancelReservation(null, m_reservationList.get(1)));
-		
+
 		/* Check for sending null data instead of reservation and costumer. */
 		assertFalse("Successfully delivered null data.", m_cancelReservation.cancelReservation(null, null));
 	}
@@ -232,12 +212,15 @@ public class CostumerCancelReservationTest
 		float expectedRefund = 0;
 		assertTrue("Refund for less than a hour calculated wrongly.",
 				m_cancelReservation.calculateRefund(m_reservationList.get(0)) == expectedRefund);
-		
-		/* Check the method for less than 3 hours date before the delivery date and more than a hour. */
+
+		/*
+		 * Check the method for less than 3 hours date before the delivery date and more
+		 * than a hour.
+		 */
 		expectedRefund = 50;
 		assertTrue("Refund for less than 3 hours and more than a hour calculated wrongly.",
 				m_cancelReservation.calculateRefund(m_reservationList.get(2)) == expectedRefund);
-		
+
 		/* Check the method for more than 3 hours date before the delivery date. */
 		expectedRefund = 100;
 		assertTrue("Refund for more than 3 hour calculated wrongly.",
@@ -262,7 +245,7 @@ public class CostumerCancelReservationTest
 			assertTrue(true);
 		}
 	}
-	
+
 	/**
 	 * Testing method to test if the refund calculating method throws
 	 * {@link RuntimeException} when sending null data.
@@ -273,7 +256,7 @@ public class CostumerCancelReservationTest
 		try {
 			m_cancelReservation.calculateRefund(null);
 			/* If the method returns here then no exception was thrown. */
-			fail("The reservation with negative price doesn't throw exception as axpected.");
+			fail("The reservation with null data doesn't throw exception as axpected.");
 		}
 		catch (RuntimeException e) {
 			assertTrue(true);

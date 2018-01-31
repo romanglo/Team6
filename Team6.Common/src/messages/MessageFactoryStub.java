@@ -4,13 +4,13 @@ package messages;
 import entities.IEntity;
 
 /**
- *
- * MessageFactoryMock: Mock class for message creator.
- * 
+ * MessageFactoryStub: Stub class for message creator.
  */
-public class MessageFactoryMock implements IMessagesFactory
+public class MessageFactoryStub implements IMessagesFactory
 {
-
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public Message createMessage(IEntity entity, EntityDataOperation operation)
 	{
