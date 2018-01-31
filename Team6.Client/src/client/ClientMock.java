@@ -47,22 +47,11 @@ public class ClientMock implements IMessageSender
 	@Override
 	public boolean sendMessageToServer(Message data)
 	{
-		if (data == null) {
-			return false;
-		}
-
 		boolean isSuccess = false;
 		RespondMessageData respondMessageData;
-		EntityData newEntityData;
+		EntityData newEntityData = null;
 		IMessageData messageData = data.getMessageData();
-		if (!(messageData instanceof EntityData)) {
-			return false;
-		}
-
 		EntityData entityData = (EntityData) messageData;
-		if (entityData.getOperation() != EntityDataOperation.Update) {
-			return false;
-		}
 
 		IEntity entity = entityData.getEntity();
 		if (entity instanceof Costumer) {
@@ -99,8 +88,6 @@ public class ClientMock implements IMessageSender
 				isSuccess = false;
 				newEntityData = new EntityData(EntityDataOperation.None, reservation);
 			}
-		} else {
-			newEntityData = new EntityData(EntityDataOperation.None, entity);
 		}
 
 		respondMessageData = new RespondMessageData(newEntityData, isSuccess);

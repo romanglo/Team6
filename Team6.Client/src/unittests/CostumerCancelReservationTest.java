@@ -162,6 +162,29 @@ public class CostumerCancelReservationTest
 	}
 
 	/**
+	 * Testing method to test if a costumer with wrong ID is delivered to the server
+	 * and returns false for the update request.
+	 */
+	@Test
+	public void testCancelReservationCostumerNotExist()
+	{
+		m_clientShame.setMessagesHandler((msg) -> {
+			/* Parse the response from the mock. */
+			IMessageData messageData = msg.getMessageData();
+			RespondMessageData respondMessageData = (RespondMessageData) messageData;
+			IEntity entity = ((EntityData) respondMessageData.getMessageData()).getEntity();
+			if (entity instanceof Costumer) {
+				assertFalse("The costumer with wrong ID was accepted.", respondMessageData.isSucceed());
+			}
+		});
+		/* Create costumer instance with not existing ID */
+		Costumer costumer = new Costumer(m_costumer);
+		costumer.setId(2);
+		assertTrue("Failed to send reservation cancel. Costumer: " + costumer,
+				m_cancelReservation.cancelReservation(costumer, m_reservationList.get(3)));
+	}
+
+	/**
 	 * Testing method to test if a reservation with wrong shop ID is delivered to
 	 * the server and returns false for the update request.
 	 */

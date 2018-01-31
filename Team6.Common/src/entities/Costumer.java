@@ -75,7 +75,6 @@ public class Costumer extends User
 		m_id = costumer.getId();
 		m_balance = costumer.getBalance();
 		setEmail(costumer.getEmail());
-		setImage(costumer.getImage());
 		setPassword(costumer.getPassword());
 		setPrivilege(costumer.getPrivilege());
 		setStatus(costumer.getStatus());

@@ -8,6 +8,7 @@ import entities.IEntity;
  */
 public class MessageFactoryStub implements IMessagesFactory
 {
+
 	/**
 	 * {@inheritDoc}
 	 */

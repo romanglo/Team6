@@ -711,7 +711,7 @@ public class CostumerController extends BaseController
 		combo_hour.setItems(hoursList);
 		combo_minute.setItems(minutesList);
 
-		m_costumerCancelReservation = new CostumerCancelReservation(m_Client);
+		m_costumerCancelReservation = new CostumerCancelReservation(m_Client, new MessagesFactory());
 	}
 
 	/**

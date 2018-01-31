@@ -34,18 +34,6 @@ public class CostumerCancelReservation
 	// region Constructors
 
 	/**
-	 * Constructor.
-	 *
-	 * @param client
-	 *            The connection with the server.
-	 */
-	public CostumerCancelReservation(Client client)
-	{
-		m_messageSender = client;
-		m_messagesFactory = new MessagesFactory();
-	}
-
-	/**
 	 * Constructor for testing.
 	 *
 	 * @param messageSender
@@ -77,14 +65,11 @@ public class CostumerCancelReservation
 		if (costumer == null || reservation == null) {
 			return false;
 		}
-		boolean flag;
+
 		reservation.setType(ReservationType.Canceled);
 		Message entityMessage = m_messagesFactory.createMessage(reservation, EntityDataOperation.Update);
-		flag = m_messageSender.sendMessageToServer(entityMessage);
+		m_messageSender.sendMessageToServer(entityMessage);
 
-		if (!flag) {
-			return flag;
-		}
 		float balance = calculateRefund(reservation) + costumer.getBalance();
 		costumer.setBalance(balance);
 		entityMessage = m_messagesFactory.createMessage(costumer, EntityDataOperation.Update);
