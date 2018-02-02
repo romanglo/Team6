@@ -4,8 +4,9 @@ package controllers;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import client.Client;
 import client.IMessageSender;
+import common.ITimeProvider;
+import common.RealTimeProvider;
 import entities.Costumer;
 import entities.EntitiesEnums.ReservationType;
 import entities.Reservation;
@@ -29,9 +30,23 @@ public class CostumerCancelReservation
 
 	private IMessagesFactory m_messagesFactory;
 
+	private ITimeProvider m_timeProvider;
+
 	// end region -> Fields
 
 	// region Constructors
+
+	/**
+	 * 
+	 * @param messageSender
+	 *            The connection with the server.
+	 */
+	public CostumerCancelReservation(IMessageSender messageSender)
+	{
+		m_messageSender = messageSender;
+		m_messagesFactory = new MessagesFactory();
+		m_timeProvider = new RealTimeProvider();
+	}
 
 	/**
 	 * Constructor for testing.
@@ -40,13 +55,16 @@ public class CostumerCancelReservation
 	 *            The connection with the server.
 	 * @param messagesFactory
 	 *            The message factory that creates messages.
+	 * @param timeProvider
+	 *            The instance that provide the system current time.
 	 */
-	public CostumerCancelReservation(IMessageSender messageSender, IMessagesFactory messagesFactory)
+	public CostumerCancelReservation(IMessageSender messageSender, IMessagesFactory messagesFactory,
+			ITimeProvider timeProvider)
 	{
 		m_messageSender = messageSender;
 		m_messagesFactory = messagesFactory;
+		m_timeProvider = timeProvider;
 	}
-
 	// end region -> Constructors
 
 	// region Public Methods
@@ -93,9 +111,9 @@ public class CostumerCancelReservation
 			throw new RuntimeException();
 		}
 		Date firstDate = reservation.getDeliveryDate();
-		Date secondDate = new Date();
+		Date secondDate = m_timeProvider.getCurrentTime();
 
-		long diffInMillies = Math.abs(firstDate.getTime() - secondDate.getTime());
+		long diffInMillies = firstDate.getTime() - secondDate.getTime();
 		long diff = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
 		float returnValue;

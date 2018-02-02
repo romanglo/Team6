@@ -711,7 +711,7 @@ public class CostumerController extends BaseController
 		combo_hour.setItems(hoursList);
 		combo_minute.setItems(minutesList);
 
-		m_costumerCancelReservation = new CostumerCancelReservation(m_Client, new MessagesFactory());
+		m_costumerCancelReservation = new CostumerCancelReservation(m_Client);
 	}
 
 	/**
@@ -1116,8 +1116,7 @@ public class CostumerController extends BaseController
 				cancelItemsList.add(item);
 			}
 			Platform.runLater(() -> {
-				cancel_total_price_label
-						.setText(String.format("%.2f", m_reservationEntity.getPrice()));
+				cancel_total_price_label.setText(String.format("%.2f", m_reservationEntity.getPrice()));
 				tablecolumn_cancel_id.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Integer>("id"));
 				tablecolumn_cancel_name.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, String>("name"));
 				tablecolumn_cancel_price.setCellValueFactory(new PropertyValueFactory<CatalogItemRow, Float>("price"));
@@ -1611,7 +1610,7 @@ public class CostumerController extends BaseController
 	private void initializeCancel()
 	{
 		m_currScreen = ScreenType.Cancel;
-		
+
 		Reservation reservation = new Reservation();
 		reservation.setCostumerId(Costumer_SavedData.getCostumerId());
 		reservation.setId(m_reservationId);
