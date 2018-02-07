@@ -273,6 +273,37 @@ public class Reservation implements IEntity
 	}
 
 	/**
+	 * Empty constructor.
+	 */
+	public Reservation()
+	{
+		
+	}
+	
+	/**
+	 * Copy constructor.
+	 *
+	 * @param reservation
+	 *            The {@link Reservation} to set in the new instance.
+	 */
+	public Reservation(Reservation reservation)
+	{
+		m_id = reservation.getId();
+		m_blessingCard = reservation.getBlessingCard();
+		m_costumerId = reservation.getCostumerId();
+		m_creditCard = reservation.getCreditCard();
+		m_deliveryAddress = reservation.getDeliveryAddress();
+		m_deliveryDate = reservation.getDeliveryDate();
+		m_deliveryName = reservation.getDeliveryName();
+		m_deliveryPhone = reservation.getDeliveryPhone();
+		m_deliveryType = reservation.getDeliveryType();
+		m_numberOfItems = reservation.getNumberOfItems();
+		m_price = reservation.getPrice();
+		m_shopManagerId = reservation.getShopManagerId();
+		m_type = reservation.getType();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

@@ -1,0 +1,17 @@
+ClientSide
+ClientSide.boundaries
+ClientSide.boundaries.images
+ClientSide.client
+ClientSide.controllers
+CommonLib
+CommonLib.common
+CommonLib.common.images
+CommonLib.entities
+CommonLib.logger
+CommonLib.messages
+CommonLib.utilities
+ServerSide
+ServerSide.configurations
+ServerSide.connectivity
+ServerSide.db
+ServerSide.server

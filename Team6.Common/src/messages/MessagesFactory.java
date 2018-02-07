@@ -11,17 +11,8 @@ import entities.IEntity;
  * MessagesFactory: Factory of {@link Message}.
  * 
  */
-public class MessagesFactory
+public class MessagesFactory implements IMessagesFactory
 {
-
-	/**
-	 * The constructor is empty to ensure that it will not be possible to create
-	 * instance of this class.
-	 */
-	private MessagesFactory()
-	{
-
-	}
 
 	/**
 	 * Create {@link Message} with a {@link IMessageData} of a {@link EntityData}
@@ -243,5 +234,14 @@ public class MessagesFactory
 		}
 		IMessageData data = new LoginData(username, password, true);
 		return new Message(data);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Message createMessage(IEntity entity, EntityDataOperation operation)
+	{
+		return createEntityMessage(entity, operation);
 	}
 }

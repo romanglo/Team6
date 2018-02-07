@@ -11,12 +11,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 import boundaries.CatalogItemRow;
 import common.AlertBuilder;
 import entities.Complaint;
 import entities.Costumer;
+import entities.EntitiesEnums.CostumerSubscription;
+import entities.EntitiesEnums.ProductType;
+import entities.EntitiesEnums.ReservationDeliveryType;
 import entities.IEntity;
 import entities.Item;
 import entities.ItemInReservation;
@@ -24,10 +26,6 @@ import entities.Reservation;
 import entities.ShopCatalogData;
 import entities.ShopCostumer;
 import entities.ShopManager;
-import entities.EntitiesEnums.CostumerSubscription;
-import entities.EntitiesEnums.ProductType;
-import entities.EntitiesEnums.ReservationDeliveryType;
-import entities.EntitiesEnums.ReservationType;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -255,9 +253,11 @@ public class CostumerController extends BaseController
 
 	private ArrayList<Complaint> m_complaintsList;
 
-	private int m_reservationId;
-
 	private ObservableList<CatalogItemRow> cancelItemsList = FXCollections.observableArrayList();
+
+	private CostumerCancelReservation m_costumerCancelReservation;
+
+	private int m_reservationId;
 
 	private Reservation m_reservationEntity;
 
@@ -356,7 +356,7 @@ public class CostumerController extends BaseController
 				showAlertMessage("Please fill in all fields to complete the reservation.", AlertType.INFORMATION);
 				return;
 			}
-			
+
 			if (!delivery_phone.getText().trim().matches("[0-9]+")) {
 				showAlertMessage("A phone number can only contain numbers.", AlertType.ERROR);
 				return;
@@ -374,7 +374,6 @@ public class CostumerController extends BaseController
 			showAlertMessage("A credit card can only contain numbers.", AlertType.ERROR);
 			return;
 		}
-		
 
 		updateFieldsWithData();
 
@@ -587,7 +586,7 @@ public class CostumerController extends BaseController
 		shopCostumer.setCostumerId(Costumer_SavedData.getCostumerId());
 		Message entityMessage = MessagesFactory.createGetEntityMessage(shopCostumer);
 		m_Client.sendMessageToServer(entityMessage);
-		
+
 		ShopCatalogData catalogData = new ShopCatalogData(Costumer_SavedData.getShopManagerId());
 		entityMessage = MessagesFactory.createIMessageDataMessage(catalogData);
 		m_Client.sendMessageToServer(entityMessage);
@@ -660,15 +659,7 @@ public class CostumerController extends BaseController
 	@FXML
 	private void cancelButtonClick(ActionEvent cancelEvent)
 	{
-		Costumer costumer = Costumer_SavedData.getCostumer();
-		float balance = calculateRefund() + costumer.getBalance();
-		costumer.setBalance(balance);
-		Message entityMessage = MessagesFactory.createUpdateEntityMessage(costumer);
-		m_Client.sendMessageToServer(entityMessage);
-
-		m_reservationEntity.setType(ReservationType.Canceled);
-		entityMessage = MessagesFactory.createUpdateEntityMessage(m_reservationEntity);
-		m_Client.sendMessageToServer(entityMessage);
+		m_costumerCancelReservation.cancelReservation(Costumer_SavedData.getCostumer(), m_reservationEntity);
 	}
 
 	/**
@@ -683,32 +674,6 @@ public class CostumerController extends BaseController
 		anchorpane_cancel.setVisible(false);
 		anchorpane_reservations.setVisible(true);
 		initializeReservations();
-	}
-
-	/**
-	 * Method calculates the refund that the costumer is supposed to get when
-	 * canceling a reservation.
-	 *
-	 * @return The refund for the costumer.
-	 */
-	private float calculateRefund()
-	{
-		Date firstDate = m_reservationEntity.getDeliveryDate();
-		Date secondDate = new Date();
-
-		long diffInMillies = Math.abs(firstDate.getTime() - secondDate.getTime());
-		long diff = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-
-		float returnValue;
-		if (diff >= 3) {
-			returnValue = m_reservationEntity.getPrice();
-		} else if (diff >= 1) {
-			returnValue = (float) (m_reservationEntity.getPrice() * 0.5);
-		} else {
-			returnValue = 0;
-		}
-
-		return returnValue;
 	}
 
 	// end region -> Events listeners
@@ -745,6 +710,8 @@ public class CostumerController extends BaseController
 
 		combo_hour.setItems(hoursList);
 		combo_minute.setItems(minutesList);
+
+		m_costumerCancelReservation = new CostumerCancelReservation(m_Client);
 	}
 
 	/**
@@ -1104,7 +1071,7 @@ public class CostumerController extends BaseController
 					IEntity entity = ((EntityData) messageData).getEntity();
 					if (entity instanceof Reservation) {
 						Platform.runLater(() -> {
-							float refund = calculateRefund();
+							float refund = m_costumerCancelReservation.calculateRefund(m_reservationEntity);
 							showAlertMessage("Reservation canceled successfully.\nPayback: " + refund,
 									AlertType.INFORMATION);
 							backToReservationsClick(new ActionEvent());

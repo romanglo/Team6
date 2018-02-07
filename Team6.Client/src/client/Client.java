@@ -18,32 +18,8 @@ import ocsf.client.AbstractClient;
  * Client: Implementation of {@link AbstractClient} that can receive and send
  * {@link Message} type message.
  */
-public class Client extends AbstractClient
+public class Client extends AbstractClient implements IMessageSender
 {
-
-	/**
-	 *
-	 * MessageReceiveHandler: Handler interface for message from the server to
-	 * display on UI.
-	 * 
-	 */
-	public interface MessageReceiveHandler
-	{
-
-		/**
-		 * Prototype of a method that meant to process the message received from the
-		 * server and updating the UI according to the Object details.
-		 *
-		 * @param msg
-		 *            - An message received from the server.
-		 * @throws Exception
-		 *             The method can throw any kind of exception, this method call
-		 *             surround with try/catch.
-		 * 
-		 * @see Message the received type.
-		 */
-		void onMessageReceived(Message msg) throws Exception;
-	}
 
 	/**
 	 *
@@ -81,7 +57,7 @@ public class Client extends AbstractClient
 
 	private ClientStatusHandler m_clientStatusHandler;
 
-	private MessageReceiveHandler m_messagesHandler;
+	private IMessageReceiveHandler m_messagesHandler;
 
 	volatile private BlockingQueue<Message> m_incomingMessages;
 
@@ -107,7 +83,7 @@ public class Client extends AbstractClient
 	 *            Handler of messages, if a handler exist the new one will swap him.
 	 *            <code>null</code> will remove the current handler.
 	 */
-	public void setMessagesHandler(@Nullable MessageReceiveHandler messagesHandler)
+	public void setMessagesHandler(@Nullable IMessageReceiveHandler messagesHandler)
 	{
 		m_messagesHandler = messagesHandler;
 	}
@@ -234,15 +210,15 @@ public class Client extends AbstractClient
 	/**
 	 * Method send message to server.
 	 *
-	 * @param data
+	 * @param message
 	 *            - Information sent from the UI.
 	 * @return true if the sending succeed and false if does not.
 	 */
-	public boolean sendMessageToServer(Message data)
+	public boolean sendMessageToServer(Message message)
 	{
 		boolean returningValue = true;
 		try {
-			sendToServer(data);
+			sendToServer(message);
 		}
 		catch (IOException e) {
 			m_logger.warning("Could not send message to server, exception: " + e.getMessage());
@@ -363,6 +339,5 @@ public class Client extends AbstractClient
 			m_running = false;
 		}
 	}
-
 	// end region - > Nested Classes
 }
